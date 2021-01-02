@@ -1049,6 +1049,29 @@ AGLContext agl_ctx = gAGLContext;
 
 /***************** CHAR TO SPRITE **********************/
 
+enum
+{
+	MACROMAN_AUML	= '\x80',
+	MACROMAN_ARING	= '\x81',
+	MACROMAN_CCEDIL	= '\x82',
+	MACROMAN_EACUTE	= '\x83',
+	MACROMAN_NTILDE	= '\x84',
+	MACROMAN_OUML	= '\x85',
+	MACROMAN_UUML	= '\x86',
+	MACROMAN_AGRAVE	= '\xCB',
+	MACROMAN_ACIRC	= '\xE5',
+	MACROMAN_ECIRC	= '\xE6',
+	MACROMAN_AACUTE	= '\xE7',
+	MACROMAN_EUML	= '\xE8',
+	MACROMAN_EGRAVE	= '\xE9',
+	MACROMAN_IACUTE	= '\xEA',
+	MACROMAN_ICIRC	= '\xEB',
+	MACROMAN_IUML	= '\xEC',
+	MACROMAN_IGRAVE	= '\xED',
+	MACROMAN_OACUTE	= '\xEE',
+	MACROMAN_OCIRC	= '\xEF',
+};
+
 short CharToSprite(char c)
 {
 short	s;
@@ -1081,47 +1104,47 @@ short	s;
 				s = HELPTEXT_SObjType_ExclamationMark;
 				break;
 
-		case	'Ü':
+		case	MACROMAN_UUML:
 				s = HELPTEXT_SObjType_UU;
 				break;
 
-		case	'Ö':
+		case	MACROMAN_OUML:
 				s = HELPTEXT_SObjType_OO;
 				break;
 
-		case	'Ä':
+		case	MACROMAN_AUML:
 				s = HELPTEXT_SObjType_AA;
 				break;
 
-		case	'Å':
+		case	MACROMAN_ARING:
 				s = HELPTEXT_SObjType_AO;
 				break;
 
-		case	'Ñ':
+		case	MACROMAN_NTILDE:
 				s = HELPTEXT_SObjType_NN;
 				break;
 
-		case	'É':
+		case	MACROMAN_EACUTE:
 				s = HELPTEXT_SObjType_EE;
 				break;
 
-		case	'È':
+		case	MACROMAN_EGRAVE:
 				s = HELPTEXT_SObjType_EE;
 				break;
 
-		case	'Ê':
+		case	MACROMAN_ECIRC:
 				s = HELPTEXT_SObjType_E;
 				break;
 
-		case	'À':
+		case	MACROMAN_AGRAVE:
 				s = HELPTEXT_SObjType_Ax;
 				break;
 
-		case	'Ô':
+		case	MACROMAN_OCIRC:
 				s = HELPTEXT_SObjType_Ox;
 				break;
 				
-		case	'Ó':
+		case	MACROMAN_OACUTE:
 				s = HELPTEXT_SObjType_Oa;
 				break;
 
