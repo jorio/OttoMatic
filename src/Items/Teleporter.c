@@ -95,13 +95,13 @@ float					rot;
 			id = itemPtr[i].parm[0];								// get teleporter ID
 			if (id >= MAX_TELEPORTERS)
 				DoFatalAlert("\pInitTeleporters: ID# >= MAX_TELEPORTERS");
-			
+
 			rot = gTeleporterRot[id] = itemPtr[i].parm[2] * (PI2/8.0f) + PI;			// get rot
-	
+
 			gTeleporterCoords[id].x = itemPtr[i].x - sin(rot) * 130.0f;					// get coords
 			gTeleporterCoords[id].z = itemPtr[i].y - cos(rot) * 130.0f;
-			gTeleporterCoords[id].y = GetTerrainY_Undeformed(gTeleporterCoords[id].x,gTeleporterCoords[id].z);			
-						
+			gTeleporterCoords[id].y = GetTerrainY_Undeformed(gTeleporterCoords[id].x,gTeleporterCoords[id].z);
+
 			gTeleporterActive[id] = false;
 		}
 	}
@@ -113,17 +113,17 @@ Boolean AddTeleporter(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj,*console;
 short	id;
-				
+
 	id = itemPtr->parm[0];
-	
+
 	if (id >= 12)						// error check since there is a 12 <--> 13 pair of teleporters which we have no 3D model for (for 1.0.2 update)
 		return(true);
-				
+
 			/************************/
 			/* MAKE TELEPORTER ARCH */
 			/************************/
-									
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_Teleporter;
 	gNewObjectDefinition.scale 		= 1.5;
 	gNewObjectDefinition.coord.x 	= x;
@@ -176,9 +176,9 @@ short	id;
 static Boolean TeleporterHitBySuperNova(ObjNode *weapon, ObjNode *teleporter, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused(weapon, weaponCoord, weaponDelta)
-	
-	gTeleporterActive[teleporter->TeleporterID] = 				
-	gTeleporterActive[teleporter->DestinationID] = true;		
+
+	gTeleporterActive[teleporter->TeleporterID] =
+	gTeleporterActive[teleporter->DestinationID] = true;
 	return(false);
 }
 
@@ -213,7 +213,7 @@ int				i;
 			teleporter->EffectChannel = PlayEffect3D(EFFECT_TELEPORTERDRONE, &teleporter->Coord);
 		else
 			Update3DSoundChannel(EFFECT_TELEPORTERDRONE, &teleporter->EffectChannel, &teleporter->Coord);
-		
+
 	}
 
 		/***************/
@@ -232,22 +232,22 @@ int				i;
 			UpdateObjectTransforms(zap2);
 		}
 	}
-	
+
 			/*****************************************/
 			/* DETERMINE WHICH SIDE PLAYER IS/WAS ON */
 			/*****************************************/
-	
+
 	dist = OGLPoint3D_Distance(&teleporter->Coord, &gPlayerInfo.coord);					// calc dist to player
 	if (dist < 900.0f)
-	{	
+	{
 					/* CALC PERPENDICULAR AIM VECTOR OF TELEPORTER */
 		v.x = 1;
 		v.y = 0;
 		OGLMatrix3x3_SetRotate(&m, teleporter->Rot.y);
 		OGLVector2D_Transform(&v,&m,&v);
-		
+
 						/* CALC TELE->PLAYER VECTORS */
-	
+
 		oldTtoV.x = player->OldCoord.x - teleporter->Coord.x;					// calc vector to old player coord
 		oldTtoV.y = player->OldCoord.z - teleporter->Coord.z;
 		FastNormalizeVector2D(oldTtoV.x, oldTtoV.y,&oldTtoV,true);
@@ -255,33 +255,33 @@ int				i;
 		newTtoV.x = player->Coord.x - teleporter->Coord.x;						// calc vector to new player coord
 		newTtoV.y = player->Coord.z - teleporter->Coord.z;
 		FastNormalizeVector2D(newTtoV.x, newTtoV.y,&newTtoV,true);
-				
+
 						/* DETERMINE SIDEDNESS */
-						
+
 		oldSide = OGLVector2D_Cross(&v, &oldTtoV);
 		newSide = OGLVector2D_Cross(&v, &newTtoV);
 
 			/* SEE IF CROSSED FROM FRONT TO BACK - THEN START TELEPORT */
-					
+
 		if (dist < (281.0f * teleporter->Scale.x))								// see if within zap radius
 		{
 			if ((oldSide * newSide) < 0.0f)										// if (-) then it changed signs, thus changed sides
 			{
-				InitiatePlayerTeleportation(teleporter);			
+				InitiatePlayerTeleportation(teleporter);
 			}
 		}
-			
+
 			/**********************************/
 			/* SEE IF DO ABSORPTOIN PARTICLES */
 			/**********************************/
-		
+
 		{
 			int					particleGroup,magicNum;
 			NewParticleGroupDefType	groupDef;
 			NewParticleDefType	newParticleDef;
 			OGLVector3D			d;
 			OGLPoint3D			p;
-		
+
 			teleporter->ParticleTimer += fps;
 			if (teleporter->ParticleTimer > 0.01f)
 			{
@@ -293,7 +293,7 @@ int				i;
 				if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 				{
 					teleporter->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
-					
+
 					groupDef.magicNum				= magicNum;
 					groupDef.type					= PARTICLE_TYPE_GRAVITOIDS;
 					groupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND;
@@ -317,27 +317,27 @@ int				i;
 					d.x = teleporter->Coord.x - p.x;
 					d.y = teleporter->Coord.y + 200.0f - p.y;
 					d.z = teleporter->Coord.z - p.z;
-				
+
 					newParticleDef.groupNum		= particleGroup;
 					newParticleDef.where		= &p;
 					newParticleDef.delta		= &d;
 					newParticleDef.scale		= RandomFloat() + 1.0f;
 					newParticleDef.rotZ			= RandomFloat()*PI2;
 					newParticleDef.rotDZ		= 0;
-					newParticleDef.alpha		= .9;		
+					newParticleDef.alpha		= .9;
 					if (AddParticleToGroup(&newParticleDef))
 						teleporter->ParticleGroup = -1;
 				}
 			}
 		}
 	}
-	
-	
+
+
 		/******************/
 		/* UPDATE SPARKLE */
 		/******************/
-	
-	i = teleporter->Sparkles[0];	
+
+	i = teleporter->Sparkles[0];
 	if (i != -1)
 	{
 		gSparkles[i].color.a -= fps * 1.0f;
@@ -347,7 +347,7 @@ int				i;
 			teleporter->Sparkles[0] = -1;
 		}
 	}
-	
+
 }
 
 
@@ -368,8 +368,8 @@ ObjNode	*zap1, *zap2;
 			/************************/
 
 				/* ZAP 1 */
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_TeleporterZap;
 	gNewObjectDefinition.coord		= teleporter->Coord;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits | STATUS_BIT_KEEPBACKFACES | STATUS_BIT_GLOW |
@@ -384,15 +384,15 @@ ObjNode	*zap1, *zap2;
 	teleporter->ChainNode->ChainNode = zap1;
 
 				/* ZAP 2 */
-				
+
 	gNewObjectDefinition.slot++;
 	gNewObjectDefinition.rot 		= teleporter->Rot.y - (PI/14.0f);
 	zap2 = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	zap2->ColorFilter.a = .5;
 	zap1->ChainNode = zap2;
-	
-	
+
+
 }
 
 
@@ -411,14 +411,14 @@ short	i;
 	gTeleporterTargetRot = gTeleporterRot[teleporter->DestinationID];
 
 	gTeleportMode = TELEPORT_MODE_DEMATERIALIZE;
-	
+
 	player->Rot.y = teleporter->Rot.y + PI;
 	player->Delta.x = player->Delta.y = player->Delta.z = 0;
 
 
 			/* MAKE SPARKLE */
-			
-				
+
+
 	i = teleporter->Sparkles[0] = GetFreeSparkle(teleporter);				// get free sparkle slot
 	if (i != -1)
 	{
@@ -432,9 +432,9 @@ short	i;
 
 		gSparkles[i].scale = 240.0f;
 		gSparkles[i].separation = 100.0f;
-		
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_BlueSpark;
-	}			
+	}
 
 
 	PlayEffect_Parms3D(EFFECT_PLAYERTELEPORT, &teleporter->Coord, NORMAL_CHANNEL_RATE, 1.5);
@@ -454,7 +454,7 @@ float	fps = gFramesPerSecondFrac;
 						/* FADE OUT */
 
 		case	TELEPORT_MODE_DEMATERIALIZE:
-				player->Scale.x = player->Scale.z -= fps * 2.5f;				
+				player->Scale.x = player->Scale.z -= fps * 2.5f;
 				if (player->Scale.x <= 0.0f)							// once completely faded, move to target location
 				{
 					float r= player->Rot.y;
@@ -468,12 +468,12 @@ float	fps = gFramesPerSecondFrac;
 					gForceCameraAlignment = true;
 					player->Rot.y = gTeleporterTargetRot;
 				}
-				
+
 				break;
-				
-				
+
+
 						/* FADE IN */
-						
+
 		case	TELEPORT_MODE_MATERIALIZE:
 				player->Scale.x = player->Scale.z += fps * 2.5f;
 				if (player->Scale.x >= gPlayerInfo.scale)			// once completely faded, move to target location
@@ -483,7 +483,7 @@ float	fps = gFramesPerSecondFrac;
 					player->Scale.x = player->Scale.z = gPlayerInfo.scale;
 					player->MoveCall = MovePlayer_Robot;
 					SetPlayerWalkAnim(player);
-					
+
 					player->Delta.x = -sin(r) * 1300.0f;				// give some forward momentum
 					player->Delta.z = -cos(r) * 1300.0f;
 				}
@@ -492,7 +492,7 @@ float	fps = gFramesPerSecondFrac;
 
 	leftHand->Scale.x =	rightHand->Scale.x = player->Scale.x;		// also scale hands
 	leftHand->Scale.z =	rightHand->Scale.z = player->Scale.z;
-	
+
 	UpdateObjectTransforms(player);
 	UpdateRobotHands(player);
 }

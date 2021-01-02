@@ -81,13 +81,13 @@ int 		i,n;
 
 
 			/* DISPOSE OF ALL LOADED OPENGL TEXTURENAMES */
-			
+
 	for (i = 0; i < n; i++)
 		MO_DisposeObjectReference(gSpriteGroupList[groupNum][i].materialObject);
-	
-	
+
+
 		/* DISPOSE OF GROUP'S ARRAY */
-		
+
 	SafeDisposePtr((Ptr)gSpriteGroupList[groupNum]);
 	gSpriteGroupList[groupNum] = nil;
 	gNumSpritesInGroupList[groupNum] = 0;
@@ -115,7 +115,7 @@ MOMaterialData	matData;
 		DoFatalAlert("\pLoadSpriteFile: FSpOpenDF failed");
 
 		/* READ # SPRITES IN THIS FILE */
-		
+
 	count = sizeof(long);
 	FSRead(refNum, &count, &gNumSpritesInGroupList[groupNum]);
 
@@ -123,7 +123,7 @@ MOMaterialData	matData;
 
 
 		/* ALLOCATE MEMORY FOR SPRITE RECORDS */
-		
+
 	gSpriteGroupList[groupNum] = (SpriteType *)AllocPtr(sizeof(SpriteType) * gNumSpritesInGroupList[groupNum]);
 	if (gSpriteGroupList[groupNum] == nil)
 		DoFatalAlert("\pLoadSpriteFile: AllocPtr failed");
@@ -137,52 +137,52 @@ MOMaterialData	matData;
 	{
 		long		bufferSize;
 		u_char *buffer;
-	
+
 			/* READ WIDTH/HEIGHT, ASPECT RATIO */
-			
-		count = sizeof(int);								
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].width);		
+
+		count = sizeof(int);
+		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].width);
 		gSpriteGroupList[groupNum][i].width = SwizzleLong(&gSpriteGroupList[groupNum][i].width);
-		
-		count = sizeof(int);								
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].height);		
+
+		count = sizeof(int);
+		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].height);
 		gSpriteGroupList[groupNum][i].height = SwizzleLong(&gSpriteGroupList[groupNum][i].height);
 
-		count = sizeof(float);								
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].aspectRatio);		
+		count = sizeof(float);
+		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].aspectRatio);
 		gSpriteGroupList[groupNum][i].aspectRatio = SwizzleFloat(&gSpriteGroupList[groupNum][i].aspectRatio);
-	
-	
+
+
 			/* READ SRC FORMAT */
-			
-		count = sizeof(GLint);								
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].srcFormat);		
+
+		count = sizeof(GLint);
+		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].srcFormat);
 		gSpriteGroupList[groupNum][i].srcFormat = SwizzleLong(&gSpriteGroupList[groupNum][i].srcFormat);
 
 
 			/* READ DEST FORMAT */
-			
-		count = sizeof(GLint);	
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].destFormat);		
+
+		count = sizeof(GLint);
+		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].destFormat);
 		gSpriteGroupList[groupNum][i].destFormat = SwizzleLong(&gSpriteGroupList[groupNum][i].destFormat);
 
 
 			/* READ BUFFER SIZE */
-			
-		count = sizeof(int);	
-		FSRead(refNum, &count, &bufferSize);		
+
+		count = sizeof(int);
+		FSRead(refNum, &count, &bufferSize);
 		bufferSize = SwizzleLong(&bufferSize);
-			
+
 		buffer = AllocPtr(bufferSize);							// alloc memory for buffer
 		if (buffer == nil)
 			DoFatalAlert("\pLoadSpriteFile: AllocPtr failed");
-		
-	
+
+
 			/* READ THE SPRITE PIXEL BUFFER */
-			
-		count = bufferSize;				
+
+		count = bufferSize;
 		FSRead(refNum, &count, buffer);
-	
+
 		if (gSpriteGroupList[groupNum][i].srcFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV)
 		{
 			int		q;
@@ -192,7 +192,7 @@ MOMaterialData	matData;
 				pix[q] = SwizzleUShort(&pix[q]);
 			}
 		}
-	
+
 
 				/*****************************/
 				/* CREATE NEW TEXTURE OBJECT */
@@ -204,58 +204,58 @@ MOMaterialData	matData;
 		matData.diffuseColor.g	= 1;
 		matData.diffuseColor.b	= 1;
 		matData.diffuseColor.a	= 1;
-		
+
 		matData.numMipmaps		= 1;
 		w = matData.width		= gSpriteGroupList[groupNum][i].width;
 		h = matData.height		= gSpriteGroupList[groupNum][i].height;
-		
-		matData.pixelSrcFormat	= gSpriteGroupList[groupNum][i].srcFormat;		
+
+		matData.pixelSrcFormat	= gSpriteGroupList[groupNum][i].srcFormat;
 		matData.pixelDstFormat	= gSpriteGroupList[groupNum][i].destFormat;
-		
+
 		matData.texturePixels[0]= nil;											// we're going to preload
-		
+
 			/* SEE IF NEED TO SHRINK FOR VOODOO 2 */
-			
+
 		if (gLowMemMode)
 		{
 			if (matData.pixelSrcFormat == GL_RGB)
 			{
 				int		x,y;
 				u_char	*src,*dest;
-				
+
 				dest = src = (u_char *)buffer;
-				
+
 				for (y = 0; y < h; y+=2)
 				{
 					for (x = 0; x < w; x+=2)
 					{
-						*dest++ = src[x*3];			
-						*dest++ = src[x*3+1];			
-						*dest++ = src[x*3+2];			
+						*dest++ = src[x*3];
+						*dest++ = src[x*3+1];
+						*dest++ = src[x*3+2];
 					}
 					src += w*2*3;
 				}
 				matData.width /= 2;
-				matData.height /= 2;		
+				matData.height /= 2;
 			}
 			else
 			if (matData.pixelSrcFormat == GL_RGBA)
 			{
 				int		x,y;
 				u_long	*src,*dest;
-				
+
 				dest = src = (u_long *)buffer;
-				
+
 				for (y = 0; y < h; y+=2)
 				{
 					for (x = 0; x < w; x+=2)
 					{
-						*dest++ = src[x];			
+						*dest++ = src[x];
 					}
 					src += w*2;
 				}
 				matData.width /= 2;
-				matData.height /= 2;		
+				matData.height /= 2;
 			}
 
 			else
@@ -263,74 +263,74 @@ MOMaterialData	matData;
 			{
 				int		x,y;
 				u_short	*src,*dest;
-				
+
 				dest = src = (u_short *)buffer;
-				
+
 				for (y = 0; y < h; y+=2)
 				{
 					for (x = 0; x < w; x+=2)
 					{
-						*dest++ = src[x];			
+						*dest++ = src[x];
 					}
 					src += w*2;
 				}
 				matData.width /= 2;
-				matData.height /= 2;		
+				matData.height /= 2;
 			}
 		}
-		
+
 					/* SPRITE IS 16-BIT PACKED PIXEL FORMAT */
-					
+
 		if (matData.pixelSrcFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV)	// see if convert 24 to 16-bit
 		{
 			matData.textureName[0] = OGL_TextureMap_Load(buffer, matData.width, matData.height, GL_BGRA_EXT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV); // load 16 as 16
-		
+
 		}
-		
+
 				/* CONVERT 24-BIT TO 16--BIT */
-				
+
 		else
 		if ((matData.pixelSrcFormat == GL_RGB) && (matData.pixelDstFormat == GL_RGB5_A1))
 		{
 			u_short	*buff16 = (u_short *)AllocPtr(matData.width*matData.height*2);			// alloc buff for 16-bit texture
-						
+
 			ConvertTexture24To16(buffer, buff16, matData.width, matData.height);
 			matData.textureName[0] = OGL_TextureMap_Load(buff16, matData.width, matData.height, GL_BGRA_EXT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV); // load 16 as 16
-			
+
 			SafeDisposePtr((Ptr)buff16);							// dispose buff
 
 		}
-		
+
 				/* USE INPUT FORMATS */
 		else
-		{		
+		{
 			matData.textureName[0] 	= OGL_TextureMap_Load(buffer,
 													 matData.width,
 													 matData.height,
 													 matData.pixelSrcFormat,
 													 matData.pixelDstFormat, GL_UNSIGNED_BYTE);
 		}
-			
+
 		gSpriteGroupList[groupNum][i].materialObject = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
 
 		if (gSpriteGroupList[groupNum][i].materialObject == nil)
 			DoFatalAlert("\pLoadSpriteFile: MO_CreateNewObjectOfType failed");
-	
-	
+
+
 		SafeDisposePtr((Ptr)buffer);														// free the buffer
 
 			/* KEEP MUSIC PLAYING */
-					
+
 		if (gSongPlayingFlag && (!gMuteMusicFlag))
-			MoviesTask(gSongMovie, 0);		
+			MoviesTask(gSongMovie, 0);
 	}
 
 
-	
+
 		/* CLOSE FILE */
-			
+
 	FSClose(refNum);
-	
+
 
 }
 
@@ -346,7 +346,7 @@ MOSpriteObject		*spriteMO;
 MOSpriteSetupData	spriteData;
 
 			/* ERROR CHECK */
-			
+
 	if (newObjDef->type >= gNumSpritesInGroupList[newObjDef->group])
 		DoFatalAlert("\pMakeSpriteObject: illegal type");
 
@@ -355,8 +355,8 @@ MOSpriteSetupData	spriteData;
 
 	newObjDef->genre = SPRITE_GENRE;
 	newObjDef->flags |= STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOZBUFFER|STATUS_BIT_NOLIGHTING;
-	
-	newObj = MakeNewObject(newObjDef);		
+
+	newObj = MakeNewObject(newObjDef);
 	if (newObj == nil)
 		return(nil);
 
@@ -373,16 +373,16 @@ MOSpriteSetupData	spriteData;
 
 
 			/* SET SPRITE MO INFO */
-			
+
 	spriteMO->objectData.scaleX =
 	spriteMO->objectData.scaleY = newObj->Scale.x;
 	spriteMO->objectData.coord = newObj->Coord;
 
 
 			/* ATTACH META OBJECT TO OBJNODE */
-			
+
 	newObj->SpriteMO = spriteMO;
-	
+
 	return(newObj);
 }
 
@@ -398,13 +398,13 @@ MOSpriteObject		*spriteMO;
 	if (type == theNode->Type)										// see if it is the same
 		return;
 
-		/* DISPOSE OF OLD TYPE */		
-		
+		/* DISPOSE OF OLD TYPE */
+
 	MO_DisposeObjectReference(theNode->SpriteMO);
 
 
 		/* MAKE NEW SPRITE MO */
-		
+
 	spriteData.loadFile = false;									// these sprites are already loaded into gSpriteList
 	spriteData.group	= theNode->Group;							// set group
 	spriteData.type 	= type;										// set group subtype
@@ -415,15 +415,15 @@ MOSpriteObject		*spriteMO;
 
 
 			/* SET SPRITE MO INFO */
-			
+
 	spriteMO->objectData.scaleX =
 	spriteMO->objectData.scaleY = theNode->Scale.x;
 	spriteMO->objectData.coord = theNode->Coord;
 
 
 			/* ATTACH META OBJECT TO OBJNODE */
-			
-	theNode->SpriteMO = spriteMO;	
+
+	theNode->SpriteMO = spriteMO;
 	theNode->Type = type;
 }
 
@@ -446,13 +446,13 @@ MOMaterialObject	*m;
 
 
 			/* DISPOSE OF ALL LOADED OPENGL TEXTURENAMES */
-			
+
 	for (i = 0; i < n; i++)
 	{
-		m = gSpriteGroupList[group][i].materialObject; 				// get material object ptr		
+		m = gSpriteGroupList[group][i].materialObject; 				// get material object ptr
 		if (m == nil)
 			DoFatalAlert("\pBlendAllSpritesInGroup: material == nil");
-		
+
 		m->objectData.flags |= 	BG3D_MATERIALFLAG_ALWAYSBLEND;		// set flag
 	}
 }
@@ -472,11 +472,11 @@ MOMaterialObject	*m;
 
 
 			/* DISPOSE OF ALL LOADED OPENGL TEXTURENAMES */
-			
-	m = gSpriteGroupList[group][type].materialObject; 				// get material object ptr		
+
+	m = gSpriteGroupList[group][type].materialObject; 				// get material object ptr
 	if (m == nil)
 		DoFatalAlert("\pBlendASprite: material == nil");
-	
+
 	m->objectData.flags |= 	BG3D_MATERIALFLAG_ALWAYSBLEND;		// set flag
 }
 
@@ -489,18 +489,18 @@ AGLContext agl_ctx = setupInfo->drawContext;
 
 
 			/* SET STATE */
-					
-	OGL_PushState();								// keep state									
+
+	OGL_PushState();								// keep state
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0, 640, 480, 0, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();					
+	glLoadIdentity();
 
 	gGlobalMaterialFlags = BG3D_MATERIALFLAG_CLAMP_V|BG3D_MATERIALFLAG_CLAMP_U;	// clamp all textures
 	OGL_DisableLighting();
-	glDisable(GL_CULL_FACE);							
+	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 
 
@@ -512,22 +512,22 @@ AGLContext agl_ctx = setupInfo->drawContext;
 
 
 		/* ACTIVATE THE MATERIAL */
-					
-	MO_DrawMaterial(gSpriteGroupList[group][type].materialObject, setupInfo);			
+
+	MO_DrawMaterial(gSpriteGroupList[group][type].materialObject, setupInfo);
 
 
 			/* DRAW IT */
-			
+
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,1);	glVertex2f(x, y);
 	glTexCoord2f(1,1);	glVertex2f(x+scale, y);
 	glTexCoord2f(1,0);	glVertex2f(x+scale, y+scale);
 	glTexCoord2f(0,0);	glVertex2f(x, y+scale);
-	glEnd();	
+	glEnd();
 
 
 		/* CLEAN UP */
-			
+
 	OGL_PopState();									// restore state
 	gGlobalMaterialFlags = 0;
 
@@ -546,16 +546,16 @@ MOSpriteObject		*spriteMO;
 MOSpriteSetupData	spriteData;
 int					i,len,sprite;
 float				scale,x,y,z,letterOffset;
-						
-			
+
+
 	newObjDef->group = SPRITE_GROUP_FONT;
 	newObjDef->genre = FONTSTRING_GENRE;
 	newObjDef->flags |= STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOZBUFFER|STATUS_BIT_NOLIGHTING|STATUS_BIT_GLOW;
 
 
 			/* MAKE OBJNODE */
-	
-	newObj = MakeNewObject(newObjDef);		
+
+	newObj = MakeNewObject(newObjDef);
 	if (newObj == nil)
 		return(nil);
 
@@ -569,19 +569,19 @@ float				scale,x,y,z,letterOffset;
 
 	scale = newObj->Scale.x;												// get scale factor
 	letterOffset = scale * FONT_WIDTH;
-	
+
 	if (center)
 	{
 		int 	numBlanks = 0;													// count # blanks in string
 		float	blankW, charW, halfW;
-		
+
 		for (i = 1; i <= len; i++)
 			if (CharToSprite(s[i]) == -1) numBlanks++;
-	
+
 		charW = (float)(len - numBlanks) * letterOffset;					// calc width of line (spaces are spaced differently than chars)
 		blankW = (float)numBlanks * (letterOffset * .75f);
 		halfW = (charW + blankW) * .5f;
-	
+
 		x = newObj->Coord.x - halfW + (letterOffset/2.0f);			// calc center starting x coord on left
 	}
 	else
@@ -593,7 +593,7 @@ float				scale,x,y,z,letterOffset;
 			/****************************/
 			/* MAKE SPRITE META-OBJECTS */
 			/****************************/
-	
+
 	for (i = 0; i < len; i++)
 	{
 		sprite = CharToSprite(s[i+1]);										// convert letter to sprite #
@@ -602,7 +602,7 @@ float				scale,x,y,z,letterOffset;
 			x += letterOffset * .75f;										// skip / put space here
 			continue;
 		}
-		
+
 		spriteData.loadFile = false;										// these sprites are already loaded into gSpriteList
 		spriteData.group	= newObjDef->group;								// set group
 		spriteData.type 	= sprite;										// convert letter into a sprite index
@@ -617,18 +617,18 @@ float				scale,x,y,z,letterOffset;
 		spriteMO->objectData.coord.x = x;
 		spriteMO->objectData.coord.y = y;
 		spriteMO->objectData.coord.z = z;
-				
+
 		spriteMO->objectData.scaleX =
 		spriteMO->objectData.scaleY = newObj->Scale.x;
 
 				/* ATTACH META OBJECT TO OBJNODE */
-			
+
 		newObj->StringCharacters[newObj->NumStringSprites++] = spriteMO;
 
 		x += letterOffset;													// next letter x coord
 	}
 
-	
+
 	return(newObj);
 }
 

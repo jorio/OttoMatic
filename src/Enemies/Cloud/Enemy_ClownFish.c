@@ -63,7 +63,7 @@ static void MoveConeBlast(ObjNode *theNode);
 
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -90,41 +90,41 @@ int				i;
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
-	
+	placement = itemPtr->placement;
+
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 				/***********************/
 				/* MAKE SKELETON ENEMY */
 				/***********************/
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_CLOWNFISH,x,z, CLOWNFISH_SCALE, 0, nil);
-		
-		
+
+
 	newObj->SplineItemPtr = itemPtr;
 	newObj->SplineNum = splineNum;
-	
+
 	newObj->Skeleton->AnimSpeed = 2.0f;
 
 				/* SET BETTER INFO */
-			
+
 	newObj->InitCoord 		= newObj->Coord;							// remember where started
 	newObj->StatusBits		|= STATUS_BIT_ONSPLINE;
 	newObj->SplinePlacement = placement;
-	newObj->Coord.y 		+= CLOWN_FISH_HOVERHEIGHT;			
+	newObj->Coord.y 		+= CLOWN_FISH_HOVERHEIGHT;
 	newObj->SplineMoveCall 	= MoveClownFishOnSpline;					// set move call
 	newObj->Health 			= CLOWNFISH_HEALTH;
 	newObj->Damage 			= CLOWNFISH_DAMAGE;
 	newObj->Kind 			= ENEMY_KIND_CLOWNFISH;
-	
-	
+
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	for (i = 0; i < NUM_WEAPON_TYPES; i++)
 		newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= ClownFishHitByWeapon;
 
@@ -132,17 +132,17 @@ int				i;
 
 
 				/* MAKE SHADOW & GLOW */
-				
+
 	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 14, 10, false);
 
 				/* GIVE IT THE BOMB */
-				
+
 	LoadClownFishWithBomb(newObj);
-	
+
 
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	DetachObject(newObj, true);										// detach this object from the linked list
 	AddToSplineObjectList(newObj, true);
 
@@ -156,7 +156,7 @@ int				i;
 
 static void MoveClownFishOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
 
@@ -167,38 +167,38 @@ Boolean isVisible;
 
 
 			/* UPDATE STUFF IF VISIBLE */
-			
+
 	if (isVisible)
 	{
-		
+
 		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,			// calc y rot aim
-												theNode->Coord.x, theNode->Coord.z);		
+												theNode->Coord.x, theNode->Coord.z);
 
 		UpdateObjectTransforms(theNode);											// update transforms
-		UpdateShadow(theNode);	
-		
+		UpdateShadow(theNode);
+
 				/* DO SOME COLLISION CHECKING */
-				
+
 		GetObjectInfo(theNode);
 		if (DoEnemyCollisionDetect(theNode,CTYPE_HURTENEMY, false))					// just do this to see if explosions hurt
-			return;	
-			
-			
+			return;
+
+
 			/* UPDATE THE BOMB */
-			
+
 		SeeIfClownFishAttack(theNode);									// see if attack first
-			
+
 		if (theNode->ChainNode != nil)
 		{
 			ObjNode	*bomb = theNode->ChainNode;
-			
+
 			FindCoordOnJoint(theNode, 0, &gBombOff, &bomb->Coord);
 			bomb->Rot.y = theNode->Rot.y;
 			UpdateObjectTransforms(bomb);
-		}		
-		
+		}
+
 				/* IF CULLED THEN GIVE BOMB */
-				
+
 		if (theNode->StatusBits & STATUS_BIT_ISCULLED)
 		{
 			if (theNode->ChainNode == nil)
@@ -207,7 +207,7 @@ Boolean isVisible;
 					LoadClownFishWithBomb(theNode);
 			}
 		}
-	}	
+	}
 }
 
 
@@ -224,10 +224,10 @@ Boolean isVisible;
 static Boolean ClownFishHitByWeapon(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord)
-	
+
 
 			/* HURT IT */
-			
+
 	HurtClownFish(enemy, weapon->Damage);
 
 
@@ -249,7 +249,7 @@ static Boolean HurtClownFish(ObjNode *enemy, float damage)
 #pragma unused(damage)
 
 	PlayEffect3D(EFFECT_FISHBOOM, &enemy->Coord);
-	ExplodeGeometry(enemy, 200, SHARD_MODE_FROMORIGIN, 1, 1.0);				
+	ExplodeGeometry(enemy, 200, SHARD_MODE_FROMORIGIN, 1, 1.0);
 	DeleteObject(enemy);
 
 	return(true);
@@ -263,17 +263,17 @@ static Boolean HurtClownFish(ObjNode *enemy, float damage)
 /************ SEE IF CLOWNFISH ATTACK *********************/
 
 static void SeeIfClownFishAttack(ObjNode *theNode)
-{	
+{
 	if (theNode->ChainNode == nil)							// see if even has a bomb
 		return;
-		
+
 	if (!gPlayerHasLanded)
 		return;
-		
+
 	if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) > CLOWNFISH_ATTACK_DIST)
 		return;
-	
-	
+
+
 
 	DropTheBomb(theNode);
 }
@@ -289,7 +289,7 @@ ObjNode *bomb;
 	FindCoordOnJoint(fish, 0, &gBombOff, &gNewObjectDefinition.coord);
 
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= CLOUD_ObjType_FishBomb;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
@@ -299,9 +299,9 @@ ObjNode *bomb;
 	bomb = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	fish->ChainNode = bomb;
-	
+
 	CreateCollisionBoxFromBoundingBox_Rotated(bomb,.8,1);			// set collision box but no Ctype since only for checking collisions
-	
+
 }
 
 
@@ -332,7 +332,7 @@ float	fps = gFramesPerSecondFrac;
 	GetObjectInfo(theNode);
 
 			/* DO GRAVITY AND MOTION */
-			
+
 	gDelta.y -= 1000.0f * fps;
 
 	gCoord.x += gDelta.x * fps;
@@ -341,31 +341,31 @@ float	fps = gFramesPerSecondFrac;
 
 
 			/* TILT DOWN */
-			
+
 	theNode->Rot.x -= 1.5f * fps;
 	if (theNode->Rot.x < (-PI/2))
 		theNode->Rot.x = -PI/2;
 
-		
+
 			/* SEE IF HIT */
 
 	if (HandleCollisions(theNode, CTYPE_TERRAIN | CTYPE_MISC | CTYPE_PLAYER, 0))
 	{
-		ExplodeFishBomb(theNode);	
+		ExplodeFishBomb(theNode);
 		return;
 	}
 
 
 	UpdateObject(theNode);
-	
-	
+
+
 		/* UPDATE SOUND */
-		
-	if (theNode->EffectChannel == -1)	
+
+	if (theNode->EffectChannel == -1)
 		theNode->EffectChannel = PlayEffect3D(EFFECT_BOMBDROP, &gCoord);
 	else
 		Update3DSoundChannel(EFFECT_BOMBDROP, &theNode->EffectChannel, &gCoord);
-	
+
 }
 
 
@@ -384,7 +384,7 @@ DeformationType		defData;
 		/*********************/
 		/* FIRST MAKE SPARKS */
 		/*********************/
-						
+
 	gNewParticleGroupDef.magicNum				= 0;
 	gNewParticleGroupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 	gNewParticleGroupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND;
@@ -401,7 +401,7 @@ DeformationType		defData;
 	{
 		x = gCoord.x;
 		y = gCoord.y;
-		z = gCoord.z;	
+		z = gCoord.z;
 
 		for (i = 0; i < 20; i++)
 		{
@@ -413,25 +413,25 @@ DeformationType		defData;
 			pt.y = y + d.y * 100.0f;
 			pt.z = z + d.z * 100.0f;
 
-			
-			
+
+
 			newParticleDef.groupNum		= pg;
 			newParticleDef.where		= &pt;
 			newParticleDef.delta		= &d;
 			newParticleDef.scale		= RandomFloat() + 1.5f;
 			newParticleDef.rotZ			= 0;
 			newParticleDef.rotDZ		= 0;
-			newParticleDef.alpha		= FULL_ALPHA + (RandomFloat() * .3f);		
+			newParticleDef.alpha		= FULL_ALPHA + (RandomFloat() * .3f);
 			AddParticleToGroup(&newParticleDef);
 		}
 	}
-	
+
 		/******************/
 		/* MAKE SHOCKWAVE */
 		/******************/
-		
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
-	gNewObjectDefinition.type 		= CLOUD_ObjType_Shockwave;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
+	gNewObjectDefinition.type 		= CLOUD_ObjType_Shockwave;
 	gNewObjectDefinition.coord		= gCoord;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOFOG|STATUS_BIT_GLOW|STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOZWRITES|STATUS_BIT_NOTEXTUREWRAP;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+30;
@@ -440,15 +440,15 @@ DeformationType		defData;
 	gNewObjectDefinition.scale 		= .2;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	newObj->ColorFilter.a = .99;
-		
+
 	newObj->Damage = .2f;
 
 		/*******************/
 		/* MAKE CONE BLAST */
 		/*******************/
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
-	gNewObjectDefinition.type 		= CLOUD_ObjType_ConeBlast;	
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
+	gNewObjectDefinition.type 		= CLOUD_ObjType_ConeBlast;
 	gNewObjectDefinition.coord.x 	= gCoord.x;
 	gNewObjectDefinition.coord.y 	= GetTerrainY(gCoord.x, gCoord.z);
 	gNewObjectDefinition.coord.z 	= gCoord.z;
@@ -460,17 +460,17 @@ DeformationType		defData;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	newObj->ColorFilter.a = .99;
 
-		
+
 		/*************************/
 		/* MAKE DEFORMATION WAVE */
 		/*************************/
-				
+
 	defData.type 				= DEFORMATION_TYPE_RADIALWAVE;
-	defData.amplitude 			= 100; 
-	defData.radius 				= 20; 
-	defData.speed 				= 3000; 
-	defData.origin.x			= gCoord.x; 
-	defData.origin.y			= gCoord.z; 
+	defData.amplitude 			= 100;
+	defData.radius 				= 20;
+	defData.speed 				= 3000;
+	defData.origin.x			= gCoord.x;
+	defData.origin.y			= gCoord.z;
 	defData.oneOverWaveLength 	= 1.0f / 500.0f;
 	defData.radialWidth			= 800.0f;
 	defData.decayRate			= 300.0f;
@@ -497,7 +497,7 @@ float	x,y,z,w;
 
 
 	theNode->Scale.x = theNode->Scale.y = theNode->Scale.z += 11.0f * fps;
-	
+
 	theNode->ColorFilter.a -= fps * 3.0f;
 	if (theNode->ColorFilter.a <= 0.0f)
 	{
@@ -506,24 +506,24 @@ float	x,y,z,w;
 	}
 
 	UpdateObjectTransforms(theNode);
-	
-	
+
+
 			/* SEE IF HIT PLAYER */
 
 	x = theNode->Coord.x;
 	y = theNode->Coord.y;
 	z = theNode->Coord.z;
 	w = theNode->Scale.x * theNode->BBox.max.x;
-			
+
 	if (DoSimpleBoxCollisionAgainstPlayer(y+10, y-10, x - w, x + w,	z + w, z - w))
 	{
 		ObjNode	*player = gPlayerInfo.objNode;
-	
+
 		player->Rot.y = CalcYAngleFromPointToPoint(player->Rot.y,x,z,player->Coord.x, player->Coord.z);		// aim player direction of blast
 		PlayerGotHit(nil, theNode->Damage);																			// get hit
 		player->Delta.x *= 2.0f;
 		player->Delta.z *= 2.0f;
-//		player->Delta.y *= 2.0f;		
+//		player->Delta.y *= 2.0f;
 	}
 }
 
@@ -535,7 +535,7 @@ static void MoveConeBlast(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 	theNode->Scale.x = theNode->Scale.y = theNode->Scale.z += fps * 5.0f;
-	
+
 	theNode->ColorFilter.a -= fps * 1.5f;
 	if (theNode->ColorFilter.a <= 0.0f)
 	{

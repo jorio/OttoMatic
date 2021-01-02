@@ -139,7 +139,7 @@ float				cornerX,cornerZ,dist,alpha;
 MOTriangleIndecies	*triPtr;
 Boolean				fadeEdges;
 ObjNode				*obj;
-	
+
 	gIsSky = gIsSkyTable[gLevelNum];								// sky on this level?
 	if (!gIsSky)
 		return;
@@ -147,10 +147,10 @@ ObjNode				*obj;
 	fadeEdges = gFadeEdges[gLevelNum];
 
 			/* BUILD BASE GRID */
-			
+
 	cornerX = -(float)SKY_GRID_SIZE/2.0f * SKY_GRID_SCALE;
 	cornerZ = -(float)SKY_GRID_SIZE/2.0f * SKY_GRID_SCALE;
-			
+
 	for (r = 0; r < SKY_GRID_SIZE; r++)
 	{
 		for (c = 0; c < SKY_GRID_SIZE; c++)
@@ -158,7 +158,7 @@ ObjNode				*obj;
 			gSkyPoints[r][c].x = cornerX + c * SKY_GRID_SCALE + (RandomFloat2() * (SKY_GRID_SCALE * gSkyWarp[gLevelNum]));
 			gSkyPoints[r][c].z = cornerZ + r * SKY_GRID_SCALE + (RandomFloat2() * (SKY_GRID_SCALE * gSkyWarp[gLevelNum]));
 			gSkyPoints[r][c].y = RandomFloat2() * 100.0f;
-			
+
 			dist = CalcDistance3D(0,0,0, gSkyPoints[r][c].x,gSkyPoints[r][c].y, gSkyPoints[r][c].z);
 			if (fadeEdges)
 			{
@@ -171,21 +171,21 @@ ObjNode				*obj;
 			}
 			else
 				alpha = 1.0;
-			
+
 			gSkyPoints[r][c].y -= dist * gSkyDip[gLevelNum];	// dip down as it goes away
-			
-			
+
+
 			gSkyColors[r][c].r = 1;
 			gSkyColors[r][c].g = 1;
 			gSkyColors[r][c].b = 1;
 			gSkyColors[r][c].a = alpha;
 		}
 	}
-		
+
 			/* BUILD TRIANGLES */
-		
+
 	triPtr = &gSkyTriangles[0];
-	
+
 	for (r = 0; r < (SKY_GRID_SIZE-1); r++)
 	{
 		for (c = 0; c < (SKY_GRID_SIZE-1); c++)
@@ -200,26 +200,26 @@ ObjNode				*obj;
 			triPtr->vertexIndices[2] = triPtr->vertexIndices[1] -1;
 			triPtr++;
 		}
-	}	
-	
+	}
+
 	gSkyScrollX = 0;
 	gSkyScrollZ = 0;
-	
+
 	gIsSky = true;
-	
-	
+
+
 			/**********************/
 			/* CREATE DRAW OBJECT */
 			/**********************/
-			
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;				
+
+	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING;
-	
-	obj = MakeNewObject(&gNewObjectDefinition);		
-	obj->CustomDrawFunction = DrawSky;		
-	
+
+	obj = MakeNewObject(&gNewObjectDefinition);
+	obj->CustomDrawFunction = DrawSky;
+
 }
 
 
@@ -240,7 +240,7 @@ void DisposeSky(void)
 /**************** DRAW SKY *****************/
 
 static void DrawSky(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
-{		
+{
 #pragma unused(theNode)
 
 OGLMatrix4x4	m;
@@ -250,7 +250,7 @@ AGLContext agl_ctx = setupInfo->drawContext;
 
 	if (!gIsSky)
 		return;
-		
+
 
 		/***************************/
 		/* ANIMATE & CALCULATE UVS */
@@ -258,7 +258,7 @@ AGLContext agl_ctx = setupInfo->drawContext;
 
 	u = gSkyScrollX += gFramesPerSecondFrac * .03f;
 	v = gSkyScrollZ += gFramesPerSecondFrac * .03f;
-	
+
 	u += gPlayerInfo.camera.cameraLocation.x * .0003f;
 	v += gPlayerInfo.camera.cameraLocation.z * .0003f;
 
@@ -270,14 +270,14 @@ AGLContext agl_ctx = setupInfo->drawContext;
 			gSkyUVs1[r][c].v = v + r * .8f;
 		}
 	}
-	
+
 
 			/*****************/
 			/* DRAW GEOMETRY */
 			/*****************/
-			
+
 	OGL_PushState();
-		
+
 	glEnable(GL_TEXTURE_2D);											// enable textures
 	glDisableClientState(GL_NORMAL_ARRAY);								// disable normal arrays
 
@@ -286,19 +286,19 @@ AGLContext agl_ctx = setupInfo->drawContext;
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);								// make glow
 		gGlobalMaterialFlags |= BG3D_MATERIALFLAG_ALWAYSBLEND;
 	}
-		
+
 			/* SETUP VERTEX ARRAY */
-			
+
 	glEnableClientState(GL_VERTEX_ARRAY);								// enable vertex arrays
 	glVertexPointer(3, GL_FLOAT, 0, (GLfloat *)&gSkyPoints[0][0]);		// point to point array
 
 
 			/* SETUP VERTEX UVS */
-			
+
 	glTexCoordPointer(2, GL_FLOAT, 0,(GLfloat *)&gSkyUVs1[0][0]);			// enable uv arrays
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	
-		
+
+
 			/* SETUP VERTEX COLORS */
 
 	if (gFadeEdges[gLevelNum])
@@ -308,25 +308,25 @@ AGLContext agl_ctx = setupInfo->drawContext;
 	}
 	else
 		glDisableClientState(GL_COLOR_ARRAY);
-		
+
 
 			/* SET TRANSLATION TRANSFORM */
-			
+
 	OGLMatrix4x4_SetTranslate(&m, gPlayerInfo.camera.cameraLocation.x,
-								gSkyY[gLevelNum], 
+								gSkyY[gLevelNum],
 								gPlayerInfo.camera.cameraLocation.z);
 	glMultMatrixf((GLfloat *)&m);
 
 
 			/* SUBMIT IT */
 
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][0].materialObject, setupInfo);			
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][0].materialObject, setupInfo);
 
 	glDrawElements(GL_TRIANGLES,NUM_SKY_TRIANGLES*3,GL_UNSIGNED_INT,&gSkyTriangles[0]);
 	if (OGL_CheckError())
 		DoFatalAlert("\pDrawSky: glDrawElements");
 
-				
+
 	gGlobalMaterialFlags &= ~BG3D_MATERIALFLAG_ALWAYSBLEND;			// make sure this is off
 	OGL_PopState();
 }

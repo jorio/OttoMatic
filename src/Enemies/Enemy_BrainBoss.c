@@ -130,7 +130,7 @@ ObjNode					*newObj;
 
 	gNumPortalsBlown = 0;
 	gBrainBossDead = false;
-	
+
 	for (i = 0; i < NUM_BRAIN_PORTALS; i++)
 		gPortalBlown[i] = false;
 
@@ -148,29 +148,29 @@ ObjNode					*newObj;
 		{
 			short	id;
 			float	x,z;
-		
+
 			id = itemPtr[i].parm[0];								// get generator ID
-							
+
 			x = gBrainPortalCoords[id].x = itemPtr[i].x;			// get coords
 			z = gBrainPortalCoords[id].z = itemPtr[i].y;
 			gBrainPortalCoords[id].y = GetTerrainY_Undeformed(x,z) + 700.0f;
 		}
 	}
-	
-	
+
+
 		/****************************************/
 		/* CREATE DUMMY DRAW OBJECT FOR PORTALS */
 		/****************************************/
-	
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;				
+
+	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+2;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.scale 		= 1;
 	gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOLIGHTING|STATUS_BIT_GLOW|STATUS_BIT_NOZWRITES;
-	
-	newObj = MakeNewObject(&gNewObjectDefinition);		
+
+	newObj = MakeNewObject(&gNewObjectDefinition);
 	newObj->CustomDrawFunction = DrawPortalBeams;
-	
+
 }
 
 
@@ -191,52 +191,52 @@ DeformationType		defData;
 				/*******************/
 				/* MAKE BRAIN CORE */
 				/*******************/
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= BRAINBOSS_ObjType_BrainCore;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z) + BRAINBOSS_HOVER_Y;	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z) + BRAINBOSS_HOVER_Y;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 	gNewObjectDefinition.slot 		= 200;
 	gNewObjectDefinition.moveCall 	= MoveBrainBoss;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= BRAINBOSS_SCALE;
 	gBrainBoss = core = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-								
+
 	core->Health 		= 	BRAINBOSS_HEALTH;
 	core->Mode			=	BRAIN_MODE_HOVER;
 	core->OpenDelay 	=	5.0f;
 	core->OpenDist 		= 	0;
-	
+
 				/* SET COLLISION INFO */
-				
+
 	core->CType = CTYPE_MISC | CTYPE_AUTOTARGETWEAPON | CTYPE_BLOCKCAMERA;
-	core->CBits = CBITS_ALLSOLID;	
+	core->CBits = CBITS_ALLSOLID;
 	CreateCollisionBoxFromBoundingBox(core, 1,1);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	core->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= BrainBossHitByWeapon;
 	core->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] 	= BrainBossHitBySuperNova;
 	core->HitByWeaponHandler[WEAPON_TYPE_FLAME] 		= BrainBossHitByWeapon;
 	core->HitByWeaponHandler[WEAPON_TYPE_FLARE] 		= BrainBossHitByWeapon;
-			
+
 	core->HurtCallback = HurtBrainBoss;							// set hurt callback function
 
 	core->WeaponAutoTargetOff.y = BRAINBOSS_SCALE * 83.0f;
 
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(core, SHADOW_TYPE_CIRCULAR, 15, 20, false);
 
 				/*******************/
 				/* MAKE LEFT BRAIN */
 				/*******************/
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= BRAINBOSS_ObjType_LeftBrain;
 	gNewObjectDefinition.coord		= core->Coord;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
@@ -247,13 +247,13 @@ DeformationType		defData;
 	left = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	left->CType = CTYPE_HURTME | CTYPE_BLOCKCAMERA;
-	left->CBits = CBITS_ALLSOLID;	
+	left->CBits = CBITS_ALLSOLID;
 	CreateCollisionBoxFromBoundingBox(left, 1,1);
 
 	core->ChainNode = left;
 
 				/* MAKE EYE SPARKLE */
-				
+
 	i = left->Sparkles[0] = GetFreeSparkle(left);				// get free sparkle slot
 	if (i != -1)
 	{
@@ -269,27 +269,27 @@ DeformationType		defData;
 
 		gSparkles[i].scale = 220.0f;
 		gSparkles[i].separation = 30.0f;
-		
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_RedGlint;
 	}
-			
-				
+
+
 
 				/********************/
 				/* MAKE RIGHT BRAIN */
 				/********************/
-				
+
 	gNewObjectDefinition.type 		= BRAINBOSS_ObjType_RightBrain;
 	right = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	right->CType = CTYPE_HURTME | CTYPE_BLOCKCAMERA;
-	right->CBits = CBITS_ALLSOLID;	
+	right->CBits = CBITS_ALLSOLID;
 	CreateCollisionBoxFromBoundingBox(right, 1,1);
 
 	left->ChainNode = right;
-	
+
 				/* MAKE EYE SPARKLE */
-				
+
 	i = right->Sparkles[0] = GetFreeSparkle(right);				// get free sparkle slot
 	if (i != -1)
 	{
@@ -305,11 +305,11 @@ DeformationType		defData;
 
 		gSparkles[i].scale = 190.0f;
 		gSparkles[i].separation = 30.0f;
-		
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_RedGlint;
 	}
-		
-	
+
+
 			/**************************/
 			/* MAKE STATIC DISCHARGES */
 			/**************************/
@@ -317,32 +317,32 @@ DeformationType		defData;
 	for (i = 0; i < NUM_BRAIN_STATIC; i++)
 	{
 		ObjNode	*stat;
-		
-		gNewObjectDefinition.genre		= CUSTOM_GENRE;		
+
+		gNewObjectDefinition.genre		= CUSTOM_GENRE;
 		gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOTEXTUREWRAP|
 											STATUS_BIT_KEEPBACKFACES | STATUS_BIT_GLOW;
 		gNewObjectDefinition.slot 		= SLOT_OF_DUMB + 10;
 		gNewObjectDefinition.moveCall 	= MoveBrainStatic;
 		stat = MakeNewObject(&gNewObjectDefinition);
-	
+
 		stat->CustomDrawFunction = DrawBrainStatic;
 
-		SetBrainStaticLocation(stat);	
-	
+		SetBrainStaticLocation(stat);
+
 	}
 
 			/****************************/
 			/* MAKE TERRAIN DEFORMATION */
 			/****************************/
-	
+
 	if (gG4)
 	{
 		defData.type 				= DEFORMATION_TYPE_CONTINUOUSWAVE;
-		defData.amplitude 			= 30; 
-		defData.radius 				= 0; 
-		defData.speed 				= -1100; 
-		defData.origin.x			= x; 
-		defData.origin.y			= z; 
+		defData.amplitude 			= 30;
+		defData.radius 				= 0;
+		defData.speed 				= -1100;
+		defData.origin.x			= x;
+		defData.origin.y			= z;
 		defData.oneOverWaveLength 	= 1.0f / 100.0f;
 		defData.radialWidth			= 1100.0f;
 		defData.decayRate			= 20.0f;
@@ -350,7 +350,7 @@ DeformationType		defData;
 	}
 	else
 		gBrainBossDeformation = -1;
-		
+
 	return(true);
 }
 
@@ -377,7 +377,7 @@ static void MoveBrainStatic(ObjNode *theNode)
 		DeleteObject(theNode);
 		return;
 	}
-	
+
 	theNode->Timer -= gFramesPerSecondFrac;
 	if (theNode->Timer <= 0.0f)								// see if time to move to new location
 		SetBrainStaticLocation(theNode);
@@ -399,12 +399,12 @@ OGLPoint3D		pts[4];
 			/***************/
 			/* CALC POINTS */
 			/***************/
-			
+
 	if (gBrainBoss->OpenDist == 0.0f)				// bail if nothing to draw
 		return;
 
 			/* SET OFFSET POINTS */
-				
+
 	pts[0].x = -gBrainBoss->OpenDist;				// left top offset
 	pts[0].y = theNode->Coord.y;
 	pts[0].z = theNode->Coord.z;
@@ -428,24 +428,24 @@ OGLPoint3D		pts[4];
 	m.value[M03] = gBrainBoss->Coord.x;							// insert translation
 	m.value[M13] = gBrainBoss->Coord.y;
 	m.value[M23] = gBrainBoss->Coord.z;
-	
+
 	OGLPoint3D_TransformArray(pts, &m, pts, 4);
 
 
 
 			/* SUBMIT STATIC TEXTURE */
-	
-	gGlobalTransparency = .6;
-			
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][BRAINBOSS_SObjType_Static1+(MyRandomLong()&0x3)].materialObject, setupInfo);			
 
-	
+	gGlobalTransparency = .6;
+
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][BRAINBOSS_SObjType_Static1+(MyRandomLong()&0x3)].materialObject, setupInfo);
+
+
 			/* DRAW QUAD */
-			
-	glBegin(GL_QUADS);	
-	
+
+	glBegin(GL_QUADS);
+
 		if (MyRandomLong()&1)								// random flip
-		{			
+		{
 			glTexCoord2f(0,1);	glVertex3fv((GLfloat *)&pts[0]);
 			glTexCoord2f(0,0);	glVertex3fv((GLfloat *)&pts[1]);
 			glTexCoord2f(1,0);	glVertex3fv((GLfloat *)&pts[2]);
@@ -458,8 +458,8 @@ OGLPoint3D		pts[4];
 			glTexCoord2f(1,1);	glVertex3fv((GLfloat *)&pts[2]);
 			glTexCoord2f(1,0);	glVertex3fv((GLfloat *)&pts[3]);
 		}
-		
-	glEnd();	
+
+	glEnd();
 
 	gGlobalTransparency = 1.0;
 }
@@ -481,7 +481,7 @@ float	fps = gFramesPerSecondFrac;
 
 
 			/* MAKE IT HOVER-WOBBLE */
-			
+
 	core->HoverWobble += fps * 3.0f;
 	gCoord.y = core->InitCoord.y + sin(core->HoverWobble) * 20.0f;
 
@@ -491,7 +491,7 @@ float	fps = gFramesPerSecondFrac;
 	switch(core->Mode)
 	{
 				/* HOVERING */
-				
+
 		case	BRAIN_MODE_HOVER:
 				if (gNumPortalsBlown >= NUM_BRAIN_PORTALS)
 				{
@@ -502,8 +502,8 @@ float	fps = gFramesPerSecondFrac;
 					}
 				}
 				break;
-	
-	
+
+
 				/* OPENING */
 
 		case	BRAIN_MODE_OPENING:
@@ -521,12 +521,12 @@ float	fps = gFramesPerSecondFrac;
 
 		case	BRAIN_MODE_ATTACK:
 				SeeIfBrainBossShoot(core);
-		
+
 				core->AttackTimer -= fps;
 				if (core->AttackTimer <= 0.0f)
 					core->Mode = BRAIN_MODE_CLOSING;
 				break;
-	
+
 				/* CLOSING */
 
 		case	BRAIN_MODE_CLOSING:
@@ -538,22 +538,22 @@ float	fps = gFramesPerSecondFrac;
 					core->Mode = BRAIN_MODE_HOVER;
 				}
 				break;
-	
-	}
-	
 
-		/***********/	
+	}
+
+
+		/***********/
 		/* MOVE IT */
-		/***********/	
-	
+		/***********/
+
 	if (gNumPortalsBlown >= NUM_BRAIN_PORTALS)
 	{
 		float	angle,r;
 
 				/* TURN AND MOVE */
-					
-		angle = TurnObjectTowardTarget(core, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, 1.0, false);			
-	
+
+		angle = TurnObjectTowardTarget(core, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, 1.0, false);
+
 		r = core->Rot.y;
 		gDelta.x = -sin(r) * BRAINBOSS_SPEED;
 		gDelta.z = -cos(r) * BRAINBOSS_SPEED;
@@ -562,24 +562,24 @@ float	fps = gFramesPerSecondFrac;
 		gCoord.z += gDelta.z * fps;
 
 					/* DO ENEMY COLLISION */
-					
+
 		if (DoEnemyCollisionDetect(core,CTYPE_HURTENEMY|CTYPE_FENCE, false))
 			return;
 
 
 				/* UPDATE DEFORMATION COORDS */
-				
+
 		UpdateDeformationCoords(gBrainBossDeformation, gCoord.x, gCoord.z);
 
 	}
-	
-	
-	
+
+
+
 		/**********/
 		/* UPDATE */
 		/**********/
 
-	UpdateBrainBoss(core);		
+	UpdateBrainBoss(core);
 }
 
 
@@ -593,15 +593,15 @@ ObjNode	*left, *right;
 float	r,xoff,zoff;
 
 	UpdateObject(core);
-	
-	
+
+
 			/**********************/
 			/* ALIGN BRAIN HALVES */
 			/**********************/
-			
+
 	left = core->ChainNode;										// get brain halves
 	right = left->ChainNode;
-			
+
 	r = core->Rot.y;
 	left->Rot.y = right->Rot.y = r;
 
@@ -621,12 +621,12 @@ float	r,xoff,zoff;
 	UpdateObjectTransforms(left);
 	CreateCollisionBoxFromBoundingBox_Rotated(left, 1, .7);
 
-	UpdateObjectTransforms(right);			
+	UpdateObjectTransforms(right);
 	CreateCollisionBoxFromBoundingBox_Rotated(right, 1, .7);
-	
-	
+
+
 		/* UPDATE AUDIO */
-		
+
 	if (core->EffectChannel == -1)
 		core->EffectChannel = PlayEffect_Parms3D(EFFECT_BRAINSTATIC, &gCoord, NORMAL_CHANNEL_RATE, core->OpenDist / OPEN_DIST);
 	else
@@ -654,7 +654,7 @@ float		r;
 	core->ShootTimer = .7f;											// reset timer
 
 			/* CALC AIM VECTOR */
-			
+
 	r = core->Rot.y + RandomFloat2() * .1f;
 	aim.x = -sin(r);
 	aim.y = RandomFloat() * .1f;									// lob up a little
@@ -663,7 +663,7 @@ float		r;
 
 
 			/* WHERE FROM */
-			
+
 	gNewObjectDefinition.coord.x 		= gCoord.x + aim.x * 200.0f;
 	gNewObjectDefinition.coord.y 		= gCoord.y + 300.0f;
 	gNewObjectDefinition.coord.z 		= gCoord.z + aim.z * 200.0f;
@@ -672,24 +672,24 @@ float		r;
 				/*********************/
 				/* MAKE BULLET EVENT */
 				/*********************/
-				
-	gNewObjectDefinition.genre		= EVENT_GENRE;				
+
+	gNewObjectDefinition.genre		= EVENT_GENRE;
 	gNewObjectDefinition.flags 		= 0;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+5;
 	gNewObjectDefinition.moveCall 	= MoveBrainBullet;
 	newObj = MakeNewObject(&gNewObjectDefinition);
 
 	newObj->Kind = WEAPON_TYPE_FLARE;
-	
+
 	newObj->Delta.x = aim.x * BRAIN_BULLET_SPEED;
 	newObj->Delta.y = aim.y * BRAIN_BULLET_SPEED;
 	newObj->Delta.z = aim.z * BRAIN_BULLET_SPEED;
 
-	newObj->Health = 5.0f;	
+	newObj->Health = 5.0f;
 	newObj->Damage = .25f;
-	
+
 	newObj->DelayToSeek = .5;						// set a delay before they start heat seeking
-	
+
 	newObj->ParticleTimer = 0;
 
 	newObj->CType 			= CTYPE_WEAPON;
@@ -698,12 +698,12 @@ float		r;
 
 
 			/* MAKE SHADOW */
-			
+
 	AttachShadowToObject(newObj, GLOBAL_SObjType_Shadow_Circular, 4,4, false);
 
 
 			/* MAKE SPARKLE */
-	
+
 	i = newObj->Sparkles[0] = GetFreeSparkle(newObj);				// get free sparkle slot
 	if (i != -1)
 	{
@@ -716,19 +716,19 @@ float		r;
 		gSparkles[i].color.a = 1;
 
 		gSparkles[i].scale = 100.0f;
-		
+
 		gSparkles[i].separation = 0.0f;
-					
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_RedSpark;
 	}
-	
-	
+
+
 				/* VAPOR TRAIL */
-				
+
 	newObj->VaporTrails[0] = CreatetNewVaporTrail(newObj, 0, VAPORTRAIL_TYPE_COLORSTREAK,
 													&newObj->Coord, &gTrailColorStart, .4, .6, 30);
 
-	
+
 	PlayEffect_Parms3D(EFFECT_BRAINBOSSSHOOT, &newObj->Coord, NORMAL_CHANNEL_RATE, 1.6);
 }
 
@@ -746,23 +746,23 @@ float	dist;
 
 
 			/* SEE IF GONE */
-			
+
 	theNode->Health -= fps;
 	if (theNode->Health <= 0.0f)
 	{
 		ExplodeBrainBullet(theNode);				// note:  gCoord must be set!
-		return;	
+		return;
 	}
 
 
 
 			/* SEE IF HEAT SEEK */
-			
+
 	theNode->DelayToSeek -= fps;
 	if (theNode->DelayToSeek <= 0.0f)
 	{
 		OGLVector3D	v;
-			
+
 		v.x = gPlayerInfo.coord.x - gCoord.x;
 		v.y = gPlayerInfo.coord.y - gCoord.y;
 		v.z = gPlayerInfo.coord.z - gCoord.z;
@@ -780,20 +780,20 @@ float	dist;
 		gDelta.y += v.y * (800.0f * dist);
 		gDelta.z += v.z * (4000.0f * dist);
 		theNode->Speed3D = CalcVectorLength(&gDelta);					// calc speed
-		
+
 		if (theNode->Speed3D > BRAIN_BULLET_SPEED)
 		{
 			float	q = BRAIN_BULLET_SPEED / theNode->Speed3D;
-		
+
 			gDelta.x *= q;
 			gDelta.y *= q;
-			gDelta.z *= q;		
+			gDelta.z *= q;
 		}
 	}
-	
+
 
 			/* MOVE IT */
-				
+
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
 	gCoord.z += gDelta.z * fps;
@@ -809,22 +809,22 @@ float	dist;
 		ExplodeBrainBullet(theNode);
 		return;
 	}
-	
+
 	UpdateObject(theNode);
-	
-		
+
+
 			/******************/
 			/* UPDATE SPARKLE */
 			/******************/
-		
+
 	i = theNode->Sparkles[0];
 	if (i != -1)
 	{
 		gSparkles[i].where = gCoord;
-	}			
+	}
 
 	if (VerifyVaporTrail(theNode->VaporTrails[0], theNode, 0))
-		AddToVaporTrail(&theNode->VaporTrails[0], &gCoord, &gTrailColor);	
+		AddToVaporTrail(&theNode->VaporTrails[0], &gCoord, &gTrailColor);
 
 }
 
@@ -847,7 +847,7 @@ float					x,y,z;
 			/******************/
 			/* MAKE PARTICLES */
 			/******************/
-				
+
 	gNewParticleGroupDef.magicNum				= 0;
 	gNewParticleGroupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 	gNewParticleGroupDef.flags					= PARTICLE_FLAGS_BOUNCE | PARTICLE_FLAGS_ALLAIM;
@@ -869,17 +869,17 @@ float					x,y,z;
 			pt.y = y;
 			pt.z = z + RandomFloat2() * 50.0f;
 
-			delta.x = RandomFloat2() * 500.0f;			
+			delta.x = RandomFloat2() * 500.0f;
 			delta.z = RandomFloat2() * 500.0f;
 			delta.y = RandomFloat2() * 250.0f;
-			
+
 			newParticleDef.groupNum		= pg;
 			newParticleDef.where		= &pt;
 			newParticleDef.delta		= &delta;
 			newParticleDef.scale		= 1.0f + RandomFloat();
 			newParticleDef.rotZ			= 0;
 			newParticleDef.rotDZ		= RandomFloat2() * 7.0f;
-			newParticleDef.alpha		= FULL_ALPHA;		
+			newParticleDef.alpha		= FULL_ALPHA;
 			if (AddParticleToGroup(&newParticleDef))
 				break;
 		}
@@ -888,7 +888,7 @@ float					x,y,z;
 
 
 	DeleteObject(bullet);
-	
+
 }
 
 
@@ -899,7 +899,7 @@ float					x,y,z;
 static Boolean BrainBossHitByWeapon(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weaponCoord, weaponDelta)
-				
+
 	HurtBrainBoss(enemy, weapon->Damage);
 
 	switch(enemy->Mode)
@@ -912,7 +912,7 @@ static Boolean BrainBossHitByWeapon(ObjNode *weapon, ObjNode *enemy, OGLPoint3D 
 		case	BRAIN_MODE_ATTACK:
 				enemy->AttackTimer = 0;
 				PlayEffect3D(EFFECT_BRAINPAIN, &enemy->Coord);
-				break;	
+				break;
 	}
 
 
@@ -929,9 +929,9 @@ static Boolean BrainBossHitByWeapon(ObjNode *weapon, ObjNode *enemy, OGLPoint3D 
 static Boolean BrainBossHitBySuperNova(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord, weaponDelta)
-	
+
 	HurtBrainBoss(enemy, 1.0);
-	
+
 	return(false);
 }
 
@@ -955,20 +955,20 @@ static Boolean HurtBrainBoss(ObjNode *enemy, float damage)
 	{
 		OGLColorRGBA	c;
 		float	r = enemy->Health / BRAINBOSS_HEALTH;		// get ratio 0..1
-	
+
 		r = .3f + (r * .7f);								// calc color component value
-	
+
 		c.r = 1.0;
 		c.g = r;
 		c.b = r;
 		c.a = 1.0;
-	
+
 		enemy->ColorFilter = c;								// set color of halves plus core
 		enemy->ChainNode->ColorFilter = c;
 		enemy->ChainNode->ChainNode->ColorFilter = c;
-	
-	}	
-	
+
+	}
+
 	return(false);
 }
 
@@ -984,7 +984,7 @@ static void KillBrainBoss(ObjNode *enemy)
 
 	DeleteObject(enemy);
 	gBrainBoss = nil;
-	
+
 	DeleteTerrainDeformation(gBrainBossDeformation);			// stop the deformation
 	gBrainBossDeformation = -1;
 
@@ -1004,12 +1004,12 @@ int		i,id;
 	id = itemPtr->parm[0];
 
 			/* MAKE OBJECT */
-			
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= BRAINBOSS_ObjType_BrainPort;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= ENEMY_SLOT-1;						// need to draw before elite brain dudes so xparency works right
 	gNewObjectDefinition.moveCall 	= MoveBrainAlienPort;
@@ -1032,10 +1032,10 @@ int		i,id;
 
 	for (i = 0; i < NUM_WEAPON_TYPES; i++)							// set weapon handlers
 		newObj->HitByWeaponHandler[i] 	= PortalHitByWeapon;
-	
+
 
 			/* MAKE SPARKLE */
-			
+
 	i = newObj->Sparkles[0] = GetFreeSparkle(newObj);				// get free sparkle slot
 	if (i != -1)
 	{
@@ -1051,7 +1051,7 @@ int		i,id;
 
 		gSparkles[i].scale = 300.0f;
 		gSparkles[i].separation = 40.0f;
-		
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_RedGlint;
 	}
 
@@ -1066,7 +1066,7 @@ static void MoveBrainAlienPort(ObjNode *theNode)
 {
 
 			/* SEE IF TOO MANY ELITES ALREADY */
-			
+
 	if (gG4)
 	{
 		if (gNumEnemyOfKind[ENEMY_KIND_ELITEBRAINALIEN] > 4)
@@ -1083,11 +1083,11 @@ static void MoveBrainAlienPort(ObjNode *theNode)
 
 	if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) > 3000.0f)
 		return;
-				
+
 	theNode->Timer -= gFramesPerSecondFrac;
 	if (theNode->Timer > 0.0f)
 		return;
-			
+
 	theNode->Timer = 2.0f + RandomFloat() * 3.0f;
 
 
@@ -1103,15 +1103,15 @@ ObjNode	*newObj;
 
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_ELITEBRAINALIEN,x, z,ELITEBRAINALIEN_SCALE, 1, MoveEliteBrainAlien_FromPortal);
 
-	newObj->BoundingSphereRadius *= 1.3f;						// enlarge a little 
+	newObj->BoundingSphereRadius *= 1.3f;						// enlarge a little
 
 	SetSkeletonAnim(newObj->Skeleton, 1);
 
 
 				/* SET BETTER INFO */
 
-	newObj->ColorFilter.r = 
-	newObj->ColorFilter.g = 
+	newObj->ColorFilter.r =
+	newObj->ColorFilter.g =
 	newObj->ColorFilter.b = .1;
 	newObj->ColorFilter.a = 0;
 
@@ -1121,9 +1121,9 @@ ObjNode	*newObj;
 	newObj->Health 		= 1.5;
 	newObj->Damage 		= .2;
 	newObj->Kind 		= ENEMY_KIND_ELITEBRAINALIEN;
-	
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,20);
 
@@ -1132,11 +1132,11 @@ ObjNode	*newObj;
 
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8,false);
-		
+
 	CreateBrainAlienGlow(newObj);
-		
+
 	gNumEnemies++;
 	gNumEnemyOfKind[ENEMY_KIND_ELITEBRAINALIEN]++;
 
@@ -1162,10 +1162,10 @@ float	x,y,z,x2,y2,z2,u,u2,yo;
 	y = gBrainPortalCoords[0].y;
 	z = gBrainPortalCoords[0].z;
 
-	for (i = 0; i < NUM_BRAIN_PORTALS; i++)								
+	for (i = 0; i < NUM_BRAIN_PORTALS; i++)
 	{
 				/* GET COORDS OF NEXT GENERATOR */
-				
+
 		if (i == (NUM_BRAIN_PORTALS-1))							// see if loop back
 			i2 = 0;
 		else
@@ -1174,25 +1174,25 @@ float	x,y,z,x2,y2,z2,u,u2,yo;
 		x2 = gBrainPortalCoords[i2].x;							// get next coords
 		y2 = gBrainPortalCoords[i2].y;
 		z2 = gBrainPortalCoords[i2].z;
-		
+
 
 		if ((gPortalBlown[i] == false) && (gPortalBlown[i2] == false))	// if either post is blown then skip
 		{
 				/* DRAW A QUAD */
-			
+
 			yo = 30.0f + RandomFloat() * 10.0f;
-				
+
 			u = RandomFloat() * 5.0f;
 			u2 = u + 3.0f;
-				
-			MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][BRAINBOSS_SObjType_RedZap].materialObject, setupInfo);			
-				
-			glBegin(GL_QUADS);		
+
+			MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][BRAINBOSS_SObjType_RedZap].materialObject, setupInfo);
+
+			glBegin(GL_QUADS);
 			glTexCoord2f(u,0);			glVertex3f(x,y+yo,z);
 			glTexCoord2f(u,1);			glVertex3f(x,y-yo,z);
 			glTexCoord2f(u2,1);			glVertex3f(x2,y2-yo, z2);
 			glTexCoord2f(u2,0);			glVertex3f(x2,y2+yo,z2);
-			glEnd();				
+			glEnd();
 		}
 
 				/* NEXT ENDPOINT */
@@ -1213,10 +1213,10 @@ static Boolean PortalHitByWeapon(ObjNode *weapon, ObjNode *portal, OGLPoint3D *w
 {
 #pragma unused (weapon, weaponCoord, weaponDelta)
 float	damage;
-	
+
 	if (portal->Health > 2.0f)	//------------------- hack to fix some bug
 		portal->Health = 0;
-			
+
 	if (weapon)
 	{
 		damage = weapon->Damage;
@@ -1225,18 +1225,18 @@ float	damage;
 	}
 	else				// supernova probably
 		damage = 1.0f;
-	
+
 	portal->Health -= damage;
 	if (portal->Health <= 0.0f)
 	{
 		gPortalBlown[portal->PortalID] = true;
 		gNumPortalsBlown++;
-		
+
 		ExplodeGeometry(portal, 500, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 1, .5);
-		PlayEffect_Parms3D(EFFECT_PORTALBOOM, &portal->Coord, NORMAL_CHANNEL_RATE, 1.8);		
-		
+		PlayEffect_Parms3D(EFFECT_PORTALBOOM, &portal->Coord, NORMAL_CHANNEL_RATE, 1.8);
+
 		MakeSparkExplosion(portal->Coord.x, portal->Coord.y + 50.0f, portal->Coord.z, 500.0f, 2.0, PARTICLE_SObjType_WhiteSpark,0);
-		
+
 		DeleteObject(portal);
 	}
 

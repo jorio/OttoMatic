@@ -106,7 +106,7 @@ enum
 	INFOBAR_SObjType_GrowVial,
 	INFOBAR_SObjType_FlareGun,
 	INFOBAR_SObjType_DartPOW,
-	
+
 	INFOBAR_SObjType_PulseGunGlow,
 	INFOBAR_SObjType_FreezeGlow,
 	INFOBAR_SObjType_FlameGlow,
@@ -125,7 +125,7 @@ enum
 	INFOBAR_SObjType_MeterBack,
 	INFOBAR_SObjType_WeaponDisplay,
 	INFOBAR_SObjType_RocketIcon,
-	
+
 	INFOBAR_SObjType_0,
 	INFOBAR_SObjType_1,
 	INFOBAR_SObjType_2,
@@ -136,12 +136,12 @@ enum
 	INFOBAR_SObjType_7,
 	INFOBAR_SObjType_8,
 	INFOBAR_SObjType_9,
-	
+
 	INFOBAR_SObjType_BeamCupLeft,
 	INFOBAR_SObjType_BeamCupRight,
 	INFOBAR_SObjType_TeleportBeam,
 	INFOBAR_SObjType_DestructoBeam,
-	
+
 	INFOBAR_SObjType_HumanFrame,
 	INFOBAR_SObjType_Farmer,
 	INFOBAR_SObjType_BeeWoman,
@@ -183,27 +183,27 @@ static	float	gHumanFrameX[NUM_HUMAN_TYPES];
 //
 
 void InitInfobar(OGLSetupOutputType *setupInfo)
-{		
+{
 int	i;
 
 #pragma unused(setupInfo)
 
 	gDisplayedHelpMessage = HELP_MESSAGE_NONE;
-	
+
 
 	for (i = 0; i < NUM_HUMAN_TYPES; i++)
 		gHumanFrameX[i] = 700.0f;
-		
+
 	gHealthOccilate = 0;
 	gHealthMeterRot = gFuelMeterRot = gJumpJetMeterRot = 0;
 	gHealthWarningChannel = -1;
 
 		/* SET GLOWING */
-		
+
 	BlendASprite(SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_HealthMeter);
 	BlendASprite(SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_FuelMeter);
 	BlendASprite(SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_JumpJetMeter);
-	
+
 	BlendASprite(SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_PulseGunGlow);
 	BlendASprite(SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_FreezeGlow);
 	BlendASprite(SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_FlameGlow);
@@ -215,8 +215,8 @@ int	i;
 
 
 	for (i = 0; i< MAX_INVENTORY_SLOTS; i++)
-		gWeaponY[i] = WEAPON_HIDDEN_Y; 
-		
+		gWeaponY[i] = WEAPON_HIDDEN_Y;
+
 
 }
 
@@ -236,19 +236,19 @@ void SetInfobarSpriteState(void)
 AGLContext agl_ctx = gAGLContext;
 
 	OGL_DisableLighting();
-	glDisable(GL_CULL_FACE);							
+	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);								// no z-buffer
 
 	gGlobalMaterialFlags = BG3D_MATERIALFLAG_CLAMP_V|BG3D_MATERIALFLAG_CLAMP_U;	// clamp all textures
-	
+
 
 			/* INIT MATRICES */
-					
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0, 640, 480, 0, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();					
+	glLoadIdentity();
 }
 
 
@@ -266,12 +266,12 @@ AGLContext agl_ctx = gAGLContext;
 		/************/
 
 	OGL_PushState();
-				
+
 	if (setupInfo->useFog)
 		glDisable(GL_FOG);
-		
+
 	SetInfobarSpriteState();
-							
+
 
 
 		/***************/
@@ -280,13 +280,13 @@ AGLContext agl_ctx = gAGLContext;
 
 
 		/* DRAW STUFF */
-			
+
 	Infobar_DrawGirders(setupInfo);
 	Infobar_DrawLives(setupInfo);
 	Infobar_DrawHealth(setupInfo);
 	Infobar_DrawFuel(setupInfo);
 	Infobar_DrawHumans(setupInfo);
-	
+
 	if (gLevelNum != LEVEL_NUM_SAUCER)
 	{
 		Infobar_DrawWeaponInventory(setupInfo);
@@ -297,12 +297,12 @@ AGLContext agl_ctx = gAGLContext;
 		gGlobalTransparency = .3f;					// dim these in saucer mode
 		Infobar_DrawJumpJet(setupInfo);
 		gGlobalTransparency = 1.0f;
-		
+
 		Infobar_DrawBeams(setupInfo);
 	}
-	
+
 	UpdateHelpMessage(setupInfo);
-	
+
 			/***********/
 			/* CLEANUP */
 			/***********/
@@ -321,20 +321,20 @@ MOMaterialObject	*mo;
 float				aspect;
 
 		/* ACTIVATE THE MATERIAL */
-				
+
 	mo = gSpriteGroupList[SPRITE_GROUP_INFOBAR][texNum].materialObject;
-	MO_DrawMaterial(mo, setupInfo);			
+	MO_DrawMaterial(mo, setupInfo);
 
 	aspect = (float)mo->objectData.height / (float)mo->objectData.width;
 
 			/* DRAW IT */
-			
+
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,1);	glVertex2f(x, 		y);
 	glTexCoord2f(1,1);	glVertex2f(x+size, 	y);
 	glTexCoord2f(1,0);	glVertex2f(x+size,  y+(size*aspect));
 	glTexCoord2f(0,0);	glVertex2f(x,		y+(size*aspect));
-	glEnd();	
+	glEnd();
 }
 
 /******************** DRAW INFOBAR SPRITE: CENTERED **********************/
@@ -349,9 +349,9 @@ MOMaterialObject	*mo;
 float				aspect;
 
 		/* ACTIVATE THE MATERIAL */
-				
+
 	mo = gSpriteGroupList[SPRITE_GROUP_INFOBAR][texNum].materialObject;
-	MO_DrawMaterial(mo, setupInfo);			
+	MO_DrawMaterial(mo, setupInfo);
 
 	aspect = (float)mo->objectData.height / (float)mo->objectData.width;
 
@@ -359,13 +359,13 @@ float				aspect;
 	y -= (size*aspect)*.5f;
 
 			/* DRAW IT */
-			
+
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,1);	glVertex2f(x, 		y);
 	glTexCoord2f(1,1);	glVertex2f(x+size, 	y);
 	glTexCoord2f(1,0);	glVertex2f(x+size,  y+(size*aspect));
 	glTexCoord2f(0,0);	glVertex2f(x,		y+(size*aspect));
-	glEnd();	
+	glEnd();
 }
 
 
@@ -382,20 +382,20 @@ MOMaterialObject	*mo;
 float				aspect;
 
 		/* ACTIVATE THE MATERIAL */
-				
+
 	mo = gSpriteGroupList[group][texNum].materialObject;
-	MO_DrawMaterial(mo, setupInfo);			
+	MO_DrawMaterial(mo, setupInfo);
 
 	aspect = (float)mo->objectData.height / (float)mo->objectData.width;
 
 			/* DRAW IT */
-			
+
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,1);	glVertex2f(x, 		y);
 	glTexCoord2f(1,1);	glVertex2f(x+size, 	y);
 	glTexCoord2f(1,0);	glVertex2f(x+size,  y+(size*aspect));
 	glTexCoord2f(0,0);	glVertex2f(x,		y+(size*aspect));
-	glEnd();	
+	glEnd();
 }
 
 
@@ -411,12 +411,12 @@ OGLPoint2D			p[4];
 OGLMatrix3x3		m;
 
 		/* ACTIVATE THE MATERIAL */
-				
+
 	mo = gSpriteGroupList[SPRITE_GROUP_INFOBAR][texNum].materialObject;
-	MO_DrawMaterial(mo, setupInfo);			
+	MO_DrawMaterial(mo, setupInfo);
 
 				/* SET COORDS */
-				
+
 	aspect = (float)mo->objectData.height / (float)mo->objectData.width;
 
 	xoff = size*.5f;
@@ -434,13 +434,13 @@ OGLMatrix3x3		m;
 	yoff += y;
 
 			/* DRAW IT */
-			
+
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,1);	glVertex2f(p[0].x + xoff, p[0].y + yoff);
 	glTexCoord2f(1,1);	glVertex2f(p[1].x + xoff, p[1].y + yoff);
 	glTexCoord2f(1,0);	glVertex2f(p[2].x + xoff, p[2].y + yoff);
 	glTexCoord2f(0,0);	glVertex2f(p[3].x + xoff, p[3].y + yoff);
-	glEnd();	
+	glEnd();
 }
 
 
@@ -453,20 +453,20 @@ MOMaterialObject	*mo;
 float				aspect;
 
 		/* ACTIVATE THE MATERIAL */
-				
+
 	mo = gSpriteGroupList[SPRITE_GROUP_INFOBAR][texNum].materialObject;
-	MO_DrawMaterial(mo, setupInfo);			
+	MO_DrawMaterial(mo, setupInfo);
 
 	aspect = (float)mo->objectData.height / (float)mo->objectData.width;
 
 			/* DRAW IT */
-			
+
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,1);	glVertex2f(x, 			y);
 	glTexCoord2f(1,1);	glVertex2f(x+scaleX, 	y);
 	glTexCoord2f(1,0);	glVertex2f(x+scaleX, 	y+(scaleY*aspect));
 	glTexCoord2f(0,0);	glVertex2f(x,			y+(scaleY*aspect));
-	glEnd();	
+	glEnd();
 }
 
 
@@ -483,24 +483,24 @@ int		q,n;
 float	x;
 
 				/* DRAW ATOM ICON */
-				
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);								// make glow
 	DrawInfobarSprite(ATOM_X, ATOM_Y, ATOM_SIZE, INFOBAR_SObjType_Atom, setupInfo);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-	
+
+
 		/* DRAW QUANTITY NUMBER */
 
 	q = gPlayerInfo.numAtoms;
 	NumToString(q, s);
-	
+
 	x = ATOM_X + ATOM_SIZE;
 	for (n = 1; n <= s[0]; n++)
 	{
 		DrawSprite(SPRITE_GROUP_FONT, s[n]-'0',x, ATOM_Y + 10.0f, 20.0f, 0, 0, setupInfo);
 		x += 17.0f;
 	}
-	
+
 }
 #endif
 
@@ -521,19 +521,19 @@ Str32	s;
 	for (i = 0; i < MAX_INVENTORY_SLOTS; i++)
 	{
 		type = gPlayerInfo.weaponInventory[i].type;										// get weapon type
-		
+
 		if ((type != NO_INVENTORY_HERE)	|| (gWeaponY[i] > WEAPON_HIDDEN_Y))						// see if valid
 		{
 					/* CALC Y */
-					
+
 			if (type == NO_INVENTORY_HERE)
-				y = WEAPON_HIDDEN_Y;			
+				y = WEAPON_HIDDEN_Y;
 			else
 			if (gPlayerInfo.currentWeaponType == type)
 				y = 0;
 			else
 				y = WEAPON_INACTIVE_Y;
-				
+
 			if (gWeaponY[i] > y)
 			{
 				gWeaponY[i] -= fps * WEAPON_FRAME_SIZE * 3.0f;
@@ -545,14 +545,14 @@ Str32	s;
 			{
 				gWeaponY[i] += fps * WEAPON_FRAME_SIZE * 3.0f;
 				if (gWeaponY[i] > y)
-					gWeaponY[i] = y;				
+					gWeaponY[i] = y;
 			}
 
 			y = gWeaponY[i];
-			
+
 
 					/* DRAW FRAME */
-					
+
 			DrawInfobarSprite(x, y, WEAPON_FRAME_SIZE, INFOBAR_SObjType_WeaponDisplay, setupInfo);
 
 
@@ -560,14 +560,14 @@ Str32	s;
 			{
 
 								/* DRAW GLOW */
-									
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE);								
+
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 				DrawInfobarSprite_Centered(x + WEAPON_FRAME_SIZE/2, y+WEAPON_Y, WEAPON_SIZE * (1.0f + RandomFloat()*.15f), INFOBAR_SObjType_PulseGunGlow + type, setupInfo);
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 								/* DRAW ICON */
-								
-				DrawInfobarSprite_Centered(x + WEAPON_FRAME_SIZE/2, y+WEAPON_Y, WEAPON_SIZE, INFOBAR_SObjType_PulseGun + type, setupInfo);			
+
+				DrawInfobarSprite_Centered(x + WEAPON_FRAME_SIZE/2, y+WEAPON_Y, WEAPON_SIZE, INFOBAR_SObjType_PulseGun + type, setupInfo);
 
 
 					/* DRAW QUANTITY NUMBER */
@@ -575,9 +575,9 @@ Str32	s;
 				if (type != WEAPON_TYPE_FIST)									// dont draw fist quantity since unlimited
 				{
 					NumToString(gPlayerInfo.weaponInventory[i].quantity, s);
-					
+
 					tx = x + 50;
-					
+
 					for (n = 1; n <= s[0]; n++)
 					{
 						DrawInfobarSprite(tx, y+60, 8, INFOBAR_SObjType_0 + s[n]-'0', setupInfo);
@@ -588,7 +588,7 @@ Str32	s;
 		}
 
 			/* NEXT SLOT */
-			
+
 		x += WEAPON_FRAME_SIZE - 5;
 	}
 
@@ -635,42 +635,42 @@ static const float scales[NUM_HUMAN_TYPES] =
 };
 
 	for (i = 0; i < NUM_HUMAN_TYPES; i++)
-	{		
+	{
 		if (gNumHumansRescuedOfType[i] == 0)					// skip if none of these rescued
 			continue;
-		
+
 				/* SCROLL INTO POSITION */
-				
+
 		x = gHumanFrameX[i];									// get current scroll X
 		if (x > HUMAN_X)										// see if need to move it
 		{
 			x -= gFramesPerSecondFrac * 150.0f;
 			if (x < HUMAN_X)
-				x = HUMAN_X;	
-			gHumanFrameX[i] = x;	
+				x = HUMAN_X;
+			gHumanFrameX[i] = x;
 		}
-		
+
 		y = HUMAN_Y + HUMAN_SPACING * i;
 
-		
+
 					/* DRAW FRAME */
-					
-		DrawInfobarSprite_Centered(x, y, HUMAN_SCALE * 3.0f, INFOBAR_SObjType_HumanFrame, setupInfo);	
-	
-	
-	
+
+		DrawInfobarSprite_Centered(x, y, HUMAN_SCALE * 3.0f, INFOBAR_SObjType_HumanFrame, setupInfo);
+
+
+
 					/* DRAW HUMAN ICON */
-	
-		x -= HUMAN_SCALE * .4f;			
-		DrawInfobarSprite_Centered(x, y, scales[i], INFOBAR_SObjType_Farmer+i, setupInfo);	
-		
-		
+
+		x -= HUMAN_SCALE * .4f;
+		DrawInfobarSprite_Centered(x, y, scales[i], INFOBAR_SObjType_Farmer+i, setupInfo);
+
+
 					/* DRAW QUANTITY */
-								
+
 		NumToString(gNumHumansRescuedOfType[i], s);
-		
+
 		tx = x - (HUMAN_SCALE * 3/4);
-		
+
 		for (n = 1; n <= s[0]; n++)
 		{
 			DrawInfobarSprite(tx, y-HUMAN_SCALE, HUMAN_SCALE/3, INFOBAR_SObjType_0 + s[n]-'0', setupInfo);
@@ -699,7 +699,7 @@ Boolean	warningOn;
 		warningOn = false;
 
 			/* DRAW BACK */
-	
+
 	if (warningOn)												// see if wobble
 	{
 		xoff = sin(gHealthWarningWobble) * 4.0f;
@@ -707,10 +707,10 @@ Boolean	warningOn;
 	}
 	else
 		xoff = 0;
-			
+
 	if (n >= 1.0f)
 	{
-		gHealthMeterRot += fps * 2.0f;								
+		gHealthMeterRot += fps * 2.0f;
 		DrawInfobarSprite_Rotated(HEALTH_X + xoff, HEALTH_Y, HEALTH_SIZE, INFOBAR_SObjType_MeterBack, gHealthMeterRot, setupInfo);
 	}
 	else
@@ -718,21 +718,21 @@ Boolean	warningOn;
 
 
 			/* DRAW METER */
-		
+
 	gHealthOccilate += fps * 10.0f;
 	size = HEALTH_SIZE * (1.0f + sin(gHealthOccilate)*.04f) * n;
 	x = HEALTH_X + (HEALTH_SIZE - size) * .5f;
 	y = HEALTH_Y + (HEALTH_SIZE - size) * .5f;
-	
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);								// make glow
 	DrawInfobarSprite(x+xoff, y, size, INFOBAR_SObjType_HealthMeter, setupInfo);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-	
-	
+
+
+
 		/* WHILE WE'RE HERE, UPDATE WARNING BEEP */
-		
-		
+
+
 	if (warningOn)
 	{
 		if (gHealthWarningChannel == -1)
@@ -757,14 +757,14 @@ float	n, fps = gFramesPerSecondFrac;
 
 
 			/* DRAW ROCKET ICON */
-			
+
 	DrawInfobarSprite(FUEL_X-34, 15, 30, INFOBAR_SObjType_RocketIcon, setupInfo);
 
 
 	n = gPlayerInfo.fuel;										// get health
 
 			/* DRAW BACK */
-			
+
 	if (n >= 1.0f)
 	{
 		gFuelMeterRot += fps * 2.0f;
@@ -777,7 +777,7 @@ float	n, fps = gFramesPerSecondFrac;
 	size = FUEL_SIZE * (1.0f + cos(gHealthOccilate)*.04f) * n;
 	x = FUEL_X + (FUEL_SIZE - size) * .5f;
 	y = FUEL_Y + (FUEL_SIZE - size) * .5f;
-	
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);								// make glow
 	DrawInfobarSprite(x, y, size, INFOBAR_SObjType_FuelMeter, setupInfo);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -795,7 +795,7 @@ float	n, fps = gFramesPerSecondFrac;
 	n = gPlayerInfo.jumpJet;										// get jj
 
 			/* DRAW BACK */
-			
+
 	if (n >= 1.0f)
 	{
 		gJumpJetMeterRot -= fps * 2.0f;
@@ -808,7 +808,7 @@ float	n, fps = gFramesPerSecondFrac;
 	size = JUMP_SIZE * (1.0f + cos(gHealthOccilate)*.04f) * n;
 	x = JUMP_X + (JUMP_SIZE - size) * .5f;
 	y = JUMP_Y + (JUMP_SIZE - size) * .5f;
-	
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);								// make glow
 	DrawInfobarSprite(x, y, size, INFOBAR_SObjType_JumpJetMeter, setupInfo);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -831,23 +831,23 @@ float	q,q2,y;
 			/**********************/
 
 				/* DRAW BEAM */
-				
+
 	if (gBeamMode == BEAM_MODE_TELEPORT)
 		q = gBeamCharge * 250.0f;
 	else
 		q = 0;
-		
+
 	q += 5.0f;														// give a tad extra so something is always showing
-		
+
 	gGlobalTransparency = .8f + RandomFloat() * .2f;
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);								// make glow
 	DrawInfobarSprite_Scaled(BEAM_X, BEAM_Y, q, BEAM_SCALE, INFOBAR_SObjType_TeleportBeam, setupInfo);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
-		
+
+
 				/* DRAW CUPS */
-									
-	gGlobalTransparency = 1.0f;	
+
+	gGlobalTransparency = 1.0f;
 	q += BEAM_CUP_SCALE;
 	DrawInfobarSprite_Centered(BEAM_CUP_X, BEAM_CUP_Y, BEAM_CUP_SCALE, INFOBAR_SObjType_BeamCupLeft, setupInfo);
 	DrawInfobarSprite_Centered(BEAM_CUP_X+q, BEAM_CUP_Y, BEAM_CUP_SCALE, INFOBAR_SObjType_BeamCupRight, setupInfo);
@@ -865,20 +865,20 @@ float	q,q2,y;
 		q2 = 0;
 
 	q2 += 5.0f;
-			
+
 	gGlobalTransparency = .8f + RandomFloat() * .2f;
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);								// make glow
 	DrawInfobarSprite_Scaled(BEAM_X, BEAM_Y+BEAM_CUP_SCALE, q2, BEAM_SCALE, INFOBAR_SObjType_DestructoBeam, setupInfo);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 				/* DRAW CUPS */
-				
-	gGlobalTransparency = 1.0f;	
+
+	gGlobalTransparency = 1.0f;
 	q2 += BEAM_CUP_SCALE;
 	DrawInfobarSprite_Centered(BEAM_CUP_X, BEAM_CUP_Y + BEAM_CUP_SCALE, BEAM_CUP_SCALE, INFOBAR_SObjType_BeamCupLeft, setupInfo);
 	DrawInfobarSprite_Centered(BEAM_CUP_X+q2,  BEAM_CUP_Y + BEAM_CUP_SCALE, BEAM_CUP_SCALE, INFOBAR_SObjType_BeamCupRight, setupInfo);
-	
-	
+
+
 			/*******************************/
 			/* DRAW GLOW FOR SELECTED BEAM */
 			/*******************************/
@@ -889,7 +889,7 @@ float	q,q2,y;
 		y += BEAM_CUP_SCALE;
 		q = q2;
 	}
-	
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);								// make glow
 	gGlobalTransparency = .8f + RandomFloat() * .2f;
 	DrawInfobarSprite2(BEAM_SPARKLE_X, y, BEAM_CUP_SCALE*3, SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_WhiteSpark4, setupInfo);
@@ -898,7 +898,7 @@ float	q,q2,y;
 
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	gGlobalTransparency = 1.0f;				
+	gGlobalTransparency = 1.0f;
 }
 
 
@@ -939,14 +939,14 @@ float	size;
 	gHelpMessageAlpha = 0;
 	gHelpMessageTimer = timer;								// set timer
 
-	
+
 			/* GET THE STRING TEXT TO DISPLAY */
-			
+
 	GetIndString(gHelpString, 1000 + gGamePrefs.language, messNum+1);
 
 
 			/* CALC STRING PARAMETERS */
-			
+
 	size = 0;
 	n = gHelpString[0];
 	for (i = 1; i <= n; i++)
@@ -957,7 +957,7 @@ float	size;
 		else
 			size += LETTER_SPACING;		// some day do proportional spacing here
 	}
-	
+
 	gHelpMessageX = 320.0f - (size * .5f);	// center the message
 }
 
@@ -976,8 +976,8 @@ AGLContext agl_ctx = gAGLContext;
 	fps = gFramesPerSecondFrac;
 
 		/* FADE THE TEXT */
-	
-	gHelpMessageTimer -= fps;	
+
+	gHelpMessageTimer -= fps;
 	if (gHelpMessageTimer > 0.0f)				// fade in
 	{
 		gHelpMessageAlpha += fps;
@@ -988,12 +988,12 @@ AGLContext agl_ctx = gAGLContext;
 	{
 		gHelpMessageAlpha -= fps;
 		if (gHelpMessageAlpha <= 0.0f)
-		{	
+		{
 			gDisplayedHelpMessage = HELP_MESSAGE_NONE;
 			return;
 		}
 	}
-	
+
 			/*******************/
 			/* DRAW THE BORDER */
 			/*******************/
@@ -1006,33 +1006,33 @@ AGLContext agl_ctx = gAGLContext;
 	glVertex2f(640, HELP_Y + 16);
 	glVertex2f(640, HELP_Y);
 	glVertex2f(0,	HELP_Y);
-	glEnd();	
+	glEnd();
 	SetColor4f(1,1,1,1);
 
 
 			/*******************/
 			/* DRAW THE STRING */
 			/*******************/
-			
+
 	x = gHelpMessageX;
 	y = HELP_Y;
-			
+
 	n = gHelpString[0];										// get str len
 
 	gGlobalTransparency = gHelpMessageAlpha;
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
-	
+
 	for (i = 1; i <= n; i++)
 	{
 				/* CONVERT LETTER INTO SPRITE # */
-				
+
 		texNum = CharToSprite(gHelpString[i]);
 		if (texNum == -1)
 		{
 			x += LETTER_SPACING * BLANK_LETTER_SPACER;
 			continue;
 		}
-			
+
 			/* DRAW THE LETTER */
 
 		DrawInfobarSprite2(x, y, LETTER_SPACING * 1.8f, SPRITE_GROUP_FONT, texNum, setupInfo);
@@ -1041,7 +1041,7 @@ AGLContext agl_ctx = gAGLContext;
 
 
 			/* CLEANUP */
-			
+
 	gGlobalTransparency = 1.0f;
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -1143,7 +1143,7 @@ short	s;
 		case	MACROMAN_OCIRC:
 				s = HELPTEXT_SObjType_Ox;
 				break;
-				
+
 		case	MACROMAN_OACUTE:
 				s = HELPTEXT_SObjType_Oa;
 				break;
@@ -1151,14 +1151,14 @@ short	s;
 		case	CHAR_APOSTROPHE:
 				s = HELPTEXT_SObjType_Apostrophe;
 				break;
-	
-	
+
+
 		default:
 				s = -1;
-	
+
 	}
-	
-	
+
+
 	return(s);
 }
 
@@ -1169,10 +1169,10 @@ Boolean AddHelpBeacon(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 
-	gNewObjectDefinition.genre		= EVENT_GENRE;				
+	gNewObjectDefinition.genre		= EVENT_GENRE;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= 0;	
+	gNewObjectDefinition.coord.y 	= 0;
 	gNewObjectDefinition.flags 		= 0;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+100;
 	gNewObjectDefinition.moveCall 	= MoveHelpBeacon;
@@ -1181,7 +1181,7 @@ ObjNode	*newObj;
 	newObj->TerrainItemPtr = itemPtr;								// keep ptr to item list
 
 	newObj->MessageNum = itemPtr->parm[0];
-	
+
 	return(true);
 }
 
@@ -1208,7 +1208,7 @@ short	messNum;
 	if (d < HELP_BEACON_RANGE)
 	{
 		messNum = theNode->MessageNum;					// get message #
-	
+
 		switch(messNum)									// do any custom handling
 		{
 			case	HELP_MESSAGE_JUMPJET:
@@ -1216,7 +1216,7 @@ short	messNum;
 						messNum = HELP_MESSAGE_NEEDJUMPFUEL;
 					break;
 		}
-	
+
 		if (!gHelpMessageDisabled[messNum])				// check to see if it was disabled
 			DisplayHelpMessage(messNum, 1.0, true);
 	}

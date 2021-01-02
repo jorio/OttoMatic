@@ -61,8 +61,8 @@ float	timeout = 40.0f;
 
 
 			/* SETUP VIEW */
-			
-	OGL_NewViewDef(&viewDef);	
+
+	OGL_NewViewDef(&viewDef);
 
 	viewDef.camera.hither 			= 10;
 	viewDef.camera.yon 				= 3000;
@@ -85,45 +85,45 @@ float	timeout = 40.0f;
 		/***********/
 		/* SHOW IT */
 		/***********/
-			
-	
+
+
 	MakeFadeEvent(true, 1.0);
 	UpdateInput();
 	CalcFramesPerSecond();
-		
+
 					/* MAIN LOOP */
-						
+
 		while(!Button())
 		{
 			CalcFramesPerSecond();
 			MoveObjects();
 			OGL_DrawScene(gGameViewInfoPtr, DisplayPicture_Draw);
-			
+
 			UpdateInput();
 			if (AreAnyNewKeysPressed())
 				break;
-				
+
 			timeout -= gFramesPerSecondFrac;
 			if (timeout < 0.0f)
 				break;
 		}
-		
-	
+
+
 			/* CLEANUP */
-			
+
 	DeleteAllObjects();
 	MO_DisposeObjectReference(gBackgoundPicture);
-	DisposeAllSpriteGroups();	
+	DisposeAllSpriteGroups();
 
 
 			/* FADE OUT */
-			
-	GammaFadeOut();
-	
 
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);	
-	
-	
+	GammaFadeOut();
+
+
+	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+
+
 }
 
 
@@ -194,7 +194,7 @@ Boolean DoLevelCheatDialog(void)
 DialogPtr 		myDialog;
 short			itemHit;
 Boolean			dialogDone = false;
-	
+
 	Enter2D();
 //	InitCursor();
 	myDialog = GetNewDialog(132,nil,MOVE_TO_FRONT);
@@ -205,14 +205,14 @@ Boolean			dialogDone = false;
 	}
 
 	AutoSizeDialog(myDialog);
-	
-	
-		
+
+
+
 //	GammaFadeIn();
-	
-	
+
+
 				/* DO IT */
-				
+
 	MyFlushEvents();
 	while(!dialogDone)
 	{
@@ -221,10 +221,10 @@ Boolean			dialogDone = false;
 		{
 			case 	1:									// hit Quit
 					CleanQuit();
-					
+
 			default:									// selected a level
 					gLevelNum = (itemHit - 2);
-					dialogDone = true;				
+					dialogDone = true;
 		}
 	}
 	DisposeDialog(myDialog);
@@ -248,7 +248,7 @@ void DoGameSettingsDialog(void)
 OSErr			err;
 EventTypeSpec	list[] = { { kEventClassCommand,  kEventProcessCommand } };
 WindowRef 		dialogWindow = nil;
-EventHandlerUPP winEvtHandler;		
+EventHandlerUPP winEvtHandler;
 ControlID 		idControl;
 ControlRef 		control;
 EventHandlerRef	ref;
@@ -268,27 +268,27 @@ const char		*rezNames[MAX_LANGUAGES] =
 		InitDefaultPrefs();
 
 	Enter2D();
-	InitCursor();	
+	InitCursor();
 	MyFlushEvents();
 
 
     		/***************/
     		/* INIT DIALOG */
     		/***************/
-    
+
 do_again:
-    
+
 	gLanguageChanged  = false;
-    
+
 			/* CREATE WINDOW FROM THE NIB */
-				
+
     err = CreateWindowFromNib(gNibs,CFStringCreateWithCString(nil, rezNames[gGamePrefs.language],
     						kCFStringEncodingMacRoman), &dialogWindow);
 	if (err)
 		DoFatalAlert("\pDoGameSettingsDialog: CreateWindowFromNib failed!");
 
 			/* CREATE NEW WINDOW EVENT HANDLER */
-				
+
     winEvtHandler = NewEventHandlerUPP(DoGameSettingsDialog_EventHandler);
     InstallWindowEventHandler(dialogWindow, winEvtHandler, GetEventTypeCount(list), list, dialogWindow, &ref);
 
@@ -296,7 +296,7 @@ do_again:
 			/* SET "SHOW VIDEO" CHECKBOX */
 
     idControl.signature = 'vido';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(dialogWindow, &idControl, &control);
 	SetControlValue(control, gGamePrefs.showScreenModeDialog);
 
@@ -304,7 +304,7 @@ do_again:
 			/* SET "CONTROL RELATIVE" BUTTONS */
 
     idControl.signature = 'relc';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(dialogWindow, &idControl, &control);
 	SetControlValue(control, gGamePrefs.playerRelControls + 1);
 
@@ -312,7 +312,7 @@ do_again:
 			/* SET LANGUAGE MENU */
 
     idControl.signature = 'lang';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(dialogWindow, &idControl, &control);
 	SetControlValue(control, gGamePrefs.language + 1);
 
@@ -321,7 +321,7 @@ do_again:
 			/**********************/
 			/* PROCESS THE DIALOG */
 			/**********************/
-			
+
     ShowWindow(dialogWindow);
 	RunAppModalLoopForWindow(dialogWindow);
 
@@ -329,11 +329,11 @@ do_again:
 			/*********************/
 			/* GET RESULT VALUES */
 			/*********************/
-			
+
 			/* GET "SHOW VIDEO" CHECKBOX */
 
     idControl.signature = 'vido';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(dialogWindow, &idControl, &control);
 	gGamePrefs.showScreenModeDialog = GetControlValue(control);
 
@@ -341,7 +341,7 @@ do_again:
 			/* GET LANGUAGE */
 
     idControl.signature = 'lang';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(dialogWindow, &idControl, &control);
 	gGamePrefs.language = GetControlValue(control) - 1;
 
@@ -349,19 +349,19 @@ do_again:
 			/* GET RELATIVE BUTTONS */
 
     idControl.signature = 'relc';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(dialogWindow, &idControl, &control);
 	gGamePrefs.playerRelControls = GetControlValue(control) - 1;
 
 				/***********/
 				/* CLEANUP */
 				/***********/
-				
+
 	DisposeEventHandlerUPP (winEvtHandler);
 	DisposeWindow (dialogWindow);
 
 			/* IF IT WAS JUST A LANGUAGE CHANGE THEN GO BACK TO THE DIALOG */
-			
+
 	if (gLanguageChanged)
 		goto do_again;
 
@@ -369,7 +369,7 @@ do_again:
 	HideCursor();
 	Exit2D();
 	SavePrefs();
-		
+
 	CalcFramesPerSecond();				// reset this so things dont go crazy when we return
 	CalcFramesPerSecond();
 
@@ -386,38 +386,38 @@ HICommand 			command;
 
 	switch(GetEventKind(event))
 	{
-				
+
 				/*******************/
 				/* PROCESS COMMAND */
 				/*******************/
-				
+
 		case	kEventProcessCommand:
 				GetEventParameter (event, kEventParamDirectObject, kEventParamHICommand, NULL, sizeof(command), NULL, &command);
 				switch(command.commandID)
 				{
 							/* OK BUTTON */
-							
+
 					case	kHICommandOK:
 		                    QuitAppModalLoopForWindow((WindowRef) userData);
 		                    break;
-					
-					
+
+
 							/* CONFIGURE INPUT BUTTON */
-							
+
 					case	'cnfg':
 							DoInputConfigDialog();
 							break;
 
 
 							/* CLEAR HIGH SCORES BUTTON */
-							
+
 					case	'hisc':
 							ClearHighScores();
 							break;
 
 
 							/* LANGUAGE */
-							
+
 					case	'lang':
 							gLanguageChanged = true;
 		                    QuitAppModalLoopForWindow((WindowRef) userData);
@@ -437,7 +437,7 @@ HICommand 			command;
 void DoGameSettingsDialog(void)
 {
 DialogRef 		myDialog;
-DialogItemType	itemHit; 
+DialogItemType	itemHit;
 ControlRef		ctrlHandle;
 Boolean			dialogDone;
 
@@ -448,9 +448,9 @@ Boolean			dialogDone;
 	Enter2D();
 
 
-	
-	InitCursor();		
-	
+
+	InitCursor();
+
 	MyFlushEvents();
 
 	UseResFile(gMainAppRezFile);
@@ -460,10 +460,10 @@ Boolean			dialogDone;
 		DoAlert("\pDoGameSettingsDialog: GetNewDialog failed!");
 		ShowSystemErr(gGamePrefs.language);
 	}
-	
-	
+
+
 				/* SET CONTROL VALUES */
-					
+
 	GetDialogItemAsControl(myDialog,10,&ctrlHandle);			// camera relativity
 	SetControlValue(ctrlHandle,!gGamePrefs.playerRelControls);
 	GetDialogItemAsControl(myDialog,11,&ctrlHandle);
@@ -481,16 +481,16 @@ Boolean			dialogDone;
 	SetControlValue(ctrlHandle,gGamePrefs.language == LANGUAGE_ITALIAN);
 	GetDialogItemAsControl(myDialog,9,&ctrlHandle);
 	SetControlValue(ctrlHandle,gGamePrefs.language == LANGUAGE_SWEDISH);
-		
 
-	
+
+
 	AutoSizeDialog(myDialog);
 
 
 
-	
+
 				/* DO IT */
-				
+
 	dialogDone = false;
 	while(dialogDone == false)
 	{
@@ -500,15 +500,15 @@ Boolean			dialogDone;
 			case 	1:									// hit ok
 					dialogDone = true;
 					break;
-					
-			case	10:																				
-			case	11:	
+
+			case	10:
+			case	11:
 					gGamePrefs.playerRelControls = (itemHit == 11);
-					GetDialogItemAsControl(myDialog,10,&ctrlHandle);		
+					GetDialogItemAsControl(myDialog,10,&ctrlHandle);
 					SetControlValue(ctrlHandle,!gGamePrefs.playerRelControls);
 					GetDialogItemAsControl(myDialog,11,&ctrlHandle);
 					SetControlValue(ctrlHandle,gGamePrefs.playerRelControls);
-					break;							
+					break;
 
 			case	4:
 			case	5:
@@ -535,12 +535,12 @@ Boolean			dialogDone;
 					DoInputConfigDialog();
 					InitCursor();
 					break;
-					
-					
+
+
 			case	15:
 					ClearHighScores();
 					break;
-					
+
 
 		}
 	}
@@ -549,14 +549,14 @@ Boolean			dialogDone;
 
 	DisposeDialog(myDialog);
 
-	
+
 	HideCursor();
 
 	Exit2D();
-	
-	
+
+
 	SavePrefs();
-		
+
 	CalcFramesPerSecond();				// reset this so things dont go crazy when we return
 	CalcFramesPerSecond();
 

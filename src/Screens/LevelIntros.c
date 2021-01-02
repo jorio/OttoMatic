@@ -59,7 +59,7 @@ enum
 
 	INTRO_ObjType_Star,
 	INTRO_ObjType_PlanetGlow,
-	
+
 	INTRO_ObjType_Earth,
 	INTRO_ObjType_EarthClouds,
 
@@ -118,7 +118,7 @@ float	oldTime,maxTime = 11.0f;
 			/**************/
 			/* PLAY MUSIC */
 			/**************/
-			
+
 	switch(gLevelNum)
 	{
 		case	LEVEL_NUM_FARM:
@@ -136,20 +136,20 @@ float	oldTime,maxTime = 11.0f;
 		case	LEVEL_NUM_CLOUD:
 				PlaySong(SONG_CLOUD, true);
 				break;
-				
+
 		case	LEVEL_NUM_JUNGLE:
 				PlaySong(SONG_JUNGLE, true);
 				break;
-				
+
 		case	LEVEL_NUM_JUNGLEBOSS:
 				PlaySong(SONG_JUNGLEBOSS, true);
 				return;										// this level doesn't have an intro, so bail now.
 				break;
-				
+
 		case	LEVEL_NUM_FIREICE:
 				PlaySong(SONG_FIREICE, true);
 				break;
-				
+
 		case	LEVEL_NUM_SAUCER:
 				PlaySong(SONG_SAUCER, true);
 				break;
@@ -158,7 +158,7 @@ float	oldTime,maxTime = 11.0f;
 				PlaySong(SONG_BRAINBOSS, true);
 				maxTime = 5.0f;
 				break;
-				
+
 		default:
 				PlaySong(SONG_APOCALYPSE, true);
 	}
@@ -166,50 +166,50 @@ float	oldTime,maxTime = 11.0f;
 
 	gIntroTimer = 0;
 	gLevelNameTransparency = 0;
-	
+
 			/* SETUP */
-	
-	SetupIntroScreen();	
+
+	SetupIntroScreen();
 	MakeFadeEvent(true, 1.0);
 
 				/*************/
 				/* MAIN LOOP */
 				/*************/
-				
+
 	CalcFramesPerSecond();
-	UpdateInput();		
-	
+	UpdateInput();
+
 	while(true)
 	{
 			/* DRAW STUFF */
-	
+
 		CalcFramesPerSecond();
-		UpdateInput();		
-		MoveObjects();				
-		OGL_DrawScene(gGameViewInfoPtr, DrawIntroCallback);	
+		UpdateInput();
+		MoveObjects();
+		OGL_DrawScene(gGameViewInfoPtr, DrawIntroCallback);
 
 		if (AreAnyNewKeysPressed())
 			break;
-			
-			
+
+
 				/* CHECK TIMER */
-				
+
 		oldTime = gIntroTimer;
 		gIntroTimer += gFramesPerSecondFrac;
 		if ((gIntroTimer > maxTime) && (oldTime <= maxTime))
 		{
-#if ALLOW_FADE		
+#if ALLOW_FADE
 			MakeFadeEvent(false, 1.0);
 #else
 			break;
-#endif						
+#endif
 		}
-	
+
 		if (gGammaFadePercent <= 0.0f)
-			break;	
+			break;
 	}
-	
-	
+
+
 			/* CLEANUP */
 
 	GammaFadeOut();
@@ -238,25 +238,25 @@ const short textSprites[] =
 
 
 			/* DRAW OBJECTS */
-			
+
 	DrawObjects(info);
 	DrawSparkles(info);
-	
-	
+
+
 		/************************/
 		/* DRAW SPRITE OVERLAYS */
 		/************************/
-			
+
 	OGL_PushState();
-				
+
 	if (info->useFog)
 		glDisable(GL_FOG);
-		
+
 	SetInfobarSpriteState();
-		
+
 
 			/* DRAW LEVEL TEXT */
-		
+
 	if (gLevelNum == LEVEL_NUM_BRAINBOSS)							// comes in sooner on Brain Boss level
 	{
 		if (gIntroTimer > 1.0f)
@@ -267,7 +267,7 @@ const short textSprites[] =
 		}
 	}
 	else
-	{	
+	{
 		if (gIntroTimer > 3.0f)
 		{
 			gLevelNameTransparency += gFramesPerSecondFrac *.6f;
@@ -275,12 +275,12 @@ const short textSprites[] =
 				gLevelNameTransparency = 1.0f;
 		}
 	}
-		
+
 	gGlobalTransparency = gLevelNameTransparency;
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);								// make glow
 	DrawInfobarSprite(0,440, 300, textSprites[gLevelNum], info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	gGlobalTransparency = 1.0;	
+	gGlobalTransparency = 1.0;
 
 			/***********/
 			/* CLEANUP */
@@ -288,7 +288,7 @@ const short textSprites[] =
 
 	OGL_PopState();
 	gGlobalMaterialFlags = 0;
-			
+
 }
 
 
@@ -301,7 +301,7 @@ OGLSetupInputType	viewDef;
 ObjNode	*planet,*glow,*newObj,*clouds;
 int		i;
 
-const OGLColorRGBA glowColor[] = 
+const OGLColorRGBA glowColor[] =
 {
 	.7,.7,1,.99,						// earth
 	.7,.3,1,.99,						// slime
@@ -343,15 +343,15 @@ const Byte	cloud[] =
 	INTRO_ObjType_FireClouds,			// fire & ice
 	INTRO_ObjType_SaucerClouds,			// saucer
 	INTRO_ObjType_XClouds,				// brain boss
-};	
+};
 
 
 
 			/**************/
 			/* SETUP VIEW */
 			/**************/
-			
-	OGL_NewViewDef(&viewDef);	
+
+	OGL_NewViewDef(&viewDef);
 
 	viewDef.lights.ambientColor 	= ambientColor;
 	viewDef.lights.fillDirection[0].x *= -1.0f;
@@ -363,8 +363,8 @@ const Byte	cloud[] =
 
 			/*********************/
 			/* SET ANAGLYPH INFO */
-			/*********************/			
-			
+			/*********************/
+
 	if (gGamePrefs.anaglyph)
 	{
 		if (!gGamePrefs.anaglyphColor)
@@ -373,7 +373,7 @@ const Byte	cloud[] =
 			viewDef.lights.ambientColor.g 		+= .1f;
 			viewDef.lights.ambientColor.b 		+= .1f;
 		}
-				
+
 		gAnaglyphFocallength	= 300.0f;
 		gAnaglyphEyeSeparation 	= 70.0f;
 	}
@@ -389,7 +389,7 @@ const Byte	cloud[] =
 
 
 			/* LOAD SPRITES */
-			
+
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:spheremap.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
 
@@ -413,7 +413,7 @@ const Byte	cloud[] =
 			/**************/
 			/* MAKE STARS */
 			/**************/
-	
+
 	for (i = 0; i < 170; i++)
 	{
 		OGLMatrix4x4	m;
@@ -424,28 +424,28 @@ const Byte	cloud[] =
 			1,.6,.6,1,			// red
 			.6,.6,1,1,			// blue
 			.7,.7,8,1,			// grey
-		
+
 		};
-	
+
 		OGLMatrix4x4_SetRotateAboutPoint(&m, &viewDef.camera.from, RandomFloat()*PI2,RandomFloat()*PI2,RandomFloat()*PI2);
 		p.x = p.y =0;
 		p.z = viewDef.camera.yon * .9f;
 		OGLPoint3D_Transform(&p,&m,&gNewObjectDefinition.coord);
-	
-		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELINTRO;	
+
+		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELINTRO;
 		gNewObjectDefinition.type 		= INTRO_ObjType_Star;
-		gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_GLOW | STATUS_BIT_NOTEXTUREWRAP | 
+		gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_GLOW | STATUS_BIT_NOTEXTUREWRAP |
 										STATUS_BIT_NOZWRITES | STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING | STATUS_BIT_AIMATCAMERA;
 		gNewObjectDefinition.slot 		= 200;
 		gNewObjectDefinition.moveCall 	= MoveStar;
 		gNewObjectDefinition.rot 		= 0;
 		gNewObjectDefinition.scale 	    = 4.0f + RandomFloat() * 3.0f;
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 		newObj->SpecialF[0] = RandomFloat() * PI;
-		
+
 		newObj->ColorFilter = colors[MyRandomLong()&0x3];
-		
+
 	}
 
 
@@ -454,8 +454,8 @@ const Byte	cloud[] =
 			/***************/
 
 				/* EARTH SPHERE */
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELINTRO;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELINTRO;
 	gNewObjectDefinition.type 		= terra[gLevelNum];
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.y 	= 0;
@@ -466,10 +466,10 @@ const Byte	cloud[] =
 	gNewObjectDefinition.rot 		= PI2/3;
 	gNewObjectDefinition.scale 	    = 60;
 	planet = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 
 			/* EARTH CLOUDS */
-			
+
 	gNewObjectDefinition.type 		= cloud[gLevelNum];
 	gNewObjectDefinition.flags 		= STATUS_BIT_ROTYZX | STATUS_BIT_DONTCULL | STATUS_BIT_UVTRANSFORM |
 									STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOZWRITES;
@@ -482,7 +482,7 @@ const Byte	cloud[] =
 	clouds->ColorFilter.a = .95;
 
 			/* GLOW */
-			
+
 	gNewObjectDefinition.type 		= INTRO_ObjType_PlanetGlow;
 	gNewObjectDefinition.flags 		= STATUS_BIT_ROTYZX | STATUS_BIT_DONTCULL | STATUS_BIT_UVTRANSFORM |
 									STATUS_BIT_GLOW | STATUS_BIT_NOZWRITES;
@@ -501,19 +501,19 @@ const Byte	cloud[] =
 			/**************/
 			/* MAKE SHIPS */
 			/**************/
-			
+
 	switch(gLevelNum)
 	{
 		case	LEVEL_NUM_SAUCER:								// show ice saucer
 				CreateIntroSaucer2();
 				break;
-				
+
 		case	LEVEL_NUM_BRAINBOSS:							// no ships
 				break;
-	
+
 		default:
 				CreateIntroSaucers();
-	
+
 	}
 }
 
@@ -530,13 +530,13 @@ float	x,z;
 	for (r = 0; r < 4; r++)
 	{
 		x = 130.0f + r / 2.0f * -900.0f;
-		
+
 		for (c = 0; c < (r+1); c++)
-		{	
-			gNewObjectDefinition.group 		= MODEL_GROUP_LEVELINTRO;	
+		{
+			gNewObjectDefinition.group 		= MODEL_GROUP_LEVELINTRO;
 			gNewObjectDefinition.type 		= INTRO_ObjType_EnemySaucer_Top;
 			gNewObjectDefinition.coord.x 	= x + RandomFloat2() * 100.0f;
-			gNewObjectDefinition.coord.y 	= -2000;	
+			gNewObjectDefinition.coord.y 	= -2000;
 			gNewObjectDefinition.coord.z 	= z + RandomFloat2() * 100.0f;
 			gNewObjectDefinition.flags 		= 0;
 			gNewObjectDefinition.slot 		= 100;
@@ -563,10 +563,10 @@ static void CreateIntroSaucer2(void)
 {
 ObjNode	*newObj;
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELINTRO;	
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELINTRO;
 	gNewObjectDefinition.type 		= INTRO_ObjType_IceSaucer;
 	gNewObjectDefinition.coord.x 	= 130;
-	gNewObjectDefinition.coord.y 	= -2000;	
+	gNewObjectDefinition.coord.y 	= -2000;
 	gNewObjectDefinition.coord.z 	= 1000;
 	gNewObjectDefinition.flags 		= 0;
 	gNewObjectDefinition.slot 		= 100;
@@ -582,11 +582,11 @@ ObjNode	*newObj;
 /********************** FREE INTRO ART **********************/
 
 static void FreeIntroScreen(void)
-{				
-	FlushEvents (everyEvent, REMOVE_ALL_EVENTS);	
+{
+	FlushEvents (everyEvent, REMOVE_ALL_EVENTS);
 	DeleteAllObjects();
 	DisposeParticleSystem();
-	DisposeAllSpriteGroups();	
+	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
 }
@@ -602,36 +602,36 @@ float	fps = gFramesPerSecondFrac;
 float	r;
 
 	GetObjectInfo(topObj);
-	
+
 			/* MAKE WOBBLE */
-			
+
 	topObj->SpecialF[0] += fps * 3.0f;
 	r = sin(topObj->SpecialF[0]) * .1f;
 	topObj->Rot.z = r;
-	
+
 			/* MOVE IT */
-			
+
 	gCoord.z -= 800.0f * fps;
 
 			/* MAKE IT SPIN */
-			
+
 	topObj->Rot.y -= fps * 3.0f;
 
 
 	UpdateObject(topObj);
-	
-		
+
+
 			/* UPDATE CAMERA */
-			
+
 	if (topObj->Kind == 0)
-	{			
+	{
 		OGL_UpdateCameraFromTo(gGameViewInfoPtr, &gGameViewInfoPtr->cameraPlacement.cameraLocation, &gCoord);
-	
+
 	}
-	
-	
+
+
 			/* UPDATE AUDIO */
-			
+
 	if (topObj->EffectChannel != -1)
 	{
 		Update3DSoundChannel(EFFECT_SAUCER, &topObj->EffectChannel, &topObj->Coord);

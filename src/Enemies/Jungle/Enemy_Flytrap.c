@@ -54,7 +54,7 @@ static void AlignPlayerInFlyTrapGrasp(ObjNode *enemy);
 
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -99,10 +99,10 @@ ObjNode	*newObj;
 				/*******************************/
 				/* MAKE DEFAULT SKELETON ENEMY */
 				/*******************************/
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_FLYTRAP,x,z, FLYTRAP_SCALE, (float)itemPtr->parm[0] * PI2/8, MoveFlyTrap);
 	newObj->TerrainItemPtr = itemPtr;
-	
+
 	newObj->Skeleton->CurrentAnimTime = newObj->Skeleton->MaxAnimTime * RandomFloat();		// set random time index so all of these are not in sync
 
 
@@ -114,23 +114,23 @@ ObjNode	*newObj;
 	newObj->Damage 		= .1;
 	newObj->Kind 		= ENEMY_KIND_FLYTRAP;
 
-	newObj->FrozenTimer	= 0;	
-	newObj->CheckEatFlag = false;		
-	
+	newObj->FrozenTimer	= 0;
+	newObj->CheckEatFlag = false;
+
 				/* SET COLLISION INFO */
-				
+
 	SetObjectCollisionBounds(newObj, newObj->BBox.max.y, newObj->BBox.min.y, -100,100,100,-100);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FREEZE] 		= FlyTrapHitByFreeze;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FLAME] 		= FlyTrapHitByFire;
-			
+
 	if (gLevelNum == LEVEL_NUM_JUNGLEBOSS)				// dont auto target these on boss level since cant be killed
 		newObj->CType &= ~CTYPE_AUTOTARGETWEAPON;
-		
-		
+
+
 	gNumEnemies++;
 	gNumEnemyOfKind[ENEMY_KIND_FLYTRAP]++;
 	return(true);
@@ -154,13 +154,13 @@ static	void(*myMoveTable[])(ObjNode *) =
 		return;
 	}
 
-	
+
 			/* SEE IF FROZEN */
 
 	if (theNode->FrozenTimer > 0.0f)
 		MoveFlyTrap_Frozen(theNode);
-	else	
-		myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+	else
+		myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -173,17 +173,17 @@ float	angle,dist;
 
 
 			/* SEE IF ATTACK */
-		
+
 	if (gPlayerInfo.invincibilityTimer > 0.0f)				// dont attack if I'm invincible
 		return;
 
-	angle = TurnObjectTowardTarget(theNode, &theNode->Coord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, 0, false);			
+	angle = TurnObjectTowardTarget(theNode, &theNode->Coord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, 0, false);
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, theNode->Coord.x, theNode->Coord.z);
 
 	if ((dist < FLYTRAP_ATTACK_DIST) && (angle < (PI/3.0f)))
 	{
-		MorphToSkeletonAnim(theNode->Skeleton, FLYTRAP_ANIM_EAT, 2);		
-	}	
+		MorphToSkeletonAnim(theNode->Skeleton, FLYTRAP_ANIM_EAT, 2);
+	}
 }
 
 
@@ -200,7 +200,7 @@ float	fps = gFramesPerSecondFrac;
 
 
 				/* UPDATE */
-			
+
 
 	theNode->FrozenTimer -= fps;								// dec the frozen timer & see if thawed
 	if (theNode->FrozenTimer <= 0.0f)
@@ -218,35 +218,35 @@ float	fps = gFramesPerSecondFrac;
 /********************** MOVE FLYTRAP: EAT ******************************/
 
 static void  MoveFlyTrap_Eat(ObjNode *theNode)
-{				
+{
 			/*********************/
 			/* SEE IF EAT PLAYER */
 			/*********************/
 
 	if (theNode->Skeleton->AnimHasStopped)
-		MorphToSkeletonAnim(theNode->Skeleton, FLYTRAP_ANIM_WAIT, 2);	
-	else	
+		MorphToSkeletonAnim(theNode->Skeleton, FLYTRAP_ANIM_WAIT, 2);
+	else
 	if (theNode->CheckEatFlag && (gPlayerInfo.scaleRatio <= 1.0f))
 	{
 		OGLPoint3D	intersect;
 		Boolean		overTop;
 		float		fenceTop;
-		
+
 		if (!SeeIfLineSegmentHitsFence(&gPlayerInfo.coord, &gCoord, &intersect, &overTop, &fenceTop))			// dont grab if there's a fence between us
-		{								
+		{
 			OGLPoint3D	p;
-			
+
 			FindCoordOnJoint(theNode, FLYTRAP_JOINT_HEAD, &gJawOff, &p);			// get coord of mouth
 			if (CalcQuickDistance(p.x, p.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < 200.0f)
 			{
 				theNode->GrippingPlayer = true;
-				theNode->ThrowPlayerFlag = false;					
+				theNode->ThrowPlayerFlag = false;
 				MorphToSkeletonAnim(theNode->Skeleton, FLYTRAP_ANIM_GOBBLE, 3);			// make gobble
 				theNode->Skeleton->AnimSpeed = .6;
 				SetSkeletonAnim(gPlayerInfo.objNode->Skeleton, PLAYER_ANIM_GRABBED2);	// put player into grabbed mode
 			}
 		}
-	}		
+	}
 }
 
 
@@ -255,37 +255,37 @@ static void  MoveFlyTrap_Eat(ObjNode *theNode)
 static void  MoveFlyTrap_Gobble(ObjNode *theNode)
 {
 
-				
+
 	if (theNode->GrippingPlayer)
 	{
 		AlignPlayerInFlyTrapGrasp(theNode);
-	
-	
+
+
 			/* SEE IF THROW PLAYER */
-				
+
 		if (theNode->ThrowPlayerFlag)					// see if throw player now
 		{
 			OGLMatrix4x4	m;
 			ObjNode			*player = gPlayerInfo.objNode;
 			const OGLVector3D	throwVec = {0,1,-1};
-			
-			MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_THROWN, 7.0);	
+
+			MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_THROWN, 7.0);
 			PlayEffect_Parms3D(EFFECT_THROWNSWOOSH, &player->Coord, NORMAL_CHANNEL_RATE, 2.0);
 
 			FindJointMatrixAtFlagEvent(theNode, FLYTRAP_JOINT_HEAD, &m);			// calc throw vector @ exact time of throw flag
 			OGLVector3D_Transform(&throwVec, &m, &player->Delta);
 			player->Delta.x *= 2500.0f;
-			player->Delta.y *= 2500.0f; 
+			player->Delta.y *= 2500.0f;
 			player->Delta.z *= 2500.0f;
 			gCurrentMaxSpeed = 15000;
-				
+
 			theNode->GrippingPlayer = false;
 		}
 	}
-	
-	
+
+
 			/* SEE IF DONE */
-			
+
 	if (theNode->Skeleton->AnimHasStopped)
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, FLYTRAP_ANIM_WAIT, 2);
@@ -329,7 +329,7 @@ static Boolean FlyTrapHitByFreeze(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *w
 		return(true);
 
 			/* CHANGE THE TEXTURE */
-				
+
 	enemy->Skeleton->overrideTexture = gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][JUNGLE_SObjType_FrozenFlyTrap].materialObject;
 
 
@@ -365,28 +365,28 @@ OGLMatrix4x4	m,m2,m3;
 float		scale;
 
 			/* CALC SCALE MATRIX */
-			
+
 	scale = PLAYER_DEFAULT_SCALE/FLYTRAP_SCALE;					// to adjust from onion's scale to player's
 	OGLMatrix4x4_SetScale(&m2, scale, scale, scale);
 
 
 			/* CALC TRANSLATE MATRIX */
-			
+
 	OGLMatrix4x4_SetTranslate(&m3, gJawOff.x, gJawOff.y, gJawOff.z);
 	OGLMatrix4x4_Multiply(&m2, &m3, &m);
 
 
 			/* GET ALIGNMENT MATRIX */
-			
+
 	FindJointFullMatrix(enemy, FLYTRAP_JOINT_HEAD, &m2);									// get joint's matrix
 
-	
+
 	OGLMatrix4x4_Multiply(&m, &m2, &gPlayerInfo.objNode->BaseTransformMatrix);
 	SetObjectTransformMatrix(gPlayerInfo.objNode);
 
-	
+
 			/* FIND COORDS */
-			
+
 	FindCoordOnJoint(enemy, FLYTRAP_JOINT_HEAD, &gJawOff, &gPlayerInfo.objNode->Coord);			// get coord of mouth
 }
 

@@ -78,7 +78,7 @@ static void GiantLizardHitByJumpJet(ObjNode *enemy);
 
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -138,13 +138,13 @@ int		i;
 				/*******************************/
 				/* MAKE DEFAULT SKELETON ENEMY */
 				/*******************************/
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_GIANTLIZARD,x,z, GIANTLIZARD_SCALE, 0, MoveGiantLizard);
 	newObj->TerrainItemPtr = itemPtr;
 	newObj->EnemyRegenerate = itemPtr->parm[3] & (1<<1);
 
 	SetSkeletonAnim(newObj->Skeleton, GIANTLIZARD_ANIM_STAND);
-	
+
 
 				/*******************/
 				/* SET BETTER INFO */
@@ -154,29 +154,29 @@ int		i;
 	newObj->Damage 		= .1;
 	newObj->Kind 		= ENEMY_KIND_GIANTLIZARD;
 
-	newObj->BreatheFire = false;	
-	
+	newObj->BreatheFire = false;
+
 				/* SET COLLISION INFO */
-				
+
 	SetObjectCollisionBounds(newObj, 160,-500,-200,200,200,-200);
 	CalcNewTargetOffsets(newObj,GIANTLIZARD_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	for (i = 0; i < NUM_WEAPON_TYPES; i++)
 		newObj->HitByWeaponHandler[i] = GiantLizardHitByWeapon;
 	newObj->HitByJumpJetHandler = GiantLizardHitByJumpJet;
 
 	newObj->HurtCallback = HurtGiantLizard;							// set hurt callback function
-			
+
 
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 20, 35,false);
-		
-		
+
+
 	gNumEnemies++;
 	gNumEnemyOfKind[ENEMY_KIND_GIANTLIZARD]++;
 	return(true);
@@ -206,8 +206,8 @@ static	void(*myMoveTable[])(ObjNode *) =
 	}
 
 	GetObjectInfo(theNode);
-	
-	myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -231,18 +231,18 @@ float	dist;
 	}
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 
-	UpdateGiantLizard(theNode);		
+	UpdateGiantLizard(theNode);
 }
 
 
@@ -258,7 +258,7 @@ float		r,fps,angle,dist;
 
 			/* MOVE TOWARD PLAYER */
 
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, GIANTLIZARD_TURN_SPEED, true);			
+	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, GIANTLIZARD_TURN_SPEED, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * GIANTLIZARD_WALK_SPEED;
@@ -268,29 +268,29 @@ float		r,fps,angle,dist;
 
 
 				/* SEE IF STAND */
-					
+
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
 	if (dist >= GIANTLIZARD_CHASE_DIST_MAX)
 		MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_STAND, 4);
-		
-		
+
+
 				/* UPDATE ANIM SPEED */
 
 	if (theNode->Skeleton->AnimNum == GIANTLIZARD_ANIM_WALK)
 		theNode->Skeleton->AnimSpeed = GIANTLIZARD_WALK_SPEED * .005f;
-	
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
-		
+
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfGiantLizardAttack(theNode, angle, dist);
-		
-		
-	UpdateGiantLizard(theNode);		
+
+
+	UpdateGiantLizard(theNode);
 }
 
 /********************** MOVE GIANTLIZARD: BREATHE ******************************/
@@ -298,21 +298,21 @@ float		r,fps,angle,dist;
 static void  MoveGiantLizard_Breathe(ObjNode *theNode)
 {
 			/* MOVE */
-				
+
 	ApplyFrictionToDeltas(3000.0,&gDelta);
-	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, GIANTLIZARD_TURN_SPEED/5, false);			
-				
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, GIANTLIZARD_TURN_SPEED/5, false);
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 				/* BREATHE FIRE */
-				
+
 	if (theNode->BreatheFire)
 	{
 		if (theNode->EffectChannel == -1)
@@ -320,23 +320,23 @@ static void  MoveGiantLizard_Breathe(ObjNode *theNode)
 		else
 			Update3DSoundChannel(EFFECT_FIREBREATH, &theNode->EffectChannel, &gCoord);
 
-		GiantLizardShootFlames(theNode);	
+		GiantLizardShootFlames(theNode);
 	}
-	
+
 				/* SEE IF ABORT */
 	else
 	if (gPlayerInfo.scaleRatio <= 1.0f)							// only test abort if play is normal size
 	{
 		if (CalcQuickDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < GIANTLIZARD_FLAME_DIST_MIN)	// abort if player too close
 		{
-			MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_EAT, 2);	// eat instead		
+			MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_EAT, 2);	// eat instead
 		}
-	}	
+	}
 
 
 
 				/* SEE IF DONE */
-				
+
 	if (theNode->Skeleton->AnimHasStopped)
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_WALK, 1);
@@ -344,7 +344,7 @@ static void  MoveGiantLizard_Breathe(ObjNode *theNode)
 	}
 
 
-	UpdateGiantLizard(theNode);		
+	UpdateGiantLizard(theNode);
 }
 
 
@@ -352,19 +352,19 @@ static void  MoveGiantLizard_Breathe(ObjNode *theNode)
 
 static void  MoveGiantLizard_Eat(ObjNode *theNode)
 {
-		
+
 
 			/* MOVE */
-				
+
 	ApplyFrictionToDeltas(2000.0,&gDelta);
-	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, GIANTLIZARD_TURN_SPEED/5, false);			
-				
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, GIANTLIZARD_TURN_SPEED/5, false);
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
@@ -378,11 +378,11 @@ static void  MoveGiantLizard_Eat(ObjNode *theNode)
 		OGLPoint3D	intersect;
 		Boolean		overTop;
 		float		fenceTop;
-		
+
 		if (!SeeIfLineSegmentHitsFence(&gPlayerInfo.coord, &gCoord, &intersect, &overTop, &fenceTop))	// dont grab if there's a fence between us
-		{								
+		{
 			OGLPoint3D	p;
-			
+
 			FindCoordOnJoint(theNode, GIANTLIZARD_JOINT_HEAD, &gJawOff, &p);			// get coord of mouth
 			if (CalcQuickDistance(p.x, p.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < 200.0f)
 			{
@@ -396,11 +396,11 @@ static void  MoveGiantLizard_Eat(ObjNode *theNode)
 		}
 		else
 			MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_WALK, 1);		// dont eat, so keep chasing
-		
-	}		
+
+	}
 
 
-	UpdateGiantLizard(theNode);		
+	UpdateGiantLizard(theNode);
 }
 
 
@@ -412,21 +412,21 @@ static void  MoveGiantLizard_Gobble(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 	ApplyFrictionToDeltas(2000.0,&gDelta);
-		
+
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 			/* ALIGN PLAYER IN GRASP */
-				
+
 	AlignPlayerInLizardGrasp(theNode);
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 	{
 		return;
@@ -434,8 +434,8 @@ float	fps = gFramesPerSecondFrac;
 
 
 				/* SEE IF DONE */
-			
-	theNode->GobbleTimer -= fps;	
+
+	theNode->GobbleTimer -= fps;
 	if (theNode->GobbleTimer <= 0.0f)
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_THROW, 3);
@@ -443,8 +443,8 @@ float	fps = gFramesPerSecondFrac;
 	}
 
 
-	UpdateGiantLizard(theNode);		
-	
+	UpdateGiantLizard(theNode);
+
 }
 
 
@@ -456,34 +456,34 @@ static void  MoveGiantLizard_Throw(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 	ApplyFrictionToDeltas(2000.0,&gDelta);
-		
+
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
-				
+
 	if (theNode->GrippingPlayer)
 	{
 		AlignPlayerInLizardGrasp(theNode);
-	
-	
+
+
 			/* SEE IF THROW PLAYER */
-				
+
 		if (theNode->ThrowPlayerFlag)					// see if throw player now
 		{
 			OGLMatrix4x4	m;
 			ObjNode			*player = gPlayerInfo.objNode;
 			const OGLVector3D	throwVec = {0,-.2,-1};
-			
-			MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_THROWN, 7.0);	
+
+			MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_THROWN, 7.0);
 			PlayEffect_Parms3D(EFFECT_THROWNSWOOSH, &player->Coord, NORMAL_CHANNEL_RATE, 2.0);
 
 			FindJointMatrixAtFlagEvent(theNode, GIANTLIZARD_JOINT_HEAD, &m);			// calc throw vector @ exact time of throw flag
@@ -492,20 +492,20 @@ float	fps = gFramesPerSecondFrac;
 			player->Delta.y = 0; //3200.0f;
 			player->Delta.z *= 3200.0f;
 			gCurrentMaxSpeed = 20000;
-				
+
 			theNode->GrippingPlayer = false;
 		}
 	}
-	
-	
+
+
 			/* SEE IF DONE */
-			
+
 	if (theNode->Skeleton->AnimHasStopped)
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_STAND, 1);
 	}
 
-	UpdateGiantLizard(theNode);		
+	UpdateGiantLizard(theNode);
 }
 
 
@@ -521,14 +521,14 @@ static void  MoveGiantLizard_GotHit(ObjNode *theNode)
 
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if on ground, add friction
 		ApplyFrictionToDeltas(1200.0,&gDelta);
-		
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;			// add gravity
 
 	MoveEnemy(theNode);
 
 
 				/* SEE IF DONE */
-			
+
 	theNode->ButtTimer -= gFramesPerSecondFrac;
 	if (theNode->ButtTimer <= 0.0)
 	{
@@ -537,7 +537,7 @@ static void  MoveGiantLizard_GotHit(ObjNode *theNode)
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
@@ -551,22 +551,22 @@ static void  MoveGiantLizard_GotHit(ObjNode *theNode)
 static void  MoveGiantLizard_Death(ObjNode *theNode)
 {
 			/* SEE IF GONE */
-			
+
 	if (theNode->StatusBits & STATUS_BIT_ISCULLED)		// if was culled on last frame and is far enough away, then delete it
 	{
 		if (CalcQuickDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) > 1000.0f)
 		{
 			DeleteEnemy(theNode);
 			return;
-		}		
+		}
 	}
 
 
 				/* MOVE IT */
-				
+
 	if (theNode->Speed3D > 500.0f)
 		TurnObjectTowardTarget(theNode, &gCoord, gCoord.x - gDelta.x, gCoord.z - gDelta.z, 10, false);	// aim with motion
-				
+
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)		// if on ground, add friction
 		ApplyFrictionToDeltas(1500.0,&gDelta);
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;		// add gravity
@@ -574,15 +574,15 @@ static void  MoveGiantLizard_Death(ObjNode *theNode)
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEATH_ENEMY_COLLISION_CTYPES, false))
 		return;
 
 
 				/* UPDATE */
-			
-	UpdateGiantLizard(theNode);		
-	
+
+	UpdateGiantLizard(theNode);
+
 }
 
 
@@ -593,20 +593,20 @@ static void  MoveGiantLizard_Angry(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 	ApplyFrictionToDeltas(1200.0,&gDelta);
-		
+
 	gDelta.y -= ENEMY_GRAVITY*fps;			// add gravity
 
 	MoveEnemy(theNode);
-	
+
 				/* SEE IF DONE */
-			
+
 	theNode->AngryTimer -= fps;
 	if (theNode->AngryTimer <= 0.0)
 		MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_STAND, 3);
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
@@ -632,24 +632,24 @@ int				i;
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
-	
+	placement = itemPtr->placement;
+
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 
 				/* MAKE DEFAULT SKELETON ENEMY */
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_GIANTLIZARD,x,z, GIANTLIZARD_SCALE,0,nil);
-		
-		
+
+
 	newObj->SplineItemPtr = itemPtr;
 	newObj->SplineNum = splineNum;
-	
+
 	SetSkeletonAnim(newObj->Skeleton, GIANTLIZARD_ANIM_WALK);
 	newObj->Skeleton->AnimSpeed = 2.0f;
 
 				/* SET BETTER INFO */
-			
+
 	newObj->InitCoord 		= newObj->Coord;							// remember where started
 	newObj->StatusBits		|= STATUS_BIT_ONSPLINE;
 	newObj->SplinePlacement = placement;
@@ -657,18 +657,18 @@ int				i;
 	newObj->Health 			= 1.0;
 	newObj->Damage 			= 0;
 	newObj->Kind 			= ENEMY_KIND_GIANTLIZARD;
-	
-	newObj->BreatheFire = false;	
-	
-					
+
+	newObj->BreatheFire = false;
+
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,GIANTLIZARD_TARGET_OFFSET);
 
-				
+
 				/* SET WEAPON HANDLERS */
-				
+
 	for (i = 0; i < NUM_WEAPON_TYPES; i++)
 		newObj->HitByWeaponHandler[i] = GiantLizardHitByWeapon;
 	newObj->HitByJumpJetHandler = GiantLizardHitByJumpJet;
@@ -678,13 +678,13 @@ int				i;
 
 
 				/* MAKE SHADOW & GLOW */
-				
+
 	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 20, 35, false);
 
 
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	DetachObject(newObj, true);										// detach this object from the linked list
 	AddToSplineObjectList(newObj, true);
 
@@ -696,7 +696,7 @@ int				i;
 
 static void MoveGiantLizardOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
 
@@ -707,30 +707,30 @@ Boolean isVisible;
 
 
 			/* UPDATE STUFF IF VISIBLE */
-			
+
 	if (isVisible)
 	{
-		
+
 		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,			// calc y rot aim
-												theNode->Coord.x, theNode->Coord.z);		
+												theNode->Coord.x, theNode->Coord.z);
 
 		theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - theNode->BottomOff;	// calc y coord
 		UpdateObjectTransforms(theNode);											// update transforms
-		UpdateShadow(theNode);	
-		
+		UpdateShadow(theNode);
+
 				/* DO SOME COLLISION CHECKING */
-				
+
 		GetObjectInfo(theNode);
 		if (DoEnemyCollisionDetect(theNode,CTYPE_HURTENEMY, false))					// just do this to see if explosions hurt
 			return;
-			
-			
+
+
 					/* SEE IF LEAVE SPLINE TO CHASE PLAYER */
-					
+
 		if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < GIANTLIZARD_DETACH_DIST)
-			DetachEnemyFromSpline(theNode, MoveGiantLizard);			
-			
-	}	
+			DetachEnemyFromSpline(theNode, MoveGiantLizard);
+
+	}
 }
 
 
@@ -741,7 +741,7 @@ static void UpdateGiantLizard(ObjNode *theNode)
 	theNode->RoarSpacing -= gFramesPerSecondFrac;				// dec the roar effect spacing timer
 
 	UpdateEnemy(theNode);
-		
+
 }
 
 
@@ -753,28 +753,28 @@ OGLMatrix4x4	m,m2,m3;
 float		scale;
 
 			/* CALC SCALE MATRIX */
-			
+
 	scale = PLAYER_DEFAULT_SCALE/GIANTLIZARD_SCALE;					// to adjust from onion's scale to player's
 	OGLMatrix4x4_SetScale(&m2, scale, scale, scale);
 
 
 			/* CALC TRANSLATE MATRIX */
-			
+
 	OGLMatrix4x4_SetTranslate(&m3, 0, -30.0f, -70.0f);
 	OGLMatrix4x4_Multiply(&m2, &m3, &m);
 
 
 			/* GET ALIGNMENT MATRIX */
-			
+
 	FindJointFullMatrix(enemy, GIANTLIZARD_JOINT_HEAD, &m2);									// get joint's matrix
 
-	
+
 	OGLMatrix4x4_Multiply(&m, &m2, &gPlayerInfo.objNode->BaseTransformMatrix);
 	SetObjectTransformMatrix(gPlayerInfo.objNode);
 
-	
+
 			/* FIND COORDS */
-			
+
 	FindCoordOnJoint(enemy, GIANTLIZARD_JOINT_HEAD, &gJawOff, &gPlayerInfo.objNode->Coord);			// get coord of mouth
 }
 
@@ -797,19 +797,19 @@ static Boolean GiantLizardHitByWeapon(ObjNode *weapon, ObjNode *enemy, OGLPoint3
 float	r;
 
 #pragma unused (weaponCoord, weaponDelta)
-	
+
 			/* SEE IF SUPERNOVA */
-			
+
 	if (!weapon)
 	{
 		KillGiantLizard(enemy);
 	}
-	
+
 			/* NOT SUPERNOVA */
 	else
 	{
 		switch(weapon->Kind)
-		{		
+		{
 			case	WEAPON_TYPE_FLAME:
 			case	WEAPON_TYPE_STUNPULSE:
 					if (enemy->Skeleton->AnimNum != GIANTLIZARD_ANIM_ANGRY)					// make lizard angry
@@ -822,15 +822,15 @@ float	r;
 						}
 					}
 					enemy->AngryTimer = 2.0;
-					
+
 					if (gPlayerInfo.scaleRatio > 1.0f)					 					// hurt lizard
 						HurtGiantLizard(enemy, .2f);
 					else
 						HurtGiantLizard(enemy, .07f);
-					
+
 					break;
-		
-					
+
+
 			case	WEAPON_TYPE_FIST:
 					if (gPlayerInfo.scaleRatio > 1.0f)
 					{
@@ -868,13 +868,13 @@ static Boolean HurtGiantLizard(ObjNode *enemy, float damage)
 {
 
 			/* SEE IF REMOVE FROM SPLINE */
-	
+
 	if (enemy->StatusBits & STATUS_BIT_ONSPLINE)
 		DetachEnemyFromSpline(enemy, MoveGiantLizard);
 
 
 				/* HURT ENEMY & SEE IF KILL */
-				
+
 	enemy->Health -= damage;
 	if (enemy->Health <= 0.0f)
 	{
@@ -885,12 +885,12 @@ static Boolean HurtGiantLizard(ObjNode *enemy, float damage)
 	if (damage > 1.0f)				// gotta be enough damage to cause him to fall
 	{
 					/* GO INTO HIT ANIM */
-				
+
 		if (enemy->Skeleton->AnimNum != GIANTLIZARD_ANIM_GETHIT)
 			MorphToSkeletonAnim(enemy->Skeleton, GIANTLIZARD_ANIM_GETHIT, 5);
 
 		enemy->ButtTimer = 3.0f;
-	}	
+	}
 	return(false);
 }
 
@@ -902,7 +902,7 @@ static void KillGiantLizard(ObjNode *enemy)
 int	i;
 
 	enemy->CType = CTYPE_MISC;
-				
+
 	if (enemy->Skeleton->AnimNum != GIANTLIZARD_ANIM_DEATH)
 	{
 		MorphToSkeletonAnim(enemy->Skeleton, GIANTLIZARD_ANIM_DEATH, 5);
@@ -912,7 +912,7 @@ int	i;
 
 
 			/* DISABLE THE HANDLERS */
-			
+
 	for (i = 0; i < NUM_WEAPON_TYPES; i++)
 		enemy->HitByWeaponHandler[i] = nil;
 	enemy->HitByJumpJetHandler 	= nil;
@@ -927,55 +927,55 @@ int	i;
 /************ SEE IF GIANT LIZARD ATTACK *********************/
 
 static void SeeIfGiantLizardAttack(ObjNode *theNode, float angleToPlayer, float distToPlayer)
-{		
+{
 	if ((gPlayerInfo.invincibilityTimer > 0.0f) || (!gPlayerHasLanded))
 		return;
-	
+
 			/* DON'T ATTACK THRU THINGS */
-				
+
 	if (SeeIfLineSegmentHitsAnything(&gCoord, &gPlayerInfo.coord, nil, CTYPE_FENCE|CTYPE_BLOCKRAYS))
 		return;
-	
-	
-	
+
+
+
 			/********************************/
 			/* CHECK ATTACKS FOR SMALL OTTO */
 			/********************************/
-			
+
 	if (gPlayerInfo.scaleRatio <= 1.0f)
 	{
 				/* FLAME */
-							
+
 		if ((distToPlayer < GIANTLIZARD_FLAME_DIST_MAX) && (distToPlayer > GIANTLIZARD_FLAME_DIST_MIN) && (angleToPlayer < (PI/4.0f)))
 		{
 			PlayEffect3D(EFFECT_LIZARDINHALE, &gCoord);
-			MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_BREATE, 2);		
+			MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_BREATE, 2);
 			theNode->Skeleton->AnimSpeed = .5;
 		}
-		
-		
+
+
 				/* EAT */
-				
+
 		else
 		if ((distToPlayer < GIANTLIZARD_EAT_DIST) && (angleToPlayer < (PI/4.0f)))
 		{
-			MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_EAT, 2);		
-		}	
+			MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_EAT, 2);
+		}
 	}
-	
-	
+
+
 			/******************************/
 			/* CHECK ATTACKS FOR BIG OTTO */
 			/******************************/
-	
+
 	else
 	{
 				/* FLAME */
-							
+
 		if ((distToPlayer < GIANTLIZARD_FLAME_DIST_MAX) && (angleToPlayer < (PI/4.0f)))
 		{
 			PlayEffect3D(EFFECT_LIZARDINHALE, &gCoord);
-			MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_BREATE, 2);		
+			MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_BREATE, 2);
 			theNode->Skeleton->AnimSpeed = .5;
 		}
 	}
@@ -990,51 +990,51 @@ OGLMatrix4x4	m;
 const OGLVector3D headAim = {0,-.7,-1};
 OGLVector3D		aim;
 ObjNode		*flame;
-		
+
 			/* SEE IF SHOOT NOW */
-			
+
 	enemy->ParticleTimer -= gFramesPerSecondFrac;
 	if (enemy->ParticleTimer > 0.0f)
-		return;		
+		return;
 	enemy->ParticleTimer += .06f;
-	
-		
+
+
 			/* CALCULATE THE SHOOT VECTOR & COORD */
-			
+
 	FindJointFullMatrix(enemy, GIANTLIZARD_JOINT_HEAD, &m);
 	OGLVector3D_Transform(&headAim, &m, &aim);
 	OGLPoint3D_Transform(&gJawOff, &m, &gNewObjectDefinition.coord);
-		
-		
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= JUNGLE_ObjType_FireRing;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits|STATUS_BIT_USEALIGNMENTMATRIX | STATUS_BIT_GLOW|
 									STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB-1;
-	gNewObjectDefinition.moveCall 	= MoveLizardFlame;	
-	gNewObjectDefinition.rot 		= 0;	
+	gNewObjectDefinition.moveCall 	= MoveLizardFlame;
+	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= .5f + RandomFloat() * .2f;
 	flame = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-				
+
 	flame->ColorFilter.a = .6;
 	flame->Health = RandomFloat() * .3f;						// where in alpha decay to kill it
-				
+
 		/* SET DELTAS */
-	
+
 	flame->Delta.x = aim.x * 2500.0f;
 	flame->Delta.y = aim.y * 2500.0f;
 	flame->Delta.z = aim.z * 2500.0f;
-		
+
 	flame->DeltaRot.z = RandomFloat2() * 10.0f;
 	flame->Rot.z = RandomFloat2() * PI2;
 
 				/* SET THE ALIGNMENT MATRIX */
 
 	SetAlignmentMatrixWithZRot(&flame->AlignmentMatrix, &aim, flame->Rot.z);
-		
-		
+
+
 		/* SET COLLISION */
-		
+
 	flame->Damage 			= .2;
 	flame->CType 			= CTYPE_HURTME|CTYPE_FLAMING;
 	flame->CBits			= CBITS_TOUCHABLE;
@@ -1053,18 +1053,18 @@ OGLVector3D	aim;
 	GetObjectInfo(theNode);
 
 			/* FADE */
-			
+
 	theNode->ColorFilter.a -= fps * .7f;
 	if (theNode->ColorFilter.a <= theNode->Health)
 	{
-gone:	
+gone:
 		MakeLizardFlamePoof(theNode);
 		DeleteObject(theNode);
-		return;	
+		return;
 	}
 
 			/* MOVE IT */
-				
+
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
 	gCoord.z += gDelta.z * fps;
@@ -1084,8 +1084,8 @@ gone:
 
 
 		/* SET NEW ALIGNMENT & UPDATE */
-		
-	
+
+
 	FastNormalizeVector(gDelta.x, gDelta.y, gDelta.z, &aim);
 	SetAlignmentMatrixWithZRot(&theNode->AlignmentMatrix, &aim, theNode->Rot.z);
 	UpdateObject(theNode);
@@ -1104,12 +1104,12 @@ NewParticleDefType		newParticleDef;
 float					x,y,z;
 
 #pragma unused (flame)
-	
+
 	x = gCoord.x;
 	y = gCoord.y;
 	z = gCoord.z;
 
-				
+
 	gNewParticleGroupDef.magicNum				= 0;
 	gNewParticleGroupDef.type					= PARTICLE_TYPE_GRAVITOIDS;
 	gNewParticleGroupDef.flags					= PARTICLE_FLAGS_BOUNCE|PARTICLE_FLAGS_DISPERSEIFBOUNCE;
@@ -1124,7 +1124,7 @@ float					x,y,z;
 
 	pg = NewParticleGroup(&gNewParticleGroupDef);
 	if (pg != -1)
-	{	
+	{
 		for (i = 0; i < 6; i++)
 		{
 			pt.x = x + RandomFloat2() * 60.0f;
@@ -1134,15 +1134,15 @@ float					x,y,z;
 			delta.x = RandomFloat2() * 100.0f;
 			delta.y = 200.0f + RandomFloat2() * 220.0f;
 			delta.z = RandomFloat2() * 100.0f;
-			
-			
+
+
 			newParticleDef.groupNum		= pg;
 			newParticleDef.where		= &pt;
 			newParticleDef.delta		= &delta;
 			newParticleDef.scale		= RandomFloat() + 1.0f;
 			newParticleDef.rotZ			= RandomFloat() * PI2;
 			newParticleDef.rotDZ		= RandomFloat2() * 4.0f;
-			newParticleDef.alpha		= .5;		
+			newParticleDef.alpha		= .5;
 			AddParticleToGroup(&newParticleDef);
 		}
 	}

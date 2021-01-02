@@ -69,13 +69,13 @@ static void MoveTomatoSlice(ObjNode *theNode);
 
 #define	TOMATO_JUMP_DY				2000.0f
 
-#define	TOMATO_KNOCKDOWN_SPEED		1700.0f	
+#define	TOMATO_KNOCKDOWN_SPEED		1700.0f
 
 #define	TOMATO_DAMAGE				.25f
 
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -133,47 +133,47 @@ ObjNode	*newObj;
 				/*******************************/
 				/* MAKE DEFAULT SKELETON ENEMY */
 				/*******************************/
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_TOMATO,x,z, TOMATO_SCALE, 0, MoveTomato);
 
-	
+
 	SetSkeletonAnim(newObj->Skeleton, TOMATO_ANIM_STAND);
-	
+
 
 				/*******************/
 				/* SET BETTER INFO */
 				/*******************/
-			
+
 	newObj->StatusBits |= STATUS_BIT_ROTXZY;
 
 	newObj->Health 		= 1.0;
 	newObj->Damage 		= .1;
 	newObj->Kind 		= ENEMY_KIND_TOMATO;
-			
-	
+
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,TOMATO_TARGET_OFFSET);
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] = TomatoEnemyHitByStunPulse;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] = TomatoHitBySuperNova;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FIST] = TomatoGotPunched;
 	newObj->HitByJumpJetHandler = TomatoHitByJumpJet;
-	
+
 	newObj->HurtCallback = HurtTomato;							// set hurt callback function
-	
+
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8,false);
 	CreateTomatoSparkles(newObj);
-		
+
 	gNumEnemies++;
 	gNumEnemyOfKind[ENEMY_KIND_TOMATO]++;
-	
+
 	return(newObj);
 }
 
@@ -194,7 +194,7 @@ ObjNode	*newObj;
 		newObj->Rot.y = CalcYAngleFromPointToPoint(0, x, z, gPlayerInfo.coord.x, gPlayerInfo.coord.z);		// aim at player
 
 		SetSkeletonAnim(newObj->Skeleton, TOMATO_ANIM_GROW);
-		UpdateObjectTransforms(newObj);				
+		UpdateObjectTransforms(newObj);
 	}
 
 }
@@ -220,7 +220,7 @@ static	void(*myMoveTable[])(ObjNode *) =
 	}
 
 	GetObjectInfo(theNode);
-	myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -235,33 +235,33 @@ float	angleToTarget,dist;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
-				
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, TOMATO_TURN_SPEED, true);			
 
-		
+	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, TOMATO_TURN_SPEED, true);
+
+
 
 				/* SEE IF CHASE */
 
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
 	if (dist < TOMATO_CHASE_DIST)
-	{					
+	{
 		MorphToSkeletonAnim(theNode->Skeleton, TOMATO_ANIM_WALK, 8);
 	}
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 
 
-	UpdateTomato(theNode);		
+	UpdateTomato(theNode);
 }
 
 
@@ -276,34 +276,34 @@ float		r,fps,dist,angleToPlayer;
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
-			
-	angleToPlayer = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, TOMATO_TURN_SPEED, true);			
+
+	angleToPlayer = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, TOMATO_TURN_SPEED, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * TOMATO_WALK_SPEED;
 	gDelta.z = -cos(r) * TOMATO_WALK_SPEED;
 	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
 	MoveEnemy(theNode);
-		
-		
+
+
 				/* UPDATE ANIM SPEED */
 
 	if (theNode->Skeleton->AnimNum == TOMATO_ANIM_WALK)
 		theNode->Skeleton->AnimSpeed = TOMATO_WALK_SPEED * .008f;
-	
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
-		
-		
+
+
 			/* CHECK RANGE */
-						
+
 	dist = CalcQuickDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z);
 	if (dist > TOMATO_CEASE_DIST)										// see if stop chasing
 	{
-		MorphToSkeletonAnim(theNode->Skeleton, TOMATO_ANIM_STAND, 6);	
+		MorphToSkeletonAnim(theNode->Skeleton, TOMATO_ANIM_STAND, 6);
 		gDelta.x = gDelta.z = 0;
 	}
 			/* SEE IF ATTACK */
@@ -318,11 +318,11 @@ float		r,fps,dist,angleToPlayer;
 			theNode->JumpNow = false;
 			theNode->IsInAir = false;
 			theNode->DelayUntilAttack = 5;									// set delay until it'll do this again
-			
+
 		}
 	}
-		
-	UpdateTomato(theNode);		
+
+	UpdateTomato(theNode);
 }
 
 
@@ -332,20 +332,20 @@ static void  MoveTomato_Roll(ObjNode *theNode)
 {
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if on ground, add friction
 		ApplyFrictionToDeltas(40.0,&gDelta);
-		
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;			// add gravity
 
 	MoveEnemy(theNode);
 
 				/* UPDATE ROTATIONS */
-				
+
 	theNode->Rot.x += gFramesPerSecondFrac * theNode->Speed3D * .01f;					// make spin
 
 	theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, gCoord.x, gCoord.z, theNode->OldCoord.x, theNode->OldCoord.z);
 
 
 				/* SEE IF DONE */
-			
+
 	theNode->ButtTimer -= gFramesPerSecondFrac;
 	if (theNode->ButtTimer <= 0.0)
 	{
@@ -354,7 +354,7 @@ static void  MoveTomato_Roll(ObjNode *theNode)
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
@@ -369,8 +369,8 @@ static void  MoveTomato_Jump(ObjNode *theNode)
 {
 			/* SEE IF JUMP NOW */
 
-	if (theNode->JumpNow)	
-	{	
+	if (theNode->JumpNow)
+	{
 		PlayEffect3D(EFFECT_TOMATOJUMP, &gCoord);
 
 		theNode->JumpNow = false;
@@ -382,16 +382,16 @@ static void  MoveTomato_Jump(ObjNode *theNode)
 
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 	if (theNode->IsInAir)
 		theNode->Rot.x -= gFramesPerSecondFrac * theNode->Speed3D * .005f;					// make spin
 
-	
+
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
@@ -407,32 +407,32 @@ static void  MoveTomato_Jump(ObjNode *theNode)
 		{
 			MorphToSkeletonAnim(theNode->Skeleton, TOMATO_ANIM_ROLL, 8);
 			theNode->ButtTimer = 1.0f;
-			
+
 					/* MAKE DEFORMATION WAVE */
 
 			if (theNode->StatusBits & STATUS_BIT_ONGROUND)		// if landed on terrain then do deformation wave
 			{
 				DeformationType		defData;
-										
+
 				defData.type 				= DEFORMATION_TYPE_RADIALWAVE;
-				defData.amplitude 			= 150.0f; 
-				defData.radius 				= 0; 
-				defData.speed 				= 2800; 
-				defData.origin.x			= gCoord.x; 
-				defData.origin.y			= gCoord.z; 
+				defData.amplitude 			= 150.0f;
+				defData.radius 				= 0;
+				defData.speed 				= 2800;
+				defData.origin.x			= gCoord.x;
+				defData.origin.y			= gCoord.z;
 				defData.oneOverWaveLength 	= 1.0f / 280.0f;
 				defData.radialWidth			= 400.0f;
 				defData.decayRate			= 100.0f;
 				NewSuperTileDeformation(&defData);
 			}
-			
+
 					/* SEE IF LANDED ON PLAYER */
-					
+
 			CheckIfTomatoLandedOnPlayer(theNode);
 		}
 	}
 
-	UpdateTomato(theNode);		
+	UpdateTomato(theNode);
 }
 
 
@@ -446,14 +446,14 @@ float	scale;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 		/* MAKE GROW */
-		
+
 	scale = theNode->Scale.x += gFramesPerSecondFrac;
-	
+
 	if (scale >= TOMATO_SCALE)
 		scale = TOMATO_SCALE;
 
-	theNode->Scale.x = 
-	theNode->Scale.y = 
+	theNode->Scale.x =
+	theNode->Scale.y =
 	theNode->Scale.z = scale;
 
 	if (DoEnemyCollisionDetect(theNode,0, true))			// just do ground
@@ -461,14 +461,14 @@ float	scale;
 
 
 			/* SEE IF DONE GROWING */
-			
+
 	if (theNode->Skeleton->AnimHasStopped)
 	{
-		MorphToSkeletonAnim(theNode->Skeleton, TOMATO_ANIM_STAND, 2);	
+		MorphToSkeletonAnim(theNode->Skeleton, TOMATO_ANIM_STAND, 2);
 		gDelta.y = 700.0f;
 	}
 
-	UpdateTomato(theNode);		
+	UpdateTomato(theNode);
 }
 
 
@@ -491,44 +491,44 @@ float			x,z,placement;
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
-	
+	placement = itemPtr->placement;
+
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 
 				/* MAKE DEFAULT SKELETON ENEMY */
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_TOMATO,x,z, TOMATO_SCALE, 0, nil);
-		
-		
+
+
 	newObj->SplineItemPtr = itemPtr;
 	newObj->SplineNum = splineNum;
-	
+
 	SetSkeletonAnim(newObj->Skeleton, TOMATO_ANIM_WALK);
-		
+
 
 				/* SET BETTER INFO */
-			
+
 	newObj->StatusBits		|= STATUS_BIT_ONSPLINE;
 	newObj->SplinePlacement = placement;
-	newObj->Coord.y 		-= newObj->BottomOff;			
+	newObj->Coord.y 		-= newObj->BottomOff;
 	newObj->SplineMoveCall 	= MoveTomatoOnSpline;				// set move call
 	newObj->Health 			= 1.0;
 	newObj->Damage 			= 0;
 	newObj->Kind 			= ENEMY_KIND_TOMATO;
-	
+
 //	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + gNewObjectDefinition.type,
 //								 0, -1, MULTI_TEXTURE_COMBINE_ADD, 2);					// set this model to be sphere mapped
-	
-	
+
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,TOMATO_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] = TomatoEnemyHitByStunPulse;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] = TomatoHitBySuperNova;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FIST] = TomatoGotPunched;
@@ -540,14 +540,14 @@ float			x,z,placement;
 	newObj->InitCoord = newObj->Coord;							// remember where started
 
 				/* MAKE SHADOW */
-				
+
 	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8, false);
 
 	CreateTomatoSparkles(newObj);
 
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	DetachObject(newObj, true);										// detach this object from the linked list
 	AddToSplineObjectList(newObj, true);
 
@@ -559,7 +559,7 @@ float			x,z,placement;
 
 static void MoveTomatoOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
 
@@ -570,32 +570,32 @@ Boolean isVisible;
 
 
 			/* UPDATE STUFF IF VISIBLE */
-			
+
 	if (isVisible)
 	{
 		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,			// calc y rot aim
-												theNode->Coord.x, theNode->Coord.z);		
+												theNode->Coord.x, theNode->Coord.z);
 
 		theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - theNode->BottomOff;	// calc y coord
 		UpdateObjectTransforms(theNode);																// update transforms
-		UpdateShadow(theNode);	
+		UpdateShadow(theNode);
 		UpdateTomatoSparkles(theNode);
-		
+
 				/* DO SOME COLLISION CHECKING */
-				
+
 		GetObjectInfo(theNode);
 		if (DoEnemyCollisionDetect(theNode,CTYPE_HURTENEMY, false))					// just do this to see if explosions hurt
 			return;
 
 
 					/* SEE IF LEAVE SPLINE TO CHASE PLAYER */
-					
+
 		if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < TOMATO_DETACH_DIST)
-			DetachEnemyFromSpline(theNode, MoveTomato);			
+			DetachEnemyFromSpline(theNode, MoveTomato);
 
 	}
-	
-	
+
+
 }
 
 
@@ -637,7 +637,7 @@ ObjNode	*hitObj;
 	if (gPlayerInfo.invincibilityTimer > 0.0f)				// dont bother if player is invincible
 		return;
 
-	for (i=0; i < gNumCollisions; i++)						
+	for (i=0; i < gNumCollisions; i++)
 	{
 		if ((gCollisionList[i].type == COLLISION_TYPE_OBJ) && (gCollisionList[i].sides & SIDE_BITS_BOTTOM))
 		{
@@ -647,7 +647,7 @@ ObjNode	*hitObj;
 				if (gPlayerInfo.objNode->Skeleton->AnimNum != PLAYER_ANIM_ACCORDIAN)
 				{
 					CrushPlayer();
-//					MorphToSkeletonAnim(gPlayerInfo.objNode->Skeleton, PLAYER_ANIM_ACCORDIAN, 5);				
+//					MorphToSkeletonAnim(gPlayerInfo.objNode->Skeleton, PLAYER_ANIM_ACCORDIAN, 5);
 //					PlayerLoseHealth(TOMATO_DAMAGE, PLAYER_DEATH_TYPE_EXPLODE);
 //					gPlayerInfo.objNode->AccordianTimer = 2.0;
 //					PlayEffect3D(EFFECT_PLAYERCRUSH, &gPlayerInfo.coord);
@@ -670,7 +670,7 @@ short	i,j;
 	{
 
 				/* CREATE EYE LIGHTS */
-				
+
 		i = theNode->Sparkles[j] = GetFreeSparkle(theNode);				// get free sparkle slot
 		if (i == -1)
 			return;
@@ -691,7 +691,7 @@ short	i,j;
 
 		gSparkles[i].scale = 190.0f;
 		gSparkles[i].separation = 10.0f;
-		
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark3;
 	}
 }
@@ -718,7 +718,7 @@ const static OGLPoint3D	rightEye = {30,10,-60};
 		FindCoordOnJoint(theNode, 0, &rightEye, &gSparkles[i].where);		// calc coord of right eye
 		gSparkles[i].aim.x = aimX;											// update aim vector
 		gSparkles[i].aim.z = aimZ;
-	}	
+	}
 
 
 		/* UPDATE LEFT EYE */
@@ -729,7 +729,7 @@ const static OGLPoint3D	rightEye = {30,10,-60};
 		FindCoordOnJoint(theNode, 0, &leftEye, &gSparkles[i].where);		// calc coord of left eye
 		gSparkles[i].aim.x = aimX;											// update aim vector
 		gSparkles[i].aim.z = aimZ;
-	}	
+	}
 
 }
 
@@ -743,21 +743,21 @@ const static OGLPoint3D	rightEye = {30,10,-60};
 static Boolean TomatoEnemyHitByStunPulse(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord)
-	
+
 
 			/* HURT IT */
-			
+
 	if (HurtTomato(enemy, .5))
 		return(true);
 
-	
+
 			/* GIVE MOMENTUM */
 
 	enemy->Delta.x += weaponDelta->x * .6f;
 	enemy->Delta.y += weaponDelta->y * .6f;
 	enemy->Delta.z += weaponDelta->z * .6f;
 
-	return(true);	
+	return(true);
 }
 
 /************ TOMATO GOT PUNCHED *****************/
@@ -772,7 +772,7 @@ float	r;
 #pragma unused (weapon, fistCoord, weaponDelta)
 
 			/* HURT IT */
-			
+
 	if (HurtTomato(enemy, .5))
 		return(true);
 
@@ -784,7 +784,7 @@ float	r;
 	enemy->Delta.z = -cos(r) * 1000.0f;
 	enemy->Delta.y = 500.0f;
 
-	return(true);	
+	return(true);
 }
 
 /************** TOMATO GOT HIT BY SUPERNOVA *****************/
@@ -792,9 +792,9 @@ float	r;
 static Boolean TomatoHitBySuperNova(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord, weaponDelta)
-	
+
 	KillTomato(enemy);
-	
+
 	return(false);
 }
 
@@ -817,13 +817,13 @@ static Boolean HurtTomato(ObjNode *enemy, float damage)
 {
 
 			/* SEE IF REMOVE FROM SPLINE */
-	
+
 	if (enemy->StatusBits & STATUS_BIT_ONSPLINE)
 		DetachEnemyFromSpline(enemy, MoveTomato);
 
 
 				/* HURT ENEMY & SEE IF KILL */
-				
+
 	enemy->Health -= damage;
 	if (enemy->Health <= 0.0f)
 	{
@@ -832,13 +832,13 @@ static Boolean HurtTomato(ObjNode *enemy, float damage)
 	else
 	{
 					/* GO INTO HIT ANIM */
-				
+
 		if (enemy->Skeleton->AnimNum != TOMATO_ANIM_ROLL)
 			MorphToSkeletonAnim(enemy->Skeleton, TOMATO_ANIM_ROLL, 5);
 
 		enemy->ButtTimer = 3.0f;
-	}	
-	
+	}
+
 	return(false);
 }
 
@@ -850,27 +850,27 @@ static Boolean HurtTomato(ObjNode *enemy, float damage)
 
 static Boolean KillTomato(ObjNode *enemy)
 {
-	
+
 int	i;
 ObjNode	*newObj;
-			
+
 	SpewAtoms(&enemy->Coord, 0,1, 2, false);
 
 	PlayEffect3D(EFFECT_TOMATOSPLAT, &enemy->Coord);
 
 
-			
+
 				/* SET DEFAULT STUFF */
-						
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_TomatoSlice;
 	gNewObjectDefinition.coord.x 	= enemy->Coord.x;
 	gNewObjectDefinition.coord.y 	= enemy->Coord.y + enemy->BottomOff + 30.0f;
-	gNewObjectDefinition.coord.z 	= enemy->Coord.z;	
+	gNewObjectDefinition.coord.z 	= enemy->Coord.z;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
-	gNewObjectDefinition.moveCall 	= MoveTomatoSlice;	
-	gNewObjectDefinition.rot 		= 0;	
+	gNewObjectDefinition.moveCall 	= MoveTomatoSlice;
+	gNewObjectDefinition.rot 		= 0;
 
 
 			/****************/
@@ -880,26 +880,26 @@ ObjNode	*newObj;
 	for (i = 0; i < 5; i++)
 	{
 		gNewObjectDefinition.scale 		= .5f + RandomFloat2() * .1f;
-	
+
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 		newObj->Delta.y = 400.0f + RandomFloat() * 400.0f;
 		newObj->Delta.x = RandomFloat2() * 500.0f;
 		newObj->Delta.z = RandomFloat2() * 500.0f;
-		
+
 		newObj->DeltaRot.x = RandomFloat2() * 5.0f;
 		newObj->DeltaRot.y = RandomFloat2() * 10.0f;
-		newObj->DeltaRot.z = RandomFloat2() * 5.0f;		
-		
+		newObj->DeltaRot.z = RandomFloat2() * 5.0f;
+
 		gNewObjectDefinition.coord.y += 30.0f;
 	}
-	
+
 			/* EXPLODE GEOMETRY */
-				
+
 	ExplodeGeometry(enemy, 300, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 2, .8);
 
-	
-	DeleteEnemy(enemy);	
+
+	DeleteEnemy(enemy);
 	return(true);
 }
 
@@ -922,7 +922,7 @@ float fps = gFramesPerSecondFrac;
 	theNode->Rot.z += theNode->DeltaRot.z * fps;
 
 			/* SEE IF FALLEN BELOW FLOOR */
-			
+
 	if (gCoord.y < (GetTerrainY(gCoord.x, gCoord.z) - 300.0f))
 	{
 		DeleteObject(theNode);

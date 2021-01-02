@@ -93,22 +93,22 @@ float			sx,sy,sz;
 	{
 		sx = theNode->Scale.x * tweakXZ;
 		sy = theNode->Scale.y;
-		sz = theNode->Scale.z * tweakXZ;	
+		sz = theNode->Scale.z * tweakXZ;
 	}
-	
+
 			/* CONVERT TO COLLISON BOX */
-			
+
 	bBox =  &theNode->BBox;
-						
+
 	theNode->LeftOff 	= bBox->min.x * sx;
 	theNode->RightOff 	= bBox->max.x * sx;
 	theNode->FrontOff 	= bBox->max.z * sz;
 	theNode->BackOff 	= bBox->min.z * sz;
 	theNode->BottomOff 	= bBox->min.y * sy;
 	theNode->TopOff 	= theNode->BottomOff + (bBox->max.y - bBox->min.y) * sy * tweakY;
-	
+
 	CalcObjectBoxFromNode(theNode);
-	KeepOldCollisionBoxes(theNode);	
+	KeepOldCollisionBoxes(theNode);
 }
 
 
@@ -134,20 +134,20 @@ float			sx,sy,sz;
 	{
 		sx = theNode->Scale.x * tweakXZ;
 		sy = theNode->Scale.y;
-		sz = theNode->Scale.z * tweakXZ;	
+		sz = theNode->Scale.z * tweakXZ;
 	}
-	
+
 			/* CONVERT TO COLLISON BOX */
-			
+
 	bBox =  &theNode->BBox;
-						
+
 	theNode->LeftOff 	= bBox->min.x * sx;
 	theNode->RightOff 	= bBox->max.x * sx;
 	theNode->FrontOff 	= bBox->max.z * sz;
 	theNode->BackOff 	= bBox->min.z * sz;
 	theNode->BottomOff 	= bBox->min.y * sy;
 	theNode->TopOff 	= theNode->BottomOff + (bBox->max.y - bBox->min.y) * sy * tweakY;
-	
+
 	CalcObjectBoxFromNode(theNode);
 }
 
@@ -166,10 +166,10 @@ float			maxSide,off;
 	theNode->NumCollisionBoxes = 1;
 
 			/* POINT TO BOUNDING BOX */
-			
+
 	bBox =  &theNode->BBox;
-			
-	
+
+
 			/* DETERMINE LARGEST SIDE */
 
 	if (theNode->Genre == SKELETON_GENRE)
@@ -190,7 +190,7 @@ float			maxSide,off;
 
 
 			/* CONVERT TO COLLISON BOX */
-			
+
 	theNode->LeftOff 	= -maxSide;
 	theNode->RightOff 	= maxSide;
 	theNode->FrontOff 	= maxSide;
@@ -198,9 +198,9 @@ float			maxSide,off;
 	theNode->TopOff 	= bBox->max.y * s;
 	theNode->BottomOff 	= bBox->min.y * s;
 	theNode->TopOff 	= theNode->BottomOff + (bBox->max.y - bBox->min.y) * s;
-	
+
 	CalcObjectBoxFromNode(theNode);
-	KeepOldCollisionBoxes(theNode);	
+	KeepOldCollisionBoxes(theNode);
 }
 
 
@@ -218,34 +218,34 @@ float			minX,minZ,maxX,maxZ;
 	theNode->NumCollisionBoxes = 1;
 
 			/* POINT TO BOUNDING BOX */
-			
+
 	if (theNode->Genre == SKELETON_GENRE)
 		bBox =  &gObjectGroupBBoxList[MODEL_GROUP_SKELETONBASE+theNode->Type][0];	// (skeleton type is actually the Group #, and only 1 model in there, so 0)
 	else
 		bBox =  &gObjectGroupBBoxList[theNode->Group][theNode->Type];				// get ptr to this model's local bounding box
-	
+
 
 			/* ROTATE BOUNDING BOX */
-		
+
 	OGLMatrix3x3_SetRotate(&m, -theNode->Rot.y);	// NOTE: we (-) the rotation cuz 2D y rot will be inverse of a 3D y rot (dont ask, just trust me)
-	
-	
+
+
 	p.x = bBox->min.x;								// far left corner
 	p.y = bBox->min.z;
-	OGLPoint2D_Transform(&p, &m, &p1);	
+	OGLPoint2D_Transform(&p, &m, &p1);
 	p.x = bBox->max.x;								// far right corner
 	p.y = bBox->min.z;
-	OGLPoint2D_Transform(&p, &m, &p2);	
+	OGLPoint2D_Transform(&p, &m, &p2);
 	p.x = bBox->max.x;								// near right corner
 	p.y = bBox->max.z;
-	OGLPoint2D_Transform(&p, &m, &p3);	
+	OGLPoint2D_Transform(&p, &m, &p3);
 	p.x = bBox->min.x;								// near left corner
 	p.y = bBox->max.z;
-	OGLPoint2D_Transform(&p, &m, &p4);	
-	
-	
+	OGLPoint2D_Transform(&p, &m, &p4);
+
+
 			/* FIND MIN/MAX */
-			
+
 	minX = p1.x;
 	if (p2.x < minX)
 		minX = p2.x;
@@ -261,7 +261,7 @@ float			minX,minZ,maxX,maxZ;
 		maxX = p3.x;
 	if (p4.x > maxX)
 		maxX = p4.x;
-		
+
 	minZ = p1.y;
 	if (p2.y < minZ)
 		minZ = p2.y;
@@ -277,22 +277,22 @@ float			minX,minZ,maxX,maxZ;
 		maxZ = p3.y;
 	if (p4.y > maxZ)
 		maxZ = p4.y;
-	
+
 
 			/* CONVERT TO COLLISON BOX */
-	
+
 	s = theNode->Scale.x;
-						
+
 	theNode->LeftOff 	= minX * (s * tweakXZ);
 	theNode->RightOff 	= maxX * (s * tweakXZ);
 	theNode->FrontOff 	= maxZ * (s * tweakXZ);
 	theNode->BackOff 	= minZ * (s * tweakXZ);
-	
+
 	theNode->BottomOff 	= bBox->min.y * s;
 	theNode->TopOff 	= theNode->BottomOff + (bBox->max.y - bBox->min.y) * s * tweakY;
-	
+
 	CalcObjectBoxFromNode(theNode);
-	KeepOldCollisionBoxes(theNode);	
+	KeepOldCollisionBoxes(theNode);
 }
 
 
@@ -315,7 +315,7 @@ long	i;
 		theNode->CollisionBoxes[i].oldRight = theNode->CollisionBoxes[i].right;
 		theNode->CollisionBoxes[i].oldFront = theNode->CollisionBoxes[i].front;
 		theNode->CollisionBoxes[i].oldBack = theNode->CollisionBoxes[i].back;
-	}	
+	}
 
 
 	theNode->OldCoord = theNode->Coord;			// remember coord also
@@ -332,9 +332,9 @@ long	i;
 void CalcObjectBoxFromNode(ObjNode *theNode)
 {
 CollisionBoxType *boxPtr;
-		
+
 	if (theNode->NumCollisionBoxes > 0)
-	{		
+	{
 		boxPtr = &theNode->CollisionBoxes[0];					// get ptr to 1st box (presumed only box)
 
 		boxPtr->left 	= theNode->Coord.x + (float)theNode->LeftOff;
@@ -360,7 +360,7 @@ CollisionBoxType *boxPtr;
 
 	if (theNode == nil)
 		return;
-		
+
 	boxPtr = theNode->CollisionBoxes;					// get ptr to 1st box (presumed only box)
 
 	boxPtr->left 	= gCoord.x  + (float)theNode->LeftOff;
@@ -383,7 +383,7 @@ void SetObjectCollisionBounds(ObjNode *theNode, short top, short bottom, short l
 
 	theNode->NumCollisionBoxes = 1;					// 1 collision box
 	theNode->TopOff 		= top;
-	theNode->BottomOff 	= bottom;	
+	theNode->BottomOff 	= bottom;
 	theNode->LeftOff 	= left;
 	theNode->RightOff 	= right;
 	theNode->FrontOff 	= front;
@@ -416,12 +416,12 @@ void CalcNewTargetOffsets(ObjNode *theNode, float scale)
 ObjNode	*AttachShadowToObject(ObjNode *theNode, int shadowType, float scaleX, float scaleZ, Boolean checkBlockers)
 {
 ObjNode	*shadowObj;
-					
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;				
+
+	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.coord 		= theNode->Coord;
 	gNewObjectDefinition.coord.y 	+= SHADOW_Y_OFF;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|gAutoFadeStatusBits;
-									
+
 	if (theNode->Slot >= SLOT_OF_DUMB+1)					// shadow *must* be after parent!
 		gNewObjectDefinition.slot 	= theNode->Slot+1;
 	else
@@ -429,7 +429,7 @@ ObjNode	*shadowObj;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= scaleX;
-	
+
 	shadowObj = MakeNewObject(&gNewObjectDefinition);
 	if (shadowObj == nil)
 		return(nil);
@@ -463,8 +463,8 @@ float	dist,scaleX,scaleZ;
 	shadowNode = theNode->ShadowNode;
 	if (shadowNode == nil)
 		return;
-				
-		
+
+
 	x = theNode->Coord.x;
 	y = theNode->Coord.y + theNode->BottomOff;
 	z = theNode->Coord.z;
@@ -475,7 +475,7 @@ float	dist,scaleX,scaleZ;
 		/****************************************************/
 		/* SEE IF SHADOW IS ON BLOCKER OBJECT OR ON TERRAIN */
 		/****************************************************/
-		
+
 	if (shadowNode->CheckForBlockers)
 	{
 		thisNodePtr = gFirstNodePtr;
@@ -483,7 +483,7 @@ float	dist,scaleX,scaleZ;
 		{
 			if (thisNodePtr->Slot >= SLOT_OF_DUMB)
 				break;
-				
+
 			if (thisNodePtr->CType & CTYPE_BLOCKSHADOW)						// look for things which can block the shadow
 			{
 				if (thisNodePtr->NumCollisionBoxes)
@@ -502,20 +502,20 @@ float	dist,scaleX,scaleZ;
 						/* SHADOW IS ON OBJECT  */
 
 					shadowNode->Coord.y = thisNodePtr->CollisionBoxes[0].top + SHADOW_Y_OFF;
-					
+
 					shadowNode->Scale.x = shadowNode->SpecialF[0];				// use preset scale
 					shadowNode->Scale.z = shadowNode->SpecialF[1];
 					UpdateObjectTransforms(shadowNode);
 					return;
-					
+
 				}
-			}		
-	next:					
+			}
+	next:
 			thisNodePtr = (ObjNode *)thisNodePtr->NextNode;		// next node
 		}
 		while (thisNodePtr != nil);
-	}		
-		
+	}
+
 			/************************/
 			/* SHADOW IS ON TERRAIN */
 			/************************/
@@ -523,21 +523,21 @@ float	dist,scaleX,scaleZ;
 	RotateOnTerrain(shadowNode, SHADOW_Y_OFF, nil);							// set transform matrix
 
 			/* CALC SCALE OF SHADOW */
-			
+
 	dist = (y - shadowNode->Coord.y) * (1.0f/2000.0f);					// as we go higher, shadow gets smaller
 	if (dist < 0.0f)
 		dist = 0;
-		
+
 	dist = 1.0f - dist;
 
 	scaleX = dist * shadowNode->SpecialF[0];
 	scaleZ = dist * shadowNode->SpecialF[1];
-	
+
 	if (scaleX < 0.0f)
 		scaleX = 0;
 	if (scaleZ < 0.0f)
 		scaleZ = 0;
-	
+
 	shadowNode->Scale.x = scaleX;				// this scale wont get updated until next frame (RotateOnTerrain).
 	shadowNode->Scale.z = scaleZ;
 }
@@ -559,26 +559,26 @@ AGLContext agl_ctx = setupInfo->drawContext;
 
 
 			/* SUBMIT SHADOW TEXTURE */
-			
+
 	gGlobalTransparency = theNode->ColorFilter.a;
 
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_Shadow_Circular+shadowType].materialObject, setupInfo);			
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_Shadow_Circular+shadowType].materialObject, setupInfo);
 
 
 			/* DRAW THE SHADOW */
-			
-	glDisable(GL_CULL_FACE);	
-	glBegin(GL_QUADS);				
+
+	glDisable(GL_CULL_FACE);
+	glBegin(GL_QUADS);
 	glTexCoord2f(0,0);	glVertex3f(-20, 0, 20);
 	glTexCoord2f(1,0);	glVertex3f(20, 0, 20);
 	glTexCoord2f(1,1);	glVertex3f(20, 0, -20);
 	glTexCoord2f(0,1);	glVertex3f(-20, 0, -20);
-	glEnd();	
-	glEnable(GL_CULL_FACE);	
+	glEnd();
+	glEnable(GL_CULL_FACE);
 
 	OGL_PopState();
 	gGlobalTransparency = 1.0;
-	
+
 }
 
 
@@ -614,15 +614,15 @@ float		hX, hY, hZ, hW;			// Homogeneous co-ordinates
 		return;
 
 					/* PROCESS EACH OBJECT */
-					
+
 	do
 	{
 		if (theNode->StatusBits & STATUS_BIT_ALWAYSCULL)
 			goto try_cull;
-			
+
 		if (theNode->StatusBits & STATUS_BIT_HIDDEN)			// if hidden then skip
 			goto next;
-		
+
 		if (theNode->StatusBits & STATUS_BIT_DONTCULL)			// see if dont want to use our culling
 			goto draw_on;
 
@@ -631,10 +631,10 @@ try_cull:
 	bBox = &theNode->BBox;
 	if (bBox->isEmpty)											// skip culling if no bbox
 		goto draw_on;
-		
+
 
 			/* CALCULATE THE LOCAL->FRUSTUM MATRIX FOR THIS OBJECT */
-				
+
 	if (theNode->Genre == SKELETON_GENRE)			// skeletons are already oriented, just need translation
 	{
 		OGLMatrix4x4_SetTranslate(&m, theNode->Coord.x, theNode->Coord.y, theNode->Coord.z);
@@ -672,10 +672,10 @@ try_cull:
 
 	clipCodeAND = ~0;
 	clipCodeOR 	= 0;
-					
+
 	for (i = 0; i < 8; i++)
 	{
-		switch (i)														// load current bbox corner in IX,IY,IZ 
+		switch (i)														// load current bbox corner in IX,IY,IZ
 		{
 			case	0:	lX = minX;	lY = minY;	lZ = minZ;	break;
 			case	1:	lX = minX;	lY = minY;	lZ = maxZ;	break;
@@ -684,9 +684,9 @@ try_cull:
 			case	4:	lX = maxX;	lY = minY;	lZ = minZ;	break;
 			case	5:	lX = maxX;	lY = minY;	lZ = maxZ;	break;
 			case	6:	lX = maxX;	lY = maxY;	lZ = minZ;	break;
-			default:	lX = maxX;	lY = maxY;	lZ = maxZ;				
+			default:	lX = maxX;	lY = maxY;	lZ = maxZ;
 		}
-							
+
 		hW = lX * m30 + lY * m31 + lZ * m32 + m33;
 		hY = lX * m10 + lY * m11 + lZ * m12 + m13;
 		hZ = lX * m20 + lY * m21 + lZ * m22 + m23;
@@ -695,36 +695,36 @@ try_cull:
 		minusHW = -hW;
 
 				/* CHECK Y */
-				
+
 		if (hY < minusHW)
 			clipFlags = 0x8;
 		else
 		if (hY > hW)
 			clipFlags = 0x4;
 		else
-			clipFlags = 0;				
-		
-		
+			clipFlags = 0;
+
+
 				/* CHECK Z */
-				
+
 		if (hZ > hW)
 			clipFlags |= 0x20;
 		else
 		if (hZ < 0.0f)
 			clipFlags |= 0x10;
-		
-		
+
+
 				/* CHECK X */
-				
+
 		if (hX < minusHW)
 			clipFlags |= 0x2;
 		else
 		if (hX > hW)
 			clipFlags |= 0x1;
-		
+
 		clipCodeAND &= clipFlags;
-		clipCodeOR |= clipFlags;		
-	}			
+		clipCodeOR |= clipFlags;
+	}
 
 	/****************************/
 	/* SEE IF WAS CULLED OR NOT */
@@ -739,27 +739,27 @@ try_cull:
 
 //	if (clipCodeOR == 0)														// check for case #1
 //	{
-//		theNode->StatusBits |= STATUS_BIT_NOCLIPTEST;	
+//		theNode->StatusBits |= STATUS_BIT_NOCLIPTEST;
 //	}
 
-			
+
 	if (clipCodeAND)															// check for case #2
 	{
 		theNode->StatusBits |= STATUS_BIT_ISCULLED;								// set cull bit
 	}
 	else
 	{
-draw_on:	
+draw_on:
 		theNode->StatusBits &= ~STATUS_BIT_ISCULLED;							// clear cull bit
 	}
 
 
-	
+
 				/* NEXT NODE */
-next:			
+next:
 		theNode = theNode->NextNode;		// next node
 	}
-	while (theNode != nil);	
+	while (theNode != nil);
 }
 
 

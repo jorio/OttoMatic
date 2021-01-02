@@ -78,21 +78,21 @@ Boolean AddJungleGate(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 int		i;
-									
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= JUNGLE_ObjType_Gate;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;
 	gNewObjectDefinition.moveCall 	= MoveJungleGate;
-	
+
 	if (itemPtr->parm[0] == 1)
 		gNewObjectDefinition.rot 		= PI/2;
 	else
 		gNewObjectDefinition.rot 		= 0;
-	
+
 	gNewObjectDefinition.scale 		= JUNGLEGATE_SCALE;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
@@ -109,8 +109,8 @@ int		i;
 	CreateCollisionBoxFromBoundingBox_Rotated(newObj, 1.1, 1);
 
 			/* COLLISION CALLBACKS */
-			
-	
+
+
 	for (i = 0; i < NUM_WEAPON_TYPES; i++)								// all weapons call this
 		newObj->HitByWeaponHandler[i] = JungleGate_HitByWeaponHandler;
 
@@ -125,7 +125,7 @@ static void MoveJungleGate(ObjNode *theNode)
 float	off,r;
 
 		/* SEE IF OUT OF RANGE */
-		
+
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
 		DeleteObject(theNode);
@@ -137,13 +137,13 @@ float	off,r;
 	if (theNode->ShimmeyTimer > 0.0f)
 	{
 		off = cos(theNode->ShimmeyTimer	* 20.0f) * (theNode->ShimmeyTimer * 10.0f);
-		
+
 		r = theNode->Rot.y;
-		
+
 		theNode->Coord.x = theNode->InitCoord.x + sin(r) * off;
 		theNode->Coord.z = theNode->InitCoord.z + cos(r) * off;
 		UpdateObjectTransforms(theNode);
-		
+
 		theNode->ShimmeyTimer -= gFramesPerSecondFrac;
 		if (theNode->ShimmeyTimer < 0.0f)
 			theNode->ShimmeyTimer = 0;
@@ -158,21 +158,21 @@ float	off,r;
 static Boolean	JungleGate_HitByWeaponHandler(ObjNode *weaponObj, ObjNode *gate, OGLPoint3D *where, OGLVector3D *delta)
 {
 #pragma unused(where, delta)
-	
+
 				/* THE GIANT'S FIST CAN BUST THE GATE */
-				
+
 	if (!weaponObj)
 		goto nope;
-		
+
 	if ((weaponObj->Kind == WEAPON_TYPE_FIST) && (gPlayerInfo.scaleRatio > 1.0f))
 		DoTrig_JungleGate(gate, nil, 0);
 	else
-	{	
-nope:		
+	{
+nope:
 		if (gate->ShimmeyTimer == 0.0f)
 			gate->ShimmeyTimer = 1.1f;
 	}
-		
+
 	return(true);			// stop weapon
 }
 
@@ -198,13 +198,13 @@ float	dx,dz;
 				theNode->ShimmeyTimer = .5f;							// make shimmy instead
 			return(true);
 		}
-		
+
 		dx = whoNode->Delta.x;
 		dz = whoNode->Delta.z;
 	}
 	else
 	{
-		dx = dz = 0;	
+		dx = dz = 0;
 	}
 
 			/**************/
@@ -214,20 +214,20 @@ float	dx,dz;
 	for (i = 0; i < 9; i++)
 	{
 		OGLPoint3D	coord;
-		static const short types[] = 
+		static const short types[] =
 		{
 			JUNGLE_ObjType_GateChunk0,
 			JUNGLE_ObjType_GateChunk0,
 			JUNGLE_ObjType_GateChunk1,
-			JUNGLE_ObjType_GateChunk2		
+			JUNGLE_ObjType_GateChunk2
 		};
-		
+
 		coord.x = RandomFloat2() * 200.0f;
 		coord.y = RandomFloat() * 500.0f;
 		coord.z = 0;
 		OGLPoint3D_Transform(&coord, &theNode->BaseTransformMatrix, &gNewObjectDefinition.coord);
-		
-		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 		gNewObjectDefinition.type 		= types[MyRandomLong() & 0x3];
 		gNewObjectDefinition.flags 		= 0;
 		gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
@@ -235,11 +235,11 @@ float	dx,dz;
 		gNewObjectDefinition.moveCall 	= MoveWoodenGateChunk;
 		gNewObjectDefinition.scale 		= theNode->Scale.x;
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-		
+
 		newObj->DeltaRot.x = RandomFloat2() * PI2;
 		newObj->DeltaRot.y = RandomFloat2() * PI2;
 		newObj->DeltaRot.z = RandomFloat2() * PI2;
-		
+
 		newObj->Delta.x = dx * .2f;
 		newObj->Delta.y = RandomFloat() * 600.0f;
 		newObj->Delta.z = dz * .2f;
@@ -252,7 +252,7 @@ float	dx,dz;
 
 
 			/* DELETE THE GATE */
-			
+
 	theNode->TerrainItemPtr = nil;								// never come back
 	DeleteObject(theNode);
 
@@ -268,14 +268,14 @@ float	dx,dz;
 Boolean AddTurtlePlatform(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-							
+
 					/* MAIN OBJECT */
-				
+
 	gNewObjectDefinition.type 		= SKELETON_TYPE_TURTLE;
-	gNewObjectDefinition.animNum 	= 0;					
+	gNewObjectDefinition.animNum 	= 0;
 	gNewObjectDefinition.coord.x 	= x;
-	
-	if (!GetWaterY(x, z, &gNewObjectDefinition.coord.y))			// get water y	
+
+	if (!GetWaterY(x, z, &gNewObjectDefinition.coord.y))			// get water y
 		gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.coord.z 	= z;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
@@ -293,7 +293,7 @@ ObjNode	*newObj;
 	newObj->Kind		 	= TRIGTYPE_TURTLE;
 
 			/* SET COLLISION BASED ON ROT */
-			
+
 	if (itemPtr->parm[0] & 1)
 	{
 		CreateCollisionBoxFromBoundingBox(newObj, .8,1);
@@ -316,7 +316,7 @@ static void MoveTurtlePlatform(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 		/* SEE IF OUT OF RANGE */
-		
+
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
 		DeleteObject(theNode);
@@ -325,8 +325,8 @@ float	fps = gFramesPerSecondFrac;
 
 	GetObjectInfo(theNode);
 
-	
-			
+
+
 	theNode->TimeSinceStepped += fps;
 	if (theNode->TimeSinceStepped > 1.0f)
 	{
@@ -336,7 +336,7 @@ float	fps = gFramesPerSecondFrac;
 			MorphToSkeletonAnim(theNode->Skeleton, 0, 4.0);
 
 				/* WOBBLE */
-				
+
 		theNode->WobbleIndex += fps * PI2;
 		gCoord.y = theNode->InitCoord.y + sin(theNode->WobbleIndex) * 10.0f;
 
@@ -372,16 +372,16 @@ Boolean AddSmashable(TerrainItemEntryType *itemPtr, long  x, long z)
 ObjNode	*newObj;
 short	type = itemPtr->parm[0];
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= JUNGLE_ObjType_Hut + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;
-	gNewObjectDefinition.moveCall 	= MoveStaticObject;	
+	gNewObjectDefinition.moveCall 	= MoveStaticObject;
 	gNewObjectDefinition.rot 		= (float)itemPtr->parm[1] * (PI2/8.0f);
-	
+
 	gNewObjectDefinition.scale 		= 3.0;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
@@ -413,7 +413,7 @@ Boolean DoTrig_Smashable(ObjNode *theNode, ObjNode *whoNode, Byte sideBits)
 
 	if (gPlayerInfo.scaleRatio <= 1.0f)
 		return(true);
-		
+
 	ExplodeGeometry(theNode, 800, SHARD_MODE_BOUNCE, 1, .5);
 
 	theNode->TerrainItemPtr = nil;								// never come back
@@ -435,14 +435,14 @@ Boolean DoTrig_Smashable(ObjNode *theNode, ObjNode *whoNode, Byte sideBits)
 Boolean AddLeafPlatform(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj,*shadowObj;
-			
-					/* MAKE LEAF PLATFORM */					
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+					/* MAKE LEAF PLATFORM */
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= JUNGLE_ObjType_LeafPlatform0 + itemPtr->parm[0];
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY_Undeformed(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY_Undeformed(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;
 	gNewObjectDefinition.moveCall 	= MoveLeafPlatform;
@@ -473,26 +473,26 @@ ObjNode	*newObj,*shadowObj;
 				break;
 		case	3:
 				newObj->CollisionBoxes[0].left += 350.0f;
-				break;				
+				break;
 	}
 	CalcObjectBoxFromNode(newObj);
-	KeepOldCollisionBoxes(newObj);	
-	
-	
+	KeepOldCollisionBoxes(newObj);
+
+
 	newObj->WobbleIndex = RandomFloat2()*PI2;
-	
-	
+
+
 				/* MAKE SHADOW */
-				
+
 	gNewObjectDefinition.type 		= JUNGLE_ObjType_LeafPlatformShadow;
 	gNewObjectDefinition.coord.y 	= FindHighestCollisionAtXZ(x,z, CTYPE_TERRAIN | CTYPE_WATER) + 3.0f;
 	gNewObjectDefinition.slot		= WATER_SLOT+1;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits | STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING;
 	gNewObjectDefinition.moveCall 	= MoveLeafPlatformShadow;
 	shadowObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-					
+
 	newObj->ChainNode = shadowObj;
-	
+
 	return(true);
 }
 
@@ -520,10 +520,10 @@ OGLPoint3D	p;
 
 
 			/* UPDATE COLLISION TOP */
-			
+
 	p.x = 0;
 	p.y = theNode->BBox.max.y;
-	p.z = (theNode->BBox.max.z + theNode->BBox.min.z) * .5f;	
+	p.z = (theNode->BBox.max.z + theNode->BBox.min.z) * .5f;
 	OGLPoint3D_Transform(&p, &theNode->BaseTransformMatrix, &p);
 	theNode->CollisionBoxes[0].top = p.y - 5.0f;
 	theNode->CollisionBoxes[0].bottom = theNode->CollisionBoxes[0].top - 80.0f;
@@ -565,20 +565,20 @@ static void MoveLeafPlatformShadow(ObjNode *theNode)
 float	x,y,z,r;
 
 				/* CALC POINT UNDER LEAF */
-				
+
 	r = theNode->Rot.y;
 	x = theNode->Coord.x - sin(r) * 300.0f;
 	z = theNode->Coord.x - cos(r) * 300.0f;
 
 
 				/* CALC Y COORD THERE */
-				
+
 	y = FindHighestCollisionAtXZ(x,z, CTYPE_TERRAIN | CTYPE_WATER) + 10.0f;
 
 	if (y != theNode->Coord.y)
 		UpdateObjectTransforms(theNode);
-		
-		
+
+
 }
 
 
@@ -591,21 +591,21 @@ Boolean AddDebrisGate(TerrainItemEntryType *itemPtr, long  x, long z)
 ObjNode	*newObj;
 int		i;
 short	type = itemPtr->parm[0];
-									
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_DebrisGate_Intact + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;
 	gNewObjectDefinition.moveCall 	= MoveDebrisGate;
-	
+
 	if (itemPtr->parm[1] == 1)
 		gNewObjectDefinition.rot 		= PI/2;
 	else
 		gNewObjectDefinition.rot 		= 0;
-	
+
 	gNewObjectDefinition.scale 		= DEBRISGATE_SCALE;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
@@ -643,7 +643,7 @@ static void MoveDebrisGate(ObjNode *theNode)
 float	off,r;
 
 		/* SEE IF OUT OF RANGE */
-		
+
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
 		DeleteObject(theNode);
@@ -655,13 +655,13 @@ float	off,r;
 	if (theNode->ShimmeyTimer > 0.0f)
 	{
 		off = cos(theNode->ShimmeyTimer	* 20.0f) * (theNode->ShimmeyTimer * 10.0f);
-		
+
 		r = theNode->Rot.y;
-		
+
 		theNode->Coord.x = theNode->InitCoord.x + sin(r) * off;
 		theNode->Coord.z = theNode->InitCoord.z + cos(r) * off;
 		UpdateObjectTransforms(theNode);
-		
+
 		theNode->ShimmeyTimer -= gFramesPerSecondFrac;
 		if (theNode->ShimmeyTimer < 0.0f)
 			theNode->ShimmeyTimer = 0;
@@ -674,10 +674,10 @@ float	off,r;
 static Boolean DebrisGate_HitByWeaponHandler(ObjNode *weaponObj, ObjNode *gate, OGLPoint3D *where, OGLVector3D *delta)
 {
 #pragma unused (weaponObj, where, delta)
-	
+
 	if (gate->ShimmeyTimer == 0.0f)
 		gate->ShimmeyTimer = 1.1f;
-		
+
 	return(true);			// stop weapon
 }
 
@@ -692,7 +692,7 @@ Boolean DoTrig_DebrisGate(ObjNode *theNode, ObjNode *whoNode, Byte sideBits)
 int		i;
 ObjNode	*newObj;
 
-const static short type[] = 
+const static short type[] =
 {
 	APOCALYPSE_ObjType_DebrisGate_Debris0,
 	APOCALYPSE_ObjType_DebrisGate_Debris1,
@@ -701,7 +701,7 @@ const static short type[] =
 	APOCALYPSE_ObjType_DebrisGate_Debris4
 };
 
-const static OGLPoint3D coord[] = 
+const static OGLPoint3D coord[] =
 {
 	263, 101, 0,
 	120, 41, 0,
@@ -721,7 +721,7 @@ const static OGLPoint3D coord[] =
 	for (i = 0; i < 5; i++)
 	{
 		OGLPoint3D_Transform(&coord[i], &theNode->BaseTransformMatrix, &gNewObjectDefinition.coord);
-		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 		gNewObjectDefinition.type 		= type[i];
 		gNewObjectDefinition.flags 		= 0;
 		gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
@@ -729,11 +729,11 @@ const static OGLPoint3D coord[] =
 		gNewObjectDefinition.moveCall 	= MoveWoodenGateChunk;
 		gNewObjectDefinition.scale 		= theNode->Scale.x;
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-		
+
 		newObj->DeltaRot.x = RandomFloat2() * PI2;
 		newObj->DeltaRot.y = RandomFloat2() * PI2;
 		newObj->DeltaRot.z = RandomFloat2() * PI2;
-		
+
 		newObj->Delta.x = whoNode->Delta.x * .2f;
 		newObj->Delta.y = whoNode->Delta.y + 1200.0f;
 		newObj->Delta.z = whoNode->Delta.z * .2f;
@@ -745,7 +745,7 @@ const static OGLPoint3D coord[] =
 
 
 			/* DELETE THE GATE */
-			
+
 	theNode->TerrainItemPtr = nil;								// never come back
 	DeleteObject(theNode);
 
@@ -765,13 +765,13 @@ Boolean AddChainReactingMine(TerrainItemEntryType *itemPtr, long  x, long z)
 ObjNode	*newObj;
 float	s;
 int		i;
-							
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_ExplodingCylinder;
 	gNewObjectDefinition.scale 		= s = .6;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y	= GetTerrainY(x,z) - (gObjectGroupBBoxList[MODEL_GROUP_LEVELSPECIFIC][APOCALYPSE_ObjType_ExplodingCylinder].min.y * s);	
+	gNewObjectDefinition.coord.y	= GetTerrainY(x,z) - (gObjectGroupBBoxList[MODEL_GROUP_LEVELSPECIFIC][APOCALYPSE_ObjType_ExplodingCylinder].min.y * s);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 	gNewObjectDefinition.slot 		= 524;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject3;
@@ -780,9 +780,9 @@ int		i;
 
 	newObj->TerrainItemPtr = itemPtr;							// keep ptr to item list
 
-	
+
 				/* COLLISION INFO */
-				
+
 	newObj->CType 			= CTYPE_TRIGGER|CTYPE_MISC;
 	newObj->CBits 			= CBITS_ALLSOLID;
 	newObj->TriggerSides 	= ALL_SOLID_SIDES;					// side(s) to activate it
@@ -794,7 +794,7 @@ int		i;
 
 
 				/* SPARKLE */
-				
+
 	i = newObj->Sparkles[0] = GetFreeSparkle(newObj);				// get free sparkle slot
 	if (i != -1)
 	{
@@ -809,12 +809,12 @@ int		i;
 		gSparkles[i].color.a = 1;
 
 		gSparkles[i].scale = 120.0f;
-		
+
 		gSparkles[i].separation = 40.0f;
-					
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_RedSpark;
 	}
-				
+
 
 	return(true);
 }
@@ -851,12 +851,12 @@ DeformationType		defData;
 	where = mine->Coord;
 	x = where.x;
 	y = where.y;
-	z = where.z;	
+	z = where.z;
 
 		/*********************/
 		/* FIRST MAKE SPARKS */
 		/*********************/
-						
+
 	gNewParticleGroupDef.magicNum				= 0;
 	gNewParticleGroupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 	gNewParticleGroupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND;
@@ -882,25 +882,25 @@ DeformationType		defData;
 			pt.y = y + d.y * 100.0f;
 			pt.z = z + d.z * 100.0f;
 
-			
-			
+
+
 			newParticleDef.groupNum		= pg;
 			newParticleDef.where		= &pt;
 			newParticleDef.delta		= &d;
 			newParticleDef.scale		= RandomFloat() + 1.5f;
 			newParticleDef.rotZ			= 0;
 			newParticleDef.rotDZ		= 0;
-			newParticleDef.alpha		= FULL_ALPHA + (RandomFloat() * .3f);		
+			newParticleDef.alpha		= FULL_ALPHA + (RandomFloat() * .3f);
 			AddParticleToGroup(&newParticleDef);
 		}
 	}
-	
+
 		/******************/
 		/* MAKE SHOCKWAVE */
 		/******************/
-		
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
-	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_Shockwave;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
+	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_Shockwave;
 	gNewObjectDefinition.coord		= where;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOFOG|STATUS_BIT_GLOW|STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOZWRITES|STATUS_BIT_NOTEXTUREWRAP;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+30;
@@ -909,14 +909,14 @@ DeformationType		defData;
 	gNewObjectDefinition.scale 		= .2;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	newObj->ColorFilter.a = .99;
-		
+
 
 		/*******************/
 		/* MAKE CONE BLAST */
 		/*******************/
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
-	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_ConeBlast;	
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
+	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_ConeBlast;
 	gNewObjectDefinition.coord.x 	= where.x;
 	gNewObjectDefinition.coord.y 	= GetTerrainY(where.x, where.z);
 	gNewObjectDefinition.coord.z 	= where.z;
@@ -928,17 +928,17 @@ DeformationType		defData;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	newObj->ColorFilter.a = .99;
 
-		
+
 		/*************************/
 		/* MAKE DEFORMATION WAVE */
 		/*************************/
-				
+
 	defData.type 				= DEFORMATION_TYPE_RADIALWAVE;
-	defData.amplitude 			= 100; 
-	defData.radius 				= 20; 
-	defData.speed 				= 3000; 
-	defData.origin.x			= where.x; 
-	defData.origin.y			= where.z; 
+	defData.amplitude 			= 100;
+	defData.radius 				= 20;
+	defData.speed 				= 3000;
+	defData.origin.x			= where.x;
+	defData.origin.y			= where.z;
 	defData.oneOverWaveLength 	= 1.0f / 500.0f;
 	defData.radialWidth			= 800.0f;
 	defData.decayRate			= 300.0f;
@@ -948,7 +948,7 @@ DeformationType		defData;
 	ExplodeGeometry(mine, 500, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 1, 1.0);
 	DeleteObject(mine);
 	PlayEffect_Parms3D(EFFECT_MINEEXPLODE, &gCoord, NORMAL_CHANNEL_RATE, 2.0);
-	
+
 	return(true);
 }
 
@@ -963,7 +963,7 @@ float	x,y,z,w;
 short	n,i;
 
 	theNode->Scale.x = theNode->Scale.y = theNode->Scale.z += 9.0f * fps;
-	
+
 	theNode->ColorFilter.a -= fps * 2.2f;
 	if (theNode->ColorFilter.a <= 0.0f)
 	{
@@ -977,18 +977,18 @@ short	n,i;
 			/***********************/
 			/* SEE IF HIT ANYTHING */
 			/***********************/
-			
+
 	x = theNode->Coord.x;
 	y = theNode->Coord.y;
 	z = theNode->Coord.z;
 	w = theNode->Scale.x * theNode->BBox.max.x;
 
 			/* CHECK TO SEE IF HIT PLAYER */
-			
+
 	if (DoSimpleBoxCollisionAgainstPlayer(y+10, y-10, x - w, x + w,	z + w, z - w))
 	{
 		ObjNode	*player = gPlayerInfo.objNode;
-	
+
 		player->Rot.y = CalcYAngleFromPointToPoint(player->Rot.y,x,z,player->Coord.x, player->Coord.z);		// aim player direction of blast
 		PlayerGotHit(nil, theNode->Damage);																			// get hit
 		player->Delta.x *= 2.0f;
@@ -996,7 +996,7 @@ short	n,i;
 	}
 
 			/* CHECK TO SEE IF HIT ENEMY */
-			
+
 	if (DoSimpleBoxCollision(y+10, y-10, x - w, x + w,	z + w, z - w, CTYPE_ENEMY))
 	{
 		for (i = 0; i < gNumCollisions; i++)
@@ -1006,26 +1006,26 @@ short	n,i;
 			enemy->Rot.y = CalcYAngleFromPointToPoint(enemy->Rot.y,x,z,enemy->Coord.x, enemy->Coord.z);		// aim enemy direction of blast
 			enemy->Delta.x *= 2.0f;
 			enemy->Delta.z *= 2.0f;
-			
+
 			if (enemy->HurtCallback)												// call enemy's hurt function
 				enemy->HurtCallback(enemy, 1.0);
-		
+
 		}
 	}
 
 
 		/* SEE IF HIT ANOTHER CHAIN REACTING MINE */
-		
+
 	n = DoSimpleBoxCollision(y+10, y-10, x - w, x + w,	z + w, z - w, CTYPE_MISC | CTYPE_TRIGGER);
 	for (i = 0; i < n; i++)
 	{
 		ObjNode	*obj = gCollisionList[i].objectPtr;						// get hit obj
-		
+
 		if (obj->Kind != TRIGTYPE_CHAINREACTINGMINE)					// see if it's a mine
 			continue;
-	
+
 		DoTrig_ChainReactingMine(obj, theNode, 0);						// trigger the mine to explode
-	}	
+	}
 
 
 }
@@ -1038,7 +1038,7 @@ static void MoveConeBlast(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 	theNode->Scale.x = theNode->Scale.y = theNode->Scale.z += fps * 5.0f;
-	
+
 	theNode->ColorFilter.a -= fps * 1.5f;
 	if (theNode->ColorFilter.a <= 0.0f)
 	{
@@ -1065,17 +1065,17 @@ float	x2,z2;
 
 	x2 = (float)x * TERRAIN_POLYGON_SIZE + (TERRAIN_POLYGON_SIZE/2.0f);
 	z2 = (float)z * TERRAIN_POLYGON_SIZE;
-							
-							
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= CLOUD_ObjType_TrapDoor;
 	gNewObjectDefinition.coord.x 	= x2;
 	gNewObjectDefinition.coord.y 	= GetTerrainY_Undeformed(x2,z2-10.0f);			// get height of terrain in back of this a ways (the hole is a pit)
 	gNewObjectDefinition.coord.z 	= z2;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;
-	gNewObjectDefinition.moveCall 	= MoveTrapDoor;	
-	gNewObjectDefinition.rot 		= 0;	
+	gNewObjectDefinition.moveCall 	= MoveTrapDoor;
+	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= TERRAIN_POLYGON_SIZE;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
@@ -1090,8 +1090,8 @@ float	x2,z2;
 
 
 	newObj->Mode = TRAP_DOOR_MODE_WAIT;
-	
-	
+
+
 	return(true);
 }
 
@@ -1103,7 +1103,7 @@ static void MoveTrapDoor(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 		/* SEE IF OUT OF RANGE */
-		
+
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
 		DeleteObject(theNode);
@@ -1114,23 +1114,23 @@ float	fps = gFramesPerSecondFrac;
 	{
 		case	TRAP_DOOR_MODE_WAIT:
 				break;
-				
+
 		case	TRAP_DOOR_MODE_OPEN:
 				if (theNode->Rot.x < (PI/2))
 					theNode->DeltaRot.x += fps * 6.0f;
 				else
 				if (theNode->Rot.x > (PI/2))
 					theNode->DeltaRot.x -= fps * 6.0f;
-				
+
 				theNode->Rot.x += theNode->DeltaRot.x * fps;
-				
+
 				if (theNode->Rot.x > (PI * 2/3))
 				{
 					theNode->Rot.x = PI*2/3;
 					theNode->DeltaRot.x = theNode->DeltaRot.x * -.8f;
 				}
 
-				UpdateObjectTransforms(theNode);				
+				UpdateObjectTransforms(theNode);
 				break;
 
 	}
@@ -1151,9 +1151,9 @@ Boolean DoTrig_TrapDoor(ObjNode *theNode, ObjNode *whoNode, Byte sideBits)
 	{
 		theNode->DeltaRot.x = 0;
 		theNode->Mode = TRAP_DOOR_MODE_OPEN;
-		
+
 		theNode->CType = 0;
-		
+
 		PlayEffect3D(EFFECT_TRAPDOOR, &theNode->Coord);
 	}
 

@@ -65,12 +65,12 @@ ObjNode	*newObj,*step;
 					/***************/
 					/* MAKE CANNON */
 					/***************/
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= CLOUD_ObjType_Cannon;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 70;
 	gNewObjectDefinition.moveCall 	= MoveCannon;
@@ -126,43 +126,43 @@ float	r;
 		DeleteObject(theNode);
 		return;
 	}
-	
-	
+
+
 			/* SEE IF FIRE CANNON */
-			
+
 	if (theNode->FuseIsLit)
 		theNode->FuseTimer -= gFramesPerSecondFrac;
-		
+
 	if (player->Skeleton->AnimNum == PLAYER_ANIM_CLIMBINTO)		// see if player is in cannon
 	{
 		if (theNode->FuseTimer <= 0.0f)
-		{			
+		{
 					/* MOVE PLAYER TO CURRENT POINT */
-					
-			FindCoordOfJoint(player, 0, &player->Coord);	
-			player->Coord.y += 40.0f;		
+
+			FindCoordOfJoint(player, 0, &player->Coord);
+			player->Coord.y += 40.0f;
 			SetSkeletonAnim(player->Skeleton, PLAYER_ANIM_SHOOTFROMCANNON);
 			r = player->Rot.y = theNode->Rot.y;
 			player->Rot.x = PI/6;
 			UpdateObjectTransforms(player);
-			
+
 			player->Delta.y = 900;
 			player->Delta.x = -sin(r) * 1600.0f;
 			player->Delta.z = -cos(r) * 1600.0f;
-		
+
 			MakePuff(&player->Coord, 100.0, PARTICLE_SObjType_BlackSmoke, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, .5);
-	
+
 			PlayEffect3D(EFFECT_CANNONFIRE, &theNode->Coord);
-			
+
 			gCameraUserRotY = 0;									// swing camera to back
 		}
-	}	
-	
+	}
+
 				/* PLAYER NOT IN CANNON */
 	else
 	{
 		float	x,z;
-		
+
 		if (IsPlayerInPositionToEnterCannon(&x, &z))				// see if should do help message
 			DisplayHelpMessage(HELP_MESSAGE_INTOCANNON,1.0, true);
 	}
@@ -185,12 +185,12 @@ float	r,x,z;
 		{
 			/* CALC HOT-SPOT IN FRONT OF CANNON */
 
-			r = thisNodePtr->Rot.y;		
-			x = thisNodePtr->Coord.x - (sin(r) * (240.0f * CANNON_SCALE));	
+			r = thisNodePtr->Rot.y;
+			x = thisNodePtr->Coord.x - (sin(r) * (240.0f * CANNON_SCALE));
 			z = thisNodePtr->Coord.z - (cos(r) * (240.0f * CANNON_SCALE));
 
 			/* SEE IF PLAYER CLOSE ENOUGH TO IT */
-			
+
 			if (CalcDistance(x,z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < 80.0f)
 			{
 				*outX = x;									// pass back the tip
@@ -198,8 +198,8 @@ float	r,x,z;
 				return(thisNodePtr);
 			}
 		}
-		
-		
+
+
 		thisNodePtr = thisNodePtr->NextNode;				// next node
 	}
 	while (thisNodePtr != nil);

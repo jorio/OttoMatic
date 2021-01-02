@@ -76,15 +76,15 @@ static	Boolean		gStopOnLanding;
 Boolean AddRocketSled(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	if (gLevelNum == LEVEL_NUM_CLOUD)
 		gNewObjectDefinition.type 	= CLOUD_ObjType_RocketSled;
 	else
 		gNewObjectDefinition.type	= FIREICE_ObjType_RocketSled;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= PLAYER_SLOT-3;								// move before player
 	gNewObjectDefinition.moveCall 	= MoveRocketSled;
@@ -131,7 +131,7 @@ int	i;
 
 
 			/* REMEMBER INITIAL DIRECTION OF AIM */
-			
+
 	gRocketSledStartAim.x = -sin(theNode->Rot.y);
 	gRocketSledStartAim.y = -cos(theNode->Rot.y);
 
@@ -139,7 +139,7 @@ int	i;
 			/*****************/
 			/* MAKE SPARKLES */
 			/*****************/
-			
+
 	i = theNode->Sparkles[0] = GetFreeSparkle(theNode);				// get free sparkle slot
 	if (i != -1)
 	{
@@ -155,7 +155,7 @@ int	i;
 
 		gSparkles[i].scale = 300.0f;
 		gSparkles[i].separation = 50.0f;
-		
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark4;
 	}
 
@@ -174,10 +174,10 @@ int	i;
 
 		gSparkles[i].scale = 300.0f;
 		gSparkles[i].separation = 50.0f;
-		
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark4;
 	}
-			
+
 
 
 	return(true);
@@ -199,7 +199,7 @@ u_short		effect;
 
 
 			/* JUST TRACK IT IF NOT BEING DRIVEN YET */
-			
+
 	if (!theNode->RocketSledBeingRidden)
 	{
 		if (TrackTerrainItem(theNode))
@@ -207,10 +207,10 @@ u_short		effect;
 			DeleteObject(theNode);
 			return;
 		}
-		
+
 		RotateOnTerrain(theNode, 0, nil);
 		SetObjectTransformMatrix(theNode);
-		
+
 		return;
 	}
 
@@ -218,15 +218,15 @@ u_short		effect;
 				/***********************/
 				/* ROCKETSLED BEING RIDDEN*/
 				/***********************/
-				
+
 	GetObjectInfo(theNode);
-	
+
 	gForceCameraAlignment = true;								// keep camera behind the car!
 	gCameraUserRotY = 0;										// ... and reset user rot
 
 
 			/* CHECK USER CONTROLS FOR ROTATION */
-			
+
 	if (gPlayerInfo.analogControlX != 0.0f)																// see if spin
 	{
 		theNode->DeltaRot.y -= gPlayerInfo.analogControlX * fps * CONTROL_SENSITIVITY_ROCKETSLED_TURN;			// use x to rotate
@@ -234,14 +234,14 @@ u_short		effect;
 			theNode->DeltaRot.y = PI2;
 		else
 		if (theNode->DeltaRot.y < -PI2)
-			theNode->DeltaRot.y = -PI2;				
+			theNode->DeltaRot.y = -PI2;
 	}
 
 				/* ROTATE IT */
-			
-	oldRot = theNode->Rot.y;	
+
+	oldRot = theNode->Rot.y;
 	r = theNode->Rot.y += theNode->DeltaRot.y * fps;
-				
+
 	aim.x = -sin(r);											// see if over rotated
 	aim.y = -cos(r);
 
@@ -267,20 +267,20 @@ u_short		effect;
 
 
 			/* MOVE IT */
-	
+
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
 	gCoord.z += gDelta.z * fps;
 
 
 			/* UPDATE SOUND */
-			
+
 	if (gLevelNum == LEVEL_NUM_CLOUD)
 		effect = EFFECT_ROCKETSLED;
 	else
 		effect = EFFECT_ROCKETSLED2;
-			
-	if (theNode->EffectChannel == -1)	
+
+	if (theNode->EffectChannel == -1)
 		theNode->EffectChannel = PlayEffect_Parms3D(effect, &gCoord, NORMAL_CHANNEL_RATE*2/3, 2.5);
 	else
 	{
@@ -291,52 +291,52 @@ u_short		effect;
 
 		/* DO COLLISION DETECT */
 
-	HandleCollisions(theNode, CTYPE_MISC | CTYPE_FENCE, .5);		
+	HandleCollisions(theNode, CTYPE_MISC | CTYPE_FENCE, .5);
 
-		
+
 
 		/*******************************/
 		/* SEE IF ON TERRAIN OR IN AIR */
 		/*******************************/
 
-			
+
 	if ((gCoord.y + 2.0f) > GetTerrainY(gCoord.x, gCoord.z))	// see if above terrain
 	{
 		if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if was on ground before then zero out deltay
 			gDelta.y = 0;
-	
+
 		theNode->StatusBits &= ~STATUS_BIT_ONGROUND;
-	
+
 		gDelta.y -= 1100.0f * fps;								// gravity
-		
+
 //		theNode->Rot.x -= .2f * fps;							// rot to level
 //		if (theNode->Rot.x < 0.0f)
 //			theNode->Rot.x = 0.0f;
-		
+
 		gAirTime += fps;										// inc airtime & see if doing big jump
 		if (gAirTime > 1.0f)
 		{
 			gStopOnLanding = true;
 		}
-		
+
 		UpdateObject(theNode);
 	}
-	
+
 			/* ON TERRAIN, SO CONFORM */
 	else
 	{
 		OGLPoint3D	tvo, tvn;
 		OGLVector3D	v,v2;
-		
+
 		gAirTime = 0;											// reset since not in air
-		
+
 		if (gStopOnLanding)										// see if landed after big jump
 		{
 			DisableRocketSled(theNode);
 			return;
 		}
-		
-		tvo.x = theNode->OldCoord.x;								// get old terrain coord				
+
+		tvo.x = theNode->OldCoord.x;								// get old terrain coord
 		tvo.z = theNode->OldCoord.z;
 		tvo.y = GetTerrainY(tvo.x, tvo.z);
 
@@ -347,7 +347,7 @@ u_short		effect;
 		v.x = tvn.x - tvo.x;										// calc vector from old to new
 		v.y = tvn.y - tvo.y;
 		v.z = tvn.z - tvo.z;
-		
+
 		if (v.y > 0.0f)											// if slope up, then match terrain deltaY
 			gDelta.y = v.y * gFramesPerSecond * 1.1f;					// calc delta y from actual
 		else
@@ -360,32 +360,32 @@ u_short		effect;
 		theNode->Coord.y = tvn.y;
 		theNode->Coord.z = gCoord.z;
 		theNode->Delta = gDelta;
-		
+
 		theNode->StatusBits |= STATUS_BIT_ONGROUND;
-		
-		
+
+
 				/* CALC X-ROT FROM ALIGNMENT */
-				
+
 		v.x = -sin(r);						// ahead vector
 		v.z = -cos(r);
 		v.y = 0;
-		
+
 		v2.x = 0;							// aligned vector
 		v2.y = 0;
-		v2.z = -1;		
+		v2.z = -1;
 		OGLVector3D_Transform(&v2, &theNode->BaseTransformMatrix, &v2);
 		OGLVector3D_Normalize(&v2,&v2);
 
-		theNode->Rot.x = acos(OGLVector3D_Dot(&v,&v2));		
+		theNode->Rot.x = acos(OGLVector3D_Dot(&v,&v2));
 		if (v2.y < 0.0f)
 			theNode->Rot.x = -theNode->Rot.x;
-		
+
 	}
-	
+
 	MakeRocketSledSmoke(theNode);
-	
-	
-		
+
+
+
 }
 
 
@@ -408,9 +408,9 @@ OGLPoint3D			p;
 	if (theNode->ParticleTimer <= 0.0f)
 	{
 		theNode->ParticleTimer += 0.02f;
-	
+
 				/* CALC COORD OF BOTH ENGINE NOZZLES */
-				
+
 		OGLPoint3D_TransformArray(engineOffs, &theNode->BaseTransformMatrix, nozzles, 2);
 
 
@@ -418,11 +418,11 @@ OGLPoint3D			p;
 
 		particleGroup 	= theNode->ParticleGroup;
 		magicNum 		= theNode->ParticleMagicNum;
-		
+
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
 			theNode->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
-			
+
 			groupDef.magicNum				= magicNum;
 			groupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 			groupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND|PARTICLE_FLAGS_ALLAIM;
@@ -440,11 +440,11 @@ OGLPoint3D			p;
 		if (particleGroup != -1)
 		{
 					/* DO LEFT ENGINE */
-					
+
 			x = nozzles[0].x;
 			y = nozzles[0].y;
 			z = nozzles[0].z;
-			
+
 			for (i = 0; i < 3; i++)
 			{
 				p.x = x + RandomFloat2() * 20.0f;
@@ -454,14 +454,14 @@ OGLPoint3D			p;
 				d.x = RandomFloat2() * 100.0f;
 				d.y = RandomFloat2() * 100.0f;
 				d.z = RandomFloat2() * 100.0f;
-			
+
 				newParticleDef.groupNum		= particleGroup;
 				newParticleDef.where		= &p;
 				newParticleDef.delta		= &d;
 				newParticleDef.scale		= 1.0;
 				newParticleDef.rotZ			= RandomFloat()*PI2;
 				newParticleDef.rotDZ		= RandomFloat()*PI2;
-				newParticleDef.alpha		= .6;		
+				newParticleDef.alpha		= .6;
 				if (AddParticleToGroup(&newParticleDef))
 				{
 					theNode->ParticleGroup = -1;
@@ -470,11 +470,11 @@ OGLPoint3D			p;
 			}
 
 					/* DO RIGHT ENGINE */
-					
+
 			x = nozzles[1].x;
 			y = nozzles[1].y;
 			z = nozzles[1].z;
-			
+
 			for (i = 0; i < 3; i++)
 			{
 				p.x = x + RandomFloat2() * 20.0f;
@@ -484,14 +484,14 @@ OGLPoint3D			p;
 				d.x = RandomFloat2() * 100.0f;
 				d.y = RandomFloat2() * 100.0f;
 				d.z = RandomFloat2() * 100.0f;
-			
+
 				newParticleDef.groupNum		= particleGroup;
 				newParticleDef.where		= &p;
 				newParticleDef.delta		= &d;
 				newParticleDef.scale		= 1.0;
 				newParticleDef.rotZ			= RandomFloat()*PI2;
 				newParticleDef.rotDZ		= RandomFloat()*PI2;
-				newParticleDef.alpha		= .6;		
+				newParticleDef.alpha		= .6;
 				if (AddParticleToGroup(&newParticleDef))
 				{
 					theNode->ParticleGroup = -1;
@@ -512,27 +512,27 @@ static void DisableRocketSled(ObjNode *theNode)
 ObjNode	*player = gPlayerInfo.objNode;
 
 	gPlayerRocketSled = nil;
-	
+
 	SetSkeletonAnim(player->Skeleton, PLAYER_ANIM_BELLYSLIDE);
-	gPlayerInfo.knockDownTimer = 1.0f;	
-	
+	gPlayerInfo.knockDownTimer = 1.0f;
+
 	player->Delta = gDelta;
 	player->Coord.y = GetTerrainY(player->Coord.x, player->Coord.z) - player->BBox.min.y;
-	
+
 	gCurrentMaxSpeed = theNode->Speed2D * .6f;
 	gTimeSinceLastThrust = 0;
 
 
 			/* BLOW UP THE SLED ON IMPACT */
-			
+
 	if (gLevelNum == LEVEL_NUM_CLOUD)
 		PlayEffect3D(EFFECT_BUMPERPOLEBREAK, &gCoord);
 	else
 		PlayEffect3D(EFFECT_SLEDEXPLODE, &gCoord);
-			
+
 	ExplodeGeometry(theNode, 400, SHARD_MODE_UPTHRUST, 1, .5);
 	DeleteObject(theNode);
-	
+
 }
 
 
@@ -555,25 +555,25 @@ const static OGLPoint3D zero = {0,0,0};
 
 
 			/* CALC SCALE MATRIX */
-			
+
 	scale = PLAYER_DEFAULT_SCALE/ROCKETSLED_SCALE;							// to adjust from tobogan scale to player's
 	OGLMatrix4x4_SetScale(&m2, scale, scale, scale);
 
 
 			/* CALC TRANSLATE MATRIX */
-			
+
 	OGLMatrix4x4_SetTranslate(&m3, 0 ,132, 70);
 	OGLMatrix4x4_Multiply(&m2, &m3, &m);
 
 
 			/* GET ALIGNMENT MATRIX */
-			
+
 	OGLMatrix4x4_Multiply(&m, &gPlayerRocketSled->BaseTransformMatrix, &gPlayerInfo.objNode->BaseTransformMatrix);
 	SetObjectTransformMatrix(gPlayerInfo.objNode);
-	
+
 	OGLPoint3D_Transform(&zero, &gPlayerInfo.objNode->BaseTransformMatrix, &gCoord);		// calc player coord
 	player->Coord = gCoord;
-	
+
 	player->Rot.y = gPlayerRocketSled->Rot.y;
 }
 

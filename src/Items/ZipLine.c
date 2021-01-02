@@ -68,12 +68,12 @@ typedef struct
 	short		numPoints;
 	OGLPoint3D	splinePoints[MAX_ZIP_SPLINE_POINTS];
 	OGLBoundingBox	bbox;
-	
+
 	MOVertexArrayData	mesh;
 	OGLPoint3D			meshPoints[MAX_ZIP_GEOMETRY_POINTS];
 	OGLTextureCoord		meshUVs[MAX_ZIP_GEOMETRY_POINTS];
 	MOTriangleIndecies	meshTriangles[MAX_ZIP_GEOMETRY_POINTS];
-	
+
 }ZipLineType;
 
 
@@ -125,23 +125,23 @@ ObjNode					*newObj;
 			id = itemPtr[i].parm[0];								// get zip ID
 			if (id >= MAX_ZIP_LINES)
 				DoFatalAlert("\pInitZipLines: zip line ID# >= MAX_ZIP_LINES");
-				
+
 			gZipLines[id].isUsed = true;							// this ID is used
-				
+
 			x = itemPtr[i].x;										// get coords
 			z = itemPtr[i].y;
-			
+
 			if (itemPtr[i].parm[1] == 0)							// see if start or end pt
 			{
 				gZipLines[id].start.x = x;
 				gZipLines[id].start.z = z;
-				gZipLines[id].start.y = GetTerrainY_Undeformed(x,z);			
+				gZipLines[id].start.y = GetTerrainY_Undeformed(x,z);
 			}
 			else													// end pt
 			{
 				gZipLines[id].end.x = x;
 				gZipLines[id].end.z = z;
-				gZipLines[id].end.y = GetTerrainY_Undeformed(x,z);			
+				gZipLines[id].end.y = GetTerrainY_Undeformed(x,z);
 			}
 		}
 	}
@@ -150,15 +150,15 @@ ObjNode					*newObj;
 		/**************************************/
 		/* BUILD THE SPLINES FOR EACH ZIPLINE */
 		/**************************************/
-			
-	for (i = 0; i < MAX_ZIP_LINES; i++)								
-	{					
+
+	for (i = 0; i < MAX_ZIP_LINES; i++)
+	{
 		if (!gZipLines[i].isUsed)									// see if this one was used
 			continue;
 
-		
+
 			/* CREATE NUB ARRAY */
-			
+
 		nubs[0] = gZipLines[i].start;								// set start & end nubs
 		nubs[0].y += ZIP_LINE_HEIGHT;
 		nubs[3] = gZipLines[i].end;
@@ -174,34 +174,34 @@ ObjNode					*newObj;
 
 
 			/* CALC SPLINE */
-			
+
 		GenerateZipSpline(i, nubs);
-		
-		
+
+
 			/* BUILD THE GEOMETRY */
-			
+
 		BuildZipGeometry(i);
-		
-		
+
+
 			/* BUILD THE PULLY */
-			
+
 		AttachPullyToZip(i);
 	}
-	
-	
+
+
 		/****************************/
 		/* CREATE DUMMY DRAW OBJECT */
 		/****************************/
-	
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;				
+
+	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.slot 		= 105;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.scale 		= 1;
 	gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOLIGHTING;
-	
-	newObj = MakeNewObject(&gNewObjectDefinition);		
-	newObj->CustomDrawFunction = DrawZipLines;		
-	
+
+	newObj = MakeNewObject(&gNewObjectDefinition);
+	newObj->CustomDrawFunction = DrawZipLines;
+
 }
 
 
@@ -214,15 +214,15 @@ Boolean AddZipLinePost(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	if (gLevelNum == LEVEL_NUM_APOCALYPSE)
 		gNewObjectDefinition.type 	= APOCALYPSE_ObjType_ZipLinePost;
 	else
 		gNewObjectDefinition.type 	= FIREICE_ObjType_ZipLinePost;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 70;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject;
@@ -249,7 +249,7 @@ ObjNode	*newObj;
 
 /******************** GENERATE SPLINE POINTS ***************************/
 
-static void GenerateZipSpline(short zipNum, OGLPoint3D *nubPoints) 
+static void GenerateZipSpline(short zipNum, OGLPoint3D *nubPoints)
 {
 OGLPoint3D	**space,*splinePoints;
 OGLPoint3D 	*a, *b, *c, *d;
@@ -267,7 +267,7 @@ const short numNubs = 4;
 	minX = minZ = -maxX;
 
 				/* CALC POINT DENSITY */
-				
+
 	pointsPerSpan = OGLPoint3D_Distance(&nubPoints[0], &nubPoints[1]) * .2f;		// # points per span is a function of the length of the spline, so measure from start to end
 	if (pointsPerSpan > MAX_POINTS_PER_SPAN)
 		DoFatalAlert("\pGenerateZipSpline: pointsPerSpan > MAX_POINTS_PER_SPAN");
@@ -276,20 +276,20 @@ const short numNubs = 4;
 		/* GET SPLINE INFO */
 
 	splinePoints = gZipLines[zipNum].splinePoints;						// point to point list
-	
+
 
 
 				/* ALLOCATE 2D ARRAY FOR CALCULATIONS */
-				
-	Alloc_2d_array(OGLPoint3D, space, 8, numNubs); 
+
+	Alloc_2d_array(OGLPoint3D, space, 8, numNubs);
 
 
 		/*******************************************************/
 		/* DO MAGICAL CUBIC SPLINE CALCULATIONS ON CONTROL PTS */
 		/*******************************************************/
-					
+
 	h0 = space[0];
-	h1 = space[1]; 
+	h1 = space[1];
 	h2 = space[2];
 	h3 = space[3];
 
@@ -300,12 +300,12 @@ const short numNubs = 4;
 
 
 				/* COPY CONTROL POINTS INTO ARRAY */
-				
+
 	for (i = 0; i < numNubs; i++)
 		d[i] = nubPoints[i];
-		
-				
-	for (i = 0, imax = numNubs - 2; i < imax; i++)		
+
+
+	for (i = 0, imax = numNubs - 2; i < imax; i++)
 	{
 		h2[i].x = h2[i].y = h2[i].z = 1;
 		h3[i].x = 3 *(d[i+ 2].x - 2 * d[i+ 1].x + d[i].x);
@@ -333,24 +333,24 @@ const short numNubs = 4;
 		a[i].z = 4.0f - h0[i1].z;
 		h1[i].z = (h3[i].z - h1[i1].z) / a[i].z;
 	}
-	
+
 	b[numNubs - 3] = h1[numNubs - 3];
-	
-	for (i = numNubs - 4; i >= 0; i--) 
+
+	for (i = numNubs - 4; i >= 0; i--)
 	{
  		b[i].x = h1[i].x - h0[i].x * b[i+ 1].x;
  		b[i].y = h1[i].y - h0[i].y * b[i+ 1].y;
  		b[i].z = h1[i].z - h0[i].z * b[i+ 1].z;
  	}
- 		
-	for (i = numNubs - 2; i >= 1; i--) 
+
+	for (i = numNubs - 2; i >= 1; i--)
 		b[i] = b[i - 1];
-		
-	b[0].x = b[numNubs - 1].x = 
-	b[0].y = b[numNubs - 1].y = 
+
+	b[0].x = b[numNubs - 1].x =
+	b[0].y = b[numNubs - 1].y =
 	b[0].z = b[numNubs - 1].z = 0;
 	hi_a = a + numNubs - 1;
-	
+
 	for (; a < hi_a; a++, b++, c++, d++)
 	{
 		c->x = ((d+1)->x - d->x) -(2.0f * b->x + (b+1)->x) * (1.0f/3.0f);
@@ -366,63 +366,63 @@ const short numNubs = 4;
 		/***********************************/
 		/* NOW CALCULATE THE SPLINE POINTS */
 		/***********************************/
-		  
+
 	a = space[4];
 	b = space[5];
 	c = space[6];
 	d = space[7];
-  	
+
   	numPoints = 0;
 	for (nub = 0; a < hi_a; a++, b++, c++, d++, nub++)
-	{		
-		
+	{
+
 				/* CALC THIS SPAN */
-				
-		dt = 1.0f / pointsPerSpan; 
-		for (t = 0; t < (1.0f - EPS); t += dt) 
+
+		dt = 1.0f / pointsPerSpan;
+		for (t = 0; t < (1.0f - EPS); t += dt)
 		{
 			if (numPoints >= MAX_ZIP_SPLINE_POINTS)				// see if overflow
 				DoFatalAlert("\pGenerateZipSpline: numPoints >= MAX_ZIP_SPLINE_POINTS");
-				
+
  			splinePoints[numPoints].x = ((a->x * t + b->x) * t + c->x) * t + d->x;		// save point
- 			splinePoints[numPoints].y = ((a->y * t + b->y) * t + c->y) * t + d->y; 
- 			splinePoints[numPoints].z = ((a->z * t + b->z) * t + c->z) * t + d->z; 
- 			
+ 			splinePoints[numPoints].y = ((a->y * t + b->y) * t + c->y) * t + d->y;
+ 			splinePoints[numPoints].z = ((a->z * t + b->z) * t + c->z) * t + d->z;
+
  					/* UPDATE BBOX */
- 					
- 			if (splinePoints[numPoints].x > maxX)									
+
+ 			if (splinePoints[numPoints].x > maxX)
  				maxX = splinePoints[numPoints].x;
  			if (splinePoints[numPoints].x < minX)
  				minX = splinePoints[numPoints].x;
- 				
- 			if (splinePoints[numPoints].y > maxY)									
+
+ 			if (splinePoints[numPoints].y > maxY)
  				maxY = splinePoints[numPoints].y;
  			if (splinePoints[numPoints].y < minY)
  				minY = splinePoints[numPoints].y;
 
- 			if (splinePoints[numPoints].z > maxZ)									
+ 			if (splinePoints[numPoints].z > maxZ)
  				maxZ = splinePoints[numPoints].z;
  			if (splinePoints[numPoints].z < minZ)
  				minZ = splinePoints[numPoints].z;
- 			
+
  			numPoints++;
  		}
 	}
 
 
 		/* END */
-		
+
 	gZipLines[zipNum].bbox.min.x = minX;
 	gZipLines[zipNum].bbox.max.x = maxX;
-	
+
 	gZipLines[zipNum].bbox.min.y = minY;
 	gZipLines[zipNum].bbox.max.y = maxY;
 
 	gZipLines[zipNum].bbox.min.z = minZ;
 	gZipLines[zipNum].bbox.max.z = maxZ;
-		
+
 	gZipLines[zipNum].numPoints = numPoints;
-	Free_2d_array(space); 
+	Free_2d_array(space);
 }
 
 
@@ -443,27 +443,27 @@ OGLVector3D			v1;
 const static OGLVector3D	up = {0,1,0};
 
 			/* INIT MESH BASICS */
-			
+
 	mesh->numMaterials = 1;										// 1 material
 	if (gLevelNum == LEVEL_NUM_APOCALYPSE)
 		mesh->materials[0] = gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][APOCALYPSE_SObjType_Rope].materialObject;	// set ILLEGAL ref to this texture
 	else
-		mesh->materials[0] = gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][FIREICE_SObjType_Rope].materialObject;	
+		mesh->materials[0] = gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][FIREICE_SObjType_Rope].materialObject;
 	mesh->points 		= meshPoints;
 	mesh->normals 		= nil;
 	mesh->uvs[0]		= uvs;
 	mesh->colorsByte 	= nil;
 	mesh->colorsFloat 	= nil;
 	mesh->triangles 	= triangles;
-	
+
 
 
 			/* BUILD THE VERTEX LIST */
-		
+
 	v1.x = gZipLines[zipNum].end.x - gZipLines[zipNum].start.x;				// calc direction vector
-	v1.y = gZipLines[zipNum].end.y - gZipLines[zipNum].start.y;	
-	v1.z = gZipLines[zipNum].end.z - gZipLines[zipNum].start.z;		
-	OGLVector3D_Normalize(&v1, &v1);	
+	v1.y = gZipLines[zipNum].end.y - gZipLines[zipNum].start.y;
+	v1.z = gZipLines[zipNum].end.z - gZipLines[zipNum].start.z;
+	OGLVector3D_Normalize(&v1, &v1);
 	OGLVector3D_Cross(&v1, &up, &v1);										// calc side vector
 	v1.x *= ZIP_THICKNESS;													// scale vector
 	v1.y *= ZIP_THICKNESS;
@@ -475,30 +475,30 @@ const static OGLVector3D	up = {0,1,0};
 	{
 		if (p >= MAX_ZIP_GEOMETRY_POINTS)
 			DoFatalAlert("\pBuildZipGeometry: p >= MAX_ZIP_GEOMETRY_POINTS");
-		
+
 		meshPoints[p] 	= 									// start 4 verts
-		meshPoints[p+1] = 
-		meshPoints[p+2] = 
+		meshPoints[p+1] =
+		meshPoints[p+2] =
 		meshPoints[p+3] = splinePoints[i];
-		
+
 		meshPoints[p].y 	+= ZIP_THICKNESS;				// top vertex
 		meshPoints[p+1].y 	-= ZIP_THICKNESS;				// bottom vertex
-		
+
 		meshPoints[p+2].x 	-= v1.x;						// left
 		meshPoints[p+2].z 	-= v1.z;
 
 		meshPoints[p+3].x 	+= v1.x;						// right
 		meshPoints[p+3].z 	+= v1.z;
-			
+
 		uvs[p].u 	= u;									// top uv
 		uvs[p].v 	= 1.0;
-		
+
 		uvs[p+1].u 	= u;									// bottom uv
 		uvs[p+1].v 	= 0;
 
 		uvs[p+2].u 	= u;									// left uv
 		uvs[p+2].v 	= 1.0;
-		
+
 		uvs[p+3].u 	= u;									// right uv
 		uvs[p+3].v 	= 0;
 
@@ -506,29 +506,29 @@ const static OGLVector3D	up = {0,1,0};
 		u += 12.0f;
 	}
 
-	meshPoints[p] = 
-	meshPoints[p+1] = 
-	meshPoints[p+2] = 
+	meshPoints[p] =
+	meshPoints[p+1] =
+	meshPoints[p+2] =
 	meshPoints[p+3] = gZipLines[zipNum].splinePoints[gZipLines[zipNum].numPoints-1];			// set final end points
-	
+
 	meshPoints[p].y 	+= ZIP_THICKNESS;				// top vertex
 	meshPoints[p+1].y 	-= ZIP_THICKNESS;				// bottom vertex
-	
+
 	meshPoints[p+2].x 	-= v1.x;						// left
 	meshPoints[p+2].z 	-= v1.z;
 
 	meshPoints[p+3].x 	+= v1.x;						// right
 	meshPoints[p+3].z 	+= v1.z;
-		
+
 	uvs[p].u 	= u;									// top uv
 	uvs[p].v 	= 1.0;
-	
+
 	uvs[p+1].u 	= u;									// bottom uv
 	uvs[p+1].v 	= 0;
 
 	uvs[p+2].u 	= u;									// left uv
 	uvs[p+2].v 	= 1.0;
-	
+
 	uvs[p+3].u 	= u;									// right uv
 	uvs[p+3].v 	= 0;
 
@@ -541,24 +541,24 @@ const static OGLVector3D	up = {0,1,0};
 
 
 		/* BUILD THE TRIANGLE LIST */
-		
+
 	t = 0;
 	p = 0;
 	for (i = 0; i < mesh->numTriangles; i+=2)
 	{
 		if (t >= MAX_ZIP_GEOMETRY_POINTS)
 			DoFatalAlert("\pBuildZipGeometry: t >= MAX_ZIP_GEOMETRY_POINTS");
-	
+
 		triangles[t].vertexIndices[0] = p;
 		triangles[t].vertexIndices[1] = p+1;
 		triangles[t].vertexIndices[2] = p+4;
 		t++;
-		
+
 		triangles[t].vertexIndices[0] = p+1;
 		triangles[t].vertexIndices[1] = p+5;
 		triangles[t].vertexIndices[2] = p+4;
 		t++;
-		
+
 		p += 2;
 	}
 }
@@ -571,11 +571,11 @@ short	i;
 
 #pragma unused(theNode)
 
-	for (i = 0; i < MAX_ZIP_LINES; i++)								
+	for (i = 0; i < MAX_ZIP_LINES; i++)
 	{
 		if (!gZipLines[i].isUsed)									// see if this one was used
 			continue;
-	
+
 		if (OGL_IsBBoxVisible(&gZipLines[i].bbox, nil))				// draw if not culled
 			MO_DrawGeometry_VertexArray(&gZipLines[i].mesh, setupInfo);
 	}
@@ -588,13 +588,13 @@ short	i;
 static void AttachPullyToZip(short zipNum)
 {
 ObjNode	*newObj;
-											
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	if (gLevelNum == LEVEL_NUM_APOCALYPSE)
 		gNewObjectDefinition.type 		= APOCALYPSE_ObjType_ZipLinePully;
 	else
 		gNewObjectDefinition.type 		= FIREICE_ObjType_ZipLinePully;
-	
+
 	gNewObjectDefinition.coord 		= gZipLines[zipNum].splinePoints[(int)ZIP_PULLY_STARTOFF];				// get coord to start it
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= PLAYER_SLOT - 5;									// must move before player so that player will udpate correctly
@@ -603,7 +603,7 @@ ObjNode	*newObj;
 	gNewObjectDefinition.scale 		= 2.5;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
-	newObj->ZipID = zipNum;			
+	newObj->ZipID = zipNum;
 	newObj->SplinePlacement = ZIP_PULLY_STARTOFF;
 	newObj->Speed3D = 0;
 
@@ -621,18 +621,18 @@ ObjNode	*player = gPlayerInfo.objNode;
 
 	if (gPlayerInfo.coord.y > theNode->Coord.y)																	// only if player below zip pully
 		return;
-		
+
 	if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, player->Coord.x, player->Coord.z) > 200.0f)		// and close enough
 		return;
-	
-	MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_RIDEZIP, 10.0f);	
+
+	MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_RIDEZIP, 10.0f);
 	player->Rot.y = theNode->Rot.y;
 
 	gCurrentZip = theNode;
-	
+
 	theNode->MoveCall = MoveZipPully_Moving;
 	theNode->Speed3D = 50;
-	
+
 	gCameraUserRotY = PI/8.0f;											// angle a little for a better view
 }
 
@@ -660,16 +660,16 @@ float	fps = gFramesPerSecondFrac;
 	theNode->Speed3D += dy * -40.0f * fps;											// accelerate
 	if (theNode->Speed3D > 3000.0f)													// see if reached max speed
 		theNode->Speed3D = 3000.0f;
-		
+
 	s = theNode->SplinePlacement += theNode->Speed3D * fps;							// inc the spline index
 	i = (int)s;
-	
+
 	if ((i >= gZipLines[zipNum].numPoints) || (i < 0))								// see if hit either end of the zip spline
 	{
-		MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_FALL, 4.0f);	
+		MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_FALL, 4.0f);
 		theNode->MoveCall = MoveZipPully_Completed;
 		gCurrentZip = nil;
-		PlayEffect3D(EFFECT_PLAYERCLANG, &theNode->Coord);	
+		PlayEffect3D(EFFECT_PLAYERCLANG, &theNode->Coord);
 	}
 	else
 	{
@@ -692,7 +692,7 @@ static void MoveZipPully_Completed(ObjNode *theNode)
 		theNode->SplinePlacement = ZIP_PULLY_STARTOFF;
 		theNode->Coord = theNode->InitCoord;
 		UpdateObjectTransforms(theNode);
-		
+
 		theNode->MoveCall = MoveZipPully_Waiting;
 	}
 }

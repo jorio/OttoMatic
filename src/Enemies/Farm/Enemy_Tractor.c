@@ -70,12 +70,12 @@ ObjNode	*newObj,*frontLeftWheel, *backLeftWheel,*frontRightWheel,*backRightWheel
 				/******************/
 				/* MAKE MAIN BODY */
 				/******************/
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_Tractor;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 	gNewObjectDefinition.slot 		= 205;
 	gNewObjectDefinition.moveCall 	= MoveTractor;
@@ -88,9 +88,9 @@ ObjNode	*newObj,*frontLeftWheel, *backLeftWheel,*frontRightWheel,*backRightWheel
 	newObj->Mode = TRACTOR_MODE_WAIT;
 	newObj->WaitDelay = 0;
 	newObj->TractorIsDone = false;
-	
+
 	newObj->Damage = .4;
-	
+
 
 			/* SET COLLISION STUFF */
 
@@ -105,29 +105,29 @@ ObjNode	*newObj,*frontLeftWheel, *backLeftWheel,*frontRightWheel,*backRightWheel
 				/***************/
 				/* MAKE WHEELS */
 				/***************/
-										
+
 				/* BACK LEFT */
-				
+
 	gNewObjectDefinition.type 		= FARM_ObjType_BackLeftWheel;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
 	gNewObjectDefinition.moveCall 	= nil;
 	backLeftWheel = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	newObj->ChainNode = backLeftWheel;
-	
+
 				/* BACK RIGHT */
-				
+
 	gNewObjectDefinition.type 		= FARM_ObjType_BackLeftWheel;
 	backRightWheel = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	backLeftWheel->ChainNode = backRightWheel;
 
 				/* FRONT LEFT */
-				
+
 	gNewObjectDefinition.type 		= FARM_ObjType_FrontLeftWheel;
 	frontLeftWheel = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	backRightWheel->ChainNode = frontLeftWheel;
 
 				/* FRONT RIGHT */
-				
+
 	gNewObjectDefinition.type 		= FARM_ObjType_FrontRightWheel;
 	frontRightWheel = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	frontLeftWheel->ChainNode = frontRightWheel;
@@ -135,7 +135,7 @@ ObjNode	*newObj,*frontLeftWheel, *backLeftWheel,*frontRightWheel,*backRightWheel
 
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 9, 14,false);
 
 
@@ -149,7 +149,7 @@ ObjNode	*newObj,*frontLeftWheel, *backLeftWheel,*frontRightWheel,*backRightWheel
 static void MoveTractor(ObjNode *theNode)
 {
 		/* SEE IF MAKE GO AWAY */
-		
+
 	if (theNode->TractorIsDone)
 	{
 		if (TrackTerrainItem(theNode))
@@ -157,42 +157,42 @@ static void MoveTractor(ObjNode *theNode)
 			theNode->TerrainItemPtr = nil;					// never come back
 			DeleteObject(theNode);
 			return;
-		}	
+		}
 	}
 
 
 		/* MOVE IT */
-		
+
 	GetObjectInfo(theNode);
-	
+
 	switch(theNode->Mode)
 	{
 				/* WAITING MODE */
-				
+
 		case	TRACTOR_MODE_WAIT:
 				MoveTractor_Wait(theNode);
 				break;
-	
-	
+
+
 				/* CHASE MODE */
-				
+
 		case	TRACTOR_MODE_CHASE:
 				MoveTractor_Chase(theNode);
 				break;
 
 
 				/* RAM MODE */
-				
+
 		case	TRACTOR_MODE_RAM:
 				MoveTractor_Ram(theNode);
 				break;
-	
+
 	}
-	
-	
+
+
 		/* COLLISION DETECT */
-		
-	DoTractorCollisionDetect(theNode);			
+
+	DoTractorCollisionDetect(theNode);
 
 
 		/**********/
@@ -200,45 +200,45 @@ static void MoveTractor(ObjNode *theNode)
 		/**********/
 
 		/* UPDATE SOUND */
-		
+
 	if (!theNode->TractorIsDone)
-	{	
+	{
 		if (theNode->EffectChannel == -1)			// make sure playing sound
 			theNode->EffectChannel = PlayEffect3D(EFFECT_TRACTOR, &gCoord);
 		else
 		{
-			int	freq = NORMAL_CHANNEL_RATE + (theNode->Speed2D * 8.0f);		
+			int	freq = NORMAL_CHANNEL_RATE + (theNode->Speed2D * 8.0f);
 			ChangeChannelRate(theNode->EffectChannel, freq);
-			Update3DSoundChannel(EFFECT_TRACTOR, &theNode->EffectChannel, &gCoord);		
+			Update3DSoundChannel(EFFECT_TRACTOR, &theNode->EffectChannel, &gCoord);
 		}
 	}
 
 	UpdateObject(theNode);
 	AlignTractorWheels(theNode);
-	
-	
-	
+
+
+
 	/*********************/
 	/* SEE IF HIT PLAYER */
 	/*********************/
-	
+
 	if (OGLPoint3D_Distance(&gCoord, &gPlayerInfo.coord) < (theNode->BBox.max.z * theNode->Scale.x + gPlayerInfo.objNode->BBox.max.x))
 	{
 		OGLVector2D	v1,v2;
 		float		r,a;
-		
+
 				/* SEE IF PLAYER IN FRONT */
-				
+
 		r = theNode->Rot.y;							// calc tractor aim vec
 		v1.x = -sin(r);
 		v1.y = -cos(r);
-	
+
 		v2.x = gPlayerInfo.coord.x - gCoord.x;
 		v2.y = gPlayerInfo.coord.z - gCoord.z;
 		FastNormalizeVector2D(v2.x, v2.y, &v2, true);
-	
+
 		a = acos(OGLVector2D_Dot(&v1,&v2));			// calc angle between
-	
+
 		if (a < (PI/2))
 		{
 			PlayerGotHit(theNode, 0);
@@ -254,14 +254,14 @@ static void MoveTractor_Wait(ObjNode *theNode)
 float	speed,r,fps = gFramesPerSecondFrac;
 
 			/* DECELERATE */
-		
+
 	theNode->Speed2D -= 2300.0f * fps;
 	if (theNode->Speed2D < 0.0f)
 		theNode->Speed2D = 0;
 	speed = theNode->Speed2D;
 
 			/* MOVE TOWARD PLAYER */
-			
+
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * speed;
 	gDelta.z = -cos(r) * speed;
@@ -269,12 +269,12 @@ float	speed,r,fps = gFramesPerSecondFrac;
 	gCoord.x += gDelta.x * fps;
 	gCoord.z += gDelta.z * fps;
 	gCoord.y = GetTerrainY(gCoord.x, gCoord.z) + TRACTOR_YOFF;			// always stick to ground
-	gDelta.y = (gCoord.y - theNode->OldCoord.y) * gFramesPerSecond;	
+	gDelta.y = (gCoord.y - theNode->OldCoord.y) * gFramesPerSecond;
 
 
 			/* SEE IF CHASE */
-	
-	if (!theNode->TractorIsDone)		
+
+	if (!theNode->TractorIsDone)
 	{
 		theNode->WaitDelay -= fps;							// see if ready to chase
 		if (theNode->WaitDelay <= 0.0f)
@@ -296,15 +296,15 @@ static void MoveTractor_Chase(ObjNode *theNode)
 float	speed,angle,r,fps = gFramesPerSecondFrac;
 
 		/* ACCEL TO CHASE SPEED */
-		
+
 	theNode->Speed2D += TRACTOR_CHASE_SPEED * fps;
 	if (theNode->Speed2D > TRACTOR_CHASE_SPEED)
 		theNode->Speed2D = TRACTOR_CHASE_SPEED;
 	speed = theNode->Speed2D;
 
 			/* MOVE TOWARD PLAYER */
-			
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, TRACTOR_TURN_SPEED, false);			
+
+	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, TRACTOR_TURN_SPEED, false);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * speed;
@@ -314,10 +314,10 @@ float	speed,angle,r,fps = gFramesPerSecondFrac;
 	gCoord.z += gDelta.z * fps;
 	gCoord.y = GetTerrainY(gCoord.x, gCoord.z) + TRACTOR_YOFF;			// always stick to ground
 	gDelta.y = (gCoord.y - theNode->OldCoord.y) * gFramesPerSecond;
-	
-	
+
+
 			/* SEE IF READY TO RAM */
-			
+
 	if (angle < PI/4)
 	{
 		if (CalcQuickDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < TRACTOR_RAM_DIST)
@@ -337,14 +337,14 @@ float	speed,r,fps = gFramesPerSecondFrac;
 
 
 		/* ACCEL TO CHASE SPEED */
-		
+
 	theNode->Speed2D += TRACTOR_RAM_SPEED * fps;
 	if (theNode->Speed2D > TRACTOR_RAM_SPEED)
 		theNode->Speed2D = TRACTOR_RAM_SPEED;
 	speed = theNode->Speed2D;
 
 			/* MOVE TOWARD PLAYER */
-			
+
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * speed;
 	gDelta.z = -cos(r) * speed;
@@ -353,10 +353,10 @@ float	speed,r,fps = gFramesPerSecondFrac;
 	gCoord.z += gDelta.z * fps;
 	gCoord.y = GetTerrainY(gCoord.x, gCoord.z) + TRACTOR_YOFF;			// always stick to ground
 	gDelta.y = (gCoord.y - theNode->OldCoord.y) * gFramesPerSecond;
-	
-	
+
+
 			/* SEE IF DONE */
-			
+
 	theNode->RamTimer -= fps;
 	if (theNode->RamTimer <= 0.0f)
 	{
@@ -376,21 +376,21 @@ ObjNode	*wheel[4];
 int		i;
 OGLMatrix4x4	m1,m2,m3;
 float			dr;
-static const OGLPoint3D	wheelOffsets[4] = 
+static const OGLPoint3D	wheelOffsets[4] =
 {
 	-84,-51,135,					// back left
 	88,-51,135,						// back right
 	-72,-113,-135,					// front left
 	72,-113,-135					// front right
-};	
+};
 
 			/* GET THE WHEELS */
-			
+
 	wheel[0] = theNode->ChainNode;
 	wheel[1] = wheel[0]->ChainNode;
 	wheel[2] = wheel[1]->ChainNode;
 	wheel[3] = wheel[2]->ChainNode;
-	
+
 	dr = theNode->Speed2D * .01f * gFramesPerSecondFrac;
 	wheel[0]->Rot.x -= dr;
 	wheel[1]->Rot.x -= dr;
@@ -398,7 +398,7 @@ static const OGLPoint3D	wheelOffsets[4] =
 	dr = theNode->Speed2D * .02f * gFramesPerSecondFrac;
 	wheel[2]->Rot.x -= dr;
 	wheel[3]->Rot.x -= dr;
-	
+
 	for (i = 0; i < 4; i++)
 	{
 		OGLMatrix4x4_SetRotate_X(&m1, wheel[i]->Rot.x);						// set rotation matrix
@@ -408,7 +408,7 @@ static const OGLPoint3D	wheelOffsets[4] =
 		OGLMatrix4x4_Multiply(&m1, &m2, &m3);
 		OGLMatrix4x4_Multiply(&m3, &theNode->BaseTransformMatrix, &wheel[i]->BaseTransformMatrix);
 		SetObjectTransformMatrix(wheel[i]);
-			
+
 		wheel[i]->Coord = theNode->Coord;			// set coord to the tractor just so we have it for AutoFade
 	}
 }
@@ -419,12 +419,12 @@ static const OGLPoint3D	wheelOffsets[4] =
 static void DoTractorCollisionDetect(ObjNode *theNode)
 {
 			/* HANDLE THE BASIC STUFF */
-		
+
 	HandleCollisions(theNode, CTYPE_MISC|CTYPE_TRIGGER2|CTYPE_PLAYER, 0);
 
 
 				/* CHECK FENCE COLLISION */
-				
+
 	DoFenceCollision(theNode);
 
 }

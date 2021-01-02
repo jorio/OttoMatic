@@ -77,14 +77,14 @@ ObjNode	*newObj;
 	newObj = MakeBeeWoman(x,z);
 	newObj->TerrainItemPtr = itemPtr;
 
-	
+
 		/* SEE IF ENCASED IN ICE */
-		
+
 	if (itemPtr->parm[3] & 1)
 	{
 		EncaseHumanInIce(newObj);
 	}
-	
+
 	return(true);
 }
 
@@ -97,8 +97,8 @@ ObjNode	*newObj;
 
 		/* MAKE OBJECT */
 
-	gNewObjectDefinition.type 		= SKELETON_TYPE_BEEWOMAN;	
-	gNewObjectDefinition.animNum	= BEEWOMAN_ANIM_STAND;	
+	gNewObjectDefinition.type 		= SKELETON_TYPE_BEEWOMAN;
+	gNewObjectDefinition.animNum	= BEEWOMAN_ANIM_STAND;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.y 	= FindHighestCollisionAtXZ(x,z,CTYPE_MISC|CTYPE_MPLATFORM|CTYPE_TERRAIN);
 	gNewObjectDefinition.coord.z 	= z;
@@ -111,33 +111,33 @@ ObjNode	*newObj;
 	newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
 
 	newObj->HumanType = HUMAN_TYPE_BEEWOMAN;
-	
+
 
 				/* SET BETTER INFO */
-			
-	newObj->Coord.y 	-= newObj->BBox.min.y - 20.0f;	
+
+	newObj->Coord.y 	-= newObj->BBox.min.y - 20.0f;
 	UpdateObjectTransforms(newObj);
 
 	newObj->Health 		= 1.0;
-	
+
 	newObj->SaucerTargetType = SAUCER_TARGET_TYPE_ABDUCT;
 	newObj->SaucerAbductHandler = AbductBeeWoman;
-		
-	
+
+
 				/* SET COLLISION INFO */
-				
+
 	newObj->TriggerSides 	= ALL_SOLID_SIDES;				// side(s) to activate it
 	newObj->Kind		 	= TRIGTYPE_HUMAN;
 	newObj->CType			= CTYPE_HUMAN|CTYPE_TRIGGER;
 	newObj->CBits			= CBITS_ALLSOLID|CBITS_ALWAYSTRIGGER;
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 
-	
+
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8.0f * gHumanScaleRatio, 8.0f * gHumanScaleRatio, true);
-	
+
 	return(newObj);
 }
 
@@ -165,7 +165,7 @@ static	void(*myMoveTable[])(ObjNode *) =
 		}
 	}
 	GetObjectInfo(theNode);
-	myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -177,7 +177,7 @@ float	fps = gFramesPerSecondFrac;
 float	dx,dy,dz;
 
 			/* MOVE */
-				
+
 	gDelta.x = gDelta.z = 0;					// no intertia while standing
 
 	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
@@ -191,19 +191,19 @@ float	dx,dy,dz;
 		ObjNode *plat = theNode->MPlatform;
 		dx += plat->Delta.x;
 		dy += plat->Delta.y;
-		dz += plat->Delta.z;	
+		dz += plat->Delta.z;
 	}
-	
+
 	gCoord.x += dx*fps;
-	gCoord.y += dy*fps;	
+	gCoord.y += dy*fps;
 	gCoord.z += dz*fps;
-				
+
 
 			/* COLLISION */
-			
+
 	DoHumanCollisionDetect(theNode);
 
-	UpdateHuman(theNode);		
+	UpdateHuman(theNode);
 }
 
 
@@ -214,27 +214,27 @@ static void  MoveBeeWoman_Walking(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 float	r;
 
-	r = theNode->Rot.y;							// get aim	
+	r = theNode->Rot.y;							// get aim
 	gDelta.x = -sin(r) * 100.0f;				// set delta
 	gDelta.z = -cos(r) * 100.0f;
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
 	gCoord.z += gDelta.z * fps;
-				
+
 
 			/* COLLISION */
-			
+
 	DoHumanCollisionDetect(theNode);
 
-	UpdateHuman(theNode);		
+	UpdateHuman(theNode);
 
 
 			/* SEE IF DONE WALKING */
-			
+
 	theNode->HumanWalkTimer -= fps;
 	if (theNode->HumanWalkTimer <= 0.0f)
 		MorphToSkeletonAnim(theNode->Skeleton, 0, 3);				// go to stand anim
@@ -248,11 +248,11 @@ float	fps = gFramesPerSecondFrac;
 
 	theNode->ColorFilter.r = theNode->ColorFilter.b -= fps * .5f;
 
-	UpdateObject(theNode);		
-	
-	
+	UpdateObject(theNode);
+
+
 			/* UPDATE TELEPORT EFFECT */
-			
+
 	if (UpdateHumanTeleport(theNode, true))				// returns true if human is deleted
 		return;
 
@@ -270,15 +270,15 @@ float			x,z,placement;
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
+	placement = itemPtr->placement;
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
-	
+
 
 		/* MAKE OBJECT */
 
-	gNewObjectDefinition.type 		= SKELETON_TYPE_BEEWOMAN;	
-	gNewObjectDefinition.animNum	= BEEWOMAN_ANIM_WALK;	
+	gNewObjectDefinition.type 		= SKELETON_TYPE_BEEWOMAN;
+	gNewObjectDefinition.animNum	= BEEWOMAN_ANIM_WALK;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.coord.z 	= z;
@@ -289,9 +289,9 @@ float			x,z,placement;
 	gNewObjectDefinition.moveCall 	= MoveBeeWoman;
 
 	newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
-				
+
 	newObj->Skeleton->AnimSpeed = 1.5;
-		
+
 
 				/* SET MORE INFO */
 
@@ -299,7 +299,7 @@ float			x,z,placement;
 
 	newObj->SaucerTargetType = SAUCER_TARGET_TYPE_ABDUCT;
 	newObj->SaucerAbductHandler = AbductBeeWoman;
-			
+
 	newObj->SplineItemPtr 	= itemPtr;
 	newObj->SplineNum 		= splineNum;
 	newObj->SplinePlacement = placement;
@@ -309,18 +309,18 @@ float			x,z,placement;
 	newObj->TriggerSides 	= ALL_SOLID_SIDES;				// side(s) to activate it
 	newObj->Kind		 	= TRIGTYPE_HUMAN;
 	newObj->CType			= CTYPE_MISC|CTYPE_HUMAN|CTYPE_TRIGGER;
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj,1,1);
 
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8.0f * gHumanScaleRatio, 8.0f * gHumanScaleRatio, false);
 
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	DetachObject(newObj, true);									// detach this object from the linked list
 	AddToSplineObjectList(newObj, true);
-		
-	
+
+
 	return(true);
 }
 
@@ -329,7 +329,7 @@ float			x,z,placement;
 
 static void MoveBeeWomanOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
 
@@ -337,27 +337,27 @@ Boolean isVisible;
 		/* MOVE ALONG THE SPLINE */
 
 	IncreaseSplineIndex(theNode, 30.0f * gHumanScaleRatio);
-		
+
 	GetObjectCoordOnSpline(theNode);
 
 
 			/***************************/
 			/* UPDATE STUFF IF VISIBLE */
 			/***************************/
-			
+
 	if (isVisible)
 	{
 		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,	// calc y rot aim
-												theNode->Coord.x, theNode->Coord.z);		
-	
+												theNode->Coord.x, theNode->Coord.z);
+
 		theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - theNode->BottomOff;	// get ground Y
 		UpdateObjectTransforms(theNode);												// update transforms
 		CalcObjectBoxFromNode(theNode);													// update collision box
-		
+
 		UpdateHuman(theNode);
 		UpdateShadow(theNode);
 	}
-	
+
 			/* NOT VISIBLE */
 	else
 	{
@@ -374,7 +374,7 @@ Boolean isVisible;
 static void AbductBeeWoman(ObjNode *theNode)
 {
 			/* SEE IF REMOVE FROM SPLINE */
-	
+
 	if (theNode->StatusBits & STATUS_BIT_ONSPLINE)
 		DetachObjectFromSpline(theNode, nil);
 
@@ -384,13 +384,13 @@ static void AbductBeeWoman(ObjNode *theNode)
 	theNode->Delta.z = 0;				// stop him
 
 	MorphToSkeletonAnim(theNode->Skeleton, BEEWOMAN_ANIM_ABDUCTED, 6);
-	
-	theNode->TerrainItemPtr = nil;		// dont come back	
-	
+
+	theNode->TerrainItemPtr = nil;		// dont come back
+
 	if (gLevelNum == LEVEL_NUM_SAUCER)	// if abducted by player saucer then change move call
 		theNode->MoveCall = MoveHuman_ToPlayerSaucer;
 	else
-		theNode->MoveCall = nil;	
+		theNode->MoveCall = nil;
 }
 
 

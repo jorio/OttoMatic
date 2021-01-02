@@ -57,10 +57,10 @@ AnimEventType	*events;
 	time = skeleton->CurrentAnimTime = skeleton->MaxAnimTime * timeRatio;			// set time index
 
 			/* SET ANIM EVENT INDEX BASED ON TIME */
-			
-	numAnimEvents = def->NumAnimEvents[skeleton->AnimNum];					// get # anim events for this anim		
+
+	numAnimEvents = def->NumAnimEvents[skeleton->AnimNum];					// get # anim events for this anim
 	events = &def->AnimEventsList[skeleton->AnimNum][0];					// point to list of events
-		
+
 	for (i = 0; i < numAnimEvents; i++)										// scan for first anim event which is at or after our current time index
 	{
 		if (events[i].time >= time)
@@ -80,7 +80,7 @@ AnimEventType	*events;
 void SetSkeletonAnim(SkeletonObjDataType *skeleton, long animNum)
 {
 	SetSkeletonAnimGuts(skeleton, animNum);
-			
+
 	GetModelCurrentPosition(skeleton);			// update matrices
 }
 
@@ -91,12 +91,12 @@ static void SetSkeletonAnimGuts(SkeletonObjDataType *skeleton, long animNum)
 {
 	if (skeleton == nil)
 		return;
-		
+
 	if (animNum >= skeleton->skeletonDefinition->NumAnims)
 	{
 		DoFatalAlert("\pSetSkeletonAnim: illegal animNum");
 	}
-		
+
 	skeleton->LoopBackTime = 0;								// assume no SetMarker & it loops or zigzags to time 0:00
 	skeleton->AnimNum = animNum;
 	skeleton->AnimDirection = ANIM_DIRECTION_FORWARD;
@@ -123,36 +123,36 @@ void MorphToSkeletonAnim(SkeletonObjDataType *skeleton, long animNum, float spee
 long	j;
 SkeletonDefType	*skeletonDef;
 
-			/* SET THE USUAL STUFF FIRST */	
+			/* SET THE USUAL STUFF FIRST */
 
 	if (skeleton == nil)
 		return;
-		
+
 	if (animNum >= skeleton->skeletonDefinition->NumAnims)
 		DoFatalAlert("\pMorphToSkeletonAnim: bad anim #");
-		
+
 	SetSkeletonAnimGuts(skeleton,animNum);
 
 	skeletonDef = skeleton->skeletonDefinition;
 
 
-	
+
 		/* NOW SET MORPHING STUFF */
-			
+
 	skeleton->IsMorphing = true;
 	skeleton->MorphPercent = 0;
 	skeleton->MorphSpeed = speed;
-	
+
 	for (j=0; j < skeletonDef->NumBones; j++)
 	{
 		skeleton->MorphStart[j] = skeleton->JointCurrentPosition[j];		// copy current position into MorphStart keyframe
 		if (skeletonDef->JointKeyframes[j].numKeyFrames[animNum] > 0)
 			skeleton->MorphEnd[j] = skeletonDef->JointKeyframes[j].keyFrames[animNum][0];	// copy 1st keyframe of next anim into end kf
 		else
-			skeleton->MorphEnd[j] = skeleton->JointCurrentPosition[j];		// or if none, make end same as current	
+			skeleton->MorphEnd[j] = skeleton->JointCurrentPosition[j];		// or if none, make end same as current
 	}
-	
-	GetModelCurrentPosition(skeleton);			// update matrices	
+
+	GetModelCurrentPosition(skeleton);			// update matrices
 }
 
 
@@ -173,36 +173,36 @@ float	fps;
 	if (skeleton == nil)
 		return;
 	skeletonDef = skeleton->skeletonDefinition;
-	
+
 	fps = gFramesPerSecondFrac;
-			
+
 				/* IF JUST GOT A MORPH POSITION, THEN UPDATE MORPH */
-				
+
 	if (skeleton->IsMorphing)
 	{
 		skeleton->MorphPercent += skeleton->MorphSpeed*fps;
 		if (skeleton->MorphPercent >= 1.0f)								// see if done morphing
 			skeleton->IsMorphing = false;
 		goto  update_transforms;
-	}	
-		
+	}
+
 				/* GET SOME BASIC INFO */
-					
+
 	animNum = skeleton->AnimNum;
 	animEventIndex = skeleton->AnimEventIndex;
 	currentTime = skeleton->CurrentAnimTime;
 	animDirection = skeleton->AnimDirection;
 	loopbackTime = skeleton->LoopBackTime;
-	
-	
+
+
 				/* INCREMENT TIME INDEX */
-		
+
 	if (skeleton->PauseTimer > 0.0f)													// actually, don't inc if paused
 	{
 		skeleton->PauseTimer -= gFramesPerSecondFrac;
 	}
 	else
-	{		
+	{
 		if (animDirection == ANIM_DIRECTION_FORWARD)							// inc or dec time index
 			currentTime += (30.0f*fps)*skeleton->AnimSpeed;						// next frame
 		else																	// previous frame
@@ -220,37 +220,37 @@ float	fps;
 							else
 								animEventIndex = GetNextAnimEventAtTime(skeleton,currentTime);
 							break;
-				
+
 					default:
 							skeleton->AnimHasStopped = true;					// anim has completed
 				}
 			}
 		}
-	}	
-		
+	}
+
 			/* CHECK FOR ANIM EVENTS */
-		
+
 	loopCount = 0;														// we havnt hit a loop-based event yet
-	
+
 	while((animEventIndex < skeletonDef->NumAnimEvents[animNum]) &&
 			(currentTime >= skeletonDef->AnimEventsList[animNum][animEventIndex].time))	// see if need to process one
 	{
 		eventTime = skeletonDef->AnimEventsList[animNum][animEventIndex].time;
 		eventType = skeletonDef->AnimEventsList[animNum][animEventIndex].type;
 		eventValue = skeletonDef->AnimEventsList[animNum][animEventIndex].value;
-		
+
 		switch(eventType)
 		{
 			case	ANIMEVENT_TYPE_STOP:
 					skeleton->AnimHasStopped = true;						// anim has completed
 					animEventIndex++;
 					break;
-	
+
 			case	ANIMEVENT_TYPE_SETMARKER:
 					animEventIndex++;
 					loopbackTime = skeleton->LoopBackTime = eventTime;		// remember time to loop back to
 					break;
-	
+
 			case	ANIMEVENT_TYPE_LOOP:
 					loopCount++;
 					if (loopbackTime != 0)
@@ -273,8 +273,8 @@ float	fps;
 						}
 					}
 					break;
-					
-					
+
+
 			case	ANIMEVENT_TYPE_ZIGZAG:
 					loopCount++;
 					animDirection = ANIM_DIRECTION_BACKWARD;
@@ -282,7 +282,7 @@ float	fps;
 					skeleton->EndMode = ANIMEVENT_TYPE_ZIGZAG;
 					animEventIndex++;
 					break;
-					
+
 			case	ANIMEVENT_TYPE_SETFLAG:
 					if (eventValue >= MAX_FLAGS_IN_OBJNODE)
 						DoFatalAlert("\pError: ANIMEVENT_TYPE_SETFLAG > MAX_FLAGS_IN_OBJNODE!");
@@ -296,7 +296,7 @@ float	fps;
 					theNode->Flag[eventValue] = false;
 					animEventIndex++;
 					break;
-					
+
 			case	ANIMEVENT_TYPE_PLAYSOUND:
 					if (!gDisableAnimSounds)
 					{
@@ -304,28 +304,28 @@ float	fps;
 						{
 									/* ONION SWAP */
 							case	0:
-									PlayEffect_Parms3D(EFFECT_ONIONSWOOSH, &theNode->Coord, NORMAL_CHANNEL_RATE + (MyRandomLong()&0x3fff), 1.0);							
+									PlayEffect_Parms3D(EFFECT_ONIONSWOOSH, &theNode->Coord, NORMAL_CHANNEL_RATE + (MyRandomLong()&0x3fff), 1.0);
 									break;
 
 									/* PLAYER FOOTSTEP */
-									
+
 							case	3:
 							case	4:
 									if (gPlayerInfo.scaleRatio > 1.0f)							// see if play giant footstep
 									{
 										DeformationType		defData;
 
-										PlayEffect3D(EFFECT_GIANTFOOTSTEP, &gPlayerInfo.coord);							
+										PlayEffect3D(EFFECT_GIANTFOOTSTEP, &gPlayerInfo.coord);
 
-																			
+
 											/* MAKE DEFORMATION WAVE */
-													
+
 										defData.type 				= DEFORMATION_TYPE_RADIALWAVE;
-										defData.amplitude 			= 30.0f; 
-										defData.radius 				= 0; 
-										defData.speed 				= 3000; 
-										defData.origin.x			= gPlayerInfo.coord.x; 
-										defData.origin.y			= gPlayerInfo.coord.z; 
+										defData.amplitude 			= 30.0f;
+										defData.radius 				= 0;
+										defData.speed 				= 3000;
+										defData.origin.x			= gPlayerInfo.coord.x;
+										defData.origin.y			= gPlayerInfo.coord.z;
 										defData.oneOverWaveLength 	= 1.0f / 400.0f;
 										defData.radialWidth			= 900.0f;
 										defData.decayRate			= 100.0f;
@@ -336,19 +336,19 @@ float	fps;
 //										PlayEffect3D(EFFECT_LEFTFOOT + (eventValue-3), &gPlayerInfo.coord);
 										PlayEffect_Parms3D(EFFECT_LEFTFOOT + (eventValue-3), &gPlayerInfo.coord, NORMAL_CHANNEL_RATE, .5);
 									}
-									
+
 									break;
-									
+
 									/* PITCHER PLANT PUKE */
-									
+
 							case	5:
-									PlayEffect_Parms3D(EFFECT_PITCHERPUKE, &theNode->Coord, NORMAL_CHANNEL_RATE, 2.0);							
+									PlayEffect_Parms3D(EFFECT_PITCHERPUKE, &theNode->Coord, NORMAL_CHANNEL_RATE, 2.0);
 									break;
 
 									/* FLYTRAP CHOMP */
-									
+
 							case	6:
-									PlayEffect3D(EFFECT_FLYTRAP, &theNode->Coord);							
+									PlayEffect3D(EFFECT_FLYTRAP, &theNode->Coord);
 									break;
 
 						}
@@ -368,21 +368,21 @@ float	fps;
 
 		}
 
-		if (loopCount > 1)													// see if we may have entered an infinite loop due to single-frame loopback event occurences	
+		if (loopCount > 1)													// see if we may have entered an infinite loop due to single-frame loopback event occurences
 			break;
 	}
-		
-	
+
+
 			/* UPDATE OBJ RECORD */
-			
+
 	skeleton->CurrentAnimTime = currentTime;
 	skeleton->AnimDirection = animDirection;
 	skeleton->AnimEventIndex = animEventIndex;
 
 
 			/* UPDATE ALL OF THE TRANSFORMS & SUCH */
-update_transforms:			
-	GetModelCurrentPosition(skeleton);			
+update_transforms:
+	GetModelCurrentPosition(skeleton);
 
 }
 
@@ -413,29 +413,29 @@ SkeletonDefType	*skeletonDef;
 
 
 			/* GET INFO FOR EACH JOINT */
-			
-	for (jointNum = 0; jointNum < skeletonDef->NumBones; jointNum++)		
+
+	for (jointNum = 0; jointNum < skeletonDef->NumBones; jointNum++)
 	{
 					/* SEE IF MORPHING */
-					
+
 		if (skeleton->IsMorphing)
 		{
 			GetModelMorphPosition(skeleton,jointNum,&skeleton->JointCurrentPosition[jointNum]);
 		}
 		else
-		{			
+		{
 				/* SCAN KEYFRAMES FOR CURRENT TIME */
-				
+
 			numKeyFrames = skeletonDef->JointKeyframes[jointNum].numKeyFrames[animNum];
 			if (numKeyFrames == 0)														// if 0 keyframes, then nothing should have a keyframe and there's nothing to get, so exit
 				return;
-			
+
 			for (keyFrameNum = 0; keyFrameNum < numKeyFrames; keyFrameNum++)
 			{
 				kfPtr = &skeletonDef->JointKeyframes[jointNum].keyFrames[animNum][keyFrameNum];	//  point to this keyframe's data
-				
+
 					/* SEE IF FOUND EXACT KEYFRAME */
-					
+
 				if (kfPtr->tick == currentAnimTime)
 				{
 					skeleton->JointCurrentPosition[jointNum] = *kfPtr;			// set data & goto next joint
@@ -450,20 +450,20 @@ SkeletonDefType	*skeletonDef;
 					else
 					{
 										/* INTERPOLATE VALUES */
-					
+
 						InterpolateKeyFrames(&skeletonDef->JointKeyframes[jointNum].keyFrames[animNum][keyFrameNum-1],
 											kfPtr,&skeleton->JointCurrentPosition[jointNum],currentAnimTime);
 					}
 					goto update;
-				} 
+				}
 			}
 					/* CURRENT TIME IS AFTER LAST KEYFRAME, SO USE LAST KEYFRAME */
-			
+
 			skeleton->JointCurrentPosition[jointNum] = skeletonDef->JointKeyframes[jointNum].keyFrames[skeleton->AnimNum][numKeyFrames-1];		// set data & goto next joint
 		}
 
 				/* UPDATE SKELETON VIEW */
-			
+
 update:
 		UpdateJointTransforms(skeleton,jointNum);
 	}
@@ -488,7 +488,7 @@ float	k2Percent,k1Percent;
 	kf2 = &skeleton->MorphEnd[jointNum];
 	k2Percent = skeleton->MorphPercent;
 	k1Percent = 1.0f - k2Percent;
-	
+
 
 				/* CALC NEW INTERPOLATED DATA */
 
@@ -504,13 +504,13 @@ float	k2Percent,k1Percent;
 	{
 		interpKf->scale.x = //(kf1->scale.x * k1Percent) + (kf2->scale.x * k2Percent);
 		interpKf->scale.y = //(kf1->scale.y * k1Percent) + (kf2->scale.y * k2Percent);
-		interpKf->scale.z = (kf1->scale.z * k1Percent) + (kf2->scale.z * k2Percent);	
+		interpKf->scale.z = (kf1->scale.z * k1Percent) + (kf2->scale.z * k2Percent);
 	}
 	else
 	{
-		interpKf->scale.x = 
-		interpKf->scale.y = 
-		interpKf->scale.z = 1.0f;	
+		interpKf->scale.x =
+		interpKf->scale.y =
+		interpKf->scale.z = 1.0f;
 	}
 }
 
@@ -537,12 +537,12 @@ long	accMode;
 const float	one = 1.0f;
 
 				/* GET ACCELERATION MODE */
-				
+
 	accMode = kf1->accelerationMode;
 
 
 				/* CALC K1/K2 RATIOS */
-				
+
 	time1 = kf1->tick;
 	time2 = kf2->tick;
 
@@ -550,15 +550,15 @@ const float	one = 1.0f;
 	diffB =	currentTime-time1;						// calc time from kf1 to current time
 	k2Percent = diffB/diffA;						// calc % of k2 values
 	k1Percent = one - k2Percent;					// calc % of k1 values
-	
-	
+
+
 			/* HANDLE SPECIAL ACCELERATION MODES */
-			
+
 	switch(accMode)
 	{
 		case	ACCEL_MODE_EASEINOUT:
 				k1Percent = AccelerationPercent(k1Percent);			// calc curve & adjust
-				k2Percent = one - k1Percent;				
+				k2Percent = one - k1Percent;
 				break;
 
 		case	ACCEL_MODE_EASEIN:
@@ -571,23 +571,23 @@ const float	one = 1.0f;
 				if (k1Percent < 0.0f)
 					k1Percent = 0.0f;
 
-				k2Percent = 1.0f - k1Percent;				
+				k2Percent = 1.0f - k1Percent;
 				break;
 
 		case	ACCEL_MODE_EASEOUT:
 				k2Percent = AccelerationPercent(.5f*k2Percent);			// calc curve & adjust
 				k2Percent *= 2.0f;
-				
+
 				if (k2Percent > one)
 					k2Percent = one;
 				else
 				if (k2Percent < 0.0f)
 					k2Percent = 0.0f;
-				
+
 				k1Percent = one - k2Percent;
 				break;
 	}
-	
+
 				/* CALC NEW INTERPOLATED DATA */
 
 	interpKf->coord.x = (kf1->coord.x * k1Percent) + (kf2->coord.x * k2Percent);
@@ -596,18 +596,18 @@ const float	one = 1.0f;
 	interpKf->rotation.x = (kf1->rotation.x * k1Percent) + (kf2->rotation.x * k2Percent);
 	interpKf->rotation.y = (kf1->rotation.y * k1Percent) + (kf2->rotation.y * k2Percent);
 	interpKf->rotation.z = (kf1->rotation.z * k1Percent) + (kf2->rotation.z * k2Percent);
-	
+
 	if ((kf1->scale.x != one) || (kf2->scale.x != one))
 	{
-		interpKf->scale.x = 
-		interpKf->scale.y = 
-		interpKf->scale.z = (kf1->scale.z * k1Percent) + (kf2->scale.z * k2Percent);	
+		interpKf->scale.x =
+		interpKf->scale.y =
+		interpKf->scale.z = (kf1->scale.z * k1Percent) + (kf2->scale.z * k2Percent);
 	}
 	else
 	{
-		interpKf->scale.x = 
-		interpKf->scale.y = 
-		interpKf->scale.z = one;	
+		interpKf->scale.x =
+		interpKf->scale.y =
+		interpKf->scale.z = one;
 	}
 }
 
@@ -632,13 +632,13 @@ long	time,maxTime;
 				maxTime = time;
 		}
 	}
-	
+
 	return(maxTime);
 }
 
 
 /******************** GET NEXT ANIM EVENT AT TIME ************************/
-// 
+//
 // Given a time, return the index to the next anim event from that time
 //
 // INPUT: time
@@ -671,7 +671,7 @@ float	x,n;
 		x = i;
 	    x = (x - 0.0f)/(CURVE_SIZE - 0.0f); 		/* normalize to [0:1] */
 		n = (x*x * (3.0f - 2.0f*x));
-	
+
 		gAccelerationCurve[i] = n;
 	}
 }
@@ -696,7 +696,7 @@ long	i;
 	else
 	if (percent < 0.0f)
 		DoFatalAlert("\p AccelerationPercent < 0");
-	
+
 	return(gAccelerationCurve[i]);
 }
 
@@ -715,28 +715,28 @@ OGLVector3D			d;
 OGLPoint3D			jointCoord[MAX_JOINTS],p;
 int	numJoints,i;
 
-	
+
 		/* CALC COORDS OF EACH JOINT */
 
 	numJoints = theNode->Skeleton->skeletonDefinition->NumBones;
 	for (i = 0; i < numJoints; i++)
 		FindCoordOfJoint(theNode, i, &jointCoord[i]);
-		
-		
+
+
 			/* CREATE PARTICLE GROUP */
-			
+
 	theNode->ParticleTimer -= fps;
 	if (theNode->ParticleTimer <= 0.0f)										// see if time to make particles
-	{		
+	{
 		theNode->ParticleTimer += .05f;
-	
+
 		particleGroup 	= theNode->ParticleGroup;
 		magicNum 		= theNode->ParticleMagicNum;
-		
+
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
 			theNode->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
-			
+
 			groupDef.magicNum				= magicNum;
 			groupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 			groupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND;
@@ -752,7 +752,7 @@ int	numJoints,i;
 		}
 
 			/* ADD TO PARTICLE GROUP */
-			
+
 		if (particleGroup != -1)
 		{
 			for (i = 0; i < numJoints; i++)
@@ -764,7 +764,7 @@ int	numJoints,i;
 				d.x = 0;
 				d.y = 300.0f + RandomFloat() * 100.0f;
 				d.z = 0;
-			
+
 				newParticleDef.groupNum		= particleGroup;
 				newParticleDef.where		= &p;
 				newParticleDef.delta		= &d;
@@ -778,8 +778,8 @@ int	numJoints,i;
 					break;
 				}
 			}
-		}	
-	}	
+		}
+	}
 }
 
 

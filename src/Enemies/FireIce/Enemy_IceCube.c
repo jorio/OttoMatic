@@ -88,7 +88,7 @@ static void MoveIcicle(ObjNode *theNode);
 
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -100,7 +100,7 @@ enum
 
 
 		/* JOINTS */
-		
+
 enum
 {
 	ICECUBE_JOINT_HEAD		= 3,
@@ -145,10 +145,10 @@ ObjNode	*newObj;
 	newObj = MakeEnemy_IceCube(x,z);
 	newObj->TerrainItemPtr = itemPtr;
 	newObj->EnemyRegenerate = itemPtr->parm[3] & (1<<1);
-	
+
 	gNumEnemies++;
 	gNumEnemyOfKind[ENEMY_KIND_ICECUBE]++;
-	
+
 	return(true);
 }
 
@@ -161,11 +161,11 @@ ObjNode	*newObj;
 				/*******************************/
 				/* MAKE DEFAULT SKELETON ENEMY */
 				/*******************************/
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_ICECUBE,x,z, ICECUBE_SCALE_NORMAL, 0, MoveIceCube);
 
 	SetSkeletonAnim(newObj->Skeleton, ICECUBE_ANIM_STAND);
-	
+
 	newObj->StatusBits |= STATUS_BIT_NOLIGHTING;
 
 	newObj->ColorFilter.a = .99;
@@ -177,18 +177,18 @@ ObjNode	*newObj;
 	newObj->Health 		= ICECUBE_HEALTH;
 	newObj->Damage 		= ICECUBE_DAMAGE;
 	newObj->Kind 		= ENEMY_KIND_ICECUBE;
-	
+
 	newObj->AttackDelay = RandomFloat() * 4.0f;
-	
-	
+
+
 				/* SET COLLISION INFO */
-				
+
 	SetIceCubeCollisionBox(newObj, true);
 	CalcNewTargetOffsets(newObj,ICECUBE_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FIST] 		= IceCubeGotPunched;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= IceCubeHitByStunPulse;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FREEZE] 		= IceCubeHitByFreeze;
@@ -196,18 +196,18 @@ ObjNode	*newObj;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FLAME] 		= IceCubeHitByFlame;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FLARE] 		= IceCubeHitByFlame;
 	newObj->HitByJumpJetHandler 						= IceCubeHitByJumpJet;
-			
+
 	newObj->HurtCallback = HurtIceCube;							// set hurt callback function
 
 
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 6,false);
-		
+
 	CreateIceCubeSparkles(newObj);
-		
-	
+
+
 	return(newObj);
 }
 
@@ -223,17 +223,17 @@ float	s = theNode->Scale.x;
 float	s2 = s * 35.0f;
 
 			/* WE DO THIS MANUALLY SINCE WE DON'T WANT TO SET "OLD" INFO ALL THE TIME */
-			
+
 	theNode->NumCollisionBoxes = 1;					// 1 collision box
 	theNode->TopOff 	= 100.0f * s;
-	theNode->BottomOff 	= -100.0f * s;	
+	theNode->BottomOff 	= -100.0f * s;
 	theNode->LeftOff 	= -s2;
 	theNode->RightOff 	= s2;
 	theNode->FrontOff 	= s2;
 	theNode->BackOff 	= -s2;
 
 	CalcObjectBoxFromNode(theNode);
-	
+
 	if (atInit)								// only set old info if initing, otherwise, keep old since dont want to hoze collision on next frame
 		KeepOldCollisionBoxes(theNode);
 
@@ -260,8 +260,8 @@ static	void(*myMoveTable[])(ObjNode *) =
 	}
 
 	GetObjectInfo(theNode);
-	
-	myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -278,15 +278,15 @@ float	fps = gFramesPerSecondFrac;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
-				
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ICECUBE_TURN_SPEED, true);			
+
+	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ICECUBE_TURN_SPEED, true);
 	dist = OGLPoint3D_Distance(&gPlayerInfo.coord, &gCoord);
-		
+
 
 				/* SEE IF CHASE */
 
 
-	theNode->StandDelay -= fps;								// see if in stand delay 
+	theNode->StandDelay -= fps;								// see if in stand delay
 	if (theNode->StandDelay <= 0.0f)
 	{
 		if (!IsBottomlessPitInFrontOfEnemy(theNode->Rot.y))
@@ -294,7 +294,7 @@ float	fps = gFramesPerSecondFrac;
 			if ((dist < ICECUBE_CHASE_DIST_MAX) && (dist > ICECUBE_CHASE_DIST_MIN))
 			{
 				if (!SeeIfLineSegmentHitsAnything(&gCoord, &gPlayerInfo.coord, nil, CTYPE_FENCE))		// dont chase thru walls
-				{		
+				{
 					MorphToSkeletonAnim(theNode->Skeleton, ICECUBE_ANIM_WALK, 4);
 				}
 			}
@@ -303,23 +303,23 @@ float	fps = gFramesPerSecondFrac;
 
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
 	MoveEnemy(theNode);
 
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfIceCubeAttack(theNode, angleToTarget, dist);
 
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 
-	UpdateIceCube(theNode);		
+	UpdateIceCube(theNode);
 }
 
 
@@ -336,8 +336,8 @@ float		r,fps,angle,dist,maxSpeed,scaleFactor;
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
-			
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ICECUBE_TURN_SPEED, true);			
+
+	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ICECUBE_TURN_SPEED, true);
 
 	scaleFactor = theNode->Scale.x * (1.0f/ICECUBE_SCALE_NORMAL);
 	maxSpeed = ICECUBE_WALK_SPEED * scaleFactor;						// scale speed with size-scale
@@ -357,28 +357,28 @@ float		r,fps,angle,dist,maxSpeed,scaleFactor;
 
 
 		/* STOP WALKING IF BOTTOMLESS PIT IN FRONT OF US */
-		
+
 	if (IsBottomlessPitInFrontOfEnemy(r))
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, ICECUBE_ANIM_STAND, 4);
 	}
 	else
-	{											
+	{
 		if ((dist >= ICECUBE_CHASE_DIST_MAX) || (dist <= ICECUBE_CHASE_DIST_MIN))
 			MorphToSkeletonAnim(theNode->Skeleton, ICECUBE_ANIM_STAND, 4);
 	}
-		
-	
+
+
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfIceCubeAttack(theNode, angle, dist);
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
-		
-	UpdateIceCube(theNode);		
+
+	UpdateIceCube(theNode);
 }
 
 
@@ -393,39 +393,39 @@ OGLMatrix4x4	m,m2,rm;
 			/**********************/
 			/* DO BASIC FUNCTIONS */
 			/**********************/
-			
+
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)				// if on ground, add friction
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
-		return;			
+		return;
 
 
 			/* SEE IF DONE */
-			
+
 	if (theNode->Skeleton->AnimHasStopped)
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, ICECUBE_ANIM_STAND, 3);
 	}
 
-	UpdateIceCube(theNode);		
-	
-		
+	UpdateIceCube(theNode);
+
+
 			/*********************/
 			/* UPDATE THE ICICLE */
 			/*********************/
-	
+
 	if (icicle)														// if nil then already thrown
 	{
 					/* SEE IF THROW THE ICICLE NOW */
-					
+
 		if (theNode->ThrowNow)
 		{
 			theNode->ThrowNow = false;
@@ -433,16 +433,16 @@ OGLMatrix4x4	m,m2,rm;
 		}
 		else
 		{
-		
+
 						/* MAKE ICICLE GROW */
-								
+
 			s = icicle->Scale.x += gFramesPerSecondFrac * 1.4f;
 			if (s > 1.0f)												// this is scale ratio, real scale is set in matrix below
-				s = 1.0f;		
+				s = 1.0f;
 			icicle->Scale.x = icicle->Scale.y = icicle->Scale.z = s;
-			
+
 					/* ALIGN IT IN ENEMY'S GRASP */
-			
+
 			OGLMatrix4x4_SetScale(&m, s,s,s);										// set scale matrix
 			OGLMatrix4x4_SetRotate_Y(&rm, PI/2);									// rotate into position for hand
 			OGLMatrix4x4_Multiply(&m, &rm, &m2);
@@ -454,9 +454,9 @@ OGLMatrix4x4	m,m2,rm;
 			OGLMatrix4x4_Multiply(&m2, &m, &icicle->BaseTransformMatrix);
 			SetObjectTransformMatrix(icicle);
 		}
-	}			
-			
-			
+	}
+
+
 }
 
 
@@ -469,14 +469,14 @@ static void  MoveIceCube_GotHit(ObjNode *theNode)
 
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if on ground, add friction
 		ApplyFrictionToDeltas(1200.0,&gDelta);
-		
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;			// add gravity
 
 	MoveEnemy(theNode);
 
 
 				/* SEE IF DONE */
-			
+
 	theNode->ButtTimer -= gFramesPerSecondFrac;
 	if (theNode->ButtTimer <= 0.0)
 	{
@@ -485,7 +485,7 @@ static void  MoveIceCube_GotHit(ObjNode *theNode)
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
@@ -514,29 +514,29 @@ float			x,z,placement;
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
+	placement = itemPtr->placement;
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 
 				/* MAKE ENEMY */
-				
+
 	newObj = MakeEnemy_IceCube(x, z);
 	SetSkeletonAnim(newObj->Skeleton, ICECUBE_ANIM_WALK);
-	
+
 				/* SET SPLINE INFO */
-	
-		
+
+
 	newObj->SplineItemPtr = itemPtr;
 	newObj->SplineNum = splineNum;
-			
+
 	newObj->StatusBits		|= STATUS_BIT_ONSPLINE;
 	newObj->SplinePlacement = placement;
 	newObj->SplineMoveCall 	= MoveIceCubeOnSpline;				// set move call
 	newObj->MoveCall 		= nil;
-		
+
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	DetachObject(newObj, true);										// detach this object from the linked list
 	AddToSplineObjectList(newObj, true);
 
@@ -548,7 +548,7 @@ float			x,z,placement;
 
 static void MoveIceCubeOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 float	dist;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
@@ -560,32 +560,32 @@ float	dist;
 
 
 			/* UPDATE STUFF IF VISIBLE */
-			
+
 	if (isVisible)
 	{
-		
+
 		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,			// calc y rot aim
-												theNode->Coord.x, theNode->Coord.z);		
+												theNode->Coord.x, theNode->Coord.z);
 
 		theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - theNode->BBox.min.y;	// calc y coord
 		UpdateObjectTransforms(theNode);											// update transforms
-		UpdateShadow(theNode);	
+		UpdateShadow(theNode);
 		UpdateIceCubeSparkles(theNode);
-		
+
 				/* DO SOME COLLISION CHECKING */
-				
+
 		GetObjectInfo(theNode);
 		if (DoEnemyCollisionDetect(theNode,CTYPE_HURTENEMY, false))					// just do this to see if explosions hurt
 			return;
-			
-			
+
+
 					/* SEE IF LEAVE SPLINE TO CHASE PLAYER */
 
-		dist = OGLPoint3D_Distance(&gPlayerInfo.coord, &theNode->Coord);					
+		dist = OGLPoint3D_Distance(&gPlayerInfo.coord, &theNode->Coord);
 		if (dist < ICECUBE_DETACH_DIST)
-			DetachEnemyFromSpline(theNode, MoveIceCube);			
-			
-	}	
+			DetachEnemyFromSpline(theNode, MoveIceCube);
+
+	}
 }
 
 
@@ -598,25 +598,25 @@ static void UpdateIceCube(ObjNode *theNode)
 	UpdateEnemy(theNode);
 
 		/* GROW BACK FROM SHRINK */
-		
+
 	s = theNode->Scale.x;
 	if (s < ICECUBE_SCALE_NORMAL)
 	{
 		s += gFramesPerSecondFrac * .1f;				// grow by some amount
 		if (s > ICECUBE_SCALE_NORMAL)					// check if @ normal
 			s = ICECUBE_SCALE_NORMAL;
-	
+
 		theNode->Scale.x =
 		theNode->Scale.y =
 		theNode->Scale.z = s;
-	
+
 		UpdateObjectTransforms(theNode);
 		SetIceCubeCollisionBox(theNode, false);			// update collision box based on new scale
 	}
 
 
 		/* UPDATE SPARKLES */
-		
+
 	UpdateIceCubeSparkles(theNode);
 
 }
@@ -634,10 +634,10 @@ static void UpdateIceCube(ObjNode *theNode)
 static Boolean IceCubeHitByStunPulse(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord)
-	
+
 
 			/* HURT IT */
-			
+
 	HurtIceCube(enemy, weapon->Damage * .25f);
 
 
@@ -662,21 +662,21 @@ static Boolean IceCubeHitByFreeze(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *w
 float	s;
 
 		/* MAKE SCALE GROW */
-		
+
 	s = enemy->Scale.x;
 	if (s < ICECUBE_SCALE_MAX)
 	{
 		s += .15f;										// grow by some amount
 		if (s > ICECUBE_SCALE_MAX)						// check if @ max
 			s = ICECUBE_SCALE_MAX;
-	
+
 		enemy->Scale.x =
 		enemy->Scale.y =
 		enemy->Scale.z = s;
-	
+
 		UpdateObjectTransforms(enemy);
 		SetIceCubeCollisionBox(enemy, false);			// update collision box based on new scale
-		
+
 		enemy->Health = ICECUBE_HEALTH;					// reset health
 	}
 
@@ -694,19 +694,19 @@ float	s;
 //	enemy->Health -= .2f;
 //	if (enemy->Health <= 0.0f)
 //	{
-//		KillIceCube(enemy);	
+//		KillIceCube(enemy);
 //		return(true);
 //	}
 
 		/* MAKE SCALE SHRINK */
-		
+
 	s = enemy->Scale.x;
 	if (s > ICECUBE_SCALE_MIN)
 	{
 		s -= .25f;										// shrink by some amount
 		if (s < ICECUBE_SCALE_MIN)						// check if @ min
 		{
-			KillIceCube(enemy);	
+			KillIceCube(enemy);
 			return(true);
 		}
 
@@ -714,12 +714,12 @@ float	s;
 		enemy->Scale.y =
 		enemy->Scale.z = s;
 
-		UpdateObjectTransforms(enemy);	
+		UpdateObjectTransforms(enemy);
 		SetIceCubeCollisionBox(enemy, false);			// update collision box based on new scale
 
 		ExplodeGeometry(enemy, 200, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 3, 1.0);		// shed some ice
 	}
-	
+
 	return(true);			// stop weapon
 }
 
@@ -738,7 +738,7 @@ float	r;
 #pragma unused(fistCoord, weaponDelta)
 
 			/* HURT IT */
-			
+
 	HurtIceCube(enemy, fist->Damage);
 
 
@@ -748,8 +748,8 @@ float	r;
 
 	enemy->Delta.x = -sin(r) * 1000.0f;
 	enemy->Delta.z = -cos(r) * 1000.0f;
-	enemy->Delta.y = 500.0f;	
-		
+	enemy->Delta.y = 500.0f;
+
 	return(true);
 }
 
@@ -761,16 +761,16 @@ static void IceCubeHitByJumpJet(ObjNode *enemy)
 float	r;
 
 		/* HURT IT */
-			
+
 	HurtIceCube(enemy, 1.0);
 
 
 			/* GIVE MOMENTUM */
-			
+
 	r = gPlayerInfo.objNode->Rot.y;
 	enemy->Delta.x = -sin(r) * 1000.0f;
 	enemy->Delta.z = -cos(r) * 1000.0f;
-	enemy->Delta.y = 500.0f;	
+	enemy->Delta.y = 500.0f;
 }
 
 /************** ICECUBE GOT HIT BY SUPERNOVA *****************/
@@ -778,9 +778,9 @@ float	r;
 static Boolean IceCubeHitBySuperNova(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord, weaponDelta)
-	
+
 	KillIceCube(enemy);
-	
+
 	return(false);
 }
 
@@ -792,7 +792,7 @@ static Boolean IceCubeHitBySuperNova(ObjNode *weapon, ObjNode *enemy, OGLPoint3D
 static Boolean HurtIceCube(ObjNode *enemy, float damage)
 {
 		/* SEE IF STOP THROW ICICLE */
-		
+
 	if (enemy->ChainNode)
 	{
 		DeleteObject(enemy->ChainNode);
@@ -801,13 +801,13 @@ static Boolean HurtIceCube(ObjNode *enemy, float damage)
 
 
 			/* SEE IF REMOVE FROM SPLINE */
-	
+
 	if (enemy->StatusBits & STATUS_BIT_ONSPLINE)
 		DetachEnemyFromSpline(enemy, MoveIceCube);
 
 
 				/* HURT ENEMY & SEE IF KILL */
-				
+
 	enemy->Health -= damage;
 	if (enemy->Health <= 0.0f)
 	{
@@ -817,12 +817,12 @@ static Boolean HurtIceCube(ObjNode *enemy, float damage)
 	else
 	{
 					/* GO INTO HIT ANIM */
-				
+
 		if (enemy->Skeleton->AnimNum != ICECUBE_ANIM_GETHIT)
 			MorphToSkeletonAnim(enemy->Skeleton, ICECUBE_ANIM_GETHIT, 8);
 
 		enemy->ButtTimer = 1.0f;
-	}	
+	}
 	return(false);
 }
 
@@ -838,7 +838,7 @@ static void KillIceCube(ObjNode *enemy)
 	if (!enemy->EnemyRegenerate)
 		enemy->TerrainItemPtr = nil;							// dont ever come back
 
-	DeleteEnemy(enemy);	
+	DeleteEnemy(enemy);
 }
 
 
@@ -856,7 +856,7 @@ short	i,j;
 	{
 
 				/* CREATE EYE LIGHTS */
-				
+
 		i = theNode->Sparkles[j] = GetFreeSparkle(theNode);				// get free sparkle slot
 		if (i == -1)
 			return;
@@ -877,7 +877,7 @@ short	i,j;
 
 		gSparkles[i].scale = 70.0f;
 		gSparkles[i].separation = 20.0f;
-		
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_RedGlint;
 	}
 }
@@ -904,7 +904,7 @@ const static OGLPoint3D	rightEye = {12,6,-40};
 		FindCoordOnJoint(theNode, ICECUBE_JOINT_HEAD, &rightEye, &gSparkles[i].where);		// calc coord of right eye
 		gSparkles[i].aim.x = aimX;											// update aim vector
 		gSparkles[i].aim.z = aimZ;
-	}	
+	}
 
 
 		/* UPDATE LEFT EYE */
@@ -915,7 +915,7 @@ const static OGLPoint3D	rightEye = {12,6,-40};
 		FindCoordOnJoint(theNode, ICECUBE_JOINT_HEAD, &leftEye, &gSparkles[i].where);		// calc coord of left eye
 		gSparkles[i].aim.x = aimX;											// update aim vector
 		gSparkles[i].aim.z = aimZ;
-	}	
+	}
 
 }
 
@@ -925,13 +925,13 @@ const static OGLPoint3D	rightEye = {12,6,-40};
 /************ SEE IF ICECUBE ATTACK *********************/
 
 static void SeeIfIceCubeAttack(ObjNode *theNode, float angleToPlayer, float distToPlayer)
-{	
+{
 	if (!gPlayerHasLanded)
 		return;
-		
+
 	if (gPlayerIsDead)
 		return;
-	
+
 	if (gPlayerInfo.invincibilityTimer > 0.0f)
 		return;
 
@@ -941,24 +941,24 @@ static void SeeIfIceCubeAttack(ObjNode *theNode, float angleToPlayer, float dist
 
 	if (angleToPlayer > PI/2)
 		return;
-		
+
 		/***************************/
 		/* SEE WHICH ATTACK TO USE */
 		/***************************/
 
 		/* SEE IF IN THROW-ICE RANGE */
-		
+
 	if ((distToPlayer >= ICECUBE_THROWICE_DIST_MIN) && (distToPlayer <= ICECUBE_THROWICE_DIST_MAX))
 	{
-		IceCubeThrowIce(theNode);		
+		IceCubeThrowIce(theNode);
 	}
-	
+
 			/* SEE IF IN BREATH ICE RANGE */
 	else
 	if (distToPlayer < ICECUBE_THROWICE_DIST_MIN)
 	{
-	
-	
+
+
 	}
 }
 
@@ -970,16 +970,16 @@ static void IceCubeThrowIce(ObjNode *enemy)
 ObjNode	*icicle;
 
 			/* START ENEMY THROWING */
-			
+
 	MorphToSkeletonAnim(enemy->Skeleton, ICECUBE_ANIM_THROWICE, 4);
 	enemy->ThrowNow = false;
-	
-	
+
+
 			/*****************/
 			/* CREATE ICICLE */
 			/*****************/
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FIREICE_ObjType_Icicle;
 	gNewObjectDefinition.coord		= enemy->Coord;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits  | STATUS_BIT_NOLIGHTING;
@@ -988,9 +988,9 @@ ObjNode	*icicle;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= .1;
 	icicle = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-		
+
 	enemy->ChainNode = icicle;
-	
+
 	icicle->ColorFilter.a = .8;
 	icicle->Damage = .1;
 }
@@ -1007,27 +1007,27 @@ float	r = enemy->Rot.y;
 const OGLPoint3D handOff = {0,-20,0};
 
 	enemy->ChainNode = nil;							// enemy no longer owns this
-	
+
 	icicle->MoveCall = MoveIcicle;
 
 	FindCoordOnJointAtFlagEvent(enemy, ICECUBE_JOINT_RIGHTHAND, &handOff, &icicle->Coord);
 
 	icicle->Scale = enemy->Scale;									// set true scale
-	
+
 	icicle->Rot.y = r;
-	
+
 	icicle->Delta.x = -sin(r) * 1400.0f;
 	icicle->Delta.z = -cos(r) * 1400.0f;
 	icicle->Delta.y = 200.0f;
-	
+
 	UpdateObjectTransforms(icicle);
-	
+
 		/* SET COLLISION INFO */
-		
+
 	icicle->CType = CTYPE_HURTME;
 	icicle->CBits = CBITS_TOUCHABLE;
 	CreateCollisionBoxFromBoundingBox_Rotated(icicle, 1, 1);
-	
+
 }
 
 
@@ -1038,17 +1038,17 @@ static void MoveIcicle(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 	GetObjectInfo(theNode);
-	
+
 	gDelta.y -= 1300.0f * fps;						// gravity
-	
+
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
 	gCoord.z += gDelta.z * fps;
 
 	theNode->Rot.x -= fps * .5f;					// slowly tilt down
-	
+
 			/* SEE IF HIT ANYTHING */
-			
+
 	if (HandleCollisions(theNode, CTYPE_FENCE | CTYPE_TERRAIN | CTYPE_MISC, 0))
 	{
 		ExplodeGeometry(theNode, 300, SHARD_MODE_BOUNCE, 1, .4);

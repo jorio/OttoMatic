@@ -66,7 +66,7 @@ static void KillBlob(ObjNode *enemy);
 
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -125,7 +125,7 @@ ObjNode	*newObj;
 			/****************************/
 
 	gNewObjectDefinition.type 		= SKELETON_TYPE_BLOB;
-	gNewObjectDefinition.animNum 	= BLOB_ANIM_WALK;							
+	gNewObjectDefinition.animNum 	= BLOB_ANIM_WALK;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.coord.z 	= z;
@@ -136,32 +136,32 @@ ObjNode	*newObj;
 	gNewObjectDefinition.scale 		= BLOB_SCALE;
 
 	newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
-	
-	
+
+
 
 				/*******************/
 				/* SET BETTER INFO */
 				/*******************/
-			
+
 	newObj->ColorFilter.a = .85;
-			
+
 	newObj->MoveCall 	= MoveBlob;							// set move call
 	newObj->Health 		= 1.0;
 	newObj->Damage 		= .12;
 	newObj->Kind 		= ENEMY_KIND_BLOB;
-			
-	
+
+
 				/* SET COLLISION INFO */
 
 	newObj->CType = CTYPE_ENEMY|CTYPE_BLOCKCAMERA|CTYPE_AUTOTARGETWEAPON;
 	newObj->CBits = CBITS_TOUCHABLE;						// blobs are not solid
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,.7);
 	CalcNewTargetOffsets(newObj,BLOB_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= BlobEnemyHitByEnergy;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] 	= BlobEnemyHitByEnergy;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FIST] 		= BlobEnemyHitByEnergy;
@@ -169,18 +169,18 @@ ObjNode	*newObj;
 	newObj->HitByJumpJetHandler = BlobHitByJumpJet;
 
 	newObj->WeaponAutoTargetOff.y = newObj->BBox.max.y * .9f;	// shoot @ this point
-		
+
 
 				/* MAKE SHADOW */
-				
-	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 11, 11,false);
-		
-	SetBlobColor(newObj);	
 
-		
+	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 11, 11,false);
+
+	SetBlobColor(newObj);
+
+
 	gNumEnemies++;
 	gNumEnemyOfKind[ENEMY_KIND_BLOB]++;
-	
+
 	return(newObj);
 }
 
@@ -192,7 +192,7 @@ static void SetBlobColor(ObjNode *blob)
 float	h;
 
 	h = blob->Health;
-	
+
 	switch(blob->BlobColorType)
 	{
 		case	0:									// RED
@@ -200,22 +200,22 @@ float	h;
 				blob->ColorFilter.b = 1.0f - h;
 				blob->ColorFilter.r = 1.0f;
 				break;
-				
+
 		case	1:									// GREEN
 				blob->ColorFilter.r = 1.0f - h;
 				blob->ColorFilter.b = 1.0f - h;
-				blob->ColorFilter.g = 1.0f;	
+				blob->ColorFilter.g = 1.0f;
 				break;
-				
+
 		case	2:									// AQUA
 				blob->ColorFilter.r = 1.0f - h;
 				blob->ColorFilter.g = 1.0f - (h * .4f);
 				blob->ColorFilter.b = 1.0f;
 				break;
-				
+
 		default:
 				DoFatalAlert("\pSetBlobColor: undefined blob color type");
-	}	
+	}
 
 }
 
@@ -236,7 +236,7 @@ static	void(*myMoveTable[])(ObjNode *) =
 	}
 
 	GetObjectInfo(theNode);
-	myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -246,39 +246,39 @@ static void  MoveBlob_Walking(ObjNode *theNode)
 {
 float		r,fps,dist,angleToPlayer;
 float		health = theNode->Health;
-float		speed;					
+float		speed;
 
 
 	if (gPlayerHasLanded && (theNode->Scale.x >= BLOB_SCALE))
 		speed = BLOB_WALK_SPEED * health;			// speed is based on health
 	else
 		speed = 0;
-		
-		
+
+
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
-			
-	angleToPlayer = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, BLOB_TURN_SPEED * health, true);			
+
+	angleToPlayer = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, BLOB_TURN_SPEED * health, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * speed;
 	gDelta.z = -cos(r) * speed;
 	gDelta.y -= ENEMY_GRAVITY*fps;									// add gravity
 	MoveEnemy(theNode);
-		
-		
-	theNode->Skeleton->AnimSpeed = health;							// anim speed is based on health			
+
+
+	theNode->Skeleton->AnimSpeed = health;							// anim speed is based on health
 
 				/* DO BASIC COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,CTYPE_MISC|CTYPE_FENCE, false))		// only do on some basic things
 		return;
-		
+
 				/***************************/
 				/* SEE IF ENGULFING PLAYER */
 				/***************************/
-				
+
 	if (!gPlayerIsDead)
 	{
 		if (DoSimpleBoxCollisionAgainstPlayer(gCoord.y + theNode->TopOff, gCoord.y + theNode->BottomOff,
@@ -289,18 +289,18 @@ float		speed;
 			PlayerLoseHealth(theNode->Damage * fps, PLAYER_DEATH_TYPE_EXPLODE);								// lose health
 			MakeSteam(theNode, gPlayerInfo.coord.x, gCoord.y + theNode->BottomOff, gPlayerInfo.coord.z);
 		}
-	}										
-	
-		
+	}
+
+
 			/* CHECK RANGE */
-						
+
 	dist = CalcQuickDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z);
 	if (dist > BLOB_CEASE_DIST)										// see if stop chasing
 	{
 		gDelta.x = gDelta.z = 0;
 	}
-		
-	UpdateBlob(theNode);		
+
+	UpdateBlob(theNode);
 }
 
 
@@ -312,7 +312,7 @@ static void UpdateBlob(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 			/* UPDATE SCALE */
-			
+
 	if (theNode->Scale.x < BLOB_SCALE)
 	{
 		theNode->Scale.x = theNode->Scale.y = theNode->Scale.z += fps * .5f;
@@ -328,14 +328,14 @@ float	fps = gFramesPerSecondFrac;
 
 
 			/* UPDATE TEXTURE ANIM */
-			
+
 	theNode->TextureTransformU += fps * theNode->Health;		// animation speed is bassed on health of blob
 
 	SetBlobColor(theNode);
-	
-	
+
+
 				/* THAW */
-				
+
 	theNode->ThawDelay -= fps;
 	if (theNode->ThawDelay <= 0.0f)
 	{
@@ -346,15 +346,15 @@ float	fps = gFramesPerSecondFrac;
 			theNode->CBits = CBITS_ALLSOLID;		// not solid anymore
 		}
 	}
-	
-	
+
+
 			/* UPDATE SOUND */
-	
+
 	if (theNode->EffectChannel == -1)
 		theNode->EffectChannel = PlayEffect_Parms3D(EFFECT_BLOBMOVE, &gCoord, NORMAL_CHANNEL_RATE / 2, .5);
 	else
 		Update3DSoundChannel(EFFECT_BLOBMOVE, &theNode->EffectChannel, &gCoord);
-	
+
 }
 
 
@@ -368,22 +368,22 @@ float	fps = gFramesPerSecondFrac;
 static Boolean BlobEnemyHitByEnergy(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon,	weaponCoord, weaponDelta)
-	
+
 			/* SHATTER IT IF HEALTH IS 0, THUS FROZEN */
-			
+
 	if (enemy->Health == 0.0f)
 	{
-		KillBlob(enemy);	
+		KillBlob(enemy);
 	}
-	
+
 			/* NOT FROZEN, SO JUST HELP IT THAW */
 	else
 	{
 		enemy->Health += .5f;
 		if (enemy->Health > 1.0f)
-			enemy->Health = 1.0;	
+			enemy->Health = 1.0;
 	}
-	
+
 	return(true);
 }
 
@@ -396,19 +396,19 @@ static Boolean BlobEnemyHitByEnergy(ObjNode *weapon, ObjNode *enemy, OGLPoint3D 
 static Boolean BlobEnemyHitByFreezeGun(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon,	weaponCoord, weaponDelta)
-	
+
 
 		/* SEE IF FROZEN */
-		
+
 	enemy->Health -= .55f;
 	if (enemy->Health <= 0.0f)
 	{
-		enemy->Health = 0;	
+		enemy->Health = 0;
 		enemy->ThawDelay = 4;				// # seconds to wait before starting to thaw
 		enemy->CBits = CBITS_ALLSOLID;		// solid now that its frozen
 	}
 
-	return(true);	
+	return(true);
 }
 
 
@@ -427,7 +427,7 @@ static void BlobHitByJumpJet(ObjNode *enemy)
 //
 
 static void KillBlob(ObjNode *enemy)
-{			
+{
 ObjNode	*newObj;
 int		i;
 float	dx,dy,dz;
@@ -435,17 +435,17 @@ float	dx,dy,dz;
 		/*****************/
 		/* CREATE CHUNKS */
 		/*****************/
-			
+
 	for (i = 0; i < 5; i++)
 	{
 		dx = RandomFloat2() * 500.0f;
 		dz = RandomFloat2() * 500.0f;
 		dy = 300.0f + RandomFloat() * 400.0f;
-	
-		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 		gNewObjectDefinition.type 		= SLIME_ObjType_BlobChunk;
 		gNewObjectDefinition.coord.x 	= enemy->Coord.x + dx * .4f;
-		gNewObjectDefinition.coord.y 	= enemy->Coord.y + dy * .3f;	
+		gNewObjectDefinition.coord.y 	= enemy->Coord.y + dy * .3f;
 		gNewObjectDefinition.coord.z 	= enemy->Coord.z + dz * .4f;
 		gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 		gNewObjectDefinition.slot 		= SLOT_OF_DUMB-1;
@@ -459,7 +459,7 @@ float	dx,dy,dz;
 			case	0:									// red == health
 					newObj->POWType = POW_TYPE_HEALTH;
 					break;
-			
+
 			case	1:									// green == jump-jet
 					newObj->POWType = POW_TYPE_JUMPJET;
 					break;
@@ -467,12 +467,12 @@ float	dx,dy,dz;
 			case	2:									// blue == fuel
 					newObj->POWType = POW_TYPE_FUEL;
 					break;
-					
+
 			default:
 					DoFatalAlert("\pKillBlob: illegal BlobColorType");
 		}
-		
-		
+
+
 		newObj->Delta.x = dx;
 		newObj->Delta.y = dy;
 		newObj->Delta.z = dz;
@@ -487,7 +487,7 @@ float	dx,dy,dz;
 		newObj->CBits			= CBITS_ALLSOLID;
 
 		CreateCollisionBoxFromBoundingBox(newObj, .9,.9);
-		
+
 
 		newObj->ThawDelay = 6.0f + RandomFloat() * 5.0f;
 		newObj->BlobColorType = enemy->BlobColorType;
@@ -506,7 +506,7 @@ float	dx,dy,dz;
 	if (!enemy->EnemyRegenerate)
 		enemy->TerrainItemPtr = nil;							// dont ever come back
 
-	DeleteEnemy(enemy);	
+	DeleteEnemy(enemy);
 }
 
 
@@ -523,66 +523,66 @@ float	fps = gFramesPerSecondFrac;
 	}
 
 	GetObjectInfo(theNode);
-	
-	
+
+
 			/* MOVE IT */
-			
+
 	gDelta.y -= 1500.0f * fps;								// gravity
 
 	gCoord.x += gDelta.x * fps;								// move it
-	gCoord.y += gDelta.y * fps;	
-	gCoord.z += gDelta.z * fps;	
-	
+	gCoord.y += gDelta.y * fps;
+	gCoord.z += gDelta.z * fps;
+
 	theNode->Rot.x += theNode->DeltaRot.x * fps;			// spin
 	theNode->Rot.y += theNode->DeltaRot.y * fps;
 	theNode->Rot.z += theNode->DeltaRot.z * fps;
-	
+
 
 			/* COLLISION */
-			
+
 	HandleCollisions(theNode, CTYPE_MISC|CTYPE_ENEMY|CTYPE_PLAYER|CTYPE_TERRAIN|CTYPE_FENCE, -.8);
-	
+
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)
 		theNode->DeltaRot.x = theNode->DeltaRot.y = theNode->DeltaRot.z = 0;
-	
-	
+
+
 			/* SEE IF THAWING */
-			
+
 	if (theNode->ThawDelay <= 0.0f)
 	{
-		theNode->Health += fps * .5f;				
+		theNode->Health += fps * .5f;
 		if (theNode->Health >= 1.0f)						// see if done thawing
 		{
 			ObjNode	*newBlob;
-			
+
 			theNode->Health = 1.0f;
-			
-			
+
+
 				/* SEE IF MAKE NEW BLOB ENEMY */
-				
+
 			if (gNumEnemyOfKind[ENEMY_KIND_BLOB] < MAX_BLOBS)
 			{
 				newBlob = MakeEnemy_Blob(gCoord.x, gCoord.z);					// make new blob enemy
 				newBlob->BlobColorType = theNode->BlobColorType;				// set correct color
 				newBlob->Scale.x = newBlob->Scale.y = newBlob->Scale.z = BLOB_SCALE * .1f;	// start shrunken
-				
+
 				theNode->MoveCall = MoveBlobChunk_Thawed;						// change chunks move call
 			}
 		}
-		
+
 		SetBlobColor(theNode);
 	}
 	else
 		theNode->ThawDelay -= fps;
-	
-	
+
+
 			/* UPDATE */
-			
-	UpdateObject(theNode);	
+
+	UpdateObject(theNode);
 
 
 		/* SEE IF DISPLAY HELP */
-	
+
 	if (!gHelpMessageDisabled[HELP_MESSAGE_SLIMEBALLS])
 	{
 		if (CalcQuickDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < HELP_BEACON_RANGE)
@@ -606,7 +606,7 @@ float	fps = gFramesPerSecondFrac;
 	}
 
 		/* FADE OUT */
-		
+
 	theNode->Health -= fps;
 	if (theNode->Health <= 0.0f)
 	{

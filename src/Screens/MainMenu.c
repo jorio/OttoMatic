@@ -78,18 +78,18 @@ enum
 	MAINMENU_ObjType_CreditsIcon,
 	MAINMENU_ObjType_SavedGameIcon,
 	MAINMENU_ObjType_ExitIcon,
-	
+
 	MAINMENU_ObjType_Star,
 	MAINMENU_ObjType_Saucer,
 	MAINMENU_ObjType_Logo,
 	MAINMENU_ObjType_LogoGlow,
 	MAINMENU_ObjType_LogoNoPlanet,
-	
+
 	MAINMENU_ObjType_PangeaLogo,
 	MAINMENU_ObjType_PangeaLogoGlow,
 	MAINMENU_ObjType_AspyrLogo,
 	MAINMENU_ObjType_AspyrLogoGlow,
-	
+
 	MAINMENU_ObjType_CreditsText,
 	MAINMENU_ObjType_CreditsGlow,
 	MAINMENU_ObjType_HelpText,
@@ -106,7 +106,7 @@ enum
 	SELECT_CREDITS,
 	SELECT_HIGHSCORES,
 	SELECT_OPTIONS,
-	
+
 	NUM_SELECTIONS
 };
 
@@ -142,7 +142,7 @@ static 	Boolean	gFadeInText,gTextDone,gFadeInIconString,gHideIconString;
 /********************** DO MAINMENU SCREEN ***********************/
 
 void DoMainMenuScreen(void)
-{	
+{
 			/* SETUP */
 
 	SetupMainMenuScreen();
@@ -151,48 +151,48 @@ void DoMainMenuScreen(void)
 				/*************/
 				/* MAIN LOOP */
 				/*************/
-				
+
 	CalcFramesPerSecond();
-	UpdateInput();		
-	
-	
+	UpdateInput();
+
+
 	while(true)
 	{
 		if (gOSX)								// do this to work around the 10.1 sound bug where no audio plays unless Event loop called at some time
 			MyFlushEvents();
-			
+
 		/* CHECK USER CONTROL */
-		
+
 		UpdateInput();
 		if (DoMainMenuControl())					// returns true if want to start game
 			break;
-		
+
 
 			/* DRAW STUFF */
-	
+
 		CalcFramesPerSecond();
-		MoveObjects();				
-		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);	
+		MoveObjects();
+		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);
 
 			/* SEE IF SPAWN SAUCER */
-			
+
 		if (gCanSpawnSaucers)
 		{
 			gSaucerDelay -= gFramesPerSecondFrac;
 			if (gSaucerDelay <= 0.0f)
 			{
-				gSaucerDelay = 3.0f + RandomFloat() * 3.0f;		
-				SpawnSaucer();		
+				gSaucerDelay = 3.0f + RandomFloat() * 3.0f;
+				SpawnSaucer();
 			}
 		}
 	}
-	
-	
+
+
 			/* CLEANUP */
 
 	GammaFadeOut();
 	FreeMainMenuScreen();
-	
+
 	gDoCompanyLogos = false;						// dont do these again
 }
 
@@ -200,18 +200,18 @@ void DoMainMenuScreen(void)
 /***************** DRAW MAINMENU CALLBACK *******************/
 
 static void DrawMainMenuCallback(OGLSetupOutputType *info)
-{		
-	
+{
+
 	DrawObjects(info);
 	DrawSparkles(info);											// draw light sparkles
-	
+
 			/* DRAW LOGO */
 
 	DrawOttoLogo(info);
-	
-	
+
+
 			/* DRAW HIGH SCORES */
-			
+
 	if (gDrawHighScores)
 		DrawHighScores(info);
 }
@@ -227,20 +227,20 @@ AGLContext agl_ctx = gAGLContext;
 
 	OGL_PushState();
 
-	glDisable(GL_CULL_FACE);							
-	glDisable(GL_DEPTH_TEST);								
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
 	OGL_DisableLighting();
-						
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0, 640, 480, 0, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();					
+	glLoadIdentity();
 	glTranslatef(510,50,0);
 	glScalef(.25,-.25,.25);
-			
+
 			/* DRAW IT */
-			
+
 	gGlobalTransparency = (.7f + RandomFloat() * .3f) * gMenuLogoFadeAlpha;
 	if (gGlobalTransparency > 0.0f)
 	{
@@ -249,7 +249,7 @@ AGLContext agl_ctx = gAGLContext;
 	}
 
 	gGlobalTransparency = 1;
-	OGL_PopState();	
+	OGL_PopState();
 }
 
 
@@ -266,55 +266,55 @@ Str32	s;
 
 	OGL_PushState();
 
-	glDisable(GL_CULL_FACE);							
-	glDisable(GL_DEPTH_TEST);								
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
 	OGL_DisableLighting();
-						
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0, 640, 480, 0, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();					
+	glLoadIdentity();
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
 
 	gGlobalTransparency = gScoreFadeAlpha;
-	
+
 			/*****************/
 			/* DRAW THE TEXT */
 			/*****************/
-		
+
 	y = 120;
 	for (i = 0; i < NUM_SCORES; i++)
 	{
 				/* DRAW NAME */
-				
+
 		DrawScoreText(gHighScores[i].name, 150,y,info);
-	
+
 				/* DRAW SCORE */
-				
+
 		NumToString(gHighScores[i].score, s);	// convert score to a text string
 		if (s[0] < SCORE_DIGITS)				// pad 0's
 		{
 			n = SCORE_DIGITS-s[0];
 			BlockMove(&s[1],&s[1+n], 20);		// shift existing data over
-			
+
 			for (j = 0; j < n; j++)				// pad with 0's
 				s[1+j] = '0';
-				
+
 			s[0] = SCORE_DIGITS;
 		}
 		DrawScoreText(s, 350,y,info);
-		
+
 		y += SCORE_TEXT_SPACING * 1.3f;
-	}	
-		
+	}
+
 			/***********/
 			/* CLEANUP */
 			/***********/
 
 	gGlobalTransparency = 1;
-	OGL_PopState();	
+	OGL_PopState();
 }
 
 
@@ -325,7 +325,7 @@ void DrawScoreText(unsigned char *s, float x, float y, OGLSetupOutputType *info)
 int	n,i,texNum;
 
 	n = s[0];										// get str len
-	
+
 	for (i = 1; i <= n; i++)
 	{
 		texNum = CharToSprite(s[i]);				// get texture #
@@ -361,12 +361,12 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 	gMenuLogoFadeAlpha = -1;
 	gDrawHighScores = false;
 	gHideIconString = false;
-	
+
 			/**************/
 			/* SETUP VIEW */
 			/**************/
-			
-	OGL_NewViewDef(&viewDef);	
+
+	OGL_NewViewDef(&viewDef);
 
 	viewDef.view.clearBackBuffer = true;
 
@@ -381,8 +381,8 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 
 			/*********************/
 			/* SET ANAGLYPH INFO */
-			/*********************/			
-			
+			/*********************/
+
 	if (gGamePrefs.anaglyph)
 	{
 		if (!gGamePrefs.anaglyphColor)
@@ -391,7 +391,7 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 			viewDef.lights.ambientColor.g 		+= .1f;
 			viewDef.lights.ambientColor.b 		+= .1f;
 		}
-				
+
 		gAnaglyphFocallength	= 300.0f;
 		gAnaglyphEyeSeparation 	= 30.0f;
 	}
@@ -412,13 +412,13 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 	ImportBG3D(&spec, MODEL_GROUP_MAINMENU, gGameViewInfoPtr);
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_MAINMENU, MAINMENU_ObjType_HelpIcon,
-							 -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+							 -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_MAINMENU, MAINMENU_ObjType_OptionsIcon,
-							 -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+							 -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_MAINMENU, MAINMENU_ObjType_HighScoresIcon,
-							 -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+							 -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_MAINMENU, MAINMENU_ObjType_CreditsIcon,
-							 -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+							 -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:global.bg3d", &spec);
@@ -426,7 +426,7 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 
 
 			/* LOAD SPRITES */
-			
+
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:spheremap.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
 	InitParticleSystem(gGameViewInfoPtr);
@@ -440,18 +440,18 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 
 	LoadASkeleton(SKELETON_TYPE_OTTO, gGameViewInfoPtr);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_OTTO,
-								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
 	LoadASkeleton(SKELETON_TYPE_FARMER, gGameViewInfoPtr);
 	LoadASkeleton(SKELETON_TYPE_BEEWOMAN, gGameViewInfoPtr);
 	LoadASkeleton(SKELETON_TYPE_CLOWN, gGameViewInfoPtr);
 	LoadASkeleton(SKELETON_TYPE_MANTIS, gGameViewInfoPtr);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_MANTIS,
-								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
 	LoadASkeleton(SKELETON_TYPE_BRAINALIEN, gGameViewInfoPtr);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_BRAINALIEN,
-								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
 
 
@@ -461,11 +461,11 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 	LoadSoundBank(&spec, SOUND_BANK_MENU);
 
 
-	
+
 			/**************/
 			/* MAKE STARS */
 			/**************/
-	
+
 	for (i = 0; i < 60; i++)
 	{
 		static OGLColorRGBA colors[] =
@@ -474,32 +474,32 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 			1,.6,.6,1,			// red
 			.6,.6,1,1,			// blue
 			.7,.7,8,1,			// grey
-		
+
 		};
-	
-		gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;	
+
+		gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 		gNewObjectDefinition.type 		= MAINMENU_ObjType_Star;
 		gNewObjectDefinition.coord.x 	= RandomFloat2() * 800.0f;
 		gNewObjectDefinition.coord.y 	= RandomFloat2() * 600.0f;
 		gNewObjectDefinition.coord.z 	= -500;
-		gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_GLOW | STATUS_BIT_NOTEXTUREWRAP | 
+		gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_GLOW | STATUS_BIT_NOTEXTUREWRAP |
 										STATUS_BIT_NOZWRITES | STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING;
 		gNewObjectDefinition.slot 		= 50;
 		gNewObjectDefinition.moveCall 	= MoveStar;
 		gNewObjectDefinition.rot 		= 0;
 		gNewObjectDefinition.scale 	    = .1f + RandomFloat() * .2f;
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 		newObj->SpecialF[0] = RandomFloat() * PI;
-		
+
 		newObj->ColorFilter = colors[MyRandomLong()&0x3];
-		
+
 		newObj->Delta.x = 5.0f + RandomFloat() * 15.0f;
 	}
 
 
 				/* START W/ GAME LOGO */
-				
+
 	if (gDoCompanyLogos)
 		StartCompanyLogos();
 	else
@@ -512,10 +512,10 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 static void StartCompanyLogos(void)
 {
 ObjNode	*pangea;
-	
+
 			/* PANGEA LOGO GLOW */
-			
-	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_PangeaLogoGlow;
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.y 	= 0;
@@ -532,7 +532,7 @@ ObjNode	*pangea;
 
 
 			/* PANGEA LOGO */
-			
+
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_PangeaLogo;
 	gNewObjectDefinition.coord.z 	+= 1.0;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOTEXTUREWRAP|
@@ -540,16 +540,16 @@ ObjNode	*pangea;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.slot++;
 	pangea = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 	gLogoObj->ChainNode = pangea;
 
 
 
-	
-	
+
+
 	gLogoAmbience = PlayEffect(EFFECT_LOGOAMBIENCE);
 	gAmbienceVolume = FULL_CHANNEL_VOLUME;
-	
+
 	gCanSpawnSaucers = false;
 }
 
@@ -563,10 +563,10 @@ ObjNode	*newObj2;
 			/**************/
 			/* MAKE TITLE */
 			/**************/
-	
+
 			/* LOGO GLOW */
-			
-	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_LogoGlow;
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.y 	= 0;
@@ -579,24 +579,24 @@ ObjNode	*newObj2;
 	gLogoObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	gLogoObj->ColorFilter.a = 0;
-	
+
 
 			/* LOGO */
-			
+
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_Logo;
 	gNewObjectDefinition.coord.z 	-= 1.0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOTEXTUREWRAP|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOZWRITES;	
+	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOTEXTUREWRAP|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOZWRITES;
 	gNewObjectDefinition.slot++;
 	gNewObjectDefinition.moveCall 	= nil;
 	newObj2 = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 	newObj2->ColorFilter.a = 0;
-	
+
 	gLogoObj->ChainNode = newObj2;
 
 
 	PlaySong(SONG_THEME, true);
-	
+
 	gCanSpawnSaucers = true;
 }
 
@@ -610,7 +610,7 @@ static void FreeMainMenuScreen(void)
 	FreeAllSkeletonFiles(-1);
 	DisposeSoundBank(SOUND_BANK_MENU);
 	DisposeParticleSystem();
-	DisposeAllSpriteGroups();	
+	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
 }
@@ -632,10 +632,10 @@ ObjNode	*ring,*glow,*ringGlow;
 			/****************/
 			/* SATURN MODEL */
 			/****************/
-			
+
 				/* SPHERE */
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_SaturnSphere;
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.y 	= 0;
@@ -646,23 +646,23 @@ ObjNode	*ring,*glow,*ringGlow;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = 2.5;
 	gSaturn = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-		
+
 	gSaturn->ColorFilter.a = 0;
 
 			/* RING */
-			
+
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_SaturnRing;
 	gNewObjectDefinition.flags 		|= STATUS_BIT_NOLIGHTING;
 	gNewObjectDefinition.slot++;
 	gNewObjectDefinition.coord.z 	-= 200.0f;
 	gNewObjectDefinition.moveCall 	= nil;
 	ring = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 	gSaturn->ChainNode = ring;
 
 
 			/* GLOW */
-			
+
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_SaturnGlow;
 	gNewObjectDefinition.flags 		|= STATUS_BIT_GLOW | STATUS_BIT_NOZWRITES;
 	gNewObjectDefinition.slot 		= 350;
@@ -670,24 +670,24 @@ ObjNode	*ring,*glow,*ringGlow;
 	glow = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	glow->ColorFilter.a = 0;
-		
+
 	ring->ChainNode = glow;
 
 			/* RING GLOW */
-			
+
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_RingGlow;
 	gNewObjectDefinition.slot		= ring->Slot-1;
 	ringGlow = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	ringGlow->ColorFilter.a = 0;
-		
+
 	glow->ChainNode = ringGlow;
-	
-	
+
+
 		/*****************/
 		/* ICONS ON RING */
 		/*****************/
-	
+
 	MakeOttoIcon();
 	MakeHelpIcon();
 	MakeOptionsIcon();
@@ -695,10 +695,10 @@ ObjNode	*ring,*glow,*ringGlow;
 	MakeCreditsIcon();
 	MakeSavedGameIcon();
 	MakeExitIcon();
-	
-	
+
+
 			/* STRING */
-			
+
 	MakeIconString();
 }
 
@@ -721,9 +721,9 @@ static Str31 strings[] =
 
 	if (gGamePrefs.language != LANGUAGE_ENGLISH)		// only english for now
 		return;
-		
+
 			/* BUILD NEW TEXT STRINGS */
-			
+
 	gNewObjectDefinition.coord.x 	= 640/2;
 	gNewObjectDefinition.coord.y 	= 480-60;
 	gNewObjectDefinition.coord.z 	= 0;
@@ -735,7 +735,7 @@ static Str31 strings[] =
 
 	newObj = MakeFontStringObject(strings[gSelection], &gNewObjectDefinition, gGameViewInfoPtr, true);		// title
 	newObj->ColorFilter.a = 0;
-	
+
 	gFadeInIconString = true;
 }
 
@@ -750,7 +750,7 @@ float	fps = gFramesPerSecondFrac;
 
 
 		/* FADE IN */
-		
+
 	if (gFadeInIconString)
 	{
 		theNode->ColorFilter.a += fps * 1.8f;
@@ -766,7 +766,7 @@ float	fps = gFramesPerSecondFrac;
 			MakeIconString();
 		}
 	}
-	
+
 	if (gHideIconString)
 	{
 		theNode->StatusBits |= STATUS_BIT_HIDDEN;
@@ -779,7 +779,7 @@ float	fps = gFramesPerSecondFrac;
 			theNode->ColorFilter.a = 0;
 		}
 	}
-	
+
 }
 
 
@@ -790,30 +790,30 @@ static void MakeOttoIcon(void)
 {
 float	r;
 short	i;
-ObjNode	*icon;	
-	
+ObjNode	*icon;
+
 		/* PUT OTTO ON THERE */
-		
-	gNewObjectDefinition.type 		= SKELETON_TYPE_OTTO;	
-	gNewObjectDefinition.animNum	= PLAYER_ANIM_SITONLEDGE;	
+
+	gNewObjectDefinition.type 		= SKELETON_TYPE_OTTO;
+	gNewObjectDefinition.animNum	= PLAYER_ANIM_SITONLEDGE;
 	r = PI - (SELECT_PLAY / NUM_SELECTIONS) * PI2;							// calc relative rot of icon
 	gNewObjectDefinition.coord.x 	= -sin(r) * (ICON_PLACEMENT_RADIUS + 18);
 	gNewObjectDefinition.coord.z 	= -cos(r) * (ICON_PLACEMENT_RADIUS + 18);
-	gNewObjectDefinition.coord.y 	= 41;	
+	gNewObjectDefinition.coord.y 	= 41;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
 	gNewObjectDefinition.slot 		= PLAYER_SLOT;
 	gNewObjectDefinition.moveCall	= MoveMenuIcon;
 	gNewObjectDefinition.rot 		= r;
 	gNewObjectDefinition.scale 		= .8;
 	icon = MakeNewSkeletonObject(&gNewObjectDefinition);
-		
+
 	icon->ColorFilter.a = 0;
 	icon->Kind = SELECT_PLAY;
-		
+
 	CalcIconMatrix(icon);
-	
+
 				/* TORSO SPARKLE */
-				
+
 	i = icon->Sparkles[0] = GetFreeSparkle(icon);				// get free sparkle slot
 	if (i != -1)
 	{
@@ -829,32 +829,32 @@ ObjNode	*icon;
 
 		gSparkles[i].scale = 80.0f;
 		gSparkles[i].separation = 30.0f;
-		
-		gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark4;
-	}		
 
-	
+		gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark4;
+	}
+
+
 			/* AND HIS HANDS */
-				
+
 	gPlayerInfo.currentWeaponType = WEAPON_TYPE_FIST;
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;
 	gNewObjectDefinition.type 		= GLOBAL_ObjType_OttoLeftHand;
 	gNewObjectDefinition.slot		= SLOT_OF_DUMB;
 	gNewObjectDefinition.moveCall 	= nil;
 	gPlayerInfo.leftHandObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
-	
+
 
 			/* RIGHT HAND */
-			
+
 	gNewObjectDefinition.type 		= GLOBAL_ObjType_OttoRightHand;
 	gPlayerInfo.rightHandObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	gPlayerInfo.rightHandObj->Kind = WEAPON_TYPE_FIST;			// set weapon type since this gets passed to weapon handlers
 
 	UpdateRobotHands(icon);
-			
+
 }
 
 
@@ -864,47 +864,47 @@ ObjNode	*icon;
 static void MakeHelpIcon(void)
 {
 float	r;
-ObjNode	*icon;	
-	
-		/* PUT BEEHIVE LADY ON THERE */		
-		
-	gNewObjectDefinition.type 		= SKELETON_TYPE_BEEWOMAN;	
-	gNewObjectDefinition.animNum	= 4;	
+ObjNode	*icon;
+
+		/* PUT BEEHIVE LADY ON THERE */
+
+	gNewObjectDefinition.type 		= SKELETON_TYPE_BEEWOMAN;
+	gNewObjectDefinition.animNum	= 4;
 	r = PI - ((float)SELECT_HELP / (float)NUM_SELECTIONS) * PI2;							// calc relative rot of icon
 	gNewObjectDefinition.coord.x 	= -sin(r) * (ICON_PLACEMENT_RADIUS + 12.0);
 	gNewObjectDefinition.coord.z 	= -cos(r) * (ICON_PLACEMENT_RADIUS + 12.0);
-	gNewObjectDefinition.coord.y 	= 25;	
+	gNewObjectDefinition.coord.y 	= 25;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
 	gNewObjectDefinition.slot 		= 100;
 	gNewObjectDefinition.moveCall	= MoveMenuIcon;
 	gNewObjectDefinition.rot 		= r;
 	gNewObjectDefinition.scale 		= 1.0;
 	icon = MakeNewSkeletonObject(&gNewObjectDefinition);
-		
+
 	icon->ColorFilter.a = 0;
 	icon->Kind = SELECT_HELP;
-		
-	CalcIconMatrix(icon);			
-	
-	
+
+	CalcIconMatrix(icon);
+
+
 		/* ALSO PUT THE HELP ICON THERE */
-		
-	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_HelpIcon;
 	gNewObjectDefinition.coord.x 	= -sin(r) * (ICON_PLACEMENT_RADIUS + 25.0f);
 	gNewObjectDefinition.coord.z 	= -cos(r) * (ICON_PLACEMENT_RADIUS + 25.0f);
-	gNewObjectDefinition.coord.y 	= 25;	
+	gNewObjectDefinition.coord.y 	= 25;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL ;
 	gNewObjectDefinition.moveCall 	= MoveMenuIcon;
 	gNewObjectDefinition.rot 		= r + PI;
 	gNewObjectDefinition.scale 		= 1.8;
 	icon = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-				
+
 	icon->ColorFilter.a = 0;
 	icon->Kind = SELECT_HELP;
-		
-	CalcIconMatrix(icon);			
-	
+
+	CalcIconMatrix(icon);
+
 }
 
 /************** MAKE OPTIONS ICON **************************/
@@ -912,50 +912,50 @@ ObjNode	*icon;
 static void MakeOptionsIcon(void)
 {
 float	r;
-ObjNode	*icon;	
-	
-		/* PUT BEEHIVE LADY ON THERE */		
-		
-	gNewObjectDefinition.type 		= SKELETON_TYPE_BRAINALIEN;	
-	gNewObjectDefinition.animNum	= 7;	
+ObjNode	*icon;
+
+		/* PUT BEEHIVE LADY ON THERE */
+
+	gNewObjectDefinition.type 		= SKELETON_TYPE_BRAINALIEN;
+	gNewObjectDefinition.animNum	= 7;
 	r = PI - ((float)SELECT_OPTIONS / (float)NUM_SELECTIONS) * PI2;							// calc relative rot of icon
 	gNewObjectDefinition.coord.x 	= -sin(r + .1f) * (ICON_PLACEMENT_RADIUS + 15);
 	gNewObjectDefinition.coord.z 	= -cos(r + .1f) * (ICON_PLACEMENT_RADIUS + 15);
-	gNewObjectDefinition.coord.y 	= 29;	
+	gNewObjectDefinition.coord.y 	= 29;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
 	gNewObjectDefinition.slot 		= 100;
 	gNewObjectDefinition.moveCall	= MoveMenuIcon;
 	gNewObjectDefinition.rot 		= r;
 	gNewObjectDefinition.scale 		= 1.0;
 	icon = MakeNewSkeletonObject(&gNewObjectDefinition);
-		
+
 	icon->ColorFilter.a = 0;
 	icon->Kind = SELECT_OPTIONS;
-			
-	CalcIconMatrix(icon);			
-	
+
+	CalcIconMatrix(icon);
+
 //	CreateBrainAlienGlow(icon);
-	
-	
+
+
 		/* ALSO PUT THE OPTIONS ICON THERE */
-		
+
 	r -= .13f;
-	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;	
+	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_OptionsIcon;
 	gNewObjectDefinition.coord.x 	= -sin(r) * (ICON_PLACEMENT_RADIUS + 16);
 	gNewObjectDefinition.coord.z 	= -cos(r) * (ICON_PLACEMENT_RADIUS + 16);
-	gNewObjectDefinition.coord.y 	= 20;	
+	gNewObjectDefinition.coord.y 	= 20;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
 	gNewObjectDefinition.moveCall 	= MoveMenuIcon;
 	gNewObjectDefinition.rot 		= r + PI;
 	gNewObjectDefinition.scale 		= 1.9;
 	icon = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-				
+
 	icon->ColorFilter.a = 0;
 	icon->Kind = SELECT_OPTIONS;
-		
-	CalcIconMatrix(icon);			
-	
+
+	CalcIconMatrix(icon);
+
 }
 
 /************** MAKE HIGH SCORES ICON **************************/
@@ -963,47 +963,47 @@ ObjNode	*icon;
 static void MakeHighScoresIcon(void)
 {
 float	r;
-ObjNode	*icon;	
-	
-		/* PUT MANTIS ON THERE */		
-		
-	gNewObjectDefinition.type 		= SKELETON_TYPE_MANTIS;	
-	gNewObjectDefinition.animNum	= 5;	
+ObjNode	*icon;
+
+		/* PUT MANTIS ON THERE */
+
+	gNewObjectDefinition.type 		= SKELETON_TYPE_MANTIS;
+	gNewObjectDefinition.animNum	= 5;
 	r = PI - ((float)SELECT_HIGHSCORES / (float)NUM_SELECTIONS) * PI2;							// calc relative rot of icon
 	gNewObjectDefinition.coord.x 	= -sin(r) * (ICON_PLACEMENT_RADIUS + 5);
 	gNewObjectDefinition.coord.z 	= -cos(r) * (ICON_PLACEMENT_RADIUS + 5);
-	gNewObjectDefinition.coord.y 	= 43;	
+	gNewObjectDefinition.coord.y 	= 43;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
 	gNewObjectDefinition.slot 		= 100;
 	gNewObjectDefinition.moveCall	= MoveMenuIcon;
 	gNewObjectDefinition.rot 		= r;
 	gNewObjectDefinition.scale 		= .6;
 	icon = MakeNewSkeletonObject(&gNewObjectDefinition);
-		
+
 	icon->ColorFilter.a = 0;
 	icon->Kind = SELECT_HIGHSCORES;
-		
-	CalcIconMatrix(icon);			
-	
-	
+
+	CalcIconMatrix(icon);
+
+
 		/* ALSO PUT THE HIGHSCORES ICON THERE */
-		
-	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_HighScoresIcon;
 	gNewObjectDefinition.coord.x 	= -sin(r) * (ICON_PLACEMENT_RADIUS + 15.0f);
 	gNewObjectDefinition.coord.z 	= -cos(r) * (ICON_PLACEMENT_RADIUS + 15.0f);
-	gNewObjectDefinition.coord.y 	= 25;	
+	gNewObjectDefinition.coord.y 	= 25;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL ;
 	gNewObjectDefinition.moveCall 	= MoveMenuIcon;
 	gNewObjectDefinition.rot 		= r + PI;
 	gNewObjectDefinition.scale 		= .55;
 	icon = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-				
+
 	icon->ColorFilter.a = 0;
 	icon->Kind = SELECT_HIGHSCORES;
-		
-	CalcIconMatrix(icon);			
-	
+
+	CalcIconMatrix(icon);
+
 }
 
 /************** MAKE CREDITS ICON **************************/
@@ -1011,49 +1011,49 @@ ObjNode	*icon;
 static void MakeCreditsIcon(void)
 {
 float	r;
-ObjNode	*icon;	
+ObjNode	*icon;
 
 	r = PI - ((float)SELECT_CREDITS / (float)NUM_SELECTIONS) * PI2;							// calc relative rot of icon
 
 
-		/* PUT SKELETON ON THERE */		
-		
-	gNewObjectDefinition.type 		= SKELETON_TYPE_CLOWN;	
-	gNewObjectDefinition.animNum	= 4;	
+		/* PUT SKELETON ON THERE */
+
+	gNewObjectDefinition.type 		= SKELETON_TYPE_CLOWN;
+	gNewObjectDefinition.animNum	= 4;
 	gNewObjectDefinition.coord.x 	= -sin(r-.2f) * (ICON_PLACEMENT_RADIUS + 11);
 	gNewObjectDefinition.coord.z 	= -cos(r-.2f) * (ICON_PLACEMENT_RADIUS + 11);
-	gNewObjectDefinition.coord.y 	= 45;	
+	gNewObjectDefinition.coord.y 	= 45;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
 	gNewObjectDefinition.slot 		= 100;
 	gNewObjectDefinition.moveCall	= MoveMenuIcon;
 	gNewObjectDefinition.rot 		= r;
 	gNewObjectDefinition.scale 		= 1.0;
 	icon = MakeNewSkeletonObject(&gNewObjectDefinition);
-		
+
 	icon->ColorFilter.a = 0;
 	icon->Kind = SELECT_CREDITS;
-		
-	CalcIconMatrix(icon);			
-	
-	
+
+	CalcIconMatrix(icon);
+
+
 		/* ALSO PUT THE CREDITS ICON THERE */
-		
-	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_CreditsIcon;
 	gNewObjectDefinition.coord.x 	= -sin(r) * ICON_PLACEMENT_RADIUS;
 	gNewObjectDefinition.coord.z 	= -cos(r) * ICON_PLACEMENT_RADIUS;
-	gNewObjectDefinition.coord.y 	= 20;	
+	gNewObjectDefinition.coord.y 	= 20;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL ;
 	gNewObjectDefinition.moveCall 	= MoveMenuIcon;
 	gNewObjectDefinition.rot 		= r + PI;
 	gNewObjectDefinition.scale 		= .7;
 	icon = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-				
+
 	icon->ColorFilter.a = 0;
 	icon->Kind = SELECT_CREDITS;
-		
-	CalcIconMatrix(icon);			
-	
+
+	CalcIconMatrix(icon);
+
 }
 
 
@@ -1063,47 +1063,47 @@ ObjNode	*icon;
 static void MakeSavedGameIcon(void)
 {
 float	r;
-ObjNode	*icon;	
+ObjNode	*icon;
 
 	r = PI - ((float)SELECT_LOADSAVEDGAME / (float)NUM_SELECTIONS) * PI2;							// calc relative rot of icon
 
-		/* PUT FARMER ON THERE */		
-		
-	gNewObjectDefinition.type 		= SKELETON_TYPE_FARMER;	
-	gNewObjectDefinition.animNum	= 4;	
+		/* PUT FARMER ON THERE */
+
+	gNewObjectDefinition.type 		= SKELETON_TYPE_FARMER;
+	gNewObjectDefinition.animNum	= 4;
 	gNewObjectDefinition.coord.x 	= -sin(r-.13f) * ICON_PLACEMENT_RADIUS;
 	gNewObjectDefinition.coord.z 	= -cos(r-.13f) * ICON_PLACEMENT_RADIUS;
-	gNewObjectDefinition.coord.y 	= 32;	
+	gNewObjectDefinition.coord.y 	= 32;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
 	gNewObjectDefinition.slot 		= 100;
 	gNewObjectDefinition.moveCall	= MoveMenuIcon;
 	gNewObjectDefinition.rot 		= r + PI/2;
 	gNewObjectDefinition.scale 		= 1.15;
 	icon = MakeNewSkeletonObject(&gNewObjectDefinition);
-		
+
 	icon->ColorFilter.a = 0;
 	icon->Kind = SELECT_LOADSAVEDGAME;
-		
-	CalcIconMatrix(icon);			
-	
+
+	CalcIconMatrix(icon);
+
 		/* ALSO PUT THE ICON THERE */
-		
-	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_SavedGameIcon;
 	gNewObjectDefinition.coord.x 	= -sin(r+.1f) * ICON_PLACEMENT_RADIUS;
 	gNewObjectDefinition.coord.z 	= -cos(r+.1f) * ICON_PLACEMENT_RADIUS;
-	gNewObjectDefinition.coord.y 	= 0;	
+	gNewObjectDefinition.coord.y 	= 0;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL;
 	gNewObjectDefinition.moveCall 	= MoveMenuIcon;
 	gNewObjectDefinition.rot 		= r + PI;
 	gNewObjectDefinition.scale 		= .6;
 	icon = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-				
+
 	icon->ColorFilter.a = 0;
 	icon->Kind = SELECT_LOADSAVEDGAME;
-		
-	CalcIconMatrix(icon);			
-	
+
+	CalcIconMatrix(icon);
+
 }
 
 
@@ -1113,30 +1113,30 @@ ObjNode	*icon;
 static void MakeExitIcon(void)
 {
 float	r;
-ObjNode	*icon;	
+ObjNode	*icon;
 
 
 	r = PI - ((float)SELECT_QUIT / (float)NUM_SELECTIONS) * PI2;							// calc relative rot of icon
 
-		
-	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_ExitIcon;
 	gNewObjectDefinition.coord.x 	= -sin(r) * (ICON_PLACEMENT_RADIUS + 15);
 	gNewObjectDefinition.coord.z 	= -cos(r) * (ICON_PLACEMENT_RADIUS + 15);
-	gNewObjectDefinition.coord.y 	= 32;	
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL | STATUS_BIT_KEEPBACKFACES | 
+	gNewObjectDefinition.coord.y 	= 32;
+	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL | STATUS_BIT_KEEPBACKFACES |
 									STATUS_BIT_GLOW | STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING;
 	gNewObjectDefinition.moveCall 	= MoveMenuIcon;
 	gNewObjectDefinition.rot 		= r;
 	gNewObjectDefinition.scale 		= .93;
 	gNewObjectDefinition.slot 		= 800;
 	icon = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-				
+
 	icon->ColorFilter.a = 0;
 	icon->Kind = SELECT_QUIT;
-		
-	CalcIconMatrix(icon);			
-	
+
+	CalcIconMatrix(icon);
+
 }
 
 
@@ -1147,26 +1147,26 @@ static void CalcIconMatrix(ObjNode *theNode)
 {
 OGLMatrix4x4	m,m2,m3;
 float			r,s;
-	
+
 				/* SET SCALE MATRIX */
-				
+
 	s = theNode->Scale.x / gSaturn->Scale.x;						// to adjust from saturn scale to otto's
 	OGLMatrix4x4_SetScale(&m, s, s, s);
-	
+
 			/* SET ROTATION MATRIX */
-			
+
 	OGLMatrix4x4_SetRotate_Y(&m2, theNode->Rot.y);
 	OGLMatrix4x4_Multiply(&m, &m2, &m3);
-	
+
 			/* CALC LOCATION ON RIM */
-			
+
 	r = PI + (theNode->Kind / NUM_SELECTIONS) * PI2;
 	OGLMatrix4x4_SetTranslate(&m, theNode->Coord.x, theNode->Coord.y, theNode->Coord.z);
 	OGLMatrix4x4_Multiply(&m3, &m, &m2);
 
 
 			/* MULTIPLY MATRICES */
-			
+
 	OGLMatrix4x4_Multiply(&m2, &gSaturn->BaseTransformMatrix, &theNode->BaseTransformMatrix);
 	SetObjectTransformMatrix(theNode);
 }
@@ -1180,7 +1180,7 @@ int	i;
 OGLMatrix4x4	m;
 
 			/* FADE IN */
-			
+
 	if (theNode->ColorFilter.a < 1.0f)
 	{
 		theNode->ColorFilter.a += gFramesPerSecondFrac;
@@ -1189,19 +1189,19 @@ OGLMatrix4x4	m;
 	}
 
 	CalcIconMatrix(theNode);
-	
+
 			/* UPDATE STUFF */
-			
+
 	switch(theNode->Kind)
 	{
 		case	SELECT_PLAY:
 				UpdateRobotHands(theNode);
-				
+
 				i = theNode->Sparkles[0];								// fade in sparkle too
 				if (i != -1)
 					gSparkles[i].color.a = theNode->ColorFilter.a * .8f;
 				break;
-				
+
 		case	SELECT_QUIT:
 				if (theNode->ColorFilter.a >= 1.0f)
 					theNode->ColorFilter.a = .99f;
@@ -1227,7 +1227,7 @@ static Boolean DoMainMenuControl(void)
 			/***************/
 			/* HANDLE MENU */
 			/***************/
-						
+
 	if (gSaturn)
 	{
 			/* SPIN LEFT */
@@ -1242,7 +1242,7 @@ static Boolean DoMainMenuControl(void)
 			gFadeInIconString = false;
 		}
 				/* SPIN RIGHT */
-				
+
 		else
 		if (GetNewKeyState(KEY_RIGHT))
 		{
@@ -1253,12 +1253,12 @@ static Boolean DoMainMenuControl(void)
 				gSelection = 0;
 			gFadeInIconString = false;
 		}
-		
+
 				/* MAKE SELECTION */
 		else
 		if (GetNewKeyState(KEY_RETURN) || GetNewKeyState(KEY_SPACE))
 		{
-			
+
 			switch(gSelection)
 			{
 				case	SELECT_PLAY:
@@ -1272,17 +1272,17 @@ static Boolean DoMainMenuControl(void)
 				case	SELECT_HIGHSCORES:
 						DoHighScores();
 						break;
-						
+
 				case	SELECT_OPTIONS:
 						DoGameSettingsDialog();
 						break;
-						
+
 				case	SELECT_CREDITS:
 						DoCredits();
 						break;
-						
+
 				case	SELECT_LOADSAVEDGAME:
-#if DEMO		
+#if DEMO
 						DoAlert("\pSaved Games are not available in the demo version.");
 #else
 						if (LoadSavedGame())
@@ -1290,7 +1290,7 @@ static Boolean DoMainMenuControl(void)
 							gPlayingFromSavedGame = true;
 							return(true);
 						}
-#endif						
+#endif
 						break;
 
 				case	SELECT_QUIT:
@@ -1309,7 +1309,7 @@ static Boolean DoMainMenuControl(void)
 			DeleteObject(gLogoObj);
 			StopAChannel(&gLogoAmbience);
 			BuildMenu();
-		}	
+		}
 	}
 
 	return(false);
@@ -1333,7 +1333,7 @@ OGLMatrix4x4	m;
 		gMenuLogoFadeAlpha = 1.0;
 
 			/* FADE IN */
-			
+
 	if (theNode->ColorFilter.a < 1.0f)
 	{
 		theNode->ColorFilter.a += fps;
@@ -1343,9 +1343,9 @@ OGLMatrix4x4	m;
 
 
 				/* UPDATE ROTATION */
-				
+
 	rot = theNode->Rot.y;													// get current y rot
-	
+
 	if (gTargetRot != rot)
 	{
 		if (rot < gTargetRot)
@@ -1366,7 +1366,7 @@ OGLMatrix4x4	m;
 
 
 			/* WOBBLE ON Z */
-			
+
 	theNode->SpecialF[0] += fps * .5f;
 	gSaturn->Rot.z = -PI/12.0f + sin(theNode->SpecialF[0]) * .1f;
 	theNode->SpecialF[1] += fps * .3f;
@@ -1376,19 +1376,19 @@ OGLMatrix4x4	m;
 
 
 			/* UPDATE RING ALSO */
-			
+
 	ring->ColorFilter.a = theNode->ColorFilter.a;
 	ring->BaseTransformMatrix = theNode->BaseTransformMatrix;
 	SetObjectTransformMatrix(ring);
 
 
 			/* UPDATE GLOW ALSO */
-			
+
 	glow->ColorFilter.a = theNode->ColorFilter.a * .99f;
 
 	ringGlow->ColorFilter.a = theNode->ColorFilter.a * .6f;
 	ringGlow->BaseTransformMatrix = theNode->BaseTransformMatrix;
-	
+
 	s = 1.3f + sin(ringGlow->SpecialF[0] += fps * 11.0f) * .005f;		// undulate a little
 	OGLMatrix4x4_SetScale(&m, s,s,s);
 	OGLMatrix4x4_Multiply(&m, &ringGlow->BaseTransformMatrix, &ringGlow->BaseTransformMatrix);
@@ -1410,7 +1410,7 @@ float	fps = gFramesPerSecondFrac;
 	theNode->Coord.x += theNode->Delta.x * fps;
 	if (theNode->Coord.x > 850.0f)
 		theNode->Coord.x = -850.0f;
-		
+
 	UpdateObjectTransforms(theNode);
 }
 
@@ -1423,9 +1423,9 @@ static void SpawnSaucer(void)
 ObjNode	*newObj;
 float	dx;
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;	
+	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_Saucer;
-	
+
 	if (MyRandomLong() & 0x1)
 	{
 		gNewObjectDefinition.coord.x 	= -1200;
@@ -1445,9 +1445,9 @@ float	dx;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = .4;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 	newObj->Delta.x = dx;
-	
+
 	newObj->SpecialF[0] = 6;
 }
 
@@ -1461,7 +1461,7 @@ float	fps = gFramesPerSecondFrac;
 	if ((theNode->SpecialF[0] -= fps) <= 0.0f)
 	{
 		DeleteObject(theNode);
-		return;	
+		return;
 	}
 
 	GetObjectInfo(theNode);
@@ -1484,7 +1484,7 @@ ObjNode	*logo = glow->ChainNode;
 
 
 			/* UPDATE LOGO */
-			
+
 	logo->Coord.z += fps * 120.0f;							// move forward
 
 	if (logo->Coord.z > 500.0f)
@@ -1493,23 +1493,23 @@ ObjNode	*logo = glow->ChainNode;
 		{
 			BuildMenu();									// build the menu
 		}
-	
+
 		logo->ColorFilter.a -= fps * .8f;					// fade out
 		if (logo->ColorFilter.a <= 0.0f)
 		{
 			DeleteObject(glow);
 			return;
 		}
-	
+
 	}
 	else													// fade in
 	{
-		logo->ColorFilter.a += fps * .6f;					
+		logo->ColorFilter.a += fps * .6f;
 		if (logo->ColorFilter.a > 1.0f)
 			logo->ColorFilter.a = 1.0f;
-	
+
 	}
-	
+
 
 	UpdateObjectTransforms(logo);
 
@@ -1538,7 +1538,7 @@ ObjNode	*logo = glow->ChainNode;
 			/***************/
 
 			/* UPDATE PANGEA LOGO */
-			
+
 	logo->Coord.z += fps * 130.0f;							// move forward
 
 	if (logo->Coord.z > 400.0f)
@@ -1551,15 +1551,15 @@ ObjNode	*logo = glow->ChainNode;
 			StartGameLogo();								// build the menu
 			return;
 		}
-		
+
 		if (gLogoAmbience != -1)
 		{
 			gAmbienceVolume -= fps * (float)FULL_CHANNEL_VOLUME * .8f;
 			if (gAmbienceVolume < 0.0f)
 				gAmbienceVolume = 0;
 			ChangeChannelVolume(gLogoAmbience, gAmbienceVolume, gAmbienceVolume);
-		}		
-			
+		}
+
 	}
 
 	UpdateObjectTransforms(logo);
@@ -1598,10 +1598,10 @@ ObjNode	*glow, *text, *pane;
 	gTextDone = false;
 
 		/* DARKEN PANE */
-		
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;		
+
+	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOTEXTUREWRAP|
-										STATUS_BIT_KEEPBACKFACES;									
+										STATUS_BIT_KEEPBACKFACES;
 	gNewObjectDefinition.slot 		= 900;
 	gNewObjectDefinition.moveCall 	= MoveCredits;
 	pane = MakeNewObject(&gNewObjectDefinition);
@@ -1610,11 +1610,11 @@ ObjNode	*glow, *text, *pane;
 	pane->ColorFilter.g = 0;
 	pane->ColorFilter.b = 0;
 	pane->ColorFilter.a = 0;
-	
+
 
 			/* GLOW */
-			
-	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_HelpGlow;
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.y 	= 0;
@@ -1630,18 +1630,18 @@ ObjNode	*glow, *text, *pane;
 	pane->ChainNode = glow;
 
 			/* TEXT */
-			
+
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_HelpText;
 	gNewObjectDefinition.coord.z 	+= 1.0;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOTEXTUREWRAP|STATUS_BIT_NOLIGHTING|STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOZWRITES;
 	gNewObjectDefinition.slot++;
 	text = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 	text->ColorFilter.a = 0;
-	
+
 	glow->ChainNode = text;
 
-	
+
 
 
 		/*************************/
@@ -1655,13 +1655,13 @@ ObjNode	*glow, *text, *pane;
 			gFadeInText = false;
 
 			/* DRAW STUFF */
-	
+
 		CalcFramesPerSecond();
-		MoveObjects();				
-		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);	
+		MoveObjects();
+		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);
 	}
-	
-	
+
+
 		/* CLEANUP */
 	DeleteObject(pane);
 	UpdateInput();
@@ -1677,7 +1677,7 @@ ObjNode	*pane;
 
 #if !DEMO
 	PlaySong(SONG_HIGHSCORE, true);
-#endif	
+#endif
 
 			/* LOAD HIGH SCORES */
 
@@ -1687,12 +1687,12 @@ ObjNode	*pane;
 	gDrawHighScores = true;
 	gScoreFadeAlpha = 0;
 
-	
+
 		/* MAKE DARKEN PANE */
-		
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;		
+
+	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOTEXTUREWRAP|
-										STATUS_BIT_KEEPBACKFACES;									
+										STATUS_BIT_KEEPBACKFACES;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+100;
 	gNewObjectDefinition.moveCall 	= nil;
 	pane = MakeNewObject(&gNewObjectDefinition);
@@ -1701,7 +1701,7 @@ ObjNode	*pane;
 	pane->ColorFilter.g = 0;
 	pane->ColorFilter.b = 0;
 	pane->ColorFilter.a = 0;
-	
+
 
 		/*************************/
 		/* SHOW IN ANIMATED LOOP */
@@ -1714,7 +1714,7 @@ ObjNode	*pane;
 			gFadeInText = false;
 
 			/*  FADE IN */
-			
+
 		if (gFadeInText)
 		{
 			pane->ColorFilter.a += gFramesPerSecondFrac * 2.0f;
@@ -1725,8 +1725,8 @@ ObjNode	*pane;
 			if (gScoreFadeAlpha > 1.0f)
 				gScoreFadeAlpha = 1.0f;
 		}
-		
-			/* FADE OUT */			
+
+			/* FADE OUT */
 		else
 		{
 			pane->ColorFilter.a -= gFramesPerSecondFrac * 2.0f;
@@ -1742,20 +1742,20 @@ ObjNode	*pane;
 		}
 
 			/* DRAW STUFF */
-	
+
 		CalcFramesPerSecond();
-		MoveObjects();				
-		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);	
+		MoveObjects();
+		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);
 	}
-	
-	
+
+
 		/* CLEANUP */
 	DeleteObject(pane);
 	UpdateInput();
 	gDrawHighScores = false;
 #if !DEMO
 	PlaySong(SONG_THEME, true);
-#endif	
+#endif
 }
 
 
@@ -1784,10 +1784,10 @@ ObjNode	*pane, *glow, *text;
 	gTextDone = false;
 
 		/* DARKEN PANE */
-		
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;		
+
+	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOTEXTUREWRAP|
-										STATUS_BIT_KEEPBACKFACES;									
+										STATUS_BIT_KEEPBACKFACES;
 	gNewObjectDefinition.slot 		= 900;
 	gNewObjectDefinition.moveCall 	= MoveCredits;
 	pane = MakeNewObject(&gNewObjectDefinition);
@@ -1796,11 +1796,11 @@ ObjNode	*pane, *glow, *text;
 	pane->ColorFilter.g = 0;
 	pane->ColorFilter.b = 0;
 	pane->ColorFilter.a = 0;
-	
+
 
 			/* CREDIT GLOW */
-			
-	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_CreditsGlow;
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.y 	= 0;
@@ -1818,18 +1818,18 @@ ObjNode	*pane, *glow, *text;
 
 
 			/* TEXT */
-			
+
 	gNewObjectDefinition.type 		= MAINMENU_ObjType_CreditsText;
 	gNewObjectDefinition.coord.z 	+= 1.0;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOTEXTUREWRAP|STATUS_BIT_NOLIGHTING|STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOZWRITES;
 	gNewObjectDefinition.slot++;
 	text = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 	text->ColorFilter.a = 0;
-	
+
 	glow->ChainNode = text;
 
-	
+
 
 
 		/*************************/
@@ -1843,13 +1843,13 @@ ObjNode	*pane, *glow, *text;
 			gFadeInText = false;
 
 			/* DRAW STUFF */
-	
+
 		CalcFramesPerSecond();
-		MoveObjects();				
-		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);	
+		MoveObjects();
+		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);
 	}
-	
-	
+
+
 		/* CLEANUP */
 	DeleteObject(pane);
 	UpdateInput();
@@ -1866,17 +1866,17 @@ ObjNode	*glow = pane->ChainNode;
 ObjNode *text = glow->ChainNode;
 
 			/* FADE IN */
-			
+
 	if (gFadeInText)
 	{
 		text->ColorFilter.a += gFramesPerSecondFrac * 1.4f;
 		if (text->ColorFilter.a > 1)
 			text->ColorFilter.a = 1;
-			
+
 	}
-	
+
 		/* FADE OUT */
-		
+
 	else
 	{
 		text->ColorFilter.a -= gFramesPerSecondFrac * 1.4f;
@@ -1885,12 +1885,12 @@ ObjNode *text = glow->ChainNode;
 			text->ColorFilter.a = 0.0f;
 			gTextDone = true;
 		}
-	
+
 	}
-	
-	
+
+
 	glow->ColorFilter.a = (.8f + RandomFloat() * .2f) * (text->ColorFilter.a * .7f);
-	pane->ColorFilter.a = text->ColorFilter.a * .8f;	
+	pane->ColorFilter.a = text->ColorFilter.a * .8f;
 }
 
 
@@ -1902,17 +1902,17 @@ void DrawDarkenPane(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
 AGLContext agl_ctx = setupInfo->drawContext;
 
-	
+
 	glDisable(GL_TEXTURE_2D);
 	SetColor4fv((GLfloat *)&theNode->ColorFilter);
 	glEnable(GL_BLEND);
 
-	glBegin(GL_QUADS);				
+	glBegin(GL_QUADS);
 	glVertex3f(-1000,-1000,DARKEN_PANE_Z);
 	glVertex3f(1000,-1000,DARKEN_PANE_Z);
 	glVertex3f(1000,1000,DARKEN_PANE_Z);
 	glVertex3f(-1000,1000,DARKEN_PANE_Z);
-	glEnd();	
+	glEnd();
 
 	glDisable(GL_BLEND);
 }

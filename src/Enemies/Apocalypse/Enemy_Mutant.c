@@ -75,7 +75,7 @@ static void MutantHitByJumpJet(ObjNode *enemy);
 
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -88,7 +88,7 @@ enum
 
 
 		/* JOINTS */
-		
+
 enum
 {
 	MUTANT_JOINT_LEFTHAND	= 	10
@@ -125,7 +125,7 @@ ObjNode	*newObj;
 	newObj = MakeEnemy_Mutant(x,z);
 	newObj->TerrainItemPtr = itemPtr;
 	newObj->EnemyRegenerate = itemPtr->parm[3] & (1<<1);
-	
+
 	return(true);
 }
 
@@ -138,11 +138,11 @@ ObjNode	*newObj;
 				/*******************************/
 				/* MAKE DEFAULT SKELETON ENEMY */
 				/*******************************/
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_MUTANT,x,z, MUTANT_SCALE, 0, MoveMutant);
 
 	SetSkeletonAnim(newObj->Skeleton, MUTANT_ANIM_STAND);
-	
+
 
 
 				/*******************/
@@ -152,34 +152,34 @@ ObjNode	*newObj;
 	newObj->Health 		= 1.0;
 	newObj->Damage 		= MUTANT_DAMAGE;
 	newObj->Kind 		= ENEMY_KIND_MUTANT;
-	
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,MUTANT_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= MutantHitByStunPulse;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] 	= MutantHitBySuperNova;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FIST] 		= MutantGotPunched;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FLAME] 		= MutantHitByStunPulse;
 	newObj->HitByJumpJetHandler 						= MutantHitByJumpJet;
-			
+
 	newObj->HurtCallback = HurtMutant;							// set hurt callback function
 
 
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8,false);
-		
+
 	CreateMutantGlow(newObj);
-		
+
 	gNumEnemies++;
 	gNumEnemyOfKind[ENEMY_KIND_MUTANT]++;
-	
+
 	return(newObj);
 }
 
@@ -200,7 +200,7 @@ ObjNode	*newObj;
 		newObj->Rot.y = CalcYAngleFromPointToPoint(0, x, z, gPlayerInfo.coord.x, gPlayerInfo.coord.z);		// aim at player
 
 		SetSkeletonAnim(newObj->Skeleton, MUTANT_ANIM_GROW);
-		UpdateObjectTransforms(newObj);				
+		UpdateObjectTransforms(newObj);
 	}
 
 }
@@ -226,8 +226,8 @@ static	void(*myMoveTable[])(ObjNode *) =
 	}
 
 	GetObjectInfo(theNode);
-	
-	myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -242,10 +242,10 @@ float	angleToTarget,dist;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
-				
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, MUTANT_TURN_SPEED, true);			
 
-		
+	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, MUTANT_TURN_SPEED, true);
+
+
 
 				/* SEE IF CHASE */
 
@@ -256,23 +256,23 @@ float	angleToTarget,dist;
 	}
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
 
 
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfMutantAttack(theNode, angleToTarget, dist);
 
 
-	UpdateMutant(theNode);		
+	UpdateMutant(theNode);
 }
 
 
@@ -287,8 +287,8 @@ float		r,fps,angle,dist;
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
-			
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, MUTANT_TURN_SPEED, true);			
+
+	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, MUTANT_TURN_SPEED, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * MUTANT_WALK_SPEED;
@@ -298,28 +298,28 @@ float		r,fps,angle,dist;
 
 
 				/* SEE IF STAND */
-					
+
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
 	if ((dist >= MUTANT_CHASE_DIST_MAX) || (dist <= MUTANT_CHASE_DIST_MIN))
 		MorphToSkeletonAnim(theNode->Skeleton, MUTANT_ANIM_STAND, 4);
-		
-		
+
+
 				/* UPDATE ANIM SPEED */
 
 	if (theNode->Skeleton->AnimNum == MUTANT_ANIM_WALK)
 		theNode->Skeleton->AnimSpeed = MUTANT_WALK_SPEED * .01f;
-	
-	
+
+
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfMutantAttack(theNode, angle, dist);
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
-		
-	UpdateMutant(theNode);		
+
+	UpdateMutant(theNode);
 }
 
 
@@ -333,23 +333,23 @@ float	angleToTarget;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
-				
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, MUTANT_TURN_SPEED, true);			
 
-		
+	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, MUTANT_TURN_SPEED, true);
+
+
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
 
 			/* SEE IF HIT PLAYER */
-			
+
 	if (theNode->CheckSlap)
 	{
 		OGLPoint3D	hitPt;
@@ -358,24 +358,24 @@ float	angleToTarget;
 		OGLPoint3D				pt;
 		NewParticleDefType		newParticleDef;
 		float					x,y,z;
-		
+
 		theNode->CheckSlap = false;
-	
+
 		FindCoordOfJoint(theNode, MUTANT_JOINT_LEFTHAND, &hitPt);
-		
+
 		if (DoSimpleBoxCollisionAgainstPlayer(hitPt.y + 50.0f, hitPt.y - 50.0f, hitPt.x-50.0f, hitPt.x+50.0f,
 										hitPt.z + 50.0f, hitPt.z - 50.0f))
 		{
 			PlayEffect3D(EFFECT_PLAYERCRUSH, &hitPt);
-	
+
 			PlayerGotHit(theNode, 0);				// hurt the player
 		}
-		
+
 
 				/*************************/
 				/* MAKE RADIOACTIVE POOF */
 				/*************************/
-					
+
 		gNewParticleGroupDef.magicNum				= 0;
 		gNewParticleGroupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 		gNewParticleGroupDef.flags					= PARTICLE_FLAGS_BOUNCE;
@@ -390,42 +390,42 @@ float	angleToTarget;
 
 		pg = NewParticleGroup(&gNewParticleGroupDef);
 		if (pg != -1)
-		{	
+		{
 			x = hitPt.x;
 			y = hitPt.y;
 			z =	hitPt.z;
-			
+
 			for (i = 0; i < 15; i++)
 			{
 				pt.x = x + RandomFloat2() * 20.0f;
 				pt.y = y + RandomFloat2() * 20.0f;
 				pt.z = z + RandomFloat2() * 20.0f;
-				
+
 				delta.x = RandomFloat2() * 150.0f;
 				delta.y = RandomFloat2() * 100.0f;
 				delta.z = RandomFloat2() * 150.0f;
-				
-				
+
+
 				newParticleDef.groupNum		= pg;
 				newParticleDef.where		= &pt;
 				newParticleDef.delta		= &delta;
 				newParticleDef.scale		= 1.0f + RandomFloat2() * .2f;
 				newParticleDef.rotZ			= RandomFloat() * PI2;
 				newParticleDef.rotDZ		= RandomFloat2() * 4.0f;
-				newParticleDef.alpha		= FULL_ALPHA;		
+				newParticleDef.alpha		= FULL_ALPHA;
 				AddParticleToGroup(&newParticleDef);
 			}
 		}
-		
-		
+
+
 	}
 
 			/* SEE IF DONE */
-			
+
 	if (theNode->Skeleton->AnimHasStopped)
 		MorphToSkeletonAnim(theNode->Skeleton, MUTANT_ANIM_STAND, 7);
 
-	UpdateMutant(theNode);		
+	UpdateMutant(theNode);
 }
 
 
@@ -441,14 +441,14 @@ static void  MoveMutant_GotHit(ObjNode *theNode)
 
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if on ground, add friction
 		ApplyFrictionToDeltas(1200.0,&gDelta);
-		
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;			// add gravity
 
 	MoveEnemy(theNode);
 
 
 				/* SEE IF DONE */
-			
+
 	theNode->ButtTimer -= gFramesPerSecondFrac;
 	if (theNode->ButtTimer <= 0.0)
 	{
@@ -457,7 +457,7 @@ static void  MoveMutant_GotHit(ObjNode *theNode)
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
@@ -477,26 +477,26 @@ float	scale;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 		/* MAKE GROW */
-		
+
 	scale = theNode->Scale.x += gFramesPerSecondFrac * .4f;
-	
+
 			/* SEE IF DONE GROWING */
 
 	if (scale >= MUTANT_SCALE)
 	{
 		scale = MUTANT_SCALE;
-		MorphToSkeletonAnim(theNode->Skeleton, MUTANT_ANIM_STAND, 2);	
+		MorphToSkeletonAnim(theNode->Skeleton, MUTANT_ANIM_STAND, 2);
 		gDelta.y = 700.0f;
 	}
 
-	theNode->Scale.x = 
-	theNode->Scale.y = 
+	theNode->Scale.x =
+	theNode->Scale.y =
 	theNode->Scale.z = scale;
 
 	if (DoEnemyCollisionDetect(theNode,0, true))			// just do ground
 		return;
 
-	UpdateMutant(theNode);		
+	UpdateMutant(theNode);
 }
 
 
@@ -517,41 +517,41 @@ float			x,z,placement;
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
-	
+	placement = itemPtr->placement;
+
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 
 				/* MAKE DEFAULT SKELETON ENEMY */
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_MUTANT,x,z, MUTANT_SCALE, 0, nil);
-		
-		
+
+
 	newObj->SplineItemPtr = itemPtr;
 	newObj->SplineNum = splineNum;
-	
+
 	SetSkeletonAnim(newObj->Skeleton, MUTANT_ANIM_WALK);
 	newObj->Skeleton->AnimSpeed = 2.0f;
 
 				/* SET BETTER INFO */
-			
+
 	newObj->InitCoord 		= newObj->Coord;							// remember where started
 	newObj->StatusBits		|= STATUS_BIT_ONSPLINE;
 	newObj->SplinePlacement = placement;
-	newObj->Coord.y 		-= newObj->BottomOff;			
+	newObj->Coord.y 		-= newObj->BottomOff;
 	newObj->SplineMoveCall 	= MoveMutantOnSpline;					// set move call
 	newObj->Health 			= 1.0;
 	newObj->Damage 			= MUTANT_DAMAGE;
 	newObj->Kind 			= ENEMY_KIND_MUTANT;
-		
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,MUTANT_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= MutantHitByStunPulse;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] 	= MutantHitBySuperNova;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FIST] 		= MutantGotPunched;
@@ -562,14 +562,14 @@ float			x,z,placement;
 
 
 				/* MAKE SHADOW & GLOW */
-				
+
 	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8, false);
 
 	CreateMutantGlow(newObj);
 
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	DetachObject(newObj, true);											// detach this object from the linked list
 	AddToSplineObjectList(newObj, true);
 
@@ -581,7 +581,7 @@ float			x,z,placement;
 
 static void MoveMutantOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
 
@@ -592,31 +592,31 @@ Boolean isVisible;
 
 
 			/* UPDATE STUFF IF VISIBLE */
-			
+
 	if (isVisible)
 	{
-		
+
 		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,			// calc y rot aim
-												theNode->Coord.x, theNode->Coord.z);		
+												theNode->Coord.x, theNode->Coord.z);
 
 		theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - theNode->BBox.min.y;	// calc y coord
 		UpdateObjectTransforms(theNode);											// update transforms
-		UpdateShadow(theNode);	
+		UpdateShadow(theNode);
 		UpdateMutantGlow(theNode);													// update glow
-		
+
 				/* DO SOME COLLISION CHECKING */
-				
+
 		GetObjectInfo(theNode);
 		if (DoEnemyCollisionDetect(theNode,CTYPE_HURTENEMY, false))					// just do this to see if explosions hurt
 			return;
-			
-			
+
+
 					/* SEE IF LEAVE SPLINE TO CHASE PLAYER */
-					
+
 		if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < MUTANT_DETACH_DIST)
-			DetachEnemyFromSpline(theNode, MoveMutant);			
-			
-	}	
+			DetachEnemyFromSpline(theNode, MoveMutant);
+
+	}
 }
 
 
@@ -641,10 +641,10 @@ static void UpdateMutant(ObjNode *theNode)
 static Boolean MutantHitByStunPulse(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon,	weaponCoord)
-	
+
 
 			/* HURT IT */
-			
+
 	HurtMutant(enemy, .25);
 
 
@@ -671,10 +671,10 @@ static Boolean MutantGotPunched(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *fis
 float	r;
 
 #pragma unused (weapon,	fistCoord, weaponDelta)
-	
-	
+
+
 			/* HURT IT */
-			
+
 	HurtMutant(enemy, .25);
 
 
@@ -684,9 +684,9 @@ float	r;
 
 	enemy->Delta.x = -sin(r) * 1000.0f;
 	enemy->Delta.z = -cos(r) * 1000.0f;
-	enemy->Delta.y = 500.0f;	
+	enemy->Delta.y = 500.0f;
 
-		
+
 	return(true);
 }
 
@@ -698,16 +698,16 @@ static void MutantHitByJumpJet(ObjNode *enemy)
 float	r;
 
 		/* HURT IT */
-			
+
 	HurtMutant(enemy, 1.0);
 
 
 			/* GIVE MOMENTUM */
-			
+
 	r = gPlayerInfo.objNode->Rot.y;
 	enemy->Delta.x = -sin(r) * 1000.0f;
 	enemy->Delta.z = -cos(r) * 1000.0f;
-	enemy->Delta.y = 500.0f;	
+	enemy->Delta.y = 500.0f;
 }
 
 /************** MUTANT GOT HIT BY SUPERNOVA *****************/
@@ -715,9 +715,9 @@ float	r;
 static Boolean MutantHitBySuperNova(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord, weaponDelta)
-	
+
 	KillMutant(enemy);
-	
+
 	return(false);
 }
 
@@ -730,13 +730,13 @@ static Boolean HurtMutant(ObjNode *enemy, float damage)
 {
 
 			/* SEE IF REMOVE FROM SPLINE */
-	
+
 	if (enemy->StatusBits & STATUS_BIT_ONSPLINE)
 		DetachEnemyFromSpline(enemy, MoveMutant);
 
 
 				/* HURT ENEMY & SEE IF KILL */
-				
+
 	enemy->Health -= damage;
 	if (enemy->Health <= 0.0f)
 	{
@@ -746,12 +746,12 @@ static Boolean HurtMutant(ObjNode *enemy, float damage)
 	else
 	{
 					/* GO INTO HIT ANIM */
-				
+
 		if (enemy->Skeleton->AnimNum != MUTANT_ANIM_GETHIT)
 			MorphToSkeletonAnim(enemy->Skeleton, MUTANT_ANIM_GETHIT, 8);
 
 		enemy->ButtTimer = 1.0f;
-	}	
+	}
 	return(false);
 }
 
@@ -773,7 +773,7 @@ static void KillMutant(ObjNode *enemy)
 	if (!enemy->EnemyRegenerate)
 		enemy->TerrainItemPtr = nil;							// dont ever come back
 
-	DeleteEnemy(enemy);	
+	DeleteEnemy(enemy);
 }
 
 
@@ -782,33 +782,33 @@ static void KillMutant(ObjNode *enemy)
 /************ SEE IF MUTANT ATTACK *********************/
 
 static void SeeIfMutantAttack(ObjNode *theNode, float angleToPlayer, float distToPlayer)
-{	
+{
 	if (!gPlayerHasLanded)
 		return;
-	
+
 	if (gPlayerInfo.invincibilityTimer > 0.0f)
 		return;
-	
+
 	if (distToPlayer > MUTANT_ATTACK_DIST)
 		return;
-	
+
 	if (angleToPlayer > (PI/2))
 		return;
-	
+
 	if (gPlayerInfo.objNode->Skeleton->AnimNum == PLAYER_ANIM_RIDEZIP)		// don't attack if on zipline (avoid a weird death bug)
 		return;
 
-	
+
 			/* DON'T ATTACK THRU THINGS */
-				
+
 	if (SeeIfLineSegmentHitsAnything(&gCoord, &gPlayerInfo.coord, nil, CTYPE_FENCE|CTYPE_BLOCKRAYS))
 		return;
-	
-	
+
+
 	MorphToSkeletonAnim(theNode->Skeleton, MUTANT_ANIM_ATTACK, 5.0);
-	
+
 	theNode->CheckSlap = false;
-	
+
 	PlayEffect3D(EFFECT_MUTANTGROWL, &gCoord);
 }
 
@@ -824,7 +824,7 @@ static void CreateMutantGlow(ObjNode *alien)
 int	numJoints,i,s;
 
 	numJoints = alien->Skeleton->skeletonDefinition->NumBones;
-	if (numJoints > MAX_NODE_SPARKLES)				// make sure we don't overflow	
+	if (numJoints > MAX_NODE_SPARKLES)				// make sure we don't overflow
 		numJoints = MAX_NODE_SPARKLES;
 
 	for (i = 0; i < numJoints; i++)
@@ -841,7 +841,7 @@ int	numJoints,i,s;
 
 			gSparkles[s].scale = 150.0f;
 			gSparkles[s].separation = -100.0f;
-			
+
 			gSparkles[s].textureNum = PARTICLE_SObjType_WhiteGlow;
 		}
 	}
@@ -857,7 +857,7 @@ int	numJoints,i,s;
 
 
 	numJoints = alien->Skeleton->skeletonDefinition->NumBones;
-	if (numJoints > MAX_NODE_SPARKLES)				// make sure we don't overflow	
+	if (numJoints > MAX_NODE_SPARKLES)				// make sure we don't overflow
 		numJoints = MAX_NODE_SPARKLES;
 
 	for (i = 0; i < numJoints; i++)

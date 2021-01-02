@@ -75,7 +75,7 @@ static void StrongManReleasePlayer(ObjNode *theNode);
 
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -87,7 +87,7 @@ enum
 
 
 		/* JOINTS */
-		
+
 enum
 {
 	STRONGMAN_JOINT_WAND	= 	16
@@ -131,7 +131,7 @@ ObjNode	*newObj;
 	newObj = MakeEnemy_StrongMan(x,z);
 	newObj->TerrainItemPtr = itemPtr;
 	newObj->EnemyRegenerate = itemPtr->parm[3] & (1<<1);
-	
+
 	return(true);
 }
 
@@ -144,11 +144,11 @@ ObjNode	*newObj;
 				/*******************************/
 				/* MAKE DEFAULT SKELETON ENEMY */
 				/*******************************/
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_STRONGMAN,x,z, STRONGMAN_SCALE, 0, MoveStrongMan);
 
 	SetSkeletonAnim(newObj->Skeleton, STRONGMAN_ANIM_STAND);
-	
+
 
 
 				/*******************/
@@ -158,37 +158,37 @@ ObjNode	*newObj;
 	newObj->Health 		= 2.5;
 	newObj->Damage 		= STRONGMAN_DAMAGE;
 	newObj->Kind 		= ENEMY_KIND_STRONGMAN;
-	
+
 	newObj->AttackDelay = RandomFloat() * 4.0f;
-	
-	
+
+
 				/* SET COLLISION INFO */
-				
+
 	SetObjectCollisionBounds(newObj, 200, -200, -60, 60, 60,-60);
 	CalcNewTargetOffsets(newObj,STRONGMAN_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= StrongManHitByWeapon;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] 	= StrongManHitBySuperNova;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FLAME] 		= StrongManHitByWeapon;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_DART] 		= StrongManHitByWeapon;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FLARE] 		= StrongManHitByWeapon;
 	newObj->HitByJumpJetHandler 						= StrongManHitByJumpJet;
-			
+
 	newObj->HurtCallback = HurtStrongMan;							// set hurt callback function
 
 
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 6,false);
-		
-		
+
+
 	gNumEnemies++;
 	gNumEnemyOfKind[ENEMY_KIND_STRONGMAN]++;
-	
+
 	return(newObj);
 }
 
@@ -213,8 +213,8 @@ static	void(*myMoveTable[])(ObjNode *) =
 	}
 
 	GetObjectInfo(theNode);
-	
-	myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -231,15 +231,15 @@ float	fps = gFramesPerSecondFrac;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
-				
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, STRONGMAN_TURN_SPEED, true);			
+
+	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, STRONGMAN_TURN_SPEED, true);
 	dist = OGLPoint3D_Distance(&gPlayerInfo.coord, &gCoord);
-		
+
 
 				/* SEE IF CHASE */
 
 
-	theNode->StandDelay -= fps;								// see if in stand delay 
+	theNode->StandDelay -= fps;								// see if in stand delay
 	if (theNode->StandDelay <= 0.0f)
 	{
 		if (!IsBottomlessPitInFrontOfEnemy(theNode->Rot.y))
@@ -247,7 +247,7 @@ float	fps = gFramesPerSecondFrac;
 			if ((dist < STRONGMAN_CHASE_DIST_MAX) && (dist > STRONGMAN_CHASE_DIST_MIN))
 			{
 				if (!SeeIfLineSegmentHitsAnything(&gCoord, &gPlayerInfo.coord, nil, CTYPE_FENCE))		// dont chase thru walls
-				{		
+				{
 					MorphToSkeletonAnim(theNode->Skeleton, STRONGMAN_ANIM_WALK, 4);
 				}
 			}
@@ -256,23 +256,23 @@ float	fps = gFramesPerSecondFrac;
 
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
 	MoveEnemy(theNode);
 
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfStrongManAttack(theNode, angleToTarget, dist);
 
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 
-	UpdateStrongMan(theNode);		
+	UpdateStrongMan(theNode);
 }
 
 
@@ -287,8 +287,8 @@ float		r,fps,angle,dist;
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
-			
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, STRONGMAN_TURN_SPEED, true);			
+
+	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, STRONGMAN_TURN_SPEED, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * STRONGMAN_WALK_SPEED;
@@ -305,33 +305,33 @@ float		r,fps,angle,dist;
 
 
 		/* STOP WALKING IF BOTTOMLESS PIT IN FRONT OF US */
-		
+
 	if (IsBottomlessPitInFrontOfEnemy(r))
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, STRONGMAN_ANIM_STAND, 4);
 	}
 	else
-	{											
+	{
 		if ((dist >= STRONGMAN_CHASE_DIST_MAX) || (dist <= STRONGMAN_CHASE_DIST_MIN))
 			MorphToSkeletonAnim(theNode->Skeleton, STRONGMAN_ANIM_STAND, 4);
 	}
-		
+
 				/* UPDATE ANIM SPEED */
 
 	if (theNode->Skeleton->AnimNum == STRONGMAN_ANIM_WALK)
 		theNode->Skeleton->AnimSpeed = STRONGMAN_WALK_SPEED * .01f;
-	
-	
+
+
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfStrongManAttack(theNode, angle, dist);
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
-		
-	UpdateStrongMan(theNode);		
+
+	UpdateStrongMan(theNode);
 }
 
 
@@ -340,7 +340,7 @@ float		r,fps,angle,dist;
 static void  MoveStrongMan_GrabPlayer(ObjNode *theNode)
 {
 			/* SEE IF RELEASE PLAYER */
-			
+
 	if (theNode->ReleasePlayer)
 	{
 		StrongManReleasePlayer(theNode);
@@ -349,30 +349,30 @@ static void  MoveStrongMan_GrabPlayer(ObjNode *theNode)
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)				// if on ground, add friction
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
-		
+
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 			/* ALIGN PLAYER IN GRASP */
-				
+
 	AlignPlayerInStrongManGrasp(theNode);
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
-		return;			
+		return;
 
 
 			/* SEE IF DONE */
-			
+
 	if (theNode->Skeleton->AnimHasStopped)
 		MorphToSkeletonAnim(theNode->Skeleton, STRONGMAN_ANIM_STAND, 3);
 
-	UpdateStrongMan(theNode);		
+	UpdateStrongMan(theNode);
 
 
 }
@@ -387,14 +387,14 @@ static void  MoveStrongMan_GotHit(ObjNode *theNode)
 
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if on ground, add friction
 		ApplyFrictionToDeltas(1200.0,&gDelta);
-		
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;			// add gravity
 
 	MoveEnemy(theNode);
 
 
 				/* SEE IF DONE */
-			
+
 	theNode->ButtTimer -= gFramesPerSecondFrac;
 	if (theNode->ButtTimer <= 0.0)
 	{
@@ -403,7 +403,7 @@ static void  MoveStrongMan_GotHit(ObjNode *theNode)
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
@@ -430,41 +430,41 @@ float			x,z,placement;
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
-	
+	placement = itemPtr->placement;
+
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 
 				/* MAKE DEFAULT SKELETON ENEMY */
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_STRONGMAN,x,z, STRONGMAN_SCALE, 0, nil);
-		
-		
+
+
 	newObj->SplineItemPtr = itemPtr;
 	newObj->SplineNum = splineNum;
-	
+
 	SetSkeletonAnim(newObj->Skeleton, STRONGMAN_ANIM_WALK);
 	newObj->Skeleton->AnimSpeed = 2.0f;
 
 				/* SET BETTER INFO */
-			
+
 	newObj->InitCoord 		= newObj->Coord;							// remember where started
 	newObj->StatusBits		|= STATUS_BIT_ONSPLINE;
 	newObj->SplinePlacement = placement;
-	newObj->Coord.y 		-= newObj->BottomOff;			
+	newObj->Coord.y 		-= newObj->BottomOff;
 	newObj->SplineMoveCall 	= MoveStrongManOnSpline;					// set move call
 	newObj->Health 			= 1.0;
 	newObj->Damage 			= STRONGMAN_DAMAGE;
 	newObj->Kind 			= ENEMY_KIND_STRONGMAN;
-		
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,STRONGMAN_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= StrongManHitByWeapon;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] 	= StrongManHitBySuperNova;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FLAME] 		= StrongManHitByWeapon;
@@ -476,12 +476,12 @@ float			x,z,placement;
 
 
 				/* MAKE SHADOW & GLOW */
-				
+
 	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 6, false);
 
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	DetachObject(newObj, true);										// detach this object from the linked list
 	AddToSplineObjectList(newObj, true);
 
@@ -493,7 +493,7 @@ float			x,z,placement;
 
 static void MoveStrongManOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 float	dist;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
@@ -505,31 +505,31 @@ float	dist;
 
 
 			/* UPDATE STUFF IF VISIBLE */
-			
+
 	if (isVisible)
 	{
-		
+
 		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,			// calc y rot aim
-												theNode->Coord.x, theNode->Coord.z);		
+												theNode->Coord.x, theNode->Coord.z);
 
 		theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - theNode->BBox.min.y;	// calc y coord
 		UpdateObjectTransforms(theNode);											// update transforms
-		UpdateShadow(theNode);	
-		
+		UpdateShadow(theNode);
+
 				/* DO SOME COLLISION CHECKING */
-				
+
 		GetObjectInfo(theNode);
 		if (DoEnemyCollisionDetect(theNode,CTYPE_HURTENEMY, false))					// just do this to see if explosions hurt
 			return;
-			
-			
+
+
 					/* SEE IF LEAVE SPLINE TO CHASE PLAYER */
 
-		dist = OGLPoint3D_Distance(&gPlayerInfo.coord, &theNode->Coord);					
+		dist = OGLPoint3D_Distance(&gPlayerInfo.coord, &theNode->Coord);
 		if (dist < STRONGMAN_DETACH_DIST)
-			DetachEnemyFromSpline(theNode, MoveStrongMan);			
-			
-	}	
+			DetachEnemyFromSpline(theNode, MoveStrongMan);
+
+	}
 }
 
 
@@ -556,10 +556,10 @@ static void UpdateStrongMan(ObjNode *theNode)
 static Boolean StrongManHitByWeapon(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused(weaponCoord)
-	
+
 
 			/* HURT IT */
-			
+
 	HurtStrongMan(enemy, weapon->Damage);
 
 
@@ -580,16 +580,16 @@ static void StrongManHitByJumpJet(ObjNode *enemy)
 float	r;
 
 		/* HURT IT */
-			
+
 	HurtStrongMan(enemy, 1.0);
 
 
 			/* GIVE MOMENTUM */
-			
+
 	r = gPlayerInfo.objNode->Rot.y;
 	enemy->Delta.x = -sin(r) * 1000.0f;
 	enemy->Delta.z = -cos(r) * 1000.0f;
-	enemy->Delta.y = 500.0f;	
+	enemy->Delta.y = 500.0f;
 }
 
 /************** STRONGMAN GOT HIT BY SUPERNOVA *****************/
@@ -597,9 +597,9 @@ float	r;
 static Boolean StrongManHitBySuperNova(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord, weaponDelta)
-	
+
 	KillStrongMan(enemy);
-	
+
 	return(false);
 }
 
@@ -613,13 +613,13 @@ static Boolean HurtStrongMan(ObjNode *enemy, float damage)
 	StrongManReleasePlayer(enemy);
 
 			/* SEE IF REMOVE FROM SPLINE */
-	
+
 	if (enemy->StatusBits & STATUS_BIT_ONSPLINE)
 		DetachEnemyFromSpline(enemy, MoveStrongMan);
 
 
 				/* HURT ENEMY & SEE IF KILL */
-				
+
 	enemy->Health -= damage;
 	if (enemy->Health <= 0.0f)
 	{
@@ -629,12 +629,12 @@ static Boolean HurtStrongMan(ObjNode *enemy, float damage)
 	else
 	{
 					/* GO INTO HIT ANIM */
-				
+
 		if (enemy->Skeleton->AnimNum != STRONGMAN_ANIM_GETHIT)
 			MorphToSkeletonAnim(enemy->Skeleton, STRONGMAN_ANIM_GETHIT, 8);
 
 		enemy->ButtTimer = 1.0f;
-	}	
+	}
 	return(false);
 }
 
@@ -649,7 +649,7 @@ float	z = enemy->Coord.z;
 
 	StrongManReleasePlayer(enemy);
 
-	
+
 	SpewAtoms(&enemy->Coord, 0,1, 2, false);
 
 	MakeSparkExplosion(x, y, z, 400, 1.0, PARTICLE_SObjType_GreenSpark,0);
@@ -661,7 +661,7 @@ float	z = enemy->Coord.z;
 	if (!enemy->EnemyRegenerate)
 		enemy->TerrainItemPtr = nil;							// dont ever come back
 
-	DeleteEnemy(enemy);	
+	DeleteEnemy(enemy);
 }
 
 
@@ -670,32 +670,32 @@ float	z = enemy->Coord.z;
 /************ SEE IF STRONGMAN ATTACK *********************/
 
 static void SeeIfStrongManAttack(ObjNode *theNode, float angleToPlayer, float distToPlayer)
-{	
+{
 	if (!gPlayerHasLanded)
 		return;
-		
+
 	if (gPlayerIsDead)
 		return;
-	
+
 	if (gPlayerInfo.invincibilityTimer > 0.0f)
 		return;
 
 	if (gPlayerInfo.objNode->Skeleton->AnimNum == PLAYER_ANIM_GRABBEDBYSTRONGMAN)	// see if already grabbed
 		return;
 
-	
+
 	theNode->AttackDelay -= gFramesPerSecondFrac;
 	if (theNode->AttackDelay > 0.0f)
 		return;
 
 
-	
+
 			/* DON'T ATTACK THRU THINGS */
-				
+
 	if (SeeIfLineSegmentHitsAnything(&gCoord, &gPlayerInfo.coord, nil, CTYPE_FENCE|CTYPE_BLOCKRAYS))
 		return;
-	
-	
+
+
 			/**********************/
 			/* SEE IF GRAB PLAYER */
 			/**********************/
@@ -703,14 +703,14 @@ static void SeeIfStrongManAttack(ObjNode *theNode, float angleToPlayer, float di
 	if ((distToPlayer < STRONGMAN_GRAB_PLAYER_DIST) && (angleToPlayer < (PI/3)))
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, STRONGMAN_ANIM_GRABPLAYER, 9);
-		theNode->ReleasePlayer = false;	
-		
+		theNode->ReleasePlayer = false;
+
 		MorphToSkeletonAnim(gPlayerInfo.objNode->Skeleton, PLAYER_ANIM_GRABBEDBYSTRONGMAN, 8);
 
 		gPlayerGrabbedByThisStrongMan = theNode;
 	}
-	
-	
+
+
 }
 
 
@@ -725,34 +725,34 @@ float		scale;
 		return;
 
 			/* CALC ROT MATRIX */
-			
-	OGLMatrix4x4_SetRotate_Y(&m, PI);									// rotate 180			
+
+	OGLMatrix4x4_SetRotate_Y(&m, PI);									// rotate 180
 
 
 			/* CALC SCALE MATRIX */
-			
+
 	scale = PLAYER_DEFAULT_SCALE/STRONGMAN_SCALE;							// to adjust from onion's scale to player's
 	OGLMatrix4x4_SetScale(&m2, scale, scale, scale);
 	OGLMatrix4x4_Multiply(&m, &m2, &m2);								// apply rot
 
 
 			/* CALC TRANSLATE MATRIX */
-			
+
 	OGLMatrix4x4_SetTranslate(&m3, 0 ,30, -35);
 	OGLMatrix4x4_Multiply(&m2, &m3, &m);
 
 
 			/* GET ALIGNMENT MATRIX */
-			
+
 	FindJointFullMatrix(enemy, 1, &m2);									// get joint's matrix
-	
+
 	OGLMatrix4x4_Multiply(&m, &m2, &gPlayerInfo.objNode->BaseTransformMatrix);
 	SetObjectTransformMatrix(gPlayerInfo.objNode);
 
-	
+
 			/* FIND COORDS */
-			
-	FindCoordOfJoint(enemy, 1, &gPlayerInfo.objNode->Coord);		
+
+	FindCoordOfJoint(enemy, 1, &gPlayerInfo.objNode->Coord);
 }
 
 
@@ -762,13 +762,13 @@ static void StrongManReleasePlayer(ObjNode *theNode)
 {
 	if (gPlayerGrabbedByThisStrongMan != theNode)									// must be this guy
 		return;
-		
+
 	if (gPlayerInfo.objNode->Skeleton->AnimNum == PLAYER_ANIM_GRABBEDBYSTRONGMAN)	// verify player is grabbed
 	{
 		PlayerGotHit(theNode, 0);
 		MorphToSkeletonAnim(gPlayerInfo.objNode->Skeleton, PLAYER_ANIM_GOTHIT, 7);	// make sure in this position
 		PlayEffect_Parms3D(EFFECT_METALLAND, &gCoord, NORMAL_CHANNEL_RATE, 1.6);
-		
+
 		gPlayerGrabbedByThisStrongMan = nil;
 	}
 }

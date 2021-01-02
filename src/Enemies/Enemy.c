@@ -106,17 +106,17 @@ float	terrainY,distToFloor,bottomOff;
 
 
 			/* AUTOMATICALLY HANDLE THE BORING STUFF */
-			
+
 	HandleCollisions(theEnemy, ctype, -.9);
 
 
 			/******************************/
 			/* SCAN FOR INTERESTING STUFF */
 			/******************************/
-			
+
 
 #if 0
-	for (i=0; i < gNumCollisions; i++)						
+	for (i=0; i < gNumCollisions; i++)
 	{
 		if (gCollisionList[i].type == COLLISION_TYPE_OBJ)
 		{
@@ -125,15 +125,15 @@ float	terrainY,distToFloor,bottomOff;
 
 			if (ctype == INVALID_NODE_FLAG)						// see if has since become invalid
 				continue;
-			
+
 					/* HURT */
-					
+
 			if (ctype & CTYPE_HURTENEMY)
 			{
 			}
 		}
 	}
-	
+
 				/* CHECK PARTICLE COLLISION */
 
 	if (ParticleHitObject(theEnemy, PARTICLE_FLAGS_HURTENEMY))
@@ -141,8 +141,8 @@ float	terrainY,distToFloor,bottomOff;
 		if (EnemyGotHurt(theEnemy,.3))						// handle hit (returns true if was deleted)
 			return(true);
 	}
-#endif	
-			
+#endif
+
 
 
 			/*************************************/
@@ -153,25 +153,25 @@ float	terrainY,distToFloor,bottomOff;
 		bottomOff = theEnemy->BBox.min.y;						// use bbox's bottom
 	else
 		bottomOff = theEnemy->BottomOff;						// use collision box's bottom
-	
+
 
 	terrainY =  GetTerrainY(gCoord.x, gCoord.z);					// get terrain Y
 	distToFloor = (gCoord.y + bottomOff) - terrainY;		// calc amount I'm above or under
-	
+
 	if (distToFloor <= 0.0f)										// see if on or under floor
 	{
 		gCoord.y = terrainY - bottomOff;
 		gDelta.y = 0;
-		theEnemy->StatusBits |= STATUS_BIT_ONGROUND;	
-		
+		theEnemy->StatusBits |= STATUS_BIT_ONGROUND;
+
 				/* DEAL WITH SLOPES */
 				//
 				// Using the floor normal here, apply some deltas to it.
 				// Only apply slopes when on the ground (or really close to it)
 				//
-						
+
 		gDelta.x += gRecentTerrainNormal.x * (gFramesPerSecondFrac * ENEMY_SLOPE_ACCEL);
-		gDelta.z += gRecentTerrainNormal.z * (gFramesPerSecondFrac * ENEMY_SLOPE_ACCEL);		
+		gDelta.z += gRecentTerrainNormal.z * (gFramesPerSecondFrac * ENEMY_SLOPE_ACCEL);
 	}
 	return(false);
 }
@@ -183,7 +183,7 @@ float	terrainY,distToFloor,bottomOff;
 
 void UpdateEnemy(ObjNode *theNode)
 {
-	theNode->Speed3D = CalcVectorLength(&gDelta);	
+	theNode->Speed3D = CalcVectorLength(&gDelta);
 
 	UpdateObject(theNode);
 }
@@ -202,7 +202,7 @@ void UpdateEnemy(ObjNode *theNode)
 ObjNode *MakeEnemySkeleton(Byte skeletonType, float x, float z, float scale, float rot, void *moveCall)
 {
 ObjNode	*newObj;
-	
+
 			/****************************/
 			/* MAKE NEW SKELETON OBJECT */
 			/****************************/
@@ -219,18 +219,18 @@ ObjNode	*newObj;
 	gNewObjectDefinition.scale 		= scale;
 
 	newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
-	
-	
-	
+
+
+
 				/* SET DEFAULT COLLISION INFO */
-				
+
 	newObj->CType = CTYPE_ENEMY|CTYPE_BLOCKCAMERA|CTYPE_AUTOTARGETWEAPON;
 	newObj->CBits = CBITS_ALLSOLID;
 
-	
+
 	newObj->Coord.y -= newObj->BBox.min.y;						// offset so bottom touches ground
 	UpdateObjectTransforms(newObj);
-	
+
 	return(newObj);
 }
 
@@ -258,7 +258,7 @@ void DetachEnemyFromSpline(ObjNode *theNode, void *moveCall)
 		return;
 
 	DetachObjectFromSpline(theNode, moveCall);
-	
+
 	gNumEnemies++;									// count as a normal enemy now
 	gNumEnemyOfKind[theNode->Kind]++;
 }
@@ -279,14 +279,14 @@ ObjNode *FindClosestEnemy(OGLPoint3D *pt, float *dist)
 ObjNode		*thisNodePtr,*best = nil;
 float	d,minDist = 10000000;
 
-			
+
 	thisNodePtr = gFirstNodePtr;
-	
+
 	do
 	{
 		if (thisNodePtr->Slot >= SLOT_OF_DUMB)					// see if reach end of usable list
 			break;
-	
+
 		if (thisNodePtr->CType & CTYPE_ENEMY)
 		{
 			d = CalcQuickDistance(pt->x,pt->z,thisNodePtr->Coord.x, thisNodePtr->Coord.z);
@@ -295,7 +295,7 @@ float	d,minDist = 10000000;
 				minDist = d;
 				best = thisNodePtr;
 			}
-		}	
+		}
 		thisNodePtr = (ObjNode *)thisNodePtr->NextNode;		// next node
 	}
 	while (thisNodePtr != nil);
@@ -339,7 +339,7 @@ float	fps = gFramesPerSecondFrac;
 	GetObjectInfo(chunk);
 
 	gDelta.y -= 2000.0f * fps;								// gravity
-	
+
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
 	gCoord.z += gDelta.z * fps;

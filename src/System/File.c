@@ -14,7 +14,7 @@ extern	short			gMainAppRezFile,gCurrentSong;
 extern	short			gNumTerrainItems;
 extern	short			gPrefsFolderVRefNum;
 extern	long			gPrefsFolderDirID,gNumPaths;
-extern	long			gTerrainTileWidth,gTerrainTileDepth,gTerrainUnitWidth,gTerrainUnitDepth,gNumUniqueSuperTiles;		
+extern	long			gTerrainTileWidth,gTerrainTileDepth,gTerrainUnitWidth,gTerrainUnitDepth,gNumUniqueSuperTiles;
 extern	long			gNumSuperTilesDeep,gNumSuperTilesWide;
 extern	FSSpec			gDataSpec;
 extern	u_long			gScore,gLoadedScore;
@@ -30,7 +30,7 @@ extern	SplineDefType	**gSplineList;
 extern	int				gLevelNum;
 extern	TileAttribType	**gTileAttribList;
 extern	u_short			**gTileGrid;
-extern	MOMaterialObject	*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];	
+extern	MOMaterialObject	*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];
 extern	PrefsType			gGamePrefs;
 extern	AGLContext		gAGLContext;
 extern	AGLDrawable		gAGLWin;
@@ -73,7 +73,7 @@ static UInt32	GetFileVersion(FSSpec *spec);
 #define	SAVE_GAME_VERSION	0x0100		// 1.0
 
 		/* SAVE GAME */
-		
+
 typedef struct
 {
 	u_long		version;
@@ -86,13 +86,13 @@ typedef struct
 
 
 		/* PLAYFIELD HEADER */
-		
+
 typedef struct
 {
 	NumVersion	version;							// version of file
 	long		numItems;							// # items in map
 	long		mapWidth;							// width of map
-	long		mapHeight;							// height of map	
+	long		mapHeight;							// height of map
 	long		numTilePages;						// # tile pages
 	long		numTilesInList;						// # extracted tiles in list
 	float		tileSize;							// 3D unit size of a tile
@@ -111,7 +111,7 @@ typedef struct
 		//		since the game uses a slightly different
 		//		data structure.
 		//
-		
+
 typedef	struct
 {
 	long		x,z;
@@ -122,8 +122,8 @@ typedef struct
 {
 	u_short			type;				// type of fence
 	short			numNubs;			// # nubs in fence
-	FencePointType	**nubList;			// handle to nub list	
-	Rect			bBox;				// bounding box of fence area	
+	FencePointType	**nubList;			// handle to nub list
+	Rect			bBox;				// bounding box of fence area
 }FileFenceDefType;
 
 /**********************/
@@ -150,12 +150,12 @@ void SetDefaultDirectory(void)
 ProcessSerialNumber serial;
 ProcessInfoRec info;
 WDPBRec wpb;
-OSErr	iErr;		
-		
+OSErr	iErr;
+
 	serial.highLongOfPSN = 0;
 	serial.lowLongOfPSN = kCurrentProcess;
-	
-	
+
+
 	info.processInfoLength = sizeof(ProcessInfoRec);
 	info.processName = NULL;
 	info.processAppSpec = &gApplicationFSSpec;
@@ -165,16 +165,16 @@ OSErr	iErr;
 	wpb.ioVRefNum = gApplicationFSSpec.vRefNum;
 	wpb.ioWDDirID = gApplicationFSSpec.parID;
 	wpb.ioNamePtr = NULL;
-	
+
 	iErr = PBHSetVolSync(&wpb);
-}			
+}
 
 
 
 /******************* LOAD SKELETON *******************/
 //
 // Loads a skeleton file & creates storage for it.
-// 
+//
 // NOTE: Skeleton types 0..NUM_CHARACTERS-1 are reserved for player character skeletons.
 //		Skeleton types NUM_CHARACTERS and over are for other skeleton entities.
 //
@@ -186,7 +186,7 @@ SkeletonDefType *LoadSkeletonFile(short skeletonType, OGLSetupOutputType *setupI
 QDErr		iErr;
 short		fRefNum;
 FSSpec		fsSpec;
-SkeletonDefType	*skeleton;					
+SkeletonDefType	*skeleton;
 const Str63	fileNames[MAX_SKELETON_TYPES] =
 {
 	"\p:Skeletons:Otto.skeleton",
@@ -222,8 +222,8 @@ const Str63	fileNames[MAX_SKELETON_TYPES] =
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, fileNames[skeletonType], &fsSpec);
 	else
 		DoFatalAlert("\pLoadSkeleton: Unknown skeletonType!");
-	
-	
+
+
 			/* OPEN THE FILE'S REZ FORK */
 
 	fRefNum = FSpOpenResFile(&fsSpec,fsRdPerm);
@@ -233,36 +233,36 @@ const Str63	fileNames[MAX_SKELETON_TYPES] =
 		DoAlert("\pError opening Skel Rez file");
 		ShowSystemErr(iErr);
 	}
-	
+
 	UseResFile(fRefNum);
 	if (ResError())
 		DoFatalAlert("\pError using Rez file!");
 
-			
+
 			/* ALLOC MEMORY FOR SKELETON INFO STRUCTURE */
-			
+
 	skeleton = (SkeletonDefType *)AllocPtr(sizeof(SkeletonDefType));
 	if (skeleton == nil)
 		DoFatalAlert("\pCannot alloc SkeletonInfoType");
 
 
 			/* READ SKELETON RESOURCES */
-			
+
 	ReadDataFromSkeletonFile(skeleton,&fsSpec,skeletonType,setupInfo);
 	PrimeBoneData(skeleton);
-	
+
 			/* CLOSE REZ FILE */
-			
+
 	CloseResFile(fRefNum);
 	UseResFile(gMainAppRezFile);
-		
+
 	return(skeleton);
 }
 
 
 /************* READ DATA FROM SKELETON FILE *******************/
 //
-// Current rez file is set to the file. 
+// Current rez file is set to the file.
 //
 
 static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType, OGLSetupOutputType *setupInfo)
@@ -293,7 +293,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 	version = SwizzleShort(&headerPtr->version);
 	if (version != SKELETON_FILE_VERS_NUM)
 		DoFatalAlert("\pSkeleton file has wrong version #");
-	
+
 	numAnims = skeleton->NumAnims = SwizzleShort(&headerPtr->numAnims);			// get # anims in skeleton
 	numJoints = skeleton->NumBones = SwizzleShort(&headerPtr->numJoints);		// get # joints in skeleton
 	ReleaseResource(hand);
@@ -313,7 +313,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		/********************************/
 		/* 	LOAD THE REFERENCE GEOMETRY */
 		/********************************/
-		
+
 	alias = (AliasHandle)GetResource(rAliasType,1001);				// alias to geometry BG3D file
 	if (alias != nil)
 	{
@@ -326,7 +326,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 	}
 	else
 		DoFatalAlert("\pReadDataFromSkeletonFile: file is missing the Alias resource");
-	
+
 
 
 		/***********************************/
@@ -339,7 +339,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		u_short					*indexPtr;
 
 			/* READ BONE DATA */
-			
+
 		hand = GetResource('Bone',1000+i);
 		if (hand == nil)
 			DoFatalAlert("\pError reading Bone resource!");
@@ -347,17 +347,17 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		bonePtr = (File_BoneDefinitionType *)*hand;
 
 			/* COPY BONE DATA INTO ARRAY */
-		
+
 		skeleton->Bones[i].parentBone = SwizzleLong(&bonePtr->parentBone);					// index to previous bone
 		skeleton->Bones[i].coord.x = SwizzleFloat(&bonePtr->coord.x);						// absolute coord (not relative to parent!)
 		skeleton->Bones[i].coord.y = SwizzleFloat(&bonePtr->coord.y);
 		skeleton->Bones[i].coord.z = SwizzleFloat(&bonePtr->coord.z);
 		skeleton->Bones[i].numPointsAttachedToBone = SwizzleUShort(&bonePtr->numPointsAttachedToBone);		// # vertices/points that this bone has
-		skeleton->Bones[i].numNormalsAttachedToBone = SwizzleUShort(&bonePtr->numNormalsAttachedToBone);	// # vertex normals this bone has		
+		skeleton->Bones[i].numNormalsAttachedToBone = SwizzleUShort(&bonePtr->numNormalsAttachedToBone);	// # vertex normals this bone has
 		ReleaseResource(hand);
 
 			/* ALLOC THE POINT & NORMALS SUB-ARRAYS */
-				
+
 		skeleton->Bones[i].pointList = (u_short *)AllocPtr(sizeof(u_short) * (int)skeleton->Bones[i].numPointsAttachedToBone);
 		if (skeleton->Bones[i].pointList == nil)
 			DoFatalAlert("\pReadDataFromSkeletonFile: AllocPtr/pointList failed!");
@@ -367,13 +367,13 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 			DoFatalAlert("\pReadDataFromSkeletonFile: AllocPtr/normalList failed!");
 
 			/* READ POINT INDEX ARRAY */
-			
+
 		hand = GetResource('BonP',1000+i);
 		if (hand == nil)
 			DoFatalAlert("\pError reading BonP resource!");
 		HLock(hand);
 		indexPtr = (u_short *)(*hand);
-			
+
 			/* COPY POINT INDEX ARRAY INTO BONE STRUCT */
 
 		for (j=0; j < skeleton->Bones[i].numPointsAttachedToBone; j++)
@@ -382,22 +382,22 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 
 
 			/* READ NORMAL INDEX ARRAY */
-			
+
 		hand = GetResource('BonN',1000+i);
 		if (hand == nil)
 			DoFatalAlert("\pError reading BonN resource!");
 		HLock(hand);
 		indexPtr = (u_short *)(*hand);
-			
+
 			/* COPY NORMAL INDEX ARRAY INTO BONE STRUCT */
 
 		for (j=0; j < skeleton->Bones[i].numNormalsAttachedToBone; j++)
 			skeleton->Bones[i].normalList[j] = SwizzleUShort(&indexPtr[j]);
 		ReleaseResource(hand);
-						
+
 	}
-	
-	
+
+
 		/*******************************/
 		/* READ POINT RELATIVE OFFSETS */
 		/*******************************/
@@ -405,13 +405,13 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		// The "relative point offsets" are the only things
 		// which do not get rebuilt in the ModelDecompose function.
 		// We need to restore these manually.
-	
+
 	hand = GetResource('RelP', 1000);
 	if (hand == nil)
 		DoFatalAlert("\pError reading RelP resource!");
 	HLock(hand);
 	pointPtr = (OGLPoint3D *)*hand;
-	
+
 	i = GetHandleSize(hand) / sizeof(OGLPoint3D);
 	if (i != skeleton->numDecomposedPoints)
 		DoFatalAlert("\p# of points in Reference Model has changed!");
@@ -424,12 +424,12 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		}
 
 	ReleaseResource(hand);
-	
-	
+
+
 			/*********************/
 			/* READ ANIM INFO   */
 			/*********************/
-			
+
 	for (i=0; i < numAnims; i++)
 	{
 				/* READ ANIM HEADER */
@@ -440,11 +440,11 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		HLock(hand);
 		animHeaderPtr = (SkeletonFile_AnimHeader_Type *)*hand;
 
-		skeleton->NumAnimEvents[i] = SwizzleShort(&animHeaderPtr->numAnimEvents);			// copy # anim events in anim	
+		skeleton->NumAnimEvents[i] = SwizzleShort(&animHeaderPtr->numAnimEvents);			// copy # anim events in anim
 		ReleaseResource(hand);
 
 			/* READ ANIM-EVENT DATA */
-			
+
 		hand = GetResource('Evnt',1000+i);
 		if (hand == nil)
 			DoFatalAlert("\pError reading anim-event data resource!");
@@ -454,11 +454,11 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 			skeleton->AnimEventsList[i][j] = *animEventPtr++;							// copy whole thing
 			skeleton->AnimEventsList[i][j].time = SwizzleShort(&skeleton->AnimEventsList[i][j].time);	// then swizzle the 16-bit short value
 		}
-		ReleaseResource(hand);		
+		ReleaseResource(hand);
 
 
 			/* READ # KEYFRAMES PER JOINT IN EACH ANIM */
-					
+
 		hand = GetResource('NumK',1000+i);									// read array of #'s for this anim
 		if (hand == nil)
 			DoFatalAlert("\pError reading # keyframes/joint resource!");
@@ -471,22 +471,22 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 	for (j=0; j < numJoints; j++)
 	{
 				/* ALLOC 2D ARRAY FOR KEYFRAMES */
-				
+
 		Alloc_2d_array(JointKeyframeType,skeleton->JointKeyframes[j].keyFrames,	numAnims,MAX_KEYFRAMES);
-		
+
 		if ((skeleton->JointKeyframes[j].keyFrames == nil) || (skeleton->JointKeyframes[j].keyFrames[0] == nil))
 			DoFatalAlert("\pReadDataFromSkeletonFile: Error allocating Keyframe Array.");
 
 					/* READ THIS JOINT'S KF'S FOR EACH ANIM */
-					
-		for (i=0; i < numAnims; i++)								
+
+		for (i=0; i < numAnims; i++)
 		{
 			numKeyframes = skeleton->JointKeyframes[j].numKeyFrames[i];					// get actual # of keyframes for this joint
 			if (numKeyframes > MAX_KEYFRAMES)
 				DoFatalAlert("\pError: numKeyframes > MAX_KEYFRAMES");
-		
+
 					/* READ A JOINT KEYFRAME */
-					
+
 			hand = GetResource('KeyF',1000+(i*100)+j);
 			if (hand == nil)
 				DoFatalAlert("\pError reading joint keyframes resource!");
@@ -504,13 +504,13 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 				skeleton->JointKeyframes[j].keyFrames[i][k].scale.x				= SwizzleFloat(&keyFramePtr->scale.x);
 				skeleton->JointKeyframes[j].keyFrames[i][k].scale.y				= SwizzleFloat(&keyFramePtr->scale.y);
 				skeleton->JointKeyframes[j].keyFrames[i][k].scale.z				= SwizzleFloat(&keyFramePtr->scale.z);
-				
+
 				keyFramePtr++;
 			}
-			ReleaseResource(hand);		
+			ReleaseResource(hand);
 		}
 	}
-	
+
 }
 
 #pragma mark -
@@ -528,17 +528,17 @@ OSErr		iErr;
 short		refNum;
 FSSpec		file;
 long		count;
-				
+
 				/*************/
 				/* READ FILE */
 				/*************/
-					
+
 #if DEMO
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "\p:OttoMatic:DemoPreferences5", &file);
-#else					
+#else
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "\p:OttoMatic:Preferences5", &file);
-#endif	
-	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);	
+#endif
+	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);
 	if (iErr)
 		return(iErr);
 
@@ -546,29 +546,29 @@ long		count;
 	iErr = FSRead(refNum, &count,  (Ptr)prefBlock);		// read data from file
 	if (iErr)
 	{
-		FSClose(refNum);			
+		FSClose(refNum);
 		return(iErr);
 	}
-	
-	FSClose(refNum);			
-	
+
+	FSClose(refNum);
+
 			/****************/
 			/* VERIFY PREFS */
 			/****************/
 
 	if ((gGamePrefs.depth != 16) && (gGamePrefs.depth != 32))
 		goto err;
-	
+
 		/* THEY'RE GOOD, SO ALSO RESTORE THE HID CONTROL SETTINGS */
-			
+
 	RestoreHIDControlSettings(&gGamePrefs.controlSettings);
-	
-	
+
+
 	return(noErr);
-	
+
 err:
 	InitDefaultPrefs();
-	return(noErr);	
+	return(noErr);
 }
 
 
@@ -581,40 +581,40 @@ FSSpec				file;
 OSErr				iErr;
 short				refNum;
 long				count;
-						
+
 		/* GET THE CURRENT CONTROL SETTINGS */
-		
+
 	if (!gHIDInitialized)								// can't save prefs unless HID is initialized!
 		return;
-		
+
 	BuildHIDControlSettings(&gGamePrefs.controlSettings);
 
-						
+
 				/* CREATE BLANK FILE */
-				
+
 #if DEMO
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "\p:OttoMatic:DemoPreferences5", &file);
-#else	
+#else
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "\p:OttoMatic:Preferences5", &file);
-#endif	
+#endif
 	FSpDelete(&file);															// delete any existing file
 	iErr = FSpCreate(&file, 'Otto', 'Pref', smSystemScript);					// create blank file
 	if (iErr)
 		return;
 
 				/* OPEN FILE */
-					
+
 	iErr = FSpOpenDF(&file, fsRdWrPerm, &refNum);
 	if (iErr)
 	{
 		FSpDelete(&file);
 		return;
 	}
-		
+
 				/* WRITE DATA */
 
 	count = sizeof(PrefsType);
-	FSWrite(refNum, &count, &gGamePrefs);	
+	FSWrite(refNum, &count, &gGamePrefs);
 	FSClose(refNum);
 }
 
@@ -641,10 +641,10 @@ GraphicsImportComponent		gi;
 Rect						r;
 ComponentResult				result;
 PixMapHandle 				hPixMap;
-FInfo						fndrInfo;	
+FInfo						fndrInfo;
 
 			/* VERIFY FILE - DEBUG */
-			
+
 	iErr = FSpGetFInfo(myFSSpec, &fndrInfo);
 	if (iErr)
 	{
@@ -653,15 +653,15 @@ FInfo						fndrInfo;
 			case	fnfErr:
 					DoFatalAlert("\pDrawPictureIntoGWorld:  file is missing");
 					break;
-					
+
 			default:
 					DoFatalAlert("\pDrawPictureIntoGWorld:  file is invalid");
-		}	
+		}
 	}
-	
+
 
 			/* PREP IMPORTER COMPONENT */
-			
+
 	result = GetGraphicsImporterForFile(myFSSpec, &gi);		// load importer for this image file
 	if (result != noErr)
 	{
@@ -673,13 +673,13 @@ FInfo						fndrInfo;
 
 
 			/* KEEP MUSIC PLAYING */
-					
+
 	if (gSongPlayingFlag && (!gMuteMusicFlag))
 		MoviesTask(gSongMovie, 0);
 
 
 			/* MAKE GWORLD */
-	
+
 	iErr = NewGWorld(theGWorld, depth, &r, nil, nil, 0);					// try app mem
 	if (iErr)
 	{
@@ -700,8 +700,8 @@ FInfo						fndrInfo;
 
 
 			/* DRAW INTO THE GWORLD */
-	
-	DoLockPixels(*theGWorld);	
+
+	DoLockPixels(*theGWorld);
 	GraphicsImportSetGWorld(gi, *theGWorld, nil);			// set the gworld to draw image into
 	GraphicsImportSetQuality(gi,codecLosslessQuality);		// set import quality
 
@@ -787,17 +787,17 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 
 
 				/* LOAD AUDIO */
-				
-		
+
+
 	if (levelSoundFiles[gLevelNum][0] > 0)
 	{
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, levelSoundFiles[gLevelNum], &spec);
 		LoadSoundBank(&spec, SOUND_BANK_LEVELSPECIFIC);
 	}
-				
+
 
 			/* LOAD BG3D GEOMETRY */
-			
+
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:global.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_GLOBAL, setupInfo);
 
@@ -813,48 +813,48 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 
 
 			/* LOAD SKELETONS */
-			
+
 	LoadASkeleton(SKELETON_TYPE_OTTO, setupInfo);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_OTTO,
-								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
 	LoadASkeleton(SKELETON_TYPE_BRAINALIEN, setupInfo);
-	
+
 	if (gG4)
 	{
 		BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_BRAINALIEN,
-									 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+									 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 	}
 
 
 	LoadASkeleton(SKELETON_TYPE_FARMER, setupInfo);
 	LoadASkeleton(SKELETON_TYPE_BEEWOMAN, setupInfo);
-	
+
 #if !DEMO
 	LoadASkeleton(SKELETON_TYPE_SCIENTIST, setupInfo);
-	LoadASkeleton(SKELETON_TYPE_SKIRTLADY, setupInfo);	
+	LoadASkeleton(SKELETON_TYPE_SKIRTLADY, setupInfo);
 #endif
 
 			/* LOAD LEVEL-SPECIFIC SKELETONS & APPLY REFLECTION MAPS */
-			
+
 	switch(gLevelNum)
 	{
 		case	LEVEL_NUM_FARM:
 				LoadASkeleton(SKELETON_TYPE_ONION, setupInfo);
 				if (gG4)
 					BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_ONION,
-												 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);			
+												 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
 
 				LoadASkeleton(SKELETON_TYPE_CORN, setupInfo);
 				if (gG4)
 					BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_CORN,
-												 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);			
+												 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
 
 
 				LoadASkeleton(SKELETON_TYPE_TOMATO, setupInfo);
 				if (gG4)
 					BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_TOMATO,
-												 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);			
+												 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
 
 
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, FARM_ObjType_MetalGate,
@@ -865,15 +865,15 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 		case	LEVEL_NUM_BLOB:
 				LoadASkeleton(SKELETON_TYPE_BLOB, setupInfo);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_BLOB,
-											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
 				LoadASkeleton(SKELETON_TYPE_SQUOOSHY, setupInfo);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SQUOOSHY,
-											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
 				LoadASkeleton(SKELETON_TYPE_SLIMETREE, setupInfo);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SLIMETREE,
-											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 				BG3D_SetContainerMaterialFlags(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SLIMETREE, 0, 1,			// no wrapping on the leaves
 									 BG3D_MATERIALFLAG_CLAMP_U|BG3D_MATERIALFLAG_CLAMP_V);
 
@@ -906,7 +906,7 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, SLIME_ObjType_SlimeTube_Valve,
 											 	-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 				break;
-	
+
 		case	LEVEL_NUM_BLOBBOSS:
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, BLOBBOSS_ObjType_Tube_Bent,
 											 	-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
@@ -924,15 +924,15 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, BLOBBOSS_ObjType_BlobDroplet,
 											 	-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 				break;
-	
+
 		case	LEVEL_NUM_APOCALYPSE:
-				LoadASkeleton(SKELETON_TYPE_PODWORM, setupInfo);	
+				LoadASkeleton(SKELETON_TYPE_PODWORM, setupInfo);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_PODWORM,
-											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
-				LoadASkeleton(SKELETON_TYPE_MUTANT, setupInfo);	
-				LoadASkeleton(SKELETON_TYPE_MUTANTROBOT, setupInfo);	
+											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
+				LoadASkeleton(SKELETON_TYPE_MUTANT, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_MUTANTROBOT, setupInfo);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_MUTANTROBOT,
-											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);			
+											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
 
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, APOCALYPSE_ObjType_CrashedRocket,
 											 	-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
@@ -942,11 +942,11 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 
 
 		case	LEVEL_NUM_CLOUD:
-				LoadASkeleton(SKELETON_TYPE_CLOWN, setupInfo);	
-				LoadASkeleton(SKELETON_TYPE_CLOWNFISH, setupInfo);	
-				LoadASkeleton(SKELETON_TYPE_STRONGMAN, setupInfo);	
+				LoadASkeleton(SKELETON_TYPE_CLOWN, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_CLOWNFISH, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_STRONGMAN, setupInfo);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_CLOWNFISH,
-											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
 				if (gG4)
 				{
@@ -970,11 +970,11 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 				LoadASkeleton(SKELETON_TYPE_MANTIS, setupInfo);
 				if (gG4)
 					BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_MANTIS,
-											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 				LoadASkeleton(SKELETON_TYPE_TURTLE, setupInfo);
 				if (gG4)
 					BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_TURTLE,
-											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 				break;
 
 		case	LEVEL_NUM_JUNGLEBOSS:
@@ -982,10 +982,10 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 				LoadASkeleton(SKELETON_TYPE_FLYTRAP, setupInfo);
 				LoadASkeleton(SKELETON_TYPE_PITCHERPLANT, setupInfo);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_PITCHERPLANT,
-											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_GreenSheen);			
+											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_GreenSheen);
 
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_TURTLE,
-											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
 				if (gG4)
 				{
@@ -1005,16 +1005,16 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 					BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, JUNGLE_ObjType_LeafPlatform3,
 												 	-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_GreenSheen);
 				}
-				break;	
+				break;
 
 		case	LEVEL_NUM_FIREICE:
 				LoadASkeleton(SKELETON_TYPE_FLAMESTER, setupInfo);
 				LoadASkeleton(SKELETON_TYPE_ICECUBE, setupInfo);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_ICECUBE,
-											 0, 0, MULTI_TEXTURE_COMBINE_MODULATE, SPHEREMAP_SObjType_Tundra);			
+											 0, 0, MULTI_TEXTURE_COMBINE_MODULATE, SPHEREMAP_SObjType_Tundra);
 				LoadASkeleton(SKELETON_TYPE_SQUOOSHY, setupInfo);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SQUOOSHY,
-											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, FIREICE_ObjType_SwingerBot_Body,
 											 	-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
@@ -1040,10 +1040,10 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, FIREICE_ObjType_Peoplecicle,
 											 	-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Sea);
 
-				break;				
-				
-			
-			
+				break;
+
+
+
 		case	LEVEL_NUM_SAUCER:
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, SAUCER_ObjType_Saucer,
 											 	-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Sea);
@@ -1065,11 +1065,11 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, SAUCER_ObjType_Beemer,
 											 	-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 				break;
-				
+
 		case	LEVEL_NUM_BRAINBOSS:
 				LoadASkeleton(SKELETON_TYPE_ELITEBRAINALIEN, setupInfo);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_ELITEBRAINALIEN,
-											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, BRAINBOSS_ObjType_LeftBrain,
 											 	-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
@@ -1077,7 +1077,7 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELSPECIFIC, BRAINBOSS_ObjType_BrainPort,
 											 	-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 				break;
-				
+
 	}
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_GLOBAL, GLOBAL_ObjType_TeleportBase,
@@ -1094,7 +1094,7 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, levelSpriteFiles[gLevelNum], &spec);
 		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC, setupInfo);
 	}
-			
+
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:infobar.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_INFOBAR, setupInfo);
 
@@ -1115,10 +1115,10 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 			//
 			// must do this after creating the view!
 			//
-			
+
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, terrainFiles[gLevelNum], &spec);
 	LoadPlayfield(&spec, setupInfo);
-	
+
 }
 
 
@@ -1131,11 +1131,11 @@ void GetDemoTimer(void)
 	short				refNum;
 	FSSpec				file;
 	long				count;
-	
+
 				/* READ TIMER FROM FILE */
-					
+
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "\pSysCheck22", &file);
-	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);	
+	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);
 	if (iErr)
 		gDemoVersionTimer = 0;
 	else
@@ -1144,23 +1144,23 @@ void GetDemoTimer(void)
 		iErr = FSRead(refNum, &count,  &gDemoVersionTimer);			// read data from file
 		if (iErr)
 		{
-			FSClose(refNum);			
+			FSClose(refNum);
 			FSpDelete(&file);										// file is corrupt, so delete
 			gDemoVersionTimer = 0;
 			return;
 		}
-		FSClose(refNum);			
-	}	
-	
+		FSClose(refNum);
+	}
+
 		/* SEE IF TIMER HAS EXPIRED */
 
 	if (gDemoVersionTimer > (60*(60 * 3)))								// let play for n minutes
 	{
-		DoDemoExpiredScreen();	
+		DoDemoExpiredScreen();
 	}
 #else
-gDemoVersionTimer = 0;	
-#endif	
+gDemoVersionTimer = 0;
+#endif
 }
 
 
@@ -1175,7 +1175,7 @@ short				refNum;
 long				count;
 
 				/* CREATE BLANK FILE */
-				
+
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "\pSysCheck22", &file);
 	FSpDelete(&file);															// delete any existing file
 	iErr = FSpCreate(&file, '????', 'xxxx', smSystemScript);					// create blank file
@@ -1184,17 +1184,17 @@ long				count;
 
 
 				/* OPEN FILE */
-					
+
 	iErr = FSpOpenDF(&file, fsRdWrPerm, &refNum);
 	if (iErr)
 		return;
 
 				/* WRITE DATA */
-				
+
 	count = sizeof(float);
-	FSWrite(refNum, &count, &gDemoVersionTimer);	
-	FSClose(refNum);			
-#endif	
+	FSWrite(refNum, &count, &gDemoVersionTimer);
+	FSClose(refNum);
+#endif
 }
 
 
@@ -1204,23 +1204,23 @@ long				count;
 
 void LoadPlayfield(FSSpec *specPtr, OGLSetupOutputType *setupInfo)
 {
-	
-	
+
+
 			/* READ PLAYFIELD RESOURCES */
-						
+
 	ReadDataFromPlayfieldFile(specPtr, setupInfo);
-		
-	
-			
-	
+
+
+
+
 				/***********************/
 				/* DO ADDITIONAL SETUP */
 				/***********************/
-	
+
 	CreateSuperTileMemoryList();				// allocate memory for the supertile geometry
 	CalculateSplitModeMatrix();					// precalc the tile split mode matrix
 	InitSuperTileGrid();						// init the supertile state grid
-		
+
 	BuildTerrainItemList();						// build list of items & find player start coords
 }
 
@@ -1234,18 +1234,18 @@ PlayfieldHeaderType		**header;
 long					row,col,j,i,size;
 float					yScale;
 float					*src;
-short					fRefNum;	
-OSErr					iErr;	
-Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;		
-			
+short					fRefNum;
+OSErr					iErr;
+Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
+
 				/* OPEN THE REZ-FORK */
-			
+
 	fRefNum = FSpOpenResFile(specPtr,fsCurPerm);
 	if (fRefNum == -1)
-		DoFatalAlert("\pLoadPlayfield: FSpOpenResFile failed");				
+		DoFatalAlert("\pLoadPlayfield: FSpOpenResFile failed");
 	UseResFile(fRefNum);
 
-	
+
 			/************************/
 			/* READ HEADER RESOURCE */
 			/************************/
@@ -1256,11 +1256,11 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		DoAlert("\pReadDataFromPlayfieldFile: Error reading header resource!");
 		return;
 	}
-	
-	header = (PlayfieldHeaderType **)hand;	
+
+	header = (PlayfieldHeaderType **)hand;
 	gNumTerrainItems		= SwizzleLong(&(**header).numItems);
 	gTerrainTileWidth		= SwizzleLong(&(**header).mapWidth);
-	gTerrainTileDepth		= SwizzleLong(&(**header).mapHeight);	
+	gTerrainTileDepth		= SwizzleLong(&(**header).mapHeight);
 	g3DTileSize				= SwizzleFloat(&(**header).tileSize);
 	g3DMinY					= SwizzleFloat(&(**header).minY);
 	g3DMaxY					= SwizzleFloat(&(**header).maxY);
@@ -1272,18 +1272,18 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 	if ((gTerrainTileWidth % SUPERTILE_SIZE) != 0)		// terrain must be non-fractional number of supertiles in w/h
 		DoFatalAlert("\pReadDataFromPlayfieldFile: terrain width not a supertile multiple");
-	if ((gTerrainTileDepth % SUPERTILE_SIZE) != 0)		
+	if ((gTerrainTileDepth % SUPERTILE_SIZE) != 0)
 		DoFatalAlert("\pReadDataFromPlayfieldFile: terrain depth not a supertile multiple");
 
-				
+
 				/* CALC SOME GLOBALS HERE */
-				
+
 	gTerrainTileWidth = (gTerrainTileWidth/SUPERTILE_SIZE)*SUPERTILE_SIZE;		// round size down to nearest supertile multiple
-	gTerrainTileDepth = (gTerrainTileDepth/SUPERTILE_SIZE)*SUPERTILE_SIZE;		
+	gTerrainTileDepth = (gTerrainTileDepth/SUPERTILE_SIZE)*SUPERTILE_SIZE;
 	gTerrainUnitWidth = gTerrainTileWidth*TERRAIN_POLYGON_SIZE;					// calc world unit dimensions of terrain
 	gTerrainUnitDepth = gTerrainTileDepth*TERRAIN_POLYGON_SIZE;
 	gNumSuperTilesDeep = gTerrainTileDepth/SUPERTILE_SIZE;						// calc size in supertiles
-	gNumSuperTilesWide = gTerrainTileWidth/SUPERTILE_SIZE;	
+	gNumSuperTilesWide = gTerrainTileWidth/SUPERTILE_SIZE;
 
 
 			/**************************/
@@ -1307,20 +1307,20 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			/*******************************/
 			/* SUPERTILE RELATED RESOURCES */
 			/*******************************/
-	
+
 			/* READ SUPERTILE GRID MATRIX */
-			
+
 	if (gSuperTileTextureGrid)														// free old array
 		Free_2d_array(gSuperTileTextureGrid);
 	Alloc_2d_array(SuperTileGridType, gSuperTileTextureGrid, gNumSuperTilesDeep, gNumSuperTilesWide);
-	
+
 	hand = GetResource('STgd',1000);												// load grid from rez
 	if (hand == nil)
 		DoFatalAlert("\pReadDataFromPlayfieldFile: Error reading supertile rez resource!");
 	else																			// copy rez into 2D array
 	{
-		SuperTileGridType *src = (SuperTileGridType *)*hand;					
-		
+		SuperTileGridType *src = (SuperTileGridType *)*hand;
+
 		for (row = 0; row < gNumSuperTilesDeep; row++)
 			for (col = 0; col < gNumSuperTilesWide; col++)
 			{
@@ -1329,23 +1329,23 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 				src++;
 			}
 		ReleaseResource(hand);
-	}		
-	
+	}
+
 
 			/*******************************/
 			/* MAP LAYER RELATED RESOURCES */
 			/*******************************/
-	
-	
+
+
 			/* READ MAP DATA LAYER */
 			//
 			// The only thing we need this for is a quick way to
 			// look up tile attributes
 			//
-				
+
 	{
 		u_short	*src;
-		
+
 		hand = GetResource('Layr',1000);
 		if (hand == nil)
 			DoAlert("\pReadDataFromPlayfieldFile: Error reading map layer rez");
@@ -1354,8 +1354,8 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			if (gTileGrid)														// free old array
 				Free_2d_array(gTileGrid);
 			Alloc_2d_array(u_short, gTileGrid, gTerrainTileDepth, gTerrainTileWidth);
-				
-			src = (u_short *)*hand;					
+
+			src = (u_short *)*hand;
 			for (row = 0; row < gTerrainTileDepth; row++)
 			{
 				for (col = 0; col < gTerrainTileWidth; col++)
@@ -1365,33 +1365,33 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 				}
 			}
 			ReleaseResource(hand);
-		}		
-	}	
-	
-	
+		}
+	}
+
+
 			/* READ HEIGHT DATA MATRIX */
-	
+
 	yScale = TERRAIN_POLYGON_SIZE / g3DTileSize;											// need to scale original geometry units to game units
-	
+
 	Alloc_2d_array(float, gMapYCoords, gTerrainTileDepth+1, gTerrainTileWidth+1);			// alloc 2D array for map
 	Alloc_2d_array(float, gMapYCoordsOriginal, gTerrainTileDepth+1, gTerrainTileWidth+1);	// and the copy of it
-	
+
 	hand = GetResource('YCrd',1000);
 	if (hand == nil)
 		DoAlert("\pReadDataFromPlayfieldFile: Error reading height data resource!");
 	else
 	{
-		src = (float *)*hand;					
+		src = (float *)*hand;
 		for (row = 0; row <= gTerrainTileDepth; row++)
 			for (col = 0; col <= gTerrainTileWidth; col++)
 				gMapYCoordsOriginal[row][col] = gMapYCoords[row][col] = SwizzleFloat(src++) * yScale;
 		ReleaseResource(hand);
 	}
-	
+
 				/**************************/
 				/* ITEM RELATED RESOURCES */
 				/**************************/
-	
+
 				/* READ ITEM LIST */
 
 	hand = GetResource('Itms',1000);
@@ -1400,41 +1400,41 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	else
 	{
 		TerrainItemEntryType   *rezItems;
-	
-		DetachResource(hand);							// lets keep this data around		
+
+		DetachResource(hand);							// lets keep this data around
 		HLockHi(hand);									// LOCK this one because we have the lookup table into this
 		gMasterItemList = (TerrainItemEntryType **)hand;
 		rezItems = (TerrainItemEntryType *)*hand;
-	
+
 					/* CONVERT COORDINATES */
-					
+
 		for (i = 0; i < gNumTerrainItems; i++)
 		{
 			(*gMasterItemList)[i].x = SwizzleULong(&rezItems[i].x) * MAP2UNIT_VALUE;								// convert coordinates
-			(*gMasterItemList)[i].y = SwizzleULong(&rezItems[i].y) * MAP2UNIT_VALUE;	
+			(*gMasterItemList)[i].y = SwizzleULong(&rezItems[i].y) * MAP2UNIT_VALUE;
 
-			(*gMasterItemList)[i].type = SwizzleUShort(&rezItems[i].type);	
-			(*gMasterItemList)[i].parm[0] = rezItems[i].parm[0];	
-			(*gMasterItemList)[i].parm[1] = rezItems[i].parm[1];	
-			(*gMasterItemList)[i].parm[2] = rezItems[i].parm[2];	
-			(*gMasterItemList)[i].parm[3] = rezItems[i].parm[3];	
-			(*gMasterItemList)[i].flags = SwizzleUShort(&rezItems[i].flags);	
-		
+			(*gMasterItemList)[i].type = SwizzleUShort(&rezItems[i].type);
+			(*gMasterItemList)[i].parm[0] = rezItems[i].parm[0];
+			(*gMasterItemList)[i].parm[1] = rezItems[i].parm[1];
+			(*gMasterItemList)[i].parm[2] = rezItems[i].parm[2];
+			(*gMasterItemList)[i].parm[3] = rezItems[i].parm[3];
+			(*gMasterItemList)[i].flags = SwizzleUShort(&rezItems[i].flags);
+
 		}
 	}
 
 
-	
+
 
 			/****************************/
 			/* SPLINE RELATED RESOURCES */
 			/****************************/
-	
+
 			/* READ SPLINE LIST */
-			
+
 	hand = GetResource('Spln',1000);
 	if (hand)
-	{	
+	{
 		SplineDefType	*splinePtr = (SplineDefType *)*hand;
 
 		DetachResource(hand);
@@ -1456,79 +1456,79 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 	}
 	else
-		gNumSplines = 0;	
+		gNumSplines = 0;
 
 			/* READ SPLINE POINT LIST */
-			
+
 	for (i = 0; i < gNumSplines; i++)
 	{
 		SplineDefType	*spline = &(*gSplineList)[i];									// point to Nth spline
-	
+
 		hand = GetResource('SpPt',1000+i);
 		if (hand)
-		{	
+		{
 			SplinePointType	*ptList = (SplinePointType *)*hand;
-		
+
 			DetachResource(hand);
 			HLockHi(hand);
 			(*gSplineList)[i].pointList = (SplinePointType **)hand;
-			
+
 			for (j = 0; j < spline->numPoints; j++)			// swizzle
 			{
 				(*spline->pointList)[j].x = SwizzleFloat(&ptList[j].x);
 				(*spline->pointList)[j].z = SwizzleFloat(&ptList[j].z);
 			}
-			
+
 		}
 		else
 			DoFatalAlert("\pReadDataFromPlayfieldFile: cant get spline points rez");
-	}	
+	}
 
 
 			/* READ SPLINE ITEM LIST */
-			
+
 	for (i = 0; i < gNumSplines; i++)
 	{
 		SplineDefType	*spline = &(*gSplineList)[i];									// point to Nth spline
-	
+
 		hand = GetResource('SpIt',1000+i);
 		if (hand)
-		{	
+		{
 			SplineItemType	*itemList = (SplineItemType *)*hand;
-		
+
 			DetachResource(hand);
 			HLockHi(hand);
 			(*gSplineList)[i].itemList = (SplineItemType **)hand;
-			
+
 			for (j = 0; j < spline->numItems; j++)			// swizzle
 			{
 				(*spline->itemList)[j].placement = SwizzleFloat(&itemList[j].placement);
 				(*spline->itemList)[j].type	= SwizzleUShort(&itemList[j].type);
 				(*spline->itemList)[j].flags	= SwizzleUShort(&itemList[j].flags);
 			}
-			
+
 		}
 		else
 			DoFatalAlert("\pReadDataFromPlayfieldFile: cant get spline items rez");
-	}	
-	
+	}
+
 			/****************************/
 			/* FENCE RELATED RESOURCES */
 			/****************************/
-	
+
 			/* READ FENCE LIST */
-		
+
 	hand = GetResource('Fenc',1000);
 	if (hand)
-	{	
+	{
 		FileFenceDefType *inData;
 
 		gFenceList = (FenceDefType *)AllocPtr(sizeof(FenceDefType) * gNumFences);	// alloc new ptr for fence data
 		if (gFenceList == nil)
 			DoFatalAlert("\pReadDataFromPlayfieldFile: AllocPtr failed");
-			
+
 		inData = (FileFenceDefType *)*hand;								// get ptr to input fence list
-		
+
 		for (i = 0; i < gNumFences; i++)								// copy data from rez to new list
 		{
 			gFenceList[i].type 		= SwizzleUShort(&inData[i].type);
@@ -1536,15 +1536,15 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			gFenceList[i].nubList 	= nil;
 			gFenceList[i].sectionVectors = nil;
 			gFenceList[i].sectionNormals = nil;
-		}		
+		}
 		ReleaseResource(hand);
 	}
 	else
-		gNumFences = 0;	
+		gNumFences = 0;
 
-	
+
 			/* READ FENCE NUB LIST */
-			
+
 	for (i = 0; i < gNumFences; i++)
 	{
 		hand = GetResource('FnNb',1000+i);					// get rez
@@ -1556,13 +1556,13 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			gFenceList[i].nubList = (OGLPoint3D *)AllocPtr(sizeof(FenceDefType) * gFenceList[i].numNubs);	// alloc new ptr for nub array
 			if (gFenceList[i].nubList == nil)
 				DoFatalAlert("\pReadDataFromPlayfieldFile: AllocPtr failed");
-		
-		
+
+
 			for (j = 0; j < gFenceList[i].numNubs; j++)		// convert x,z to x,y,z
 			{
 				gFenceList[i].nubList[j].x = SwizzleLong(&fileFencePoints[j].x);
 				gFenceList[i].nubList[j].z = SwizzleLong(&fileFencePoints[j].z);
-				gFenceList[i].nubList[j].y = 0;				
+				gFenceList[i].nubList[j].y = 0;
 			}
 			ReleaseResource(hand);
 		}
@@ -1576,10 +1576,10 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			/****************************/
 
 			/* READ WATER LIST */
-		
+
 	hand = GetResource('Liqd',1000);
 	if (hand)
-	{	
+	{
 		DetachResource(hand);
 		HLockHi(hand);
 		gWaterListHandle = (WaterDefType **)hand;
@@ -1591,10 +1591,10 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			gWaterList[i].flags = SwizzleULong(&gWaterList[i].flags);
 			gWaterList[i].height = SwizzleLong(&gWaterList[i].height);
 			gWaterList[i].numNubs = SwizzleShort(&gWaterList[i].numNubs);
-			
+
 			gWaterList[i].hotSpotX = SwizzleFloat(&gWaterList[i].hotSpotX);
 			gWaterList[i].hotSpotZ = SwizzleFloat(&gWaterList[i].hotSpotZ);
-			
+
 			gWaterList[i].bBox.top = SwizzleShort(&gWaterList[i].bBox.top);
 			gWaterList[i].bBox.bottom = SwizzleShort(&gWaterList[i].bBox.bottom);
 			gWaterList[i].bBox.left = SwizzleShort(&gWaterList[i].bBox.left);
@@ -1603,31 +1603,31 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			for (j = 0; j < gWaterList[i].numNubs; j++)
 			{
 				gWaterList[i].nubList[j].x = SwizzleFloat(&gWaterList[i].nubList[j].x);
-				gWaterList[i].nubList[j].y = SwizzleFloat(&gWaterList[i].nubList[j].y);			
-			}		
+				gWaterList[i].nubList[j].y = SwizzleFloat(&gWaterList[i].nubList[j].y);
+			}
 		}
 
 
 	}
 	else
-		gNumWaterPatches = 0;	
-	
+		gNumWaterPatches = 0;
+
 
 			/* CLOSE REZ FILE */
-			
+
 	CloseResFile(fRefNum);
 	UseResFile(gMainAppRezFile);
 
 
 
-		
+
 		/********************************************/
 		/* READ SUPERTILE IMAGE DATA FROM DATA FORK */
 		/********************************************/
 
 
 				/* ALLOC BUFFERS */
-		
+
 	size = SUPERTILE_TEXMAP_SIZE * SUPERTILE_TEXMAP_SIZE * 2;						// calc size of supertile 16-bit texture
 	tempBuffer16 = AllocPtr(size);
 	if (tempBuffer16 == nil)
@@ -1644,13 +1644,13 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 
 				/* OPEN THE DATA FORK */
-				
-	iErr = FSpOpenDF(specPtr, fsCurPerm, &fRefNum);	
+
+	iErr = FSpOpenDF(specPtr, fsCurPerm, &fRefNum);
 	if (iErr)
 		DoFatalAlert("\pReadDataFromPlayfieldFile: FSpOpenDF failed!");
-	
 
-			
+
+
 	for (i = 0; i < gNumUniqueSuperTiles; i++)
 	{
 		static long	sizeoflong = 4;
@@ -1659,45 +1659,45 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		MOMaterialData	matData;
 		int		x,y;
 		u_short	*src,*dest;
-			
-		
+
+
 				/* READ THE SIZE OF THE NEXT COMPRESSED SUPERTILE TEXTURE */
-						
+
 		iErr = FSRead(fRefNum, &sizeoflong, &compressedSize);
 		if (iErr)
-			DoFatalAlert("\pReadDataFromPlayfieldFile: FSRead failed!");			
-	
+			DoFatalAlert("\pReadDataFromPlayfieldFile: FSRead failed!");
+
 		compressedSize = SwizzleLong(&compressedSize);
 
-				
+
 				/* READ & DECOMPRESS IT */
-			
-		decompressedSize = LZSS_Decode(fRefNum, tempBuffer16, compressedSize);				
+
+		decompressedSize = LZSS_Decode(fRefNum, tempBuffer16, compressedSize);
 		if (decompressedSize != size)
       			DoFatalAlert("\pReadDataFromPlayfieldFile: LZSS_Decode size is wrong!");
 
 				/* IF LOW MEM MODE THEN SHRINK THE TERRAIN TEXTURES IN HALF */
-			
+
 		if (gLowMemMode)
 		{
 			dest = src = (u_short *)tempBuffer16;
-			
+
 			for (y = 0; y < SUPERTILE_TEXMAP_SIZE; y+=2)
 			{
 				for (x = 0; x < SUPERTILE_TEXMAP_SIZE; x+=2)
 				{
-					*dest++ = src[x];			
+					*dest++ = src[x];
 				}
 				src += SUPERTILE_TEXMAP_SIZE*2;
 			}
-		
+
 			width = SUPERTILE_TEXMAP_SIZE/2;
-			height = SUPERTILE_TEXMAP_SIZE/2;		
+			height = SUPERTILE_TEXMAP_SIZE/2;
 		}
 		else
 		{
 			width = SUPERTILE_TEXMAP_SIZE;
-			height = SUPERTILE_TEXMAP_SIZE;		
+			height = SUPERTILE_TEXMAP_SIZE;
 		}
 
 
@@ -1720,7 +1720,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		matData.flags 					= 	BG3D_MATERIALFLAG_CLAMP_U|
 											BG3D_MATERIALFLAG_CLAMP_V|
 											BG3D_MATERIALFLAG_TEXTURED;
-											
+
 		switch(gLevelNum)
 		{
 			case	LEVEL_NUM_BLOBBOSS:
@@ -1732,7 +1732,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 					break;
 
 		}
-													
+
 		matData.multiTextureMode		= MULTI_TEXTURE_MODE_REFLECTIONSPHERE;
 		matData.multiTextureCombine		= MULTI_TEXTURE_COMBINE_ADD;
 		matData.diffuseColor.r			= 1;
@@ -1741,20 +1741,20 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		matData.diffuseColor.a			= 1;
 		matData.numMipmaps				= 1;										// 1 texture
 		matData.width					= width;
-		matData.height					= height;		
+		matData.height					= height;
 		matData.texturePixels[0] 		= nil;										// the original pixels are gone (or will be soon)
 		gSuperTileTextureObjects[i] 	= MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);		// create the new object
 
 
 				/* KEEP MUSIC PLAYING */
-						
+
 		if (gSongPlayingFlag && (!gMuteMusicFlag))
 			MoviesTask(gSongMovie, 0);
 	}
-	
+
 			/* CLOSE THE FILE */
-			
-	FSClose(fRefNum);	
+
+	FSClose(fRefNum);
 	if (tempBuffer16)
 		SafeDisposePtr(tempBuffer16);
 	if (tempBuffer24)
@@ -1787,11 +1787,11 @@ Boolean	blackOpaq;
 	for (y = 0; y < height / 2; y++)
 	{
 		dest = bottom;
-		
+
 		for (x = 0; x < width; x++)
 		{
 			pixel = textureBuffer[x];						// get 16bit pixel from top
-#if __BIG_ENDIAN__						
+#if __BIG_ENDIAN__
 			if ((pixel & 0x7fff) || blackOpaq)				// check/set alpha
 				pixel |= 0x8000;
 			else
@@ -1803,10 +1803,10 @@ Boolean	blackOpaq;
 				pixel |= 0x8000;
 			else
 				pixel &= 0x7fff;
-#endif		
-				
+#endif
+
 			textureBuffer[x] = bottom[x];					// copy bottom to top
-#if __BIG_ENDIAN__			
+#if __BIG_ENDIAN__
 			if ((textureBuffer[x] & 0x7fff) || blackOpaq)				// check/set alpha
 				textureBuffer[x] |= 0x8000;
 			else
@@ -1817,7 +1817,7 @@ Boolean	blackOpaq;
 				textureBuffer[x] |= 0x8000;
 			else
 				textureBuffer[x] &= 0x7fff;
-#endif		
+#endif
 
 			bottom[x] = pixel;								// save top into bottom
 		}
@@ -1825,7 +1825,7 @@ Boolean	blackOpaq;
 		textureBuffer += width;
 		bottom -= width;
 	}
-}		
+}
 
 
 #pragma mark -
@@ -1871,13 +1871,13 @@ NavDialogRef				navRef;
 NavDialogCreationOptions	createOption;
 #endif
 			/* Specify default options for dialog box */
-	
+
 	anErr = NavGetDefaultDialogOptions(&dialogOptions);
 	if (anErr == noErr)
 	{
 			/* Adjust the options to fit our needs */
-						
-		dialogOptions.dialogOptionFlags |= kNavSelectDefaultLocation;	// Set default location option				
+
+		dialogOptions.dialogOptionFlags |= kNavSelectDefaultLocation;	// Set default location option
 		dialogOptions.dialogOptionFlags ^= kNavAllowPreviews;			// Clear preview option
 		dialogOptions.dialogOptionFlags ^= kNavAllowMultipleFiles;		// Clear multiple files option
 
@@ -1888,9 +1888,9 @@ NavDialogCreationOptions	createOption;
 //		if (anErr ==noErr)
 		{
 			/* Get 'open'resource.  A nil handle being returned is OK, this simply means no automatic file filtering. */
-				
+
 			static NavTypeList			typeList = {'Otto', 0, 1, 'OSav'};	// set types to filter
-			
+
 			NavTypeListPtr 	typeListPtr = &typeList;	// = (NavTypeListHandle)GetResource('open',128);
 			NavReplyRecord 		reply;
 
@@ -1901,44 +1901,44 @@ NavDialogCreationOptions	createOption;
 			if ((anErr == noErr) && (reply.validRecord))
 			{
 					/* Deal with multiple file selection */
-					
+
 				long 	count;
-				
+
 				anErr = AECountItems(&(reply.selection),&count);
-				
-				
+
+
 					/* Set up index for file list */
-					
+
 				if (anErr == noErr)
 				{
 					long i;
-					
+
 					for (i = 1; i <= count; i++)
 					{
 						AEKeyword 	theKeyword;
 						DescType 	actualType;
 						Size 		actualSize;
-						
+
 						/* Get a pointer to selected file */
-					
+
 						anErr = AEGetNthPtr(&(reply.selection), i, typeFSS,&theKeyword, &actualType,
 											documentFSSpec, sizeof(FSSpec), &actualSize);
 					}
 				}
-				
-					
+
+
 				/* Dispose of NavReplyRecord,resources,descriptors */
-				
+
 				anErr = NavDisposeReply(&reply);
 			}
-					
+
 			(void)AEDisposeDesc(&defaultLocation);
 		}
 	}
-	
-	
+
+
 		/* CLEAN UP */
-		
+
 	if (eventProc)
 	{
 		DisposeNavEventUPP(eventProc);
@@ -1949,10 +1949,10 @@ NavDialogCreationOptions	createOption;
 		DisposeNavObjectFilterUPP(filterProc);
 		filterProc = nil;
 	}
-	
+
 #if CUSTOM
 	NavDialogDispose(navRef);
-#endif	
+#endif
 	return anErr;
 }
 
@@ -1972,14 +1972,14 @@ Str255				name = "\pOtto Saved Game";
 	if (anErr == noErr)
 	{
 		CopyPStr(name, dialogOptions.savedFileName);					// set default name
-		
+
 		anErr = NavPutFile(nil, reply, &dialogOptions, nil, fileTypeToSave, creatorType, nil);
 		if ((anErr == noErr) && (reply->validRecord))
 		{
 			AEKeyword	theKeyword;
 			DescType 	actualType;
 			Size 		actualSize;
-			
+
 			anErr = AEGetNthPtr(&(reply->selection),1,typeFSS, &theKeyword,&actualType, outSpec, sizeof(FSSpec), &actualSize);
 		}
 	}
@@ -2010,12 +2010,12 @@ void GetLibVersion(ConstStrFileNameParam libName, NumVersion *version)
 	FSSpec				spec;
 	UInt32				versCode;
 //	char				versStr[32];
-		
+
 	if (FindSharedLib(libName, &spec))
 	{
 		versCode = GetFileVersion(&spec);
 //		VersionCodeToText(versCode, versStr);
-		
+
 //		printf("Shared lib '%#s' found!\n", libName);
 //		printf("    Filename is '%#s'\n", spec.name);
 //		printf("    Version code is: 0x%08X\n", versCode);
@@ -2038,23 +2038,23 @@ static UInt32	GetFileVersion(FSSpec *spec)
 	SInt16						fRefNum, saveRefNum;
 	Handle						versH;
 	UInt32						versCode;
-	
+
 	saveRefNum = CurResFile();
 	fRefNum = FSpOpenResFile(spec, fsRdPerm);
 	if (fRefNum == -1)
 		return 0;
-	
+
 	if ((versH = Get1Resource('vers', 1)) == NULL)
 		versH = Get1Resource('vers', 2);
-	
+
 	if (versH)
 		versCode = *(UInt32 *) (*versH);
 	else
 		versCode = 0;
-	
+
 	CloseResFile(fRefNum);
 	UseResFile(saveRefNum);
-	
+
 	return versCode;
 }
 
@@ -2062,7 +2062,7 @@ static UInt32	GetFileVersion(FSSpec *spec)
 static void VersionCodeToText(UInt32 versCode, char *versStr)
 {
 	char			temp[128];
-	
+
 	if (!versCode) {
 		versStr[0] = '?';
 		versStr[1] = 0;
@@ -2075,7 +2075,7 @@ static void VersionCodeToText(UInt32 versCode, char *versStr)
 		}
 		if ((versCode & 0x0000FFFF) != 0x8000) {
 			char		c;
-			
+
 			switch (versCode & 0xFF00) {
 				case 0x8000:
 					c = 'f';
@@ -2103,12 +2103,12 @@ static Boolean MatchSharedLib(ConstStrFileNameParam libName, FSSpec *spec)
 	Boolean						result;
 	CFragResourcePtr			*cfrg;
 	CFragResourceMemberPtr		member;
-	
+
 	saveRefNum = CurResFile();
 	fRefNum = FSpOpenResFile(spec, fsRdPerm);
 	if (fRefNum == -1)
 		return false;
-	
+
 	result = false;
 	cfrg = (CFragResourcePtr *) Get1Resource(kCFragResourceType, kCFragResourceID);
 	if (cfrg && (**cfrg).memberCount) {
@@ -2121,7 +2121,7 @@ static Boolean MatchSharedLib(ConstStrFileNameParam libName, FSSpec *spec)
 			member = (CFragResourceMemberPtr) (((char *) member) + member->memberSize);
 		}
 	}
-	
+
 	CloseResFile(fRefNum);
 	UseResFile(saveRefNum);
 	return result;
@@ -2137,20 +2137,20 @@ static Boolean FindSharedLib(ConstStrFileNameParam libName, FSSpec *spec)
 	OSErr						err;
 	CInfoPBRec					cpb;
 	HFileInfo					*fpb = (HFileInfo *) &cpb;
-	
+
 	if (FindFolder(kOnSystemDisk, kExtensionFolderType, kDontCreateFolder, &extVRefNum, &extDirID) != noErr)
 		return false;
-	
+
 	if (FSMakeFSSpec(extVRefNum, extDirID, libName, spec) == noErr)
 		return true;
-	
+
 	fpb->ioVRefNum = extVRefNum;
 	fpb->ioNamePtr = fName;
 	fIndex = 1;
 	do {
 		fpb->ioDirID = extDirID;
 		fpb->ioFDirIndex = fIndex;
-		
+
 		err = PBGetCatInfoSync(&cpb);
 		if (err == noErr) {
 			if (!(fpb->ioFlAttrib & 16) && fpb->ioFlFndrInfo.fdType == kCFragLibraryFileType) {
@@ -2161,7 +2161,7 @@ static Boolean FindSharedLib(ConstStrFileNameParam libName, FSSpec *spec)
 			fIndex ++;
 		}
 	} while (err == noErr);
-	
+
 	return false;
 }
 
@@ -2184,15 +2184,15 @@ long			count;
 Boolean			success = false;
 
 	Enter2D();
-			
-	
-	InitCursor();		
-	MyFlushEvents();	
 
-			/*************************/	
+
+	InitCursor();
+	MyFlushEvents();
+
+			/*************************/
 			/* CREATE SAVE GAME DATA */
-			/*************************/	
-					
+			/*************************/
+
 	saveData.version		= SAVE_GAME_VERSION;				// save file version #
 	saveData.version		= SwizzleULong(&saveData.version);
 
@@ -2210,34 +2210,34 @@ Boolean			success = false;
 
 	saveData.jumpJet		= gPlayerInfo.jumpJet;
 	saveData.jumpJet		= SwizzleFloat(&saveData.jumpJet);
-	
+
 		/*******************/
 		/* DO NAV SERVICES */
 		/*******************/
 
 	if (PutFileWithNavServices(&navReply, &gSavedGameSpec))
-		goto bail;	
-	specPtr = &gSavedGameSpec;	
+		goto bail;
+	specPtr = &gSavedGameSpec;
 	if (navReply.replacing)										// see if delete old
 		FSpDelete(specPtr);
 
 
 				/* CREATE & OPEN THE REZ-FORK */
-			
+
 	if (FSpCreate(specPtr,'Otto','OSav',nil) != noErr)
 	{
 		DoAlert("\pError creating Save file");
 		goto bail;
 	}
-	
+
 	FSpOpenDF(specPtr,fsRdWrPerm, &fRefNum);
 	if (fRefNum == -1)
 	{
 		DoAlert("\pError opening Save file");
 		goto bail;
 	}
-				
-	
+
+
 				/* WRITE TO FILE */
 
 	count = sizeof(SaveGameType);
@@ -2249,21 +2249,21 @@ Boolean			success = false;
 	}
 
 			/* CLOSE FILE */
-			
-	FSClose(fRefNum);						
+
+	FSClose(fRefNum);
 
 
 			/* CLEANUP NAV SERVICES */
-				
+
 	NavCompleteSave(&navReply, kNavTranslateInPlace);
-	
+
 	success = true;
-	
-bail:	
+
+bail:
 	NavDisposeReply(&navReply);
 	HideCursor();
 	Exit2D();
-	
+
 	return(success);
 }
 
@@ -2282,19 +2282,19 @@ Boolean			success = false;
 //	KillSong();
 
 	Enter2D();
-	
+
 	InitCursor();
-	MyFlushEvents();	
-	
+	MyFlushEvents();
+
 
 				/* GET FILE WITH NAVIGATION SERVICES */
-			
+
 	if (GetFileWithNavServices(nil, &gSavedGameSpec) != noErr)
 		goto bail;
-	
-	
+
+
 				/* OPEN THE REZ-FORK */
-			
+
 	FSpOpenDF(&gSavedGameSpec,fsRdPerm, &fRefNum);
 	if (fRefNum == -1)
 	{
@@ -2313,14 +2313,14 @@ Boolean			success = false;
 	}
 
 			/* CLOSE FILE */
-			
-	FSClose(fRefNum);						
 
-	
-			/**********************/	
+	FSClose(fRefNum);
+
+
+			/**********************/
 			/* USE SAVE GAME DATA */
-			/**********************/	
-					
+			/**********************/
+
 	gLoadedScore = gScore = SwizzleULong(&saveData.score);
 
 	gLevelNum			= SwizzleShort(&saveData.realLevel);
@@ -2328,18 +2328,18 @@ Boolean			success = false;
 	gPlayerInfo.lives 	= SwizzleShort(&saveData.numLives);
 	gPlayerInfo.health	= SwizzleFloat(&saveData.health);
 	gPlayerInfo.jumpJet	= SwizzleFloat(&saveData.jumpJet);
-		
+
 	success = true;
-			
-		
+
+
 bail:
 	Exit2D();
 	HideCursor();
-	
-	
+
+
 //	if (!success)								// user cancelled, so start song again before returning
 //		PlaySong(oldSong, true);
-		
+
 	return(success);
 }
 

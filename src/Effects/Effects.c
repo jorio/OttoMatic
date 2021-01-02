@@ -88,11 +88,11 @@ void InitEffects(OGLSetupOutputType *setupInfo)
 
 
 			/* SET SPRITE BLENDING FLAGS */
-			
+
 	BlendASprite(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_Splash);
-		
-		
-		
+
+
+
 }
 
 
@@ -106,8 +106,8 @@ ObjNode *MakeRipple(float x, float y, float z, float startScale)
 {
 ObjNode	*newObj;
 
-	gNewObjectDefinition.group = GLOBAL1_MGroupNum_Ripple;	
-	gNewObjectDefinition.type = GLOBAL1_MObjType_Ripple;	
+	gNewObjectDefinition.group = GLOBAL1_MGroupNum_Ripple;
+	gNewObjectDefinition.type = GLOBAL1_MObjType_Ripple;
 	gNewObjectDefinition.coord.x = x;
 	gNewObjectDefinition.coord.y = y;
 	gNewObjectDefinition.coord.z = z;
@@ -121,9 +121,9 @@ ObjNode	*newObj;
 		return(nil);
 
 	newObj->Health = .8;										// transparency value
-	
+
 	MakeObjectTransparent(newObj, newObj->Health);
-	
+
 	return(newObj);
 }
 
@@ -141,7 +141,7 @@ float	fps = gFramesPerSecondFrac;
 		DeleteObject(theNode);
 		return;
 	}
-	
+
 	MakeObjectTransparent(theNode, theNode->Health);
 
 	theNode->Scale.x += fps*6.0f;
@@ -165,7 +165,7 @@ void InitParticleSystem(OGLSetupOutputType *setupInfo)
 short	i;
 FSSpec	spec;
 ObjNode	*obj;
-	
+
 
 			/* INIT GROUP ARRAY */
 
@@ -177,10 +177,10 @@ ObjNode	*obj;
 
 
 			/* LOAD SPRITES */
-			
+
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:particle.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, setupInfo);
-	
+
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
 
@@ -190,15 +190,15 @@ ObjNode	*obj;
 		//
 		// The particles need to be drawn after the fences object, but before any sprite or font objects.
 		//
-				
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;				
+
+	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.slot 		= PARTICLE_SLOT;
 	gNewObjectDefinition.moveCall 	= MoveParticleGroups;
 	gNewObjectDefinition.scale 		= 1;
 	gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOZWRITES;
-	
-	obj = MakeNewObject(&gNewObjectDefinition);		
-	obj->CustomDrawFunction = DrawParticleGroup;		
+
+	obj = MakeNewObject(&gNewObjectDefinition);
+	obj->CustomDrawFunction = DrawParticleGroup;
 
 }
 
@@ -231,17 +231,17 @@ static void DeleteParticleGroup(long groupNum)
 	if (gParticleGroups[groupNum])
 	{
 			/* NUKE GEOMETRY DATA */
-			
+
 		MO_DisposeObjectReference(gParticleGroups[groupNum]->geometryObj);
-			
+
 
 				/* NUKE GROUP ITSELF */
-					
+
 		SafeDisposePtr((Ptr)gParticleGroups[groupNum]);
 		gParticleGroups[groupNum] = nil;
 
 		gNumActiveParticleGroups--;
-	}	
+	}
 }
 
 
@@ -262,28 +262,28 @@ OGLTextureCoord			*uv;
 MOVertexArrayData 		vertexArrayData;
 MOTriangleIndecies		*t;
 
-	
+
 			/*************************/
 			/* SCAN FOR A FREE GROUP */
 			/*************************/
-			
+
 	for (i = 0; i < MAX_PARTICLE_GROUPS; i++)
 	{
 		if (gParticleGroups[i] == nil)
 		{
 				/* ALLOCATE NEW GROUP */
-				
+
 			gParticleGroups[i] = (ParticleGroupType *)AllocPtr(sizeof(ParticleGroupType));
 			if (gParticleGroups[i] == nil)
 				return(-1);									// out of memory
 
-			
+
 				/* INITIALIZE THE GROUP */
-			
+
 			gParticleGroups[i]->type = def->type;						// set type
 			for (p = 0; p < MAX_PARTICLES; p++)						// mark all unused
 				gParticleGroups[i]->isUsed[p] = false;
-			
+
 			gParticleGroups[i]->flags 				= def->flags;
 			gParticleGroups[i]->gravity 			= def->gravity;
 			gParticleGroups[i]->magnetism 			= def->magnetism;
@@ -296,12 +296,12 @@ MOTriangleIndecies		*t;
 			gParticleGroups[i]->srcBlend 			= def->srcBlend;
 			gParticleGroups[i]->dstBlend 			= def->dstBlend;
 
-				/*****************************/			
+				/*****************************/
 				/* INIT THE GROUP'S GEOMETRY */
 				/*****************************/
-						
+
 					/* SET THE DATA */
-					
+
 			vertexArrayData.numMaterials 	= 1;
 			vertexArrayData.materials[0]	= gSpriteGroupList[SPRITE_GROUP_PARTICLES][def->particleTextureNum].materialObject;	// set illegal ref because it is made legit below
 
@@ -313,25 +313,25 @@ MOTriangleIndecies		*t;
 			vertexArrayData.colorsByte 		= (OGLColorRGBA_Byte *)AllocPtr(sizeof(OGLColorRGBA_Byte) * MAX_PARTICLES * 4);
 			vertexArrayData.colorsFloat		= nil;
 			vertexArrayData.triangles		= (MOTriangleIndecies *)AllocPtr(sizeof(MOTriangleIndecies) * MAX_PARTICLES * 2);
-						
-	
+
+
 					/* INIT UV ARRAYS */
-					
+
 			uv = vertexArrayData.uvs[0];
 			for (j=0; j < (MAX_PARTICLES*4); j+=4)
 			{
 				uv[j].u = 0;									// upper left
 				uv[j].v = 1;
 				uv[j+1].u = 0;									// lower left
-				uv[j+1].v = 0;	
+				uv[j+1].v = 0;
 				uv[j+2].u = 1;									// lower right
-				uv[j+2].v = 0;	
+				uv[j+2].v = 0;
 				uv[j+3].u = 1;									// upper right
-				uv[j+3].v = 1;				
+				uv[j+3].v = 1;
 			}
-						
+
 					/* INIT TRIANGLE ARRAYS */
-					
+
 			t = vertexArrayData.triangles;
 			for (j = k = 0; j < (MAX_PARTICLES*2); j+=2, k+=4)
 			{
@@ -341,24 +341,24 @@ MOTriangleIndecies		*t;
 
 				t[j+1].vertexIndices[0] = k;							// triangle B
 				t[j+1].vertexIndices[1] = k+2;
-				t[j+1].vertexIndices[2] = k+3;			
+				t[j+1].vertexIndices[2] = k+3;
 			}
 
 
 				/* CREATE NEW GEOMETRY OBJECT */
 
 			gParticleGroups[i]->geometryObj = MO_CreateNewObjectOfType(MO_TYPE_GEOMETRY, MO_GEOMETRY_SUBTYPE_VERTEXARRAY, &vertexArrayData);
-			
+
 			gNumActiveParticleGroups++;
-			
+
 			return(i);
 		}
 	}
 
 			/* NOTHING FREE */
-			
+
 //	DoFatalAlert("\pNewParticleGroup: no free groups!");
-	return(-1);	
+	return(-1);
 }
 
 
@@ -383,15 +383,15 @@ short	p,group;
 
 
 			/* SCAN FOR FREE SLOT */
-			
+
 	for (p = 0; p < MAX_PARTICLES; p++)
 	{
 		if (!gParticleGroups[group]->isUsed[p])
 			goto got_it;
 	}
-	
+
 			/* NO FREE SLOTS */
-			
+
 	return(true);
 
 
@@ -400,25 +400,25 @@ got_it:
 	gParticleGroups[group]->alpha[p] = def->alpha;
 	gParticleGroups[group]->scale[p] = def->scale;
 	gParticleGroups[group]->coord[p] = *def->where;
-	gParticleGroups[group]->delta[p] = *def->delta;	
-	gParticleGroups[group]->rotZ[p] = def->rotZ;	
-	gParticleGroups[group]->rotDZ[p] = def->rotDZ;	
+	gParticleGroups[group]->delta[p] = *def->delta;
+	gParticleGroups[group]->rotZ[p] = def->rotZ;
+	gParticleGroups[group]->rotDZ[p] = def->rotDZ;
 	gParticleGroups[group]->isUsed[p] = true;
-	
-	
+
+
 			/* SEE IF ATTACH VAPOR TRAIL */
-			
+
 	if (gParticleGroups[group]->flags & PARTICLE_FLAGS_VAPORTRAIL)
-	{			
+	{
 		static OGLColorRGBA color = {1,.5,.5,1};
-	
+
 		color.a = def->alpha;
-	
+
 		gParticleGroups[group]->vaporTrail[p] = CreatetNewVaporTrail(nil, group, VAPORTRAIL_TYPE_COLORSTREAK,
 																	def->where, &color, .3, 2.0, 50);
 	}
-	
-	
+
+
 	return(false);
 }
 
@@ -448,33 +448,33 @@ OGLVector3D	*delta;
 			fadeRate 	= gParticleGroups[i]->fadeRate;						// get fade rate
 			magnetism 	= gParticleGroups[i]->magnetism;					// get magnetism
 			flags 		= gParticleGroups[i]->flags;
-			
+
 			n = 0;															// init counter
 			for (p = 0; p < MAX_PARTICLES; p++)
 			{
 				if (!gParticleGroups[i]->isUsed[p])							// make sure this particle is used
 					continue;
-				
+
 				n++;														// inc counter
 				delta = &gParticleGroups[i]->delta[p];						// get ptr to deltas
 				coord = &gParticleGroups[i]->coord[p];						// get ptr to coords
-				
+
 							/* ADD GRAVITY */
-							
+
 				delta->y -= gravity * fps;									// add gravity
-				
-				
+
+
 						/* DO ROTATION */
-						
+
 				gParticleGroups[i]->rotZ[p] += gParticleGroups[i]->rotDZ[p] * fps;
-				
-				
-				
-				
+
+
+
+
 				switch(gParticleGroups[i]->type)
 				{
 							/* FALLING SPARKS */
-							
+
 					case	PARTICLE_TYPE_FALLINGSPARKS:
 							coord->x += delta->x * fps;						// move it
 							coord->y += delta->y * fps;
@@ -486,24 +486,24 @@ OGLVector3D	*delta;
 							//
 							// Every particle has gravity pull on other particle
 							//
-							
+
 					case	PARTICLE_TYPE_GRAVITOIDS:
 							for (j = MAX_PARTICLES-1; j >= 0; j--)
 							{
 								float		dist,temp,x,z;
 								OGLVector3D	v;
-								
+
 								if (p==j)									// dont check against self
 									continue;
 								if (!gParticleGroups[i]->isUsed[j])			// make sure this particle is used
 									continue;
-															
+
 								x = gParticleGroups[i]->coord[j].x;
 								y = gParticleGroups[i]->coord[j].y;
 								z = gParticleGroups[i]->coord[j].z;
-								
+
 										/* calc 1/(dist2) */
-							
+
 								if (i < j)									// see if calc or get from buffer
 								{
 									temp = coord->x - x;					// dx squared
@@ -512,10 +512,10 @@ OGLVector3D	*delta;
 									dist += temp*temp;
 									temp = coord->z - z;					// dz squared
 									dist += temp*temp;
-									
+
 									dist = sqrt(dist);						// 1/dist2
 									if (dist != 0.0f)
-										dist = 1.0f / (dist*dist);  
+										dist = 1.0f / (dist*dist);
 
 									if (dist > oneOverBaseScaleSquared)		// adjust if closer than radius
 										dist = oneOverBaseScaleSquared;
@@ -526,9 +526,9 @@ OGLVector3D	*delta;
 								{
 									dist = gGravitoidDistBuffer[j][i];		// use from buffer
 								}
-								
+
 											/* calc vector to particle */
-											
+
 								if (dist != 0.0f)
 								{
 									x = x - coord->x;
@@ -540,18 +540,18 @@ OGLVector3D	*delta;
 								{
 									v.x = v.y = v.z = 0;
 								}
-																
+
 								delta->x += v.x * (dist * magnetism * fps);		// apply gravity to particle
 								delta->y += v.y * (dist * magnetism * fps);
 								delta->z += v.z * (dist * magnetism * fps);
 							}
-														
+
 							coord->x += delta->x * fps;						// move it
 							coord->y += delta->y * fps;
 							coord->z += delta->z * fps;
-							break;							
+							break;
 				}
-				
+
 				/*****************/
 				/* SEE IF BOUNCE */
 				/*****************/
@@ -559,7 +559,7 @@ OGLVector3D	*delta;
 				if (!(flags & PARTICLE_FLAGS_DONTCHECKGROUND))
 				{
 					y = GetTerrainY(coord->x, coord->z)+10.0f;					// get terrain coord at particle x/z
-					
+
 					if (flags & PARTICLE_FLAGS_BOUNCE)
 					{
 						if (delta->y < 0.0f)									// if moving down, see if hit floor
@@ -568,15 +568,15 @@ OGLVector3D	*delta;
 							{
 								coord->y = y;
 								delta->y *= -.4f;
-								
+
 								delta->x += gRecentTerrainNormal.x * 300.0f;	// reflect off of surface
 								delta->z += gRecentTerrainNormal.z * 300.0f;
-								
+
 								if (flags & PARTICLE_FLAGS_DISPERSEIFBOUNCE)	// see if disperse on impact
 								{
 									delta->y *= .4f;
 									delta->x *= 5.0f;
-									delta->z *= 5.0f;								
+									delta->z *= 5.0f;
 								}
 							}
 						}
@@ -587,37 +587,37 @@ OGLVector3D	*delta;
 					/***************/
 
 					else
-					{				
+					{
 						if (coord->y < y)									// if hit floor then nuke particle
 						{
-							gParticleGroups[i]->isUsed[p] = false;				
+							gParticleGroups[i]->isUsed[p] = false;
 						}
 					}
-				}					
-					
-				
+				}
+
+
 					/* DO SCALE */
-					
-				gParticleGroups[i]->scale[p] -= decayRate * fps;			// shrink it							
+
+				gParticleGroups[i]->scale[p] -= decayRate * fps;			// shrink it
 				if (gParticleGroups[i]->scale[p] <= 0.0f)					// see if gone
-					gParticleGroups[i]->isUsed[p] = false;				
+					gParticleGroups[i]->isUsed[p] = false;
 
 					/* DO FADE */
-					
-				gParticleGroups[i]->alpha[p] -= fadeRate * fps;				// fade it							
+
+				gParticleGroups[i]->alpha[p] -= fadeRate * fps;				// fade it
 				if (gParticleGroups[i]->alpha[p] <= 0.0f)					// see if gone
-					gParticleGroups[i]->isUsed[p] = false;				
-					
-					
+					gParticleGroups[i]->isUsed[p] = false;
+
+
 						/*****************************/
 						/* SEE IF UPDATE VAPOR TRAIL */
 						/*****************************/
-						
+
 				if (gParticleGroups[i]->flags & PARTICLE_FLAGS_VAPORTRAIL)
-				{			
+				{
 					static OGLColorRGBA color = {.9,1,.8,1};
 					short	v = gParticleGroups[i]->vaporTrail[p];
-					
+
 					if (v != -1)
 					{
 						if (VerifyVaporTrail(v, nil, i))					// if valid then update it
@@ -630,9 +630,9 @@ OGLVector3D	*delta;
 					}
 				}
 			}
-			
+
 				/* SEE IF GROUP WAS EMPTY, THEN DELETE */
-					
+
 			if (n == 0)
 			{
 				DeleteParticleGroup(i);
@@ -658,18 +658,18 @@ AGLContext agl_ctx = setupInfo->drawContext;
 #pragma unused(theNode)
 
 	v[0].z = 												// init z's to 0
-	v[1].z = 
-	v[2].z = 
+	v[1].z =
+	v[2].z =
 	v[3].z = 0;
 
 				/* SETUP ENVIRONTMENT */
-		
+
 	OGL_PushState();
-		
+
 	glEnable(GL_BLEND);
 	SetColor4f(1,1,1,1);										// full white & alpha to start with
 
-	camCoords = &gGameViewInfoPtr->cameraPlacement.cameraLocation;	
+	camCoords = &gGameViewInfoPtr->cameraPlacement.cameraLocation;
 
 	for (g = 0; g < MAX_PARTICLE_GROUPS; g++)
 	{
@@ -679,7 +679,7 @@ AGLContext agl_ctx = setupInfo->drawContext;
 		if (gParticleGroups[g])
 		{
 			u_long	allAim = gParticleGroups[g]->flags & PARTICLE_FLAGS_ALLAIM;
-		
+
 			geoData = &gParticleGroups[g]->geometryObj->objectData;			// get pointer to geometry object data
 			vertexColors = geoData->colorsByte;								// get pointer to vertex color array
 			baseScale = gParticleGroups[g]->baseScale;						// get base scale
@@ -687,22 +687,22 @@ AGLContext agl_ctx = setupInfo->drawContext;
 					/********************************/
 					/* ADD ALL PARTICLES TO TRIMESH */
 					/********************************/
-					
+
 			minX = minY = minZ = 100000000;									// init bbox
 			maxX = maxY = maxZ = -minX;
-								
+
 			for (p = n = 0; p < MAX_PARTICLES; p++)
 			{
 				float			rot;
 				OGLMatrix4x4	m;
-				
+
 				if (!gParticleGroups[g]->isUsed[p])							// make sure this particle is used
 					continue;
-	
+
 							/* CREATE VERTEX DATA */
-						
+
 				scale = gParticleGroups[g]->scale[p] * baseScale;
-				
+
 				v[0].x = -scale;
 				v[0].y = scale;
 
@@ -714,10 +714,10 @@ AGLContext agl_ctx = setupInfo->drawContext;
 
 				v[3].x = scale;
 				v[3].y = scale;
-			
+
 
 					/* TRANSFORM THIS PARTICLE'S VERTICES & ADD TO TRIMESH */
-					
+
 				coord = &gParticleGroups[g]->coord[p];
 				if ((n == 0) || allAim)										// only set the look-at matrix for the 1st particle unless we want to force it for all (optimization technique)
 					SetLookAtMatrixAndTranslate(&m, &up, coord, camCoords);	// aim at camera & translate
@@ -732,21 +732,21 @@ AGLContext agl_ctx = setupInfo->drawContext;
 				if (rot != 0.0f)											// see if need to apply rotation matrix
 				{
 					OGLMatrix4x4	rm;
-					
-					OGLMatrix4x4_SetRotate_Z(&rm, rot);	
+
+					OGLMatrix4x4_SetRotate_Z(&rm, rot);
 					OGLMatrix4x4_Multiply(&rm, &m, &rm);
 					OGLPoint3D_TransformArray(&v[0], &rm, &geoData->points[n*4], 4);	// transform w/ rot
 				}
-				else																	
+				else
 					OGLPoint3D_TransformArray(&v[0], &m, &geoData->points[n*4], 4);		// transform no-rot
 
 
 							/* UPDATE BBOX */
-						
+
 				for (i = 0; i < 4; i++)
 				{
 					int j = n*4+i;
-					
+
 					if (geoData->points[j].x < minX)
 						minX = geoData->points[j].x;
 					if (geoData->points[j].x > maxX)
@@ -760,65 +760,65 @@ AGLContext agl_ctx = setupInfo->drawContext;
 					if (geoData->points[j].z > maxZ)
 						maxZ = geoData->points[j].z;
 				}
-				
+
 					/* UPDATE COLOR/TRANSPARENCY */
-								
+
 				temp = n*4;
 				for (i = temp; i < (temp+4); i++)
 				{
-					vertexColors[i].r = 
-					vertexColors[i].g = 
+					vertexColors[i].r =
+					vertexColors[i].g =
 					vertexColors[i].b = 0xff;
 					vertexColors[i].a = gParticleGroups[g]->alpha[p] * 255.0f;		// set transparency alpha
 				}
 
 				n++;											// inc particle count
 			}
-	
+
 			if (n == 0)											// if no particles, then skip
 				continue;
-	
+
 				/* UPDATE FINAL VALUES */
 
 			geoData->numTriangles = n*2;
 			geoData->numPoints = n*4;
-			
+
 			bbox.min.x = minX;									// build bbox for culling test
 			bbox.min.y = minY;
 			bbox.min.z = minZ;
 			bbox.max.x = maxX;
 			bbox.max.y = maxY;
-			bbox.max.z = maxZ;	
+			bbox.max.z = maxZ;
 
 			if (OGL_IsBBoxVisible(&bbox, nil))						// do cull test on it
 			{
 				GLint	src,dst;
-				
+
 				src = gParticleGroups[g]->srcBlend;
 				dst = gParticleGroups[g]->dstBlend;
-				
+
 					/* DRAW IT */
-		
-				glBlendFunc(src, dst);								// set blending mode		
+
+				glBlendFunc(src, dst);								// set blending mode
 
 				if (setupInfo->useFog)
-				{				
+				{
 					if (dst == GL_ONE)
 						glDisable(GL_FOG);	// fog screws up in this mode??
 					else
 						glEnable(GL_FOG);
 				}
-				
+
 				MO_DrawObject(gParticleGroups[g]->geometryObj, setupInfo);						// draw geometry
 			}
 		}
 	}
-	
+
 			/* RESTORE MODES */
-				
+
 	SetColor4f(1,1,1,1);										// reset this
 	OGL_PopState();
-		
+
 }
 
 
@@ -851,23 +851,23 @@ OGLPoint3D	*coord;
 	{
 		if (!gParticleGroups[i])									// see if group active
 			continue;
-			
+
 		if (inFlags)												// see if check flags
 		{
 			flags = gParticleGroups[i]->flags;
 			if (!(inFlags & flags))
 				continue;
 		}
-		
+
 		for (p = 0; p < MAX_PARTICLES; p++)
 		{
 			if (!gParticleGroups[i]->isUsed[p])						// make sure this particle is used
 				continue;
-				
+
 			if (gParticleGroups[i]->alpha[p] < .4f)				// if particle is too decayed, then skip
-				continue;			 
-			
-			coord = &gParticleGroups[i]->coord[p];					// get ptr to coords					
+				continue;
+
+			coord = &gParticleGroups[i]->coord[p];					// get ptr to coords
 			if (DoSimpleBoxCollisionAgainstObject(coord->y+40.0f,coord->y-40.0f,
 												coord->x-40.0f, coord->x+40.0f,
 												coord->z+40.0f, coord->z-40.0f,
@@ -893,7 +893,7 @@ NewParticleDefType		newParticleDef;
 float					x,y,z;
 
 			/* white sparks */
-				
+
 	gNewParticleGroupDef.magicNum				= 0;
 	gNewParticleGroupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 	gNewParticleGroupDef.flags					= PARTICLE_FLAGS_BOUNCE|PARTICLE_FLAGS_ALLAIM;
@@ -908,11 +908,11 @@ float					x,y,z;
 
 	pg = NewParticleGroup(&gNewParticleGroupDef);
 	if (pg != -1)
-	{	
+	{
 		x = where->x;
 		y = where->y;
 		z = where->z;
-		
+
 		for (i = 0; i < 10; i++)
 		{
 			pt.x = x + RandomFloat2() * (2.0f * scale);
@@ -922,15 +922,15 @@ float					x,y,z;
 			delta.x = RandomFloat2() * (3.0f * scale);
 			delta.y = RandomFloat() * (2.0f  * scale);
 			delta.z = RandomFloat2() * (3.0f * scale);
-			
-			
+
+
 			newParticleDef.groupNum		= pg;
 			newParticleDef.where		= &pt;
 			newParticleDef.delta		= &delta;
 			newParticleDef.scale		= 1.0f + RandomFloat2() * .2f;
 			newParticleDef.rotZ			= RandomFloat() * PI2;
 			newParticleDef.rotDZ		= RandomFloat2() * 4.0f;
-			newParticleDef.alpha		= FULL_ALPHA;		
+			newParticleDef.alpha		= FULL_ALPHA;
 			AddParticleToGroup(&newParticleDef);
 		}
 	}
@@ -947,14 +947,14 @@ OGLPoint3D				pt;
 NewParticleDefType		newParticleDef;
 
 	n = force * .2f;
-	
+
 	if (quantityLimit)
 		if (n > quantityLimit)
 			n = quantityLimit;
-			
+
 
 			/* white sparks */
-				
+
 	gNewParticleGroupDef.magicNum				= 0;
 	gNewParticleGroupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 	gNewParticleGroupDef.flags					= PARTICLE_FLAGS_BOUNCE|PARTICLE_FLAGS_ALLAIM;
@@ -984,15 +984,15 @@ NewParticleDefType		newParticleDef;
 			delta.x = v.x * (force * scale);
 			delta.y = v.y * (force * scale);
 			delta.z = v.z * (force * scale);
-			
-			
+
+
 			newParticleDef.groupNum		= pg;
 			newParticleDef.where		= &pt;
 			newParticleDef.delta		= &delta;
 			newParticleDef.scale		= 1.0f + RandomFloat()  * .5f;
 			newParticleDef.rotZ			= 0;
 			newParticleDef.rotDZ		= 0;
-			newParticleDef.alpha		= FULL_ALPHA;		
+			newParticleDef.alpha		= FULL_ALPHA;
 			if (AddParticleToGroup(&newParticleDef))
 				break;
 		}
@@ -1022,11 +1022,11 @@ OGLPoint3D			p;
 
 		particleGroup 	= blob->ParticleGroup;
 		magicNum 		= blob->ParticleMagicNum;
-		
+
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
 			blob->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
-			
+
 			groupDef.magicNum				= magicNum;
 			groupDef.type					= PARTICLE_TYPE_GRAVITOIDS;
 			groupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND;
@@ -1052,14 +1052,14 @@ OGLPoint3D			p;
 				d.x = RandomFloat2() * 190.0f;
 				d.y = 150.0f + RandomFloat() * 190.0f;
 				d.z = RandomFloat2() * 190.0f;
-			
+
 				newParticleDef.groupNum		= particleGroup;
 				newParticleDef.where		= &p;
 				newParticleDef.delta		= &d;
 				newParticleDef.scale		= RandomFloat() + 1.0f;
 				newParticleDef.rotZ			= RandomFloat()*PI2;
 				newParticleDef.rotDZ		= 0;
-				newParticleDef.alpha		= .5;		
+				newParticleDef.alpha		= .5;
 				if (AddParticleToGroup(&newParticleDef))
 				{
 					blob->ParticleGroup = -1;
@@ -1094,7 +1094,7 @@ OGLPoint3D				where;
 		/*********************/
 		/* FIRST MAKE SPARKS */
 		/*********************/
-						
+
 	gNewParticleGroupDef.magicNum				= 0;
 	gNewParticleGroupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 	gNewParticleGroupDef.flags					= PARTICLE_FLAGS_VAPORTRAIL|PARTICLE_FLAGS_BOUNCE;
@@ -1111,7 +1111,7 @@ OGLPoint3D				where;
 	{
 		x = where.x;
 		y = where.y;
-		z = where.z;	
+		z = where.z;
 		dx = delta->x * .2f;
 		dz = delta->z * .2f;
 
@@ -1125,19 +1125,19 @@ OGLPoint3D				where;
 			d.y = RandomFloat() * 1500.0f;
 			d.x = (RandomFloat()-.5f) * d.y * 3.0f + dx;
 			d.z = (RandomFloat()-.5f) * d.y * 3.0f + dz;
-			
-			
+
+
 			newParticleDef.groupNum		= pg;
 			newParticleDef.where		= &pt;
 			newParticleDef.delta		= &d;
 			newParticleDef.scale		= RandomFloat() + 1.5f;
 			newParticleDef.rotZ			= 0;
 			newParticleDef.rotDZ		= 0;
-			newParticleDef.alpha		= FULL_ALPHA + (RandomFloat() * .3f);		
+			newParticleDef.alpha		= FULL_ALPHA + (RandomFloat() * .3f);
 			AddParticleToGroup(&newParticleDef);
 		}
 	}
-	
+
 
 }
 
@@ -1170,7 +1170,7 @@ NewParticleDefType		newParticleDef;
 	gNewParticleGroupDef.srcBlend				= GL_SRC_ALPHA;
 	gNewParticleGroupDef.dstBlend				= GL_ONE;
 
-				
+
 	pg = NewParticleGroup(&gNewParticleGroupDef);
 	if (pg != -1)
 	{
@@ -1182,14 +1182,14 @@ NewParticleDefType		newParticleDef;
 			delta.x = RandomFloat2() * 600.0f;
 			delta.y = 100.0f + RandomFloat() * 300.0f;
 			delta.z = RandomFloat2() * 600.0f;
-			
+
 			newParticleDef.groupNum		= pg;
 			newParticleDef.where		= &pt;
 			newParticleDef.delta		= &delta;
 			newParticleDef.scale		= RandomFloat() + 1.0f;
 			newParticleDef.rotZ			= 0;
 			newParticleDef.rotDZ		= 0;
-			newParticleDef.alpha		= FULL_ALPHA;					
+			newParticleDef.alpha		= FULL_ALPHA;
 			AddParticleToGroup(&newParticleDef);
 		}
 	}
@@ -1197,7 +1197,7 @@ NewParticleDefType		newParticleDef;
 			/* PLAY SPLASH SOUND */
 
 	pt.x = x;
-	pt.z = z;			
+	pt.z = z;
 //	PlayEffect_Parms3D(EFFECT_SPLASH, &pt, NORMAL_CHANNEL_RATE, 3);
 }
 
@@ -1205,7 +1205,7 @@ NewParticleDefType		newParticleDef;
 /***************** SPRAY WATER *************************/
 
 void SprayWater(ObjNode *theNode, float x, float y, float z)
-{			
+{
 float	fps = gFramesPerSecondFrac;
 int		particleGroup, magicNum;
 
@@ -1220,7 +1220,7 @@ int		particleGroup, magicNum;
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
 			theNode->SmokeParticleMagic = magicNum = MyRandomLong();			// generate a random magic num
-			
+
 			gNewParticleGroupDef.magicNum				= magicNum;
 			gNewParticleGroupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 			gNewParticleGroupDef.flags					= 0;
@@ -1235,15 +1235,15 @@ int		particleGroup, magicNum;
 			theNode->SmokeParticleGroup = particleGroup = NewParticleGroup(&gNewParticleGroupDef);
 		}
 
-	
+
 					/* ADD PARTICLE TO GROUP */
-					
+
 		if (particleGroup != -1)
 		{
 			OGLPoint3D	pt;
 			OGLVector3D delta;
 			NewParticleDefType		newParticleDef;
-						
+
 			FastNormalizeVector(gDelta.x, 0, gDelta.z, &delta);			// calc spray delta shooting out of butt
 			delta.x *= -300.0f;
 			delta.z *= -300.0f;
@@ -1255,7 +1255,7 @@ int		particleGroup, magicNum;
 			pt.x = x + (RandomFloat()-.5f) * 80.0f;			// random noise to coord
 			pt.y = y;
 			pt.z = z + (RandomFloat()-.5f) * 80.0f;
-			
+
 
 			newParticleDef.groupNum		= particleGroup;
 			newParticleDef.where		= &pt;
@@ -1263,7 +1263,7 @@ int		particleGroup, magicNum;
 			newParticleDef.scale		= RandomFloat() + 1.0f;
 			newParticleDef.rotZ			= 0;
 			newParticleDef.rotDZ		= 0;
-			newParticleDef.alpha		= FULL_ALPHA;					
+			newParticleDef.alpha		= FULL_ALPHA;
 			AddParticleToGroup(&newParticleDef);
 		}
 	}
@@ -1300,15 +1300,15 @@ OGLPoint3D			p;
 		if (theNode->SmokeTimer <= 0.0f)
 		{
 			theNode->SmokeTimer += SMOKE_TIMER;										// reset timer
-			
+
 			particleGroup 	= theNode->SmokeParticleGroup;
 			magicNum 		= theNode->SmokeParticleMagic;
-			
+
 			if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 			{
-				
+
 				theNode->SmokeParticleMagic = magicNum = MyRandomLong();			// generate a random magic num
-				
+
 				groupDef.magicNum				= magicNum;
 				groupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 				groupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND|moreFlags;
@@ -1322,7 +1322,7 @@ OGLPoint3D			p;
 				groupDef.dstBlend				= GL_ONE_MINUS_SRC_ALPHA;
 				theNode->SmokeParticleGroup = particleGroup = NewParticleGroup(&groupDef);
 			}
-	
+
 			if (particleGroup != -1)
 			{
 				for (i = 0; i < 3; i++)
@@ -1330,18 +1330,18 @@ OGLPoint3D			p;
 					p.x = x + RandomFloat2() * (40.0f * scale);
 					p.y = y + 200.0f + RandomFloat() * (50.0f * scale);
 					p.z = z + RandomFloat2() * (40.0f * scale);
-	
+
 					d.x = RandomFloat2() * (20.0f * scale);
 					d.y = 150.0f + RandomFloat() * (40.0f * scale);
 					d.z = RandomFloat2() * (20.0f * scale);
-				
+
 					newParticleDef.groupNum		= particleGroup;
 					newParticleDef.where		= &p;
 					newParticleDef.delta		= &d;
 					newParticleDef.scale		= RandomFloat() + 1.0f;
 					newParticleDef.rotZ			= RandomFloat() * PI2;
 					newParticleDef.rotDZ		= RandomFloat2();
-					newParticleDef.alpha		= .7;		
+					newParticleDef.alpha		= .7;
 					if (AddParticleToGroup(&newParticleDef))
 					{
 						theNode->SmokeParticleGroup = -1;
@@ -1360,14 +1360,14 @@ OGLPoint3D			p;
 	if (theNode->FireTimer <= 0.0f)
 	{
 		theNode->FireTimer += FIRE_TIMER;										// reset timer
-		
+
 		particleGroup 	= theNode->ParticleGroup;
 		magicNum 		= theNode->ParticleMagicNum;
-		
+
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
 			theNode->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
-			
+
 			groupDef.magicNum				= magicNum;
 			groupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 			groupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND|moreFlags;
@@ -1393,14 +1393,14 @@ OGLPoint3D			p;
 				d.x = RandomFloat2() * (50.0f * scale);
 				d.y = 50.0f + RandomFloat() * (60.0f * scale);
 				d.z = RandomFloat2() * (50.0f * scale);
-			
+
 				newParticleDef.groupNum		= particleGroup;
 				newParticleDef.where		= &p;
 				newParticleDef.delta		= &d;
 				newParticleDef.scale		= RandomFloat() + 1.0f;
 				newParticleDef.rotZ			= RandomFloat() * PI2;
 				newParticleDef.rotDZ		= RandomFloat2();
-				newParticleDef.alpha		= 1.0;		
+				newParticleDef.alpha		= 1.0;
 				if (AddParticleToGroup(&newParticleDef))
 				{
 					theNode->ParticleGroup = -1;
@@ -1437,7 +1437,7 @@ OGLPoint3D				where;
 		/*********************/
 		/* FIRST MAKE FLAMES */
 		/*********************/
-						
+
 	gNewParticleGroupDef.magicNum				= 0;
 	gNewParticleGroupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 	gNewParticleGroupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND;
@@ -1454,7 +1454,7 @@ OGLPoint3D				where;
 	{
 		x = where.x;
 		y = where.y;
-		z = where.z;	
+		z = where.z;
 		dx = delta->x * .2f;
 		dz = delta->z * .2f;
 
@@ -1468,19 +1468,19 @@ OGLPoint3D				where;
 			d.y = RandomFloat() * 1000.0f;
 			d.x = (RandomFloat()-.5f) * d.y * 3.0f + dx;
 			d.z = (RandomFloat()-.5f) * d.y * 3.0f + dz;
-			
-			
+
+
 			newParticleDef.groupNum		= pg;
 			newParticleDef.where		= &pt;
 			newParticleDef.delta		= &d;
 			newParticleDef.scale		= RandomFloat() + 1.5f;
 			newParticleDef.rotZ			= 0;
 			newParticleDef.rotDZ		= RandomFloat2() * 10.0f;
-			newParticleDef.alpha		= FULL_ALPHA + (RandomFloat() * .3f);		
+			newParticleDef.alpha		= FULL_ALPHA + (RandomFloat() * .3f);
 			AddParticleToGroup(&newParticleDef);
 		}
 	}
-	
+
 
 }
 
@@ -1520,7 +1520,7 @@ float	s = 2.0;
 		/***********/
 		/* MOVE IT */
 		/***********/
-		
+
 	switch(gDeathExitMode)
 	{
 		case	DEATH_EXIT_MODE_CLOSE:
@@ -1528,15 +1528,15 @@ float	s = 2.0;
 				if (gDeathExitX > 320.0f)
 				{
 					gDeathExitX = 320.0f;
-					
+
 					if (gPlayerInfo.lives == 0)				// see if any lives left, or if we end now
 					{
-						gDeathExitMode = DEATH_EXIT_MODE_STAY;	
-						gGameOver = true;					
+						gDeathExitMode = DEATH_EXIT_MODE_STAY;
+						gGameOver = true;
 					}
 					else
 					{
-						gDeathExitMode = DEATH_EXIT_MODE_OPEN;					
+						gDeathExitMode = DEATH_EXIT_MODE_OPEN;
 						gPlayerInfo.lives--;				// dec # lives
 						ResetPlayerAtBestCheckpoint();
 					}
@@ -1550,37 +1550,37 @@ float	s = 2.0;
 				break;
 
 	}
-				
+
 
 		/*************/
 		/* SET STATE */
 		/*************/
-		
+
 	OGL_PushState();
 
 	if (setupInfo->useFog)
 		glDisable(GL_FOG);
 	OGL_DisableLighting();
-	glDisable(GL_CULL_FACE);							
+	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);								// no z-buffer
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0, 640, 480, 0, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();					
+	glLoadIdentity();
 
 
 		/* DRAW LEFT */
-		
+
 	glTranslatef(gDeathExitX, 0, 0);
 	glScalef(s,-s,s);
 	MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_DeathExitLeft]  ,setupInfo);
 
 
 		/* DRAW RIGHT */
-		
-	glLoadIdentity();					
+
+	glLoadIdentity();
 	glTranslatef(640-gDeathExitX, 0, 0);
 	glScalef(s,-s,s);
 	MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_DeathExitRight]  ,setupInfo);
@@ -1609,28 +1609,28 @@ ObjNode	*newObj;
 	for (i = 0; i < 14; i++)
 	{
 				/* RANDOM AIM TO START WITH */
-				
+
 		aim.x = RandomFloat2();
 		aim.y = RandomFloat() * 3.0f;
 		aim.z = RandomFloat2();
 		FastNormalizeVector(aim.x, aim.y, aim.z, &aim);
-	
-		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 		gNewObjectDefinition.type 		= modelObjType;
 		gNewObjectDefinition.coord.x	= where->x + aim.x * 50.0f;
 		gNewObjectDefinition.coord.y	= where->y + aim.y * 50.0f;
 		gNewObjectDefinition.coord.z	= where->z + aim.z * 50.0f;
 		gNewObjectDefinition.flags 		= gAutoFadeStatusBits|STATUS_BIT_USEALIGNMENTMATRIX;
 		gNewObjectDefinition.slot 		= 479;
-		gNewObjectDefinition.moveCall 	= MoveBlobDroplet;	
-		gNewObjectDefinition.rot 		= 0;	
+		gNewObjectDefinition.moveCall 	= MoveBlobDroplet;
+		gNewObjectDefinition.rot 		= 0;
 		gNewObjectDefinition.scale 		= .4f + RandomFloat();
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 		newObj->Special[0] = 0;						// init counter
 
 			/* SET DELTAS */
-		
+
 		newObj->Delta.x = aim.x * 800.0f;
 		newObj->Delta.y = aim.y * 800.0f;
 		newObj->Delta.z = aim.z * 800.0f;
@@ -1641,7 +1641,7 @@ ObjNode	*newObj;
 
 
 			/* SET COLLISION */
-			
+
 		newObj->Damage 			= .1;
 		newObj->CType 			= CTYPE_HURTME;
 		newObj->CBits			= CBITS_TOUCHABLE;
@@ -1663,22 +1663,22 @@ OGLVector3D	aim;
 	GetObjectInfo(theNode);
 
 			/* MOVE IT */
-				
+
 	gDelta.y -= 1600.0f * fps;
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
 	gCoord.z += gDelta.z * fps;
 
 			/* SHRINK */
-			
-	theNode->Scale.x = 
-	theNode->Scale.y = 
+
+	theNode->Scale.x =
+	theNode->Scale.y =
 	theNode->Scale.z -= fps * .7f;
 	if (theNode->Scale.x <= 0.0f)
 	{
-gone:	
+gone:
 		DeleteObject(theNode);
-		return;	
+		return;
 	}
 
 
@@ -1691,15 +1691,15 @@ gone:
 		theNode->Special[0]++;
 		if (theNode->Special[0] > 3)
 		{
-			ExplodeGeometry(theNode, 200, SHARD_MODE_FROMORIGIN, 3, .5);	
+			ExplodeGeometry(theNode, 200, SHARD_MODE_FROMORIGIN, 3, .5);
 			goto gone;
 		}
 	}
 
 
 		/* SET NEW ALIGNMENT & UPDATE */
-		
-	
+
+
 	FastNormalizeVector(gDelta.x, gDelta.y, gDelta.z, &aim);
 	SetAlignmentMatrix(&theNode->AlignmentMatrix, &aim);
 	UpdateObject(theNode);
@@ -1714,7 +1714,7 @@ Boolean AddSmoker(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 
-	gNewObjectDefinition.genre		= EVENT_GENRE;				
+	gNewObjectDefinition.genre		= EVENT_GENRE;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
 	gNewObjectDefinition.coord.y 	= FindHighestCollisionAtXZ(x,z, CTYPE_TERRAIN | CTYPE_WATER);
@@ -1722,11 +1722,11 @@ ObjNode	*newObj;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+10;
 	gNewObjectDefinition.moveCall 	= MoveSmoker;
 	newObj = MakeNewObject(&gNewObjectDefinition);
-	
+
 	newObj->TerrainItemPtr = itemPtr;								// keep ptr to item list
 
 	newObj->Kind = itemPtr->parm[0];								// save smoke kind
-	
+
 	return(true);
 }
 
@@ -1762,16 +1762,16 @@ static const Boolean	glow[] =
 };
 
 		/* SEE IF OUT OF RANGE */
-		
+
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
 		DeleteObject(theNode);
 		return;
 	}
-	
-	
+
+
 	theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z);		// make sure on ground (for when volcanos grow over it)
-	
+
 
 		/**************/
 		/* MAKE SMOKE */
@@ -1781,17 +1781,17 @@ static const Boolean	glow[] =
 	if (theNode->Timer <= 0.0f)
 	{
 		theNode->Timer += .1f;												// reset timer
-	
+
 		t = textures[smokeType = theNode->Kind];										// get texture #
-		
+
 		particleGroup 	= theNode->ParticleGroup;
 		magicNum 		= theNode->ParticleMagicNum;
-		
+
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
-			
+
 			theNode->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
-			
+
 			groupDef.magicNum				= magicNum;
 			groupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 			groupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND;
@@ -1803,7 +1803,7 @@ static const Boolean	glow[] =
 			groupDef.particleTextureNum		= t;
 			groupDef.srcBlend				= GL_SRC_ALPHA;
 			if (glow[smokeType])
-				groupDef.dstBlend				= GL_ONE;		
+				groupDef.dstBlend				= GL_ONE;
 			else
 				groupDef.dstBlend				= GL_ONE_MINUS_SRC_ALPHA;
 			theNode->ParticleGroup = particleGroup = NewParticleGroup(&groupDef);
@@ -1812,7 +1812,7 @@ static const Boolean	glow[] =
 		if (particleGroup != -1)
 		{
 			float				x,y,z;
-			
+
 			x = theNode->Coord.x;
 			y = theNode->Coord.y;
 			z = theNode->Coord.z;
@@ -1826,14 +1826,14 @@ static const Boolean	glow[] =
 				d.x = RandomFloat2() * 80.0f;
 				d.y = 150.0f + RandomFloat() * 75.0f;
 				d.z = RandomFloat2() * 80.0f;
-			
+
 				newParticleDef.groupNum		= particleGroup;
 				newParticleDef.where		= &p;
 				newParticleDef.delta		= &d;
 				newParticleDef.scale		= RandomFloat() + 1.0f;
 				newParticleDef.rotZ			= RandomFloat()*PI2;
 				newParticleDef.rotDZ		= RandomFloat2() * .1f;
-				newParticleDef.alpha		= .6;		
+				newParticleDef.alpha		= .6;
 				if (AddParticleToGroup(&newParticleDef))
 				{
 					theNode->ParticleGroup = -1;

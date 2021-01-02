@@ -65,9 +65,9 @@ float	xangle,zdiff;
 	zdiff = fabs(zdiff);								// get abs value
 
 	xangle = atan2(-zdiff,toY-fromY) + (PI/2.0f);
-	
+
 			/* KEEP BETWEEN 0 & 2*PI */
-			
+
 	return(MaskAngle(xangle));
 }
 
@@ -82,26 +82,26 @@ float	CalcYAngleFromPointToPoint(float oldRot, float fromX, float fromZ, float t
 const static OGLVector2D	zax = {0,-1};
 OGLVector2D					aim;
 float		dot,angle,cross;
-	
+
 			/* CALC AIM VECTOR */
-			
+
 	aim.x = toX - fromX;
 	aim.y = toZ - fromZ;
 	FastNormalizeVector2D(aim.x, aim.y, &aim, true);
 
 	if ((aim.x == 0.0f) && (aim.y == 0.0f))							// if bad vector then return old
 	{
-		return(oldRot);	
+		return(oldRot);
 	}
-	
+
 			/* CALC ANGLE */
-			
+
 	dot = OGLVector2D_Dot(&zax, &aim);
 	angle = acos(dot);
 
 
 	/* NOW SEE IF WRAPPED PAST 180 DEGREES */
-	
+
 	cross = OGLVector2D_Cross(&aim, &zax);
 	if (cross < 0.0f)
 		angle = PI2 - angle;
@@ -130,7 +130,7 @@ float	r,angle,cross;
 OGLVector2D	aimVec,targetVec;
 
 			/* CALC FROM/TO COORDS */
-			
+
 	if (useOffsets)
 	{
 		toX += theNode->TargetOff.x;										// offset coord
@@ -150,30 +150,30 @@ OGLVector2D	aimVec,targetVec;
 
 
 			/* CALC ANGLE BETWEEN AIM AND TARGET */
-			
+
 	r = theNode->Rot.y;												// get normalized vector in direction of current aim
 	aimVec.x = -sin(r);
 	aimVec.y = -cos(r);
-  	
+
  	targetVec.x = toX - fromX;										// get normalized vector to target object
  	targetVec.y = toZ - fromZ;
 	OGLVector2D_Normalize(&targetVec, &targetVec);					// do ACCURATE normalize to avoid jitter!!!
 	if ((targetVec.x == 0.0f) && (targetVec.y == 0.0f))
 		return(0);
 
-	angle = acos(OGLVector2D_Dot(&aimVec, &targetVec));				// dot == angle to turn	
+	angle = acos(OGLVector2D_Dot(&aimVec, &targetVec));				// dot == angle to turn
 	cross = OGLVector2D_Cross(&aimVec, &targetVec);					// sign of cross tells us which way to turn
 
 
 			/* DO THE TURN */
-	
+
 	if (turnSpeed != 0.0f)
 	{
 		turnSpeed *= gFramesPerSecondFrac;								// calc amount to turn this frame
-		
+
 		if (turnSpeed > angle)											// make sure we dont exceed how far we want to go
 			turnSpeed = angle;
-		
+
 		if (cross > 0.0f)												// see which direction
 			turnSpeed = -turnSpeed;
 
@@ -203,26 +203,26 @@ float		angle;
 	if ((targetVec.x == 0.0f) && (targetVec.y == 0.0f))
 		return(0);
 
-			
+
 	targetVecFlat.x = targetVec.x;									// x/z plane aim vector
-	targetVecFlat.z = targetVec.z;	
+	targetVecFlat.z = targetVec.z;
 	targetVecFlat.y = sin(theNode->Rot.x);
 	OGLVector3D_Normalize(&targetVecFlat, &targetVecFlat);
-	
+
 	angle = acos(OGLVector3D_Dot(&targetVecFlat, &targetVec));				// calc angle between them
-	OGLVector3D_Cross(&targetVecFlat, &targetVec, &cross);					// calc perpendicular vector	
+	OGLVector3D_Cross(&targetVecFlat, &targetVec, &cross);					// calc perpendicular vector
 	OGLVector3D_Cross(&cross, &targetVecFlat, &cross);					// calc another vector who's y will tell us direction to rotate
 
 
 			/* DO THE TURN */
-	
+
 	if (turnSpeed != 0.0f)
 	{
 		turnSpeed *= gFramesPerSecondFrac;								// calc amount to turn this frame
-		
+
 		if (turnSpeed > angle)											// make sure we dont exceed how far we want to go
 			turnSpeed = angle;
-		
+
 		if (cross.y < 0.0f)												// see which direction
 			turnSpeed = -turnSpeed;
 
@@ -247,29 +247,29 @@ OGLVector2D	aimVec,targetVec;
 
 
 			/* CALC ANGLE BETWEEN AIM AND TARGET */
-			
+
 	aimVec.x = -sin(*rotY);
 	aimVec.y = -cos(*rotY);
-  	
+
  	targetVec.x = toX - fromX;										// get normalized vector to target object
  	targetVec.y = toZ - fromZ;
 	OGLVector2D_Normalize(&targetVec, &targetVec);					// do ACCURATE normalize to avoid jitter!!!
 	if ((targetVec.x == 0.0f) && (targetVec.y == 0.0f))
 		return(0);
 
-	angle = acos(OGLVector2D_Dot(&aimVec, &targetVec));				// dot == angle to turn	
+	angle = acos(OGLVector2D_Dot(&aimVec, &targetVec));				// dot == angle to turn
 	cross = OGLVector2D_Cross(&aimVec, &targetVec);					// sign of cross tells us which way to turn
 
 
 			/* DO THE TURN */
-	
+
 	if (turnSpeed != 0.0f)
 	{
 //		turnSpeed *= gFramesPerSecondFrac;								// calc amount to turn this frame
-		
+
 		if (turnSpeed > angle)											// make sure we dont exceed how far we want to go
 			turnSpeed = angle;
-		
+
 		if (cross > 0.0f)												// see which direction
 			turnSpeed = -turnSpeed;
 
@@ -341,16 +341,16 @@ float	vBAx, vBAy, vBAz, dot, lam;
 	ny = plane->normal.y;
 	nz = plane->normal.z;
 	planeConst = plane->constant;
-	
-	
+
+
 		/* DETERMINE SIDENESS OF VERT1 */
-		
+
 	r = -planeConst;
 	r += (nx * v1x) + (ny * v1y) + (nz * v1z);
 	a = (r < 0.0f) ? 1 : 0;
 
 		/* DETERMINE SIDENESS OF VERT2 */
-		
+
 	r = -planeConst;
 	r += (nx * v2x) + (ny * v2y) + (nz * v2z);
 	b = (r < 0.0f) ? 1 : 0;
@@ -366,33 +366,33 @@ float	vBAx, vBAy, vBAz, dot, lam;
 		/****************************************************/
 		/* LINE INTERSECTS, SO CALCULATE INTERSECTION POINT */
 		/****************************************************/
-			
+
 				/* CALC LINE SEGMENT VECTOR BA */
-				
+
 	vBAx = v2x - v1x;
 	vBAy = v2y - v1y;
 	vBAz = v2z - v1z;
-	
+
 			/* DOT OF PLANE NORMAL & LINE SEGMENT VECTOR */
-			
+
 	dot = (nx * vBAx) + (ny * vBAy) + (nz * vBAz);
-	
+
 			/* IF VALID, CALC INTERSECTION POINT */
-			
+
 	if (dot)
 	{
 		lam = planeConst;
 		lam -= (nx * v1x) + (ny * v1y) + (nz * v1z);		// calc dot product of plane normal & 1st vertex
 		lam /= dot;											// div by previous dot for scaling factor
-		
+
 		outPoint->x = v1x + (lam * vBAx);					// calc intersect point
 		outPoint->y = v1y + (lam * vBAy);
 		outPoint->z = v1z + (lam * vBAz);
 		return(true);
 	}
-	
+
 		/* IF DOT == 0, THEN LINE IS PARALLEL TO PLANE THUS NO INTERSECTION */
-		
+
 	else
 		return(false);
 }
@@ -402,7 +402,7 @@ float	vBAx, vBAy, vBAz, dot, lam;
 
 /*********** INTERSECTION OF Y AND PLANE FUNCTION ********************/
 //
-// INPUT:	
+// INPUT:
 //			x/z		:	xz coords of point
 //			p		:	ptr to the plane
 //
@@ -431,20 +431,20 @@ OGLVector3D	lookAt,theXAxis;
 
 
 		/* CALC THE X-AXIS VECTOR */
-		
+
 	FastNormalizeVector(from->x - to->x, from->y - to->y, from->z - to->z, &lookAt);	// calc temporary look-at vector
-		
+
 	theXAxis.x = 	upVector->y * lookAt.z - lookAt.y * upVector->z;					// calc cross product
 	theXAxis.y =  -(upVector->x	* lookAt.z - lookAt.x * upVector->z);
-	theXAxis.z = 	upVector->x * lookAt.y - lookAt.x * upVector->y;		
+	theXAxis.z = 	upVector->x * lookAt.y - lookAt.x * upVector->y;
 	FastNormalizeVector(theXAxis.x, theXAxis.y, theXAxis.z, &theXAxis);		// (this normalize shouldnt be needed, but do it to be safe)
-		
+
 	m->value[M00] = theXAxis.x;
 	m->value[M10] = theXAxis.y;
 	m->value[M20] = theXAxis.z;
-	
 
-#if 1	
+
+#if 1
 	{									// recompute a fixed up vector to ensure orthonormal
 		OGLVector3D	newUp;
 		OGLVector3D_Cross(&lookAt, &theXAxis, &newUp);
@@ -452,9 +452,9 @@ OGLVector3D	lookAt,theXAxis;
 		m->value[M11] = newUp.y;
 		m->value[M21] = newUp.z;
 	}
-#endif	
+#endif
 
-	
+
 		/* CALC LOOK-AT VECTOR */
 		//
 		// We totally recompute this since the input "to" is not probably orthonormal to other axes.
@@ -462,16 +462,16 @@ OGLVector3D	lookAt,theXAxis;
 
 	lookAt.x = 	-(upVector->y    * theXAxis.z - theXAxis.y * upVector->z);		// calc reversed cross product
 	lookAt.y =  (upVector->x  * theXAxis.z - theXAxis.x * upVector->z);
-	lookAt.z = 	-(upVector->x    * theXAxis.y - theXAxis.x * upVector->y);		
+	lookAt.z = 	-(upVector->x    * theXAxis.y - theXAxis.x * upVector->y);
 
 	m->value[M02] = lookAt.x;
 	m->value[M12] = lookAt.y;
 	m->value[M22] = lookAt.z;
-	
+
 
 			/* SET OTHER THINGS */
 	m->value[M30] =
-	m->value[M31] = 
+	m->value[M31] =
 	m->value[M32] =
 	m->value[M03] = m->value[M13] = m->value[M23] = 0;
 	m->value[M33] = 1;
@@ -491,7 +491,7 @@ OGLVector3D	lookAt;
 	m->value[M02] = lookAt.x;
 	m->value[M12] = lookAt.y;
 	m->value[M22] = lookAt.z;
-	
+
 
 			/* CALC UP VECTOR */
 
@@ -504,15 +504,15 @@ OGLVector3D	lookAt;
 
 	m->value[M00] = 	upVector->y * lookAt.z - lookAt.y * upVector->z;		// calc cross product
 	m->value[M10] =  	lookAt.x * upVector->z - upVector->x * lookAt.z;
-	m->value[M20] = 	upVector->x * lookAt.y - lookAt.x * upVector->y;		
-	
-	
+	m->value[M20] = 	upVector->x * lookAt.y - lookAt.x * upVector->y;
+
+
 			/* SET OTHER THINGS */
-			
+
 	m->value[M30] =
-	m->value[M31] = 
+	m->value[M31] =
 	m->value[M32] = 0;
-	
+
 	m->value[M03] = from->x;					// set translate
 	m->value[M13] = from->y;
 	m->value[M23] = from->z;
@@ -541,14 +541,14 @@ static const OGLVector3D	up = {0,1,0};
 
 
 		/* CALC X-AXIS */
-		
+
 	OGLVector3D_Cross(aim, &up, &theXAxis);
 	m->value[M00] = theXAxis.x;
 	m->value[M10] = theXAxis.y;
 	m->value[M20] = theXAxis.z;
 
 		/* CALC Y-AXIS */
-		
+
 	OGLVector3D_Cross(&theXAxis, aim, &yAxis);
 	m->value[M01] = yAxis.x;
 	m->value[M11] = yAxis.y;
@@ -556,9 +556,9 @@ static const OGLVector3D	up = {0,1,0};
 
 
 			/* SET OTHER THINGS */
-			
+
 	m->value[M30] =
-	m->value[M31] = 
+	m->value[M31] =
 	m->value[M32] =
 	m->value[M03] = m->value[M13] = m->value[M23] = 0;
 	m->value[M33] = 1;
@@ -573,18 +573,18 @@ void SetAlignmentMatrixWithZRot(OGLMatrix4x4 *m, const OGLVector3D *aim, float r
 OGLMatrix4x4	rm;
 
 			/* CALC THE ROT MATRIX */
-			
+
 	OGLMatrix4x4_SetRotate_Z(&rm, rotZ);
 
 
 
 			/* CALC THE REGULAR MATRIX */
-			
+
 	SetAlignmentMatrix(m, aim);
 
 
 		/* MULTIPLY TOGETHER */
-		
+
 	OGLMatrix4x4_Multiply(&rm, m, m);
 
 }
@@ -598,7 +598,7 @@ float CalcVectorLength(OGLVector3D *v)
 float	d;
 
 	d = (v->x * v->x) + (v->y * v->y) + (v->z * v->z);
-	
+
 	return(sqrt(d));
 }
 
@@ -609,7 +609,7 @@ float CalcVectorLength2D(const OGLVector2D *v)
 float	d;
 
 	d = (v->x * v->x) + (v->y * v->y);
-	
+
 	return(sqrt(d));
 }
 
@@ -695,57 +695,57 @@ float	dx,dy,dz;
 	dx = d->x;
 	dy = d->y;
 	dz = d->z;
-	
+
 			/* dx */
-			
+
 	if (dx < 0.0f)
 	{
 		dx += f;
 		if (dx > 0.0f)
-			dx = 0;	
+			dx = 0;
 	}
 	else
 	if (dx > 0.0f)
 	{
 		dx -= f;
 		if (dx < 0.0f)
-			dx = 0;	
+			dx = 0;
 	}
 
 
 			/* dY */
-			
+
 	if (dy < 0.0f)
 	{
 		dy += f;
 		if (dy > 0.0f)
-			dy = 0;	
+			dy = 0;
 	}
 	else
 	if (dy > 0.0f)
 	{
 		dy -= f;
 		if (dy < 0.0f)
-			dy = 0;	
+			dy = 0;
 	}
 
 
 			/* dz */
-			
+
 	if (dz < 0.0f)
 	{
 		dz += f;
 		if (dz > 0.0f)
-			dz = 0;	
+			dz = 0;
 	}
 	else
 	if (dz > 0.0f)
 	{
 		dz -= f;
 		if (dz < 0.0f)
-			dz = 0;	
+			dz = 0;
 	}
-	
+
 	d->x = dx;
 	d->y = dy;
 	d->z = dz;
@@ -771,19 +771,19 @@ float					pX,pY;
 float					verts0x,verts0y;
 float					verts1x,verts1y;
 float					verts2x,verts2y;
-	
+
 	tmp = (float *)trianglePoints;
 	skip = sizeof(OGLPoint3D) / sizeof(float);
-	
-		
+
+
 			/*****************************************/
 			/* DETERMINE LONGEST COMPONENT OF NORMAL */
 			/*****************************************/
-				
+
 	xComp = fabs(normal->x);
 	yComp = fabs(normal->y);
 	zComp = fabs(normal->z);
-	
+
 	if (xComp > yComp)
 	{
 		if (xComp > zComp)
@@ -799,18 +799,18 @@ float					verts2x,verts2y;
 			maximalComponent = VectorComponent_Z;
 	}
 
-	
-	
+
+
 				/* PROJECT 3D POINTS TO 2D */
 
 	switch(maximalComponent)
 	{
 		OGLPoint3D	*point;
-		
+
 		case	VectorComponent_X:
 				pX = point3D->y;
 				pY = point3D->z;
-				
+
 				point = (OGLPoint3D *)tmp;
 				verts0x = point->y;
 				verts0y = point->z;
@@ -827,7 +827,7 @@ float					verts2x,verts2y;
 		case	VectorComponent_Y:
 				pX = point3D->z;
 				pY = point3D->x;
-				
+
 				point = (OGLPoint3D *)tmp;
 				verts0x = point->z;
 				verts0y = point->x;
@@ -844,7 +844,7 @@ float					verts2x,verts2y;
 		case	VectorComponent_Z:
 				pX = point3D->x;
 				pY = point3D->y;
-				
+
 				point = (OGLPoint3D *)tmp;
 				verts0x = point->x;
 				verts0y = point->y;
@@ -858,11 +858,11 @@ float					verts2x,verts2y;
 				verts2y = point->y;
 				break;
 	}
-	
-	
+
+
 			/* NOW DO 2D POINT-IN-TRIANGLE CHECK */
-				
-	return ((Boolean)IsPointInTriangle(pX, pY, verts0x, verts0y, verts1x, verts1y, verts2x, verts2y));	
+
+	return ((Boolean)IsPointInTriangle(pX, pY, verts0x, verts0y, verts1x, verts1y, verts2x, verts2y));
 }
 
 #pragma mark -
@@ -878,9 +878,9 @@ Boolean IntersectLineSegments(float x1, float y1, float x2, float y2,
 		                     float x3, float y3, float x4, float y4,
                              float *x, float *y)
 {
-double	a1, a2, b1, b2, c1, c2; 				// Coefficients of line eqns. 
-long 	r1, r2, r3, r4;         				// 'Sign' values 
-double 	denom, offset, num;     				// Intermediate values 
+double	a1, a2, b1, b2, c1, c2; 				// Coefficients of line eqns.
+long 	r1, r2, r3, r4;         				// 'Sign' values
+double 	denom, offset, num;     				// Intermediate values
 double	max1,min1,max2,min2;
 
 			/***********************************************/
@@ -888,7 +888,7 @@ double	max1,min1,max2,min2;
 			/***********************************************/
 
 			/* SEE IF HORIZ OUT OF BOUNDS */
-		
+
 	if (x1 > x2)
 	{
 		max1 = x1;
@@ -899,7 +899,7 @@ double	max1,min1,max2,min2;
 		max1 = x2;
 		min1 = x1;
 	}
-	
+
 	if (x3 < x4)
 	{
 		min2 = x3;
@@ -910,7 +910,7 @@ double	max1,min1,max2,min2;
 		min2 = x4;
 		max2 = x3;
 	}
-	
+
 	if (max1 < min2)
 		return(false);
 	if (min1 > max2)
@@ -918,7 +918,7 @@ double	max1,min1,max2,min2;
 
 
 			/* SEE IF VERT OUT OF BOUNDS */
-		
+
 	if (y1 > y2)
 	{
 		max1 = y1;
@@ -929,7 +929,7 @@ double	max1,min1,max2,min2;
 		max1 = y2;
 		min1 = y1;
 	}
-	
+
 	if (y3 < y4)
 	{
 		min2 = y3;
@@ -940,14 +940,14 @@ double	max1,min1,max2,min2;
 		min2 = y4;
 		max2 = y3;
 	}
-	
+
 	if (max1 < min2)
 		return(false);
 	if (min1 > max2)
 		return(false);
 
-	
-				
+
+
 
 
      /* Compute a1, b1, c1, where line joining points 1 and 2
@@ -960,7 +960,7 @@ double	max1,min1,max2,min2;
 
 
      /* Compute r3 and r4. */
-     
+
 	r3 = (a1 * x3) + (b1 * y3) + c1;
 	r4 = (a1 * x4) + (b1 * y4) + c1;
 
@@ -993,7 +993,7 @@ double	max1,min1,max2,min2;
 
 
      /* Line segments intersect: compute intersection point. */
-   
+
 	denom = (a1 * b2) - (a2 * b1);
 	if (denom == 0.0f)
 	{
@@ -1038,17 +1038,17 @@ void CalcLineNormal2D(float p0x, float p0y, float p1x, float p1y,
 OGLVector2D		normalA, normalB;
 float			temp,x,y;
 
-	
+
 		/* CALC NORMALIZED VECTOR FROM ENDPOINT TO ENDPOINT */
-			
+
 	FastNormalizeVector2D(p0x - p1x, p0y - p1y, &normalA, false);
-	 
-	 
+
+
 		/* CALC NORMALIZED VECTOR FROM REF POINT TO ENDPOINT 0 */
 
 	FastNormalizeVector2D(px - p0x, py - p0y, &normalB, false);
-	
-	
+
+
 	temp = -((normalB.x * normalA.y) - (normalA.x * normalB.y));
 	x =   -(temp * normalA.y);
 	y =   normalA.x * temp;
@@ -1074,28 +1074,28 @@ Boolean CalcRayNormal2D(const OGLVector2D *vec, float p0x, float p0y,
 #if 0
 float			temp;
 
-	 
+
 		/* CALC NORMALIZED VECTOR FROM REF POINT TO ENDPOINT 0 */
 
 	normal->x = px - p0x;
 	normal->y = py - p0y;
-	OGLVector2D_Normalize(normal, normal);	
-				
-	
+	OGLVector2D_Normalize(normal, normal);
+
+
 			/* CALC PERPENDICULAR VECTOR */
-			
+
 	temp = -((normal->x * vec->y) - (vec->x * normal->y));
-	
+
 	if (fabs(temp) <= EPS)									// see if px,py lies on the ray, then cannot do this calc
 		return(false);
-	
+
 	normal->x =   -(temp * vec->y);
 	normal->y =   vec->x * temp;
 	OGLVector2D_Normalize(normal, normal);						// normalize result
-	
+
 	if ((normal->x == 0.0f) && (normal->y == 0.0f))			// double-check that it's valid
 		return(false);
-	
+
 	return(true);
 
 #else
@@ -1108,11 +1108,11 @@ OGLVector3D	v;
 
 	normal->x = px - p0x;
 	normal->y = py - p0y;
-	OGLVector2D_Normalize(normal, normal);	
+	OGLVector2D_Normalize(normal, normal);
 
 
 			/* CALC CROSS PRODUCT TO DETERMINE WHICH SIDE WE'RE ON */
-			
+
 	cross = OGLVector2D_Cross(vec, normal);
 
 	if (cross >= 0.0f)
@@ -1123,10 +1123,10 @@ OGLVector3D	v;
 
 	v.x = vec->x;
 	v.z = vec->y;
-	
+
 
 			/* CALC 3D CROSS PRODUCT (ELIMINATING 0'S) TO GET PERP VECTOR */
-			
+
 	normal->x =  -up * v.z;
 	normal->y = v.x * up;
 	OGLVector2D_Normalize(normal, normal);
@@ -1136,9 +1136,9 @@ OGLVector3D	v;
 	else
 		return(true);
 
-#endif	
-	
-	
+#endif
+
+
 }
 
 
@@ -1163,48 +1163,48 @@ float	mag,oneOverM;
 	y = theVector->y;
 
 			/* CALC LENGTH AND NORMALIZE INPUT VECTOR */
-			
-	mag = sqrt(x*x + y*y);							// calc magnitude of input vector;	
+
+	mag = sqrt(x*x + y*y);							// calc magnitude of input vector;
 	if (mag > EPS)
-		oneOverM = 1.0f / mag;	
+		oneOverM = 1.0f / mag;
 	else
 		oneOverM = 0;
 	x *= oneOverM;									// normalize
 	y *= oneOverM;
-	
+
 
 	normalX = N->x;
 	normalY = N->y;
-							
+
 	/* compute NxV */
 	dotProduct = normalX * x;
 	dotProduct += normalY * y;
-	
+
 	/* compute 2(NxV) */
 	dotProduct += dotProduct;
-	
+
 	/* compute final vector */
 	reflectedX = normalX * dotProduct - x;
 	reflectedY = normalY * dotProduct - y;
-	
+
 	/* Normalize the result */
-		
+
 	outVec->x = reflectedX;
 	outVec->y = reflectedY;
 	OGLVector2D_Normalize(outVec, outVec);
-	
+
 			/* SCALE TO ORIGINAL MAGNITUDE */
-			
-	outVec->x *= -mag;	
+
+	outVec->x *= -mag;
 	outVec->y *= -mag;
 }
 
 
 /*********************** REFLECT VECTOR 3D *************************/
 //
-// compute reflection vector 
+// compute reflection vector
 // which is N(2(N.V)) - V
-// N - Surface Normal 
+// N - Surface Normal
 // vec = vector aiming at the normal.
 //
 //
@@ -1218,28 +1218,28 @@ float	vx,vy,vz;
 	normalX = N->x;
 	normalY = N->y;
 	normalZ = N->z;
-				
+
 	vx = -vec->x;				// we need the vector to be from normal away, so we invert it
-	vy = -vec->y;			
-	vz = -vec->z;			
-	
-				
+	vy = -vec->y;
+	vz = -vec->z;
+
+
 	/* compute NxV */
 	dotProduct = normalX * vx;
 	dotProduct += normalY * vy;
 	dotProduct += normalZ * vz;
-	
+
 	/* compute 2(NxV) */
 	dotProduct += dotProduct;
-	
+
 	/* compute final vector */
 	reflectedX = normalX * dotProduct - vx;
 	reflectedY = normalY * dotProduct - vy;
 	reflectedZ = normalZ * dotProduct - vz;
-	
+
 	/* Normalize the result */
-		
-	FastNormalizeVector(reflectedX,reflectedY,reflectedZ,out);	
+
+	FastNormalizeVector(reflectedX,reflectedY,reflectedZ,out);
 }
 
 
@@ -1251,7 +1251,7 @@ void OGLMatrix4x4_Transpose(const OGLMatrix4x4 *matrix4x4, OGLMatrix4x4 *result)
 OGLMatrix4x4 		source;
 const OGLMatrix4x4	*sourcePtr;
 u_long 				row, column;
-	
+
 	if (result == matrix4x4)
 	{
 		source = *matrix4x4;
@@ -1265,7 +1265,7 @@ u_long 				row, column;
 		for (column = 0; column < 4; column++)
 		{
 			int	a,b;
-			
+
 			a = column*4 + row;
 			b = row*4 + column;
 			result->value[a] = sourcePtr->value[b];
@@ -1285,7 +1285,7 @@ OGLPoint3D					s;
 register const OGLPoint3D	*sPtr;
 float						w;
 register float				inverseW;
-	
+
 	if (point3D == result)
 	{
 		s = *point3D;
@@ -1293,29 +1293,29 @@ register float				inverseW;
 	}
 	else
 		sPtr = point3D;
-	
-	result->x = sPtr->x * matrix4x4->value[M00] + 
+
+	result->x = sPtr->x * matrix4x4->value[M00] +
 				sPtr->y * matrix4x4->value[M01] +
 				sPtr->z * matrix4x4->value[M02] +
 				          matrix4x4->value[M03];
-				          
+
 	result->y = sPtr->x * matrix4x4->value[M10] +
 				sPtr->y * matrix4x4->value[M11] +
 				sPtr->z * matrix4x4->value[M12] +
 				          matrix4x4->value[M13];
-				          
-	result->z = sPtr->x * matrix4x4->value[M20] + 
+
+	result->z = sPtr->x * matrix4x4->value[M20] +
 				sPtr->y * matrix4x4->value[M21] +
 				sPtr->z * matrix4x4->value[M22] +
 				          matrix4x4->value[M23];
-				
-	w 		  = sPtr->x * matrix4x4->value[M30] + 
+
+	w 		  = sPtr->x * matrix4x4->value[M30] +
 				sPtr->y * matrix4x4->value[M31] +
 				sPtr->z * matrix4x4->value[M32] +
 						  matrix4x4->value[M33];
 
 	inverseW = 1.0f / w;
-	
+
 	result->x *= inverseW;
 	result->y *= inverseW;
 	result->z *= inverseW;
@@ -1327,26 +1327,26 @@ register float				inverseW;
 
 void OGLMatrix4x4_SetScale(OGLMatrix4x4 *m, float x, float y, float z)
 {
-	m->value[M00] = x;	
-	m->value[M11] = y;	
-	m->value[M22] = z;	
-	m->value[M33] = 1;	
+	m->value[M00] = x;
+	m->value[M11] = y;
+	m->value[M22] = z;
+	m->value[M33] = 1;
 
-	m->value[M01] = 0;	
-	m->value[M02] = 0;	
-	m->value[M03] = 0;	
+	m->value[M01] = 0;
+	m->value[M02] = 0;
+	m->value[M03] = 0;
 
-	m->value[M10] = 0;	
-	m->value[M12] = 0;	
-	m->value[M13] = 0;	
+	m->value[M10] = 0;
+	m->value[M12] = 0;
+	m->value[M13] = 0;
 
-	m->value[M20] = 0;	
-	m->value[M21] = 0;	
-	m->value[M23] = 0;	
+	m->value[M20] = 0;
+	m->value[M21] = 0;
+	m->value[M23] = 0;
 
-	m->value[M30] = 0;	
-	m->value[M31] = 0;	
-	m->value[M32] = 0;	
+	m->value[M30] = 0;
+	m->value[M31] = 0;
+	m->value[M32] = 0;
 }
 
 
@@ -1372,9 +1372,9 @@ void OGLMatrix4x4_SetRotate_Y(OGLMatrix4x4	*m, float angle)
 {
 float s = sin(angle);
 float c = cos(angle);
-	
+
 	OGLMatrix4x4_SetIdentity(m);
-	
+
 	m->value[M00] = c;
 	m->value[M02] = s;
 	m->value[M20] = -s;
@@ -1388,9 +1388,9 @@ void OGLMatrix4x4_SetRotate_Z(OGLMatrix4x4	*m, float angle)
 {
 float s = sin(angle);
 float c = cos(angle);
-	
+
 	OGLMatrix4x4_SetIdentity(m);
-	
+
 	m->value[M00] = c;
 	m->value[M01] = -s;
 	m->value[M10] = s;
@@ -1404,12 +1404,12 @@ void OGLMatrix4x4_SetRotateAboutPoint(OGLMatrix4x4 *matrix4x4, const OGLPoint3D	
 									float xAngle, float yAngle, float zAngle)
 {
 OGLMatrix4x4		negTransM, rotM;
-	
+
 	OGLMatrix4x4_SetTranslate(&negTransM, -origin->x, -origin->y, -origin->z);
 	OGLMatrix4x4_SetTranslate(matrix4x4, origin->x, origin->y, origin->z);
 
 	OGLMatrix4x4_SetRotate_XYZ(&rotM, xAngle, yAngle, zAngle);
-		
+
 	OGLMatrix4x4_Multiply(&rotM, matrix4x4, matrix4x4);
 	OGLMatrix4x4_Multiply(&negTransM, matrix4x4, matrix4x4);
 }
@@ -1429,10 +1429,10 @@ float	ax0, ax1, ax2, ax3;
 	b10 = mB->value[M01];	b11 = mB->value[M11];	b12 = mB->value[M21];	b13 = mB->value[M31];
 	b20 = mB->value[M02];	b21 = mB->value[M12];	b22 = mB->value[M22];	b23 = mB->value[M32];
 	b30 = mB->value[M03];	b31 = mB->value[M13];	b32 = mB->value[M23];	b33 = mB->value[M33];
-	
+
 	ax0 = mA->value[M00];	ax1 = mA->value[M10];
 	ax2 = mA->value[M20];	ax3 = mA->value[M30];
-	
+
 	result->value[M00] = ax0*b00 + ax1*b10 + ax2*b20 + ax3*b30;
 	result->value[M10] = ax0*b01 + ax1*b11 + ax2*b21 + ax3*b31;
 	result->value[M20] = ax0*b02 + ax1*b12 + ax2*b22 + ax3*b32;
@@ -1440,7 +1440,7 @@ float	ax0, ax1, ax2, ax3;
 
 	ax0 = mA->value[M01];	ax1 = mA->value[M11];
 	ax2 = mA->value[M21];	ax3 = mA->value[M31];
-	
+
 	result->value[M01] = ax0*b00 + ax1*b10 + ax2*b20 + ax3*b30;
 	result->value[M11] = ax0*b01 + ax1*b11 + ax2*b21 + ax3*b31;
 	result->value[M21] = ax0*b02 + ax1*b12 + ax2*b22 + ax3*b32;
@@ -1448,7 +1448,7 @@ float	ax0, ax1, ax2, ax3;
 
 	ax0 = mA->value[M02];	ax1 = mA->value[M12];
 	ax2 = mA->value[M22];	ax3 = mA->value[M32];
-	
+
 	result->value[M02] = ax0*b00 + ax1*b10 + ax2*b20 + ax3*b30;
 	result->value[M12] = ax0*b01 + ax1*b11 + ax2*b21 + ax3*b31;
 	result->value[M22] = ax0*b02 + ax1*b12 + ax2*b22 + ax3*b32;
@@ -1456,7 +1456,7 @@ float	ax0, ax1, ax2, ax3;
 
 	ax0 = mA->value[M03];	ax1 = mA->value[M13];
 	ax2 = mA->value[M23];	ax3 = mA->value[M33];
-	
+
 	result->value[M03] = ax0*b00 + ax1*b10 + ax2*b20 + ax3*b30;
 	result->value[M13] = ax0*b01 + ax1*b11 + ax2*b21 + ax3*b31;
 	result->value[M23] = ax0*b02 + ax1*b12 + ax2*b22 + ax3*b32;
@@ -1500,8 +1500,8 @@ float	width, height;
 	OGL_GetCurrentViewport(setupInfo, &x, &y, &w, &h);
 
 	width = w;
-	height = h;	
-	
+	height = h;
+
 	OGLMatrix4x4_SetIdentity(m);
 
 	m->value[M00] =	width  * 0.5f;
@@ -1571,10 +1571,10 @@ float	sx,cx,sy,sz,cy,cz,sxsy,cxsy;
 	cx = cos(rx);
 	cy = cos(ry);
 	cz = cos(rz);
-	
+
 	sxsy = sx*sy;
 	cxsy = cx*sy;
-	
+
 	m->value[M00] = cy*cz;					m->value[M10] = cy*sz; 				m->value[M20] = -sy; 	m->value[M30] = 0;
 	m->value[M01] = (sxsy*cz)+(cx*-sz);		m->value[M11] = (sxsy*sz)+(cx*cz);	m->value[M21] = sx*cy;	m->value[M31] = 0;
 	m->value[M02] = (cxsy*cz)+(-sx*-sz);	m->value[M12] = (cxsy*sz)+(-sx*cz);	m->value[M22] = cx*cy;	m->value[M32] = 0;
@@ -1593,7 +1593,7 @@ float	az	= axis->z;
 float	ax2 = ax * ax;
 float	ay2 = ay * ay;
 float	az2	= az * az;
-		
+
 	axy = ax * ay;
 	axz = ax * az;
 	ayz = ay * az;
@@ -1601,7 +1601,7 @@ float	az2	= az * az;
 	sine   = sin(angle);
 	cosine = cos(angle);
 	t = 1.0f - cosine;
-	
+
 	OGLMatrix4x4_SetIdentity(m);
 
 	m->value[M00] = t * ax2 + cosine;
@@ -1627,7 +1627,7 @@ double 			sine 	= sin(angle);
 double		 	cosine 	= cos(angle);
 
 	OGLMatrix3x3_SetIdentity(m);
-	
+
 	m->value[N00] = cosine;
 	m->value[N10]  = sine;
 	m->value[N01]  = -sine;
@@ -1635,7 +1635,7 @@ double		 	cosine 	= cos(angle);
 	m->value[N02]  = -(origin->x * cosine) + (origin->y * sine) + origin->x;
 	m->value[N12]  = -(origin->x * sine) - (origin->y * cosine) + origin->y;
 	m->value[N22]  = 1.0f;
-	
+
 }
 
 
@@ -1645,7 +1645,7 @@ void OGLMatrix3x3_SetRotate(OGLMatrix3x3 *m, double angle)
 {
 float 			sine 	= sin(angle);
 float		 	cosine 	= cos(angle);
-	
+
 	OGLMatrix3x3_SetIdentity(m);
 
 	m->value[N00] =  cosine;
@@ -1678,7 +1678,7 @@ void OGLMatrix3x3_SetIdentity(OGLMatrix3x3 *m)
 void OGLMatrix3x3_Multiply(const OGLMatrix3x3	*mA,
 							const OGLMatrix3x3	*mB,
 							OGLMatrix3x3		*result)
-{	
+{
 float	b00, b01, b02;
 float	b10, b11, b12;
 float	b20, b21, b22;
@@ -1687,24 +1687,24 @@ float	ax0, ax1, ax2;
 	b00 = mB->value[N00];	b01 = mB->value[N10];	b02 = mB->value[N20];
 	b10 = mB->value[N01];	b11 = mB->value[N11];	b12 = mB->value[N21];
 	b20 = mB->value[N02];	b21 = mB->value[N12];	b22 = mB->value[N22];
-	
+
 	ax0 = mA->value[N00];	ax1 = mA->value[N10];
 	ax2 = mA->value[N20];
-	
+
 	result->value[N00] = ax0*b00 + ax1*b10 + ax2*b20;
 	result->value[N10] = ax0*b01 + ax1*b11 + ax2*b21;
 	result->value[N20] = ax0*b02 + ax1*b12 + ax2*b22;
 
 	ax0 = mA->value[N01];	ax1 = mA->value[N11];
 	ax2 = mA->value[N21];
-	
+
 	result->value[N01] = ax0*b00 + ax1*b10 + ax2*b20;
 	result->value[N11] = ax0*b01 + ax1*b11 + ax2*b21;
 	result->value[N21] = ax0*b02 + ax1*b12 + ax2*b22;
 
 	ax0 = mA->value[N02];	ax1 = mA->value[N12];
 	ax2 = mA->value[N22];
-	
+
 	result->value[N02] = ax0*b00 + ax1*b10 + ax2*b20;
 	result->value[N12] = ax0*b01 + ax1*b11 + ax2*b21;
 	result->value[N22] = ax0*b02 + ax1*b12 + ax2*b22;
@@ -1713,7 +1713,7 @@ float	ax0, ax1, ax2;
 /************** OGL:  POINT 2D TRANSFORM ******************/
 
 void OGLPoint2D_Transform(const OGLPoint2D *p, const OGLMatrix3x3 *m, OGLPoint2D *result)
-{	
+{
 float newx = (p->x * m->value[N00]) + (p->y * m->value[N01]) + m->value[N02];
 float newy = (p->x * m->value[N10]) + (p->y * m->value[N11]) + m->value[N12];
 float neww = (p->x * m->value[N20]) + (p->y * m->value[N21]) + m->value[N22];
@@ -1733,13 +1733,13 @@ float neww = (p->x * m->value[N20]) + (p->y * m->value[N21]) + m->value[N22];
 
 /************* OGL VECTOR 2D TRANSFORM ****************/
 
-void OGLVector2D_Transform(const OGLVector2D *vector2D, 
+void OGLVector2D_Transform(const OGLVector2D *vector2D,
 							const OGLMatrix3x3	*matrix3x3,
 							OGLVector2D			*result)
 {
 OGLVector2D			s;
 const OGLVector2D	*sPtr;
-		
+
 	if (vector2D == result)
 	{
 		s = *vector2D;
@@ -1747,13 +1747,13 @@ const OGLVector2D	*sPtr;
 	}
 	else
 		sPtr = vector2D;
-	
-	result->x = sPtr->x * matrix3x3->value[N00] + 
+
+	result->x = sPtr->x * matrix3x3->value[N00] +
 				sPtr->y * matrix3x3->value[N01];
-						  
+
 	result->y = sPtr->x * matrix3x3->value[N10] +
 				sPtr->y * matrix3x3->value[N11];
-	
+
 }
 
 
@@ -1764,19 +1764,19 @@ float OGLVector3D_Dot(const OGLVector3D	*v1, const OGLVector3D	*v2)
 float	dot;
 
 	dot = ((v1->x * v2->x) + (v1->y * v2->y) + (v1->z * v2->z));		// calc dot
-	
+
 			/* CHECK FOR FLOATING POINT PRECISION PROBLEMS */
 			//
 			// Since the acos of anything >1.0 is a NaN, lets be careful
 			// that we return something valid!
 			//
-			
+
 	if (dot > 1.0f)
 		dot = 1.0f;
 	else
 	if (dot < -1.0f)
 		dot = -1.0f;
-	
+
 	return(dot);
 }
 
@@ -1797,7 +1797,7 @@ float	dot;
 			// Since the acos of anything >1.0 is a NaN, lets be careful
 			// that we return something valid!
 			//
-			
+
 	if (dot > 1.0f)
 		dot = 1.0f;
 	else
@@ -1819,19 +1819,19 @@ float length, oneOverLength;
 			 (vector3D->z * vector3D->z);
 
 	length = sqrt(length);
-				   		 
+
      //  Check for zero-length vector
 
     if (length <= EPS)
     {
-       	result->x = 
-       	result->y = 
+       	result->x =
+       	result->y =
        	result->z = 0;
     }
     else
     {
     	oneOverLength = 1.0f/length;
-	
+
 		result->x = vector3D->x * oneOverLength;
 		result->y = vector3D->y * oneOverLength;
 		result->z = vector3D->z * oneOverLength;
@@ -1848,7 +1848,7 @@ float length, oneOverLength;
 	length = (vector2D->x * vector2D->x) + (vector2D->y * vector2D->y);
 
 	length = sqrt(length);
-				   		 
+
      //  Check for zero-length vector
 
     if (length <= EPS)
@@ -1859,7 +1859,7 @@ float length, oneOverLength;
     else
     {
     	oneOverLength = 1.0f/length;
-	
+
 		result->x = vector2D->x * oneOverLength;
 		result->y = vector2D->y * oneOverLength;
 	}
@@ -1872,7 +1872,7 @@ void OGLVector3D_Cross(const OGLVector3D *v1, const OGLVector3D	*v2, OGLVector3D
 {
 OGLVector3D			s1, s2, temp;
 const OGLVector3D	*s1Ptr, *s2Ptr;
-	
+
 	if (v1 == result)
 	{
 		s1 = *v1;
@@ -1881,8 +1881,8 @@ const OGLVector3D	*s1Ptr, *s2Ptr;
 	else
 	{
 		s1Ptr = v1;
-	}	
-	
+	}
+
 	if (v2 == result)
 	{
 		s2 = *v2;
@@ -1907,9 +1907,9 @@ void OGLVector3D_Transform(const OGLVector3D *vector3D,	const OGLMatrix4x4	*matr
 {
 OGLVector3D			s;
 const OGLVector3D	*sPtr;
-		
+
 	/* SEE IF VECTOR BASHING */
-	
+
 	if (vector3D == result)
 	{
 		s = *vector3D;
@@ -1917,26 +1917,26 @@ const OGLVector3D	*sPtr;
 	}
 	else
 		sPtr = vector3D;
-	 
+
 
 		/* TRANSFORM IT */
 
-	result->x = sPtr->x * matrix4x4->value[M00] + 
+	result->x = sPtr->x * matrix4x4->value[M00] +
 				sPtr->y * matrix4x4->value[M01] +
 				sPtr->z * matrix4x4->value[M02];
-				
+
 	result->y = sPtr->x * matrix4x4->value[M10] +
 				sPtr->y * matrix4x4->value[M11] +
 				sPtr->z * matrix4x4->value[M12];
-				
-	result->z = sPtr->x * matrix4x4->value[M20] + 
+
+	result->z = sPtr->x * matrix4x4->value[M20] +
 				sPtr->y * matrix4x4->value[M21] +
 				sPtr->z * matrix4x4->value[M22];
-										
-					
+
+
 		/* NORMALIZE IT */
-		
-	FastNormalizeVector(result->x, result->y, result->z, result);			
+
+	FastNormalizeVector(result->x, result->y, result->z, result);
 }
 
 
@@ -1949,10 +1949,10 @@ long	i;
 register float	m00,m01,m02;
 register float	m10,m11,m12;
 register float	m20,m21,m22;
-	
-	m00 = m->value[M00];	m01 = m->value[M01];	m02 = m->value[M02];		
-	m10 = m->value[M10];	m11 = m->value[M11];	m12 = m->value[M12];		
-	m20 = m->value[M20];	m21 = m->value[M21];	m22 = m->value[M22];		
+
+	m00 = m->value[M00];	m01 = m->value[M01];	m02 = m->value[M02];
+	m10 = m->value[M10];	m11 = m->value[M11];	m12 = m->value[M12];
+	m20 = m->value[M20];	m21 = m->value[M21];	m22 = m->value[M22];
 
 	for (i = 0; i < numVectors; i++)
 	{
@@ -1965,22 +1965,22 @@ register float	m20,m21,m22;
 
 			/* TRANSFORM IT */
 
-		accum = x * m00;					
-		accum += y * m01;					
-		ox = accum + z * m02;						
-	
-		accum = x * m10;					
-		accum += y * m11;						
-		oy = accum + z * m12;					
-		
-		accum = x * m20;					
-		accum += y * m21;					
-		oz = accum + z * m22;					
+		accum = x * m00;
+		accum += y * m01;
+		ox = accum + z * m02;
 
-						
+		accum = x * m10;
+		accum += y * m11;
+		oy = accum + z * m12;
+
+		accum = x * m20;
+		accum += y * m21;
+		oz = accum + z * m22;
+
+
 			/* NORMALIZE IT */
-			
-		FastNormalizeVector(ox,oy, oz, &outVectors[i]);			
+
+		FastNormalizeVector(ox,oy, oz, &outVectors[i]);
 	}
 }
 
@@ -2033,32 +2033,32 @@ float	m00,m01,m02,m03;
 float	m10,m11,m12,m13;
 float	m20,m21,m22,m23;
 float	m30,m31,m32,m33;
-	
-	m00 = matrix->value[M00];	m01 = matrix->value[M01];	m02 = matrix->value[M02];	m03 = matrix->value[M03];	
-	m10 = matrix->value[M10];	m11 = matrix->value[M11];	m12 = matrix->value[M12];	m13 = matrix->value[M13];	
-	m20 = matrix->value[M20];	m21 = matrix->value[M21];	m22 = matrix->value[M22];	m23 = matrix->value[M23];	
-	m30 = matrix->value[M30];	m31 = matrix->value[M31];	m32 = matrix->value[M32];	m33 = matrix->value[M33];	
-			
+
+	m00 = matrix->value[M00];	m01 = matrix->value[M01];	m02 = matrix->value[M02];	m03 = matrix->value[M03];
+	m10 = matrix->value[M10];	m11 = matrix->value[M11];	m12 = matrix->value[M12];	m13 = matrix->value[M13];
+	m20 = matrix->value[M20];	m21 = matrix->value[M21];	m22 = matrix->value[M22];	m23 = matrix->value[M23];
+	m30 = matrix->value[M30];	m31 = matrix->value[M31];	m32 = matrix->value[M32];	m33 = matrix->value[M33];
+
 	for (i = 0; i < numVertices; i++)
 	{
-		accum = inVertex[i].x * m00;					
-		accum += inVertex[i].y * m01;					
-		accum += inVertex[i].z * m02;						
-		outVertex[i].x = accum + m03;					
-	
-		accum = inVertex[i].x * m10;					
-		accum += inVertex[i].y * m11;						
-		accum += inVertex[i].z * m12;					
-		outVertex[i].y = accum + m13;					
-		
-		accum = inVertex[i].x * m20;					
-		accum += inVertex[i].y * m21;					
-		accum += inVertex[i].z * m22;					
-		outVertex[i].z = accum + m23;					
-				
-		accum = inVertex[i].x * m30;				
-		accum += inVertex[i].y * m31;				
-		accum += inVertex[i].z * m32;				
+		accum = inVertex[i].x * m00;
+		accum += inVertex[i].y * m01;
+		accum += inVertex[i].z * m02;
+		outVertex[i].x = accum + m03;
+
+		accum = inVertex[i].x * m10;
+		accum += inVertex[i].y * m11;
+		accum += inVertex[i].z * m12;
+		outVertex[i].y = accum + m13;
+
+		accum = inVertex[i].x * m20;
+		accum += inVertex[i].y * m21;
+		accum += inVertex[i].z * m22;
+		outVertex[i].z = accum + m23;
+
+		accum = inVertex[i].x * m30;
+		accum += inVertex[i].y * m31;
+		accum += inVertex[i].z * m32;
 		outVertex[i].w = accum + m33;
 	}
 }
@@ -2075,33 +2075,33 @@ long	i;
 float	m00,m01,m02,m03;
 float	m10,m11,m12,m13;
 float	m20,m21,m22,m23;
-	
-	m00 = matrix->value[M00];	m01 = matrix->value[M01];	m02 = matrix->value[M02];	m03 = matrix->value[M03];	
-	m10 = matrix->value[M10];	m11 = matrix->value[M11];	m12 = matrix->value[M12];	m13 = matrix->value[M13];	
-	m20 = matrix->value[M20];	m21 = matrix->value[M21];	m22 = matrix->value[M22];	m23 = matrix->value[M23];	
-			
+
+	m00 = matrix->value[M00];	m01 = matrix->value[M01];	m02 = matrix->value[M02];	m03 = matrix->value[M03];
+	m10 = matrix->value[M10];	m11 = matrix->value[M11];	m12 = matrix->value[M12];	m13 = matrix->value[M13];
+	m20 = matrix->value[M20];	m21 = matrix->value[M21];	m22 = matrix->value[M22];	m23 = matrix->value[M23];
+
 	for (i = 0; i < numVertices; i++)
 	{
 		float	x,y,z;
-	
+
 		x = inVertex[i].x;
 		y = inVertex[i].y;
 		z = inVertex[i].z;
-	
-		accum = x * m00;					
-		accum += y * m01;					
-		accum += z * m02;						
-		outVertex[i].x = accum + m03;					
-	
-		accum = x * m10;					
-		accum += y * m11;						
-		accum += z * m12;					
-		outVertex[i].y = accum + m13;					
-		
-		accum = x * m20;					
-		accum += y * m21;					
-		accum += z * m22;					
-		outVertex[i].z = accum + m23;					
+
+		accum = x * m00;
+		accum += y * m01;
+		accum += z * m02;
+		outVertex[i].x = accum + m03;
+
+		accum = x * m10;
+		accum += y * m11;
+		accum += z * m12;
+		outVertex[i].y = accum + m13;
+
+		accum = x * m20;
+		accum += y * m21;
+		accum += z * m22;
+		outVertex[i].z = accum + m23;
 	}
 }
 
@@ -2113,12 +2113,12 @@ void OGLPoint2D_TransformArray(const OGLPoint2D *inVertex, const OGLMatrix3x3  *
 {
 long	i;
 float	x,y;
-				
+
 	for (i = 0; i < numVertices; i++)
 	{
 		x = inVertex[i].x;
 		y = inVertex[i].y;
-		
+
 		outVertex[i].x = (x * matrix->value[N00]) + (y * matrix->value[N01]) + matrix->value[N02];
 		outVertex[i].y = (x * matrix->value[N10]) + (y * matrix->value[N11]) + matrix->value[N12];
 	}
@@ -2231,7 +2231,7 @@ OGLMatrix4x4 	mt1, mt2;
 
 			mt1.value[8]  -= mt1.value[i8]  * val;
 			mt2.value[8]  -= mt2.value[i8]  * val;
- 
+
 			mt1.value[12] -= mt1.value[i12] * val;
 			mt2.value[12] -= mt2.value[i12] * val;
 		}
@@ -2298,7 +2298,7 @@ err:
 
 /******************** OGL:  IS BBOX VISIBLE ****************************/
 //
-// Transform all the vertices into homogenous co-ordinates, and do 
+// Transform all the vertices into homogenous co-ordinates, and do
 // clip tests. Return true if visible, false if fully clipped.
 //
 // INPUT: localToWorld = optional local->world transform matrix to be applied if bbox is not in world coords
@@ -2324,7 +2324,7 @@ float			minX,minY,minZ,maxX,maxY,maxZ;
 OGLMatrix4x4	m2,*m;
 
 			/* SEE IF FACTOR IN A LOCAL->WORLD MATRIX */
-			
+
 	if (localToWorld)
 	{
 		m = &m2;
@@ -2333,8 +2333,8 @@ OGLMatrix4x4	m2,*m;
 	else
 		m = &gWorldToFrustumMatrix;
 
-		/* GET LOCAL->FRUSTUM MATRIX */		
-	
+		/* GET LOCAL->FRUSTUM MATRIX */
+
 	m00 = m->value[M00];
 	m01 = m->value[M01];
 	m02 = m->value[M02];
@@ -2351,10 +2351,10 @@ OGLMatrix4x4	m2,*m;
 	m31 = m->value[M31];
 	m32 = m->value[M32];
 	m33 = m->value[M33];
-	
+
 
 		/* TRANSFORM THE BOUNDING BOX */
-	
+
 	minX = bBox->min.x;								// load bbox into registers
 	minY = bBox->min.y;
 	minZ = bBox->min.z;
@@ -2363,10 +2363,10 @@ OGLMatrix4x4	m2,*m;
 	maxZ = bBox->max.z;
 
 	clipCodeAND = ~0;
-					
+
 	for (i = 0; i < 8; i++)
 	{
-		switch (i)									// load current bbox corner in IX,IY,IZ 
+		switch (i)									// load current bbox corner in IX,IY,IZ
 		{
 			case	0:	lX = minX;	lY = minY;	lZ = minZ;	break;
 			case	1:							lZ = maxZ;	break;
@@ -2375,9 +2375,9 @@ OGLMatrix4x4	m2,*m;
 			case	4:	lX = maxX;	lY = minY;	lZ = minZ;	break;
 			case	5:							lZ = maxZ;	break;
 			case	6:				lY = maxY;	lZ = minZ;	break;
-			default:							lZ = maxZ;				
+			default:							lZ = maxZ;
 		}
-							
+
 		hW = lX * m30 + lY * m31 + lZ * m32 + m33;
 		hY = lX * m10 + lY * m11 + lZ * m12 + m13;
 		hZ = lX * m20 + lY * m21 + lZ * m22 + m23;
@@ -2386,35 +2386,35 @@ OGLMatrix4x4	m2,*m;
 		minusHW = -hW;
 
 				/* CHECK Y */
-				
+
 		if (hY < minusHW)
 			clipFlags = 0x8;
 		else
 		if (hY > hW)
 			clipFlags = 0x4;
 		else
-			clipFlags = 0;				
-		
-		
+			clipFlags = 0;
+
+
 				/* CHECK Z */
-				
+
 		if (hZ > hW)
 			clipFlags |= 0x20;
 		else
 		if (hZ < 0.0f)
 			clipFlags |= 0x10;
-		
-		
+
+
 				/* CHECK X */
-				
+
 		if (hX < minusHW)
 			clipFlags |= 0x2;
 		else
 		if (hX > hW)
 			clipFlags |= 0x1;
-		
+
 		clipCodeAND &= clipFlags;
-	}			
+	}
 
 	if (clipCodeAND)
 		return(false);
@@ -2443,15 +2443,15 @@ float				sinTheta;
 float				scale;
 float				x,y,z;
 float				zero = 0.0f, one = 1.0f, two = 2.0f;
-	
+
 
 	/* Determine the axis and the rotation angle */
 
 	OGLVector3D_Cross (v2, v1, &axis);
-	
+
 	cosTheta = OGLVector3D_Dot(v2, v1);
 	sinTheta = OGLVector3D_Dot(&axis, &axis);
-	
+
 	if (sinTheta <= EPS)
 	{
 		/* Vectors are either opposing or equal */
@@ -2459,14 +2459,14 @@ float				zero = 0.0f, one = 1.0f, two = 2.0f;
 		if (cosTheta < zero)
 		{
 			/* Vectors are opposing */
-		
+
 			FastNormalizeVector(v2->x, v2->y, v2->z, &axis);
-			
+
 			x = fabs(axis.x);
 			orth.x = one;
 			orth.y = zero;
 			orth.z = zero;
-			
+
 			y = fabs(axis.y);
 			if (x > y)
 			{
@@ -2475,7 +2475,7 @@ float				zero = 0.0f, one = 1.0f, two = 2.0f;
 				orth.y = one;
 				orth.z = zero;
 			}
-			
+
 			z = fabs(axis.z);
 			if (x > z)
 			{
@@ -2483,70 +2483,70 @@ float				zero = 0.0f, one = 1.0f, two = 2.0f;
 				orth.y = zero;
 				orth.z = one;
 			}
-			
+
 			scale = OGLVector3D_Dot(&axis, &orth);
 			proj.x = axis.x * scale;
 			proj.y = axis.y * scale;
 			proj.z = axis.z * scale;
-						
+
 			axis.x = orth.x - proj.x;
 			axis.y = orth.y - proj.y;
 			axis.z = orth.z - proj.z;
 			FastNormalizeVector(axis.x, axis.y, axis.z, &axis);
-			
+
 			x = axis.x;
 			y = axis.y;
 			z = axis.z;
-			
+
 			matrix4x4->value[M00] = two * x * x - one;
 			matrix4x4->value[M10] = two * x * y;
 			matrix4x4->value[M20] = two * x * z;
 			matrix4x4->value[M30] = zero;
-		
+
 			matrix4x4->value[M01] = two * x * y;
 			matrix4x4->value[M11] = two * y * y - one;
 			matrix4x4->value[M21] = two * y * z;
 			matrix4x4->value[M31] = zero;
-		
+
 			matrix4x4->value[M02] = two * x * z;
 			matrix4x4->value[M12] = two * y * z;
 			matrix4x4->value[M22] = two * z * z - one;
 			matrix4x4->value[M32] = zero;
-		
+
 			matrix4x4->value[M03] = zero;
 			matrix4x4->value[M13] = zero;
 			matrix4x4->value[M23] = zero;
 			matrix4x4->value[M33] = one;
-			
+
 		}
 		else
 		{
 			/* Vectors are equal */
 			OGLMatrix4x4_SetIdentity (matrix4x4);
 		}
-		
+
 	}
 	else
 	{
 		float q1, q2;
 		float versTheta;
-		
+
 		versTheta = 1.0f - cosTheta;
 		sinTheta = sqrt(sinTheta);
-		
+
 		scale = one / sinTheta;
 		axis.x = axis.x * scale;
 		axis.y = axis.y * scale;
 		axis.z = axis.z * scale;
-				
+
 		scale = one / OGLVector3D_Dot(v2, v2);
 		cosTheta *= scale;
 		sinTheta *= scale;
-	
+
 		x = axis.x;
 		y = axis.y;
 		z = axis.z;
-		
+
 		/* Diagonal terms */
 		matrix4x4->value[M00] = versTheta * (x * x) + cosTheta;
 		matrix4x4->value[M11] = versTheta * (y * y) + cosTheta;
@@ -2557,12 +2557,12 @@ float				zero = 0.0f, one = 1.0f, two = 2.0f;
 		q2 = sinTheta * z;
 		matrix4x4->value[M10] = q1 - q2;
 		matrix4x4->value[M01] = q1 + q2;
-	
+
 		q1 = versTheta * x * z;
 		q2 = sinTheta * y;
 		matrix4x4->value[M20] = q1 + q2;
 		matrix4x4->value[M02] = q1 - q2;
-	
+
 		q1 = versTheta * y * z;
 		q2 = sinTheta * x;
 		matrix4x4->value[M21] = q1 - q2;
@@ -2595,7 +2595,7 @@ float	d;
 
 	d = OGLVector3D_Dot(&plane->normal, (OGLVector3D *) point);
 	d += plane->constant;
-	
+
 	return(d);
 }
 
@@ -2609,10 +2609,10 @@ float	p1xJ, YKJ,
 float	DENOM;
 float	XFAC, YFAC;
 float	t2;
-	
+
 	XJ = point->x;
 	YJ = point->y;
-	
+
 	p1xJ 	= p1x - XJ;
 	YKJ 	= p1y - YJ;
 	XLK 	= p2x - p1x;
@@ -2630,7 +2630,7 @@ float	t2;
 		t2 = Math_Min(Math_Max(t2, 0.0f), 1.0f);
 		XFAC = p1xJ + t2 * XLK;
 		YFAC = YKJ + t2 * YLK;
-		
+
 		*t = t2;
 		return (sqrt(XFAC*XFAC + YFAC*YFAC));
 	}
@@ -2647,11 +2647,11 @@ float			minX,minZ,maxX,maxZ,maxY,minY;
 short			i;
 
 			/* TRANSFORM ALL 8 POINTS ON BBOX */
-			
+
 	p[0].x = inBox->min.x;								// upper far left corner
 	p[0].y = inBox->max.y;
 	p[0].y = inBox->min.z;
-	
+
 	p[1].x = inBox->max.x;								// upper far right corner
 	p[1].y = inBox->max.y;
 	p[1].z = inBox->min.z;
@@ -2659,36 +2659,36 @@ short			i;
 	p[2].x = inBox->max.x;								// upper near right corner
 	p[2].y = inBox->max.y;
 	p[2].z = inBox->max.z;
-	
+
 	p[3].x = inBox->min.x;								// upper near left corner
 	p[3].y = inBox->max.y;
 	p[3].z = inBox->max.z;
-	
+
 	p[4].x = inBox->min.x;								// lower far left corner
 	p[4].y = inBox->min.y;
 	p[4].y = inBox->min.z;
-	
+
 	p[5].x = inBox->max.x;								// lower far right corner
 	p[5].y = inBox->min.y;
 	p[5].z = inBox->min.z;
-	
+
 	p[6].x = inBox->max.x;								// lower near right corner
 	p[6].y = inBox->min.y;
 	p[6].z = inBox->max.z;
-	
+
 	p[7].x = inBox->min.x;								// lower near left corner
 	p[7].y = inBox->min.y;
 	p[7].z = inBox->max.z;
-	
-	OGLPoint3D_TransformArray(p, m, pp, 8);	
+
+	OGLPoint3D_TransformArray(p, m, pp, 8);
 
 
 			/* FIND MIN/MAX */
-			
+
 	minX = maxX = pp[0].x;
 	minY = maxY = pp[0].y;
 	minZ = maxZ = pp[0].z;
-	
+
 	for (i = 1; i < 8; i++)
 	{
 		if (pp[i].x < minX)					// min X
@@ -2709,7 +2709,7 @@ short			i;
 
 
 		/* SET NEW BBOX */
-			
+
 	outBox->isEmpty = false;
 	outBox->min.x = minX;
 	outBox->max.x = maxX;

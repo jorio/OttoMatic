@@ -59,37 +59,37 @@ void DoPaused(void)
 short	i;
 Boolean	oldMute = gMuteMusicFlag;
 
-	
+
 	if (!gMuteMusicFlag)							// see if pause music
 		ToggleMusic();
 
 	BuildPausedMenu();
-	
+
 
 				/*************/
 				/* MAIN LOOP */
 				/*************/
-				
+
 	CalcFramesPerSecond();
-	UpdateInput();		
-	
+	UpdateInput();
+
 	while(true)
 	{
 			/* SEE IF MAKE SELECTION */
-		
+
 		if (NavigatePausedMenu())
 			break;
 
 			/* DRAW STUFF */
-	
+
 		CalcFramesPerSecond();
-		UpdateInput();		
+		UpdateInput();
 		DoPlayerTerrainUpdate(gPlayerInfo.camera.cameraLocation.x, gPlayerInfo.camera.cameraLocation.z);							// need to call this to keep supertiles active
 		OGL_DrawScene(gGameViewInfoPtr, DrawArea);
 
 
 			/* FADE IN TEXT */
-			
+
 		for (i = 0; i < 3; i++)
 		{
 			gPausedIcons[i]->ColorFilter.a += gFramesPerSecondFrac * 3.0f;
@@ -98,14 +98,14 @@ Boolean	oldMute = gMuteMusicFlag;
 		}
 
 
-	}	
-	
+	}
+
 	FreePausedMenu();
-	
-	
+
+
 	if (!oldMute)									// see if restart music
 		ToggleMusic();
-	
+
 }
 
 
@@ -117,10 +117,10 @@ short	i;
 
 	gPausedMenuSelection = 0;
 
-	
+
 
 			/* BUILD NEW TEXT STRINGS */
-			
+
 	gNewObjectDefinition.coord.x 	= 320;
 	gNewObjectDefinition.coord.y 	= 240;
 	gNewObjectDefinition.coord.z 	= 0;
@@ -133,14 +133,14 @@ short	i;
 	for (i = 0; i < 3; i++)
 	{
 		Str255	s;
-	
+
 		GetIndString(s, 2000 + gGamePrefs.language, i + 1);
-	
+
 		gPausedIcons[i] = MakeFontStringObject(s, &gNewObjectDefinition, gGameViewInfoPtr, true);
 		gPausedIcons[i]->ColorFilter.a = 0;
 		gNewObjectDefinition.coord.y 	+= PAUSED_TEXT_SIZE * .7f;
-	}	
-} 
+	}
+}
 
 
 /******************* MOVE PAUSED ICONS **********************/
@@ -183,7 +183,7 @@ Boolean	continueGame = false;
 
 
 		/* SEE IF CHANGE SELECTION */
-		
+
 	if (GetNewKeyState(KEY_UP) && (gPausedMenuSelection > 0))
 	{
 		gPausedMenuSelection--;
@@ -211,14 +211,14 @@ Boolean	continueGame = false;
 		{
 			gPausedIcons[i]->ColorFilter = gPausedMenuNoHiliteColor;										// hilite
 		}
-	
+
 	}
-	
-	
+
+
 			/***************************/
 			/* SEE IF MAKE A SELECTION */
 			/***************************/
-			
+
 	if (GetNewKeyState(KEY_RETURN) || GetNewKeyState(KEY_SPACE))
 	{
 //		PlayEffect(EFFECT_SELECTCLICK);
@@ -227,7 +227,7 @@ Boolean	continueGame = false;
 			case	0:								// RESUME
 					continueGame = true;
 					break;
-					
+
 			case	1:								// EXIT
 					gGameOver = true;
 					continueGame = true;
@@ -236,11 +236,11 @@ Boolean	continueGame = false;
 			case	2:								// QUIT
 					CleanQuit();
 					break;
-										
+
 		}
-	}	
-	
-	
+	}
+
+
 			/*****************************/
 			/* SEE IF CANCEL A SELECTION */
 			/*****************************/
@@ -249,9 +249,9 @@ Boolean	continueGame = false;
 	if (GetNewKeyState(KEY_ESC))
 	{
 		continueGame = true;
-	}	
-	
-	
+	}
+
+
 	return(continueGame);
 }
 

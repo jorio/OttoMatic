@@ -69,12 +69,12 @@ static void MoveOnionSlice(ObjNode *theNode);
 #define ONION_WALK_SPEED			300.0f
 
 
-#define	ONION_KNOCKDOWN_SPEED		1700.0f	
+#define	ONION_KNOCKDOWN_SPEED		1700.0f
 
 #define	SLAP_DAMAGE					.3f
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -119,7 +119,7 @@ ObjNode	*newObj;
 	newObj->EnemyRegenerate = itemPtr->parm[3] & (1<<1);
 
 	SetSkeletonAnim(newObj->Skeleton, ONION_ANIM_STAND);
-	
+
 	return(true);
 }
 
@@ -133,30 +133,30 @@ ObjNode	*newObj;
 				/*******************************/
 				/* MAKE DEFAULT SKELETON ENEMY */
 				/*******************************/
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_ONION,x,z, ONION_SCALE, 0, MoveOnion);
 
 	SetSkeletonAnim(newObj->Skeleton, ONION_ANIM_STAND);
-	
+
 
 				/*******************/
 				/* SET BETTER INFO */
 				/*******************/
-			
+
 	newObj->Health 		= 1.0;
 	newObj->Damage 		= .1;
 	newObj->Kind 		= ENEMY_KIND_ONION;
-		
+
 	newObj->DelayUntilAttack = 0;
-	
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,ONION_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] = OnionEnemyHitByStunPulse;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] = OnionHitBySuperNova;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FIST] = OnionGotPunched;
@@ -164,17 +164,17 @@ ObjNode	*newObj;
 
 	newObj->HurtCallback = HurtOnion;							// set hurt callback function
 
-	
+
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8,false);
-	
+
 	CreateOnionSparkles(newObj);
-		
+
 	gNumEnemies++;
 	gNumEnemyOfKind[ENEMY_KIND_ONION]++;
-	
+
 	return(newObj);
 }
 
@@ -195,7 +195,7 @@ ObjNode	*newObj;
 		newObj->Rot.y = CalcYAngleFromPointToPoint(0, x, z, gPlayerInfo.coord.x, gPlayerInfo.coord.z);		// aim at player
 
 		SetSkeletonAnim(newObj->Skeleton, ONION_ANIM_GROW);
-		UpdateObjectTransforms(newObj);				
+		UpdateObjectTransforms(newObj);
 	}
 
 }
@@ -221,7 +221,7 @@ static	void(*myMoveTable[])(ObjNode *) =
 	}
 
 	GetObjectInfo(theNode);
-	myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -236,33 +236,33 @@ float	angleToTarget,dist;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
-				
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ONION_TURN_SPEED, true);			
 
-		
+	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ONION_TURN_SPEED, true);
+
+
 
 				/* SEE IF CHASE */
 
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
 	if (dist < ONION_CHASE_DIST)
-	{					
+	{
 		MorphToSkeletonAnim(theNode->Skeleton, ONION_ANIM_WALK, 8);
 	}
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 
 
-	UpdateOnion(theNode);		
+	UpdateOnion(theNode);
 }
 
 
@@ -277,34 +277,34 @@ float		r,fps,dist,angleToPlayer;
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
-			
+
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * ONION_WALK_SPEED;
 	gDelta.z = -cos(r) * ONION_WALK_SPEED;
 	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
 	MoveEnemy(theNode);
-		
-	angleToPlayer = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ONION_TURN_SPEED, true);			
-		
-		
+
+	angleToPlayer = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, ONION_TURN_SPEED, true);
+
+
 				/* UPDATE ANIM SPEED */
 
 	if (theNode->Skeleton->AnimNum == ONION_ANIM_WALK)
 		theNode->Skeleton->AnimSpeed = ONION_WALK_SPEED * .004f;
-	
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
-		
-		
+
+
 			/* CHECK RANGE */
-			
+
 	dist = CalcQuickDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z);
 	if (dist > ONION_CEASE_DIST)										// see if stop chasing
 	{
-		MorphToSkeletonAnim(theNode->Skeleton, ONION_ANIM_STAND, 6);	
+		MorphToSkeletonAnim(theNode->Skeleton, ONION_ANIM_STAND, 6);
 		gDelta.x = gDelta.z = 0;
 	}
 	else
@@ -319,8 +319,8 @@ float		r,fps,dist,angleToPlayer;
 			}
 		}
 	}
-		
-	UpdateOnion(theNode);		
+
+	UpdateOnion(theNode);
 }
 
 
@@ -330,14 +330,14 @@ static void  MoveOnion_GetHit(ObjNode *theNode)
 {
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if on ground, add friction
 		ApplyFrictionToDeltas(400.0,&gDelta);
-		
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;			// add gravity
 
 	MoveEnemy(theNode);
 
 
 				/* SEE IF DONE */
-			
+
 	theNode->ButtTimer -= gFramesPerSecondFrac;
 	if (theNode->ButtTimer <= 0.0)
 	{
@@ -346,7 +346,7 @@ static void  MoveOnion_GetHit(ObjNode *theNode)
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
@@ -364,19 +364,19 @@ float	dist,angle;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 
 				/* SEE IF STRIKE IS AT BOTTOM */
-				
+
 	if (theNode->Skeleton->AnimHasStopped)
 	{
 		angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, 0, false);
@@ -385,10 +385,10 @@ float	dist,angle;
 				/*****************************************/
 				/* SEE IF PLAYER CAN BE GRABBED BY ONION */
 				/*****************************************/
-			
+
 		if (!SeeIfLineSegmentHitsAnything(&gCoord, &gPlayerInfo.coord, nil, CTYPE_FENCE|CTYPE_BLOCKRAYS|CTYPE_IMPENETRABLE))	// dont grab if there's a fence between us
-		{								
-			if ((angle < .55f) && (dist < ONION_ATTACK_DIST) && 
+		{
+			if ((angle < .55f) && (dist < ONION_ATTACK_DIST) &&
 				(gPlayerInfo.objNode->Skeleton->AnimNum != PLAYER_ANIM_GRABBED) && (gPlayerInfo.invincibilityTimer <= 0.0f))
 			{
 				theNode->GrippingPlayer = true;
@@ -397,15 +397,15 @@ float	dist,angle;
 				SetSkeletonAnim(gPlayerInfo.objNode->Skeleton, PLAYER_ANIM_GRABBED);	// put player into grabbed mode
 			}
 			else
-				MorphToSkeletonAnim(theNode->Skeleton, ONION_ANIM_STAND, 3);	
+				MorphToSkeletonAnim(theNode->Skeleton, ONION_ANIM_STAND, 3);
 		}
 		else
-			MorphToSkeletonAnim(theNode->Skeleton, ONION_ANIM_STAND, 3);	
-		
+			MorphToSkeletonAnim(theNode->Skeleton, ONION_ANIM_STAND, 3);
+
 	}
 
 
-	UpdateOnion(theNode);		
+	UpdateOnion(theNode);
 }
 
 
@@ -417,44 +417,44 @@ static void  MoveOnion_Jiggle(ObjNode *theNode)
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
 
-				
+
 			/* ALIGN PLAYER IN GRASP */
-				
+
 	AlignPlayerInOnionGrasp(theNode);
-	
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 
 				/* SEE IF DONE */
-				
+
 	if (theNode->Skeleton->AnimHasStopped)
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, ONION_ANIM_STAND, 3);
 		SetSkeletonAnim(gPlayerInfo.objNode->Skeleton, PLAYER_ANIM_FLATTENED);
 		PlayEffect3D(EFFECT_PLAYERCRUSH, &gPlayerInfo.coord);
-		
+
 		gPlayerInfo.knockDownTimer = 1.5f;
 		gPlayerInfo.objNode->Delta.x = 0;
 		gPlayerInfo.objNode->Delta.z = 0;
 		theNode->GrippingPlayer = false;
 		gPlayerInfo.invincibilityTimer = 10.0f;					// set this while flattened so I cant be bothered - it gets reset @ end of anim
-		
+
 		PlayerLoseHealth(SLAP_DAMAGE, PLAYER_DEATH_TYPE_EXPLODE);
-		
+
 	}
 
-			
 
 
-	UpdateOnion(theNode);		
+
+	UpdateOnion(theNode);
 }
 
 
@@ -468,14 +468,14 @@ float	scale;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 		/* MAKE GROW */
-		
+
 	scale = theNode->Scale.x += gFramesPerSecondFrac;
-	
+
 	if (scale >= ONION_SCALE)
 		scale = ONION_SCALE;
 
-	theNode->Scale.x = 
-	theNode->Scale.y = 
+	theNode->Scale.x =
+	theNode->Scale.y =
 	theNode->Scale.z = scale;
 
 	if (DoEnemyCollisionDetect(theNode,0, true))			// just do ground
@@ -483,14 +483,14 @@ float	scale;
 
 
 			/* SEE IF DONE GROWING */
-			
+
 	if (theNode->Skeleton->AnimHasStopped)
 	{
-		MorphToSkeletonAnim(theNode->Skeleton, ONION_ANIM_STAND, 2);	
+		MorphToSkeletonAnim(theNode->Skeleton, ONION_ANIM_STAND, 2);
 		gDelta.y = 700.0f;
 	}
 
-	UpdateOnion(theNode);		
+	UpdateOnion(theNode);
 }
 
 
@@ -502,29 +502,29 @@ OGLMatrix4x4	m,m2,m3;
 float		scale;
 
 			/* CALC SCALE MATRIX */
-			
+
 	scale = PLAYER_DEFAULT_SCALE/ONION_SCALE;							// to adjust from onion's scale to player's
 	OGLMatrix4x4_SetScale(&m2, scale, scale, scale);
 
 
 			/* CALC TRANSLATE MATRIX */
-			
+
 	OGLMatrix4x4_SetTranslate(&m3, 0,60,30);
 	OGLMatrix4x4_Multiply(&m2, &m3, &m);
 
 
 			/* GET ALIGNMENT MATRIX */
-			
+
 	FindJointFullMatrix(onion, 10, &m2);									// get joint's matrix
 
-	
+
 	OGLMatrix4x4_Multiply(&m, &m2, &gPlayerInfo.objNode->BaseTransformMatrix);
 	SetObjectTransformMatrix(gPlayerInfo.objNode);
 
-	
+
 			/* FIND COORDS */
-			
-	FindCoordOfJoint(onion, 10, &gPlayerInfo.objNode->Coord);		
+
+	FindCoordOfJoint(onion, 10, &gPlayerInfo.objNode->Coord);
 }
 
 
@@ -548,42 +548,42 @@ float			x,z,placement;
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
-	
+	placement = itemPtr->placement;
+
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 
 				/* MAKE DEFAULT SKELETON ENEMY */
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_ONION,x,z, ONION_SCALE, 0, nil);
 	if (newObj == nil)
 		return(false);
-		
-		
+
+
 	newObj->SplineItemPtr = itemPtr;
 	newObj->SplineNum = splineNum;
-	
+
 	SetSkeletonAnim(newObj->Skeleton, ONION_ANIM_WALK);
-		
+
 
 				/* SET BETTER INFO */
-			
+
 	newObj->StatusBits		|= STATUS_BIT_ONSPLINE;
 	newObj->SplinePlacement = placement;
-	newObj->Coord.y 		-= newObj->BottomOff;			
+	newObj->Coord.y 		-= newObj->BottomOff;
 	newObj->SplineMoveCall 	= MoveOnionOnSpline;				// set move call
 	newObj->Health 			= 1.0;
 	newObj->Damage 			= 0;
 	newObj->Kind 			= ENEMY_KIND_ONION;
-	
-	
+
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,ONION_TARGET_OFFSET);
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] = OnionEnemyHitByStunPulse;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] = OnionHitBySuperNova;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FIST] = OnionGotPunched;
@@ -596,14 +596,14 @@ float			x,z,placement;
 	newObj->InitCoord = newObj->Coord;							// remember where started
 
 				/* MAKE SHADOW */
-				
+
 	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8, false);
 
 	CreateOnionSparkles(newObj);
 
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	DetachObject(newObj, true);										// detach this object from the linked list
 	AddToSplineObjectList(newObj, true);
 
@@ -615,7 +615,7 @@ float			x,z,placement;
 
 static void MoveOnionOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
 
@@ -626,31 +626,31 @@ Boolean isVisible;
 
 
 			/* UPDATE STUFF IF VISIBLE */
-			
+
 	if (isVisible)
 	{
 		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,			// calc y rot aim
-												theNode->Coord.x, theNode->Coord.z);		
+												theNode->Coord.x, theNode->Coord.z);
 
 		theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - theNode->BottomOff;	// calc y coord
 		UpdateObjectTransforms(theNode);																// update transforms
-		UpdateShadow(theNode);	
+		UpdateShadow(theNode);
 		UpdateOnionSparkles(theNode);
-			
+
 				/* DO SOME COLLISION CHECKING */
-				
+
 		GetObjectInfo(theNode);
 		if (DoEnemyCollisionDetect(theNode,CTYPE_HURTENEMY, false))					// just do this to see if explosions hurt
 			return;
 
 					/* SEE IF LEAVE SPLINE TO CHASE PLAYER */
-					
+
 		if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < ONION_DETACH_DIST)
-			DetachEnemyFromSpline(theNode, MoveOnion);			
+			DetachEnemyFromSpline(theNode, MoveOnion);
 
 	}
-	
-	
+
+
 }
 
 
@@ -668,14 +668,14 @@ static void UpdateOnion(ObjNode *theNode)
 	theNode->DelayUntilAttack -= gFramesPerSecondFrac;
 
 	UpdateEnemy(theNode);
-	
+
 	UpdateOnionSparkles(theNode);
 
 	if (theNode->Skeleton->AnimNum != ONION_ANIM_JIGGLE)		// verify that player is freed if not jiggling
 	{
 		if (theNode->GrippingPlayer)
 		{
-			SetPlayerStandAnim(gPlayerInfo.objNode, 8);		
+			SetPlayerStandAnim(gPlayerInfo.objNode, 8);
 		}
 	}
 
@@ -696,7 +696,7 @@ short	i,j;
 	{
 
 				/* CREATE EYE LIGHTS */
-				
+
 		i = theNode->Sparkles[j] = GetFreeSparkle(theNode);				// get free sparkle slot
 		if (i == -1)
 			return;
@@ -717,7 +717,7 @@ short	i,j;
 
 		gSparkles[i].scale = 190.0f;
 		gSparkles[i].separation = 10.0f;
-		
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark3;
 	}
 }
@@ -744,7 +744,7 @@ const static OGLPoint3D	rightEye = {18,4,-38};
 		FindCoordOnJoint(theNode, 0, &rightEye, &gSparkles[i].where);		// calc coord of right eye
 		gSparkles[i].aim.x = aimX;											// update aim vector
 		gSparkles[i].aim.z = aimZ;
-	}	
+	}
 
 
 		/* UPDATE LEFT EYE */
@@ -755,7 +755,7 @@ const static OGLPoint3D	rightEye = {18,4,-38};
 		FindCoordOnJoint(theNode, 0, &leftEye, &gSparkles[i].where);		// calc coord of left eye
 		gSparkles[i].aim.x = aimX;											// update aim vector
 		gSparkles[i].aim.z = aimZ;
-	}	
+	}
 
 }
 
@@ -769,13 +769,13 @@ const static OGLPoint3D	rightEye = {18,4,-38};
 static Boolean OnionEnemyHitByStunPulse(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord)
-	
+
 			/* HURT IT */
-			
+
 	if (HurtOnion(enemy, .5))
 		return(true);
-	
-	
+
+
 	if (enemy->Skeleton->AnimNum != ONION_ANIM_GETHIT)
 		MorphToSkeletonAnim(enemy->Skeleton, ONION_ANIM_GETHIT, 5);
 
@@ -784,8 +784,8 @@ static Boolean OnionEnemyHitByStunPulse(ObjNode *weapon, ObjNode *enemy, OGLPoin
 
 	enemy->Delta.x += weaponDelta->x * .6f;
 	enemy->Delta.y += weaponDelta->y * .6f;
-	enemy->Delta.z += weaponDelta->z * .6f;	
-	
+	enemy->Delta.z += weaponDelta->z * .6f;
+
 	return(true);
 }
 
@@ -801,7 +801,7 @@ float	r;
 #pragma unused (fistCoord, weapon, weaponDelta)
 
 			/* HURT IT */
-			
+
 	if (HurtOnion(enemy, .5))
 		return(true);
 
@@ -813,7 +813,7 @@ float	r;
 	enemy->Delta.z = -cos(r) * 1000.0f;
 	enemy->Delta.y = 500.0f;
 
-	return(true);	
+	return(true);
 }
 
 /************** ONION GOT HIT BY SUPERNOVA *****************/
@@ -821,9 +821,9 @@ float	r;
 static Boolean OnionHitBySuperNova(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord, weaponDelta)
-	
+
 	KillOnion(enemy);
-	
+
 	return(false);
 }
 
@@ -845,13 +845,13 @@ static Boolean HurtOnion(ObjNode *enemy, float damage)
 {
 
 			/* SEE IF REMOVE FROM SPLINE */
-	
+
 	if (enemy->StatusBits & STATUS_BIT_ONSPLINE)
 		DetachEnemyFromSpline(enemy, MoveOnion);
 
 
 				/* HURT ENEMY & SEE IF KILL */
-				
+
 	enemy->Health -= damage;
 	if (enemy->Health <= 0.0f)
 	{
@@ -860,13 +860,13 @@ static Boolean HurtOnion(ObjNode *enemy, float damage)
 	else
 	{
 					/* GO INTO HIT ANIM */
-				
+
 		if (enemy->Skeleton->AnimNum != ONION_ANIM_GETHIT)
 			MorphToSkeletonAnim(enemy->Skeleton, ONION_ANIM_GETHIT, 5);
 
 		enemy->ButtTimer = 3.0f;
-	}	
-	
+	}
+
 	return(false);
 }
 
@@ -884,21 +884,21 @@ ObjNode	*newObj;
 	SpewAtoms(&enemy->Coord, 1,0, 2, false);
 
 			/* RELEASE PLAYER */
-						
+
 	if (enemy->GrippingPlayer)
-		SetPlayerStandAnim(gPlayerInfo.objNode, 8);	
-			
-			
+		SetPlayerStandAnim(gPlayerInfo.objNode, 8);
+
+
 				/* SET DEFAULT STUFF */
-						
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.coord.x 	= enemy->Coord.x;
 	gNewObjectDefinition.coord.y 	= enemy->Coord.y + enemy->BottomOff + 50.0f;
-	gNewObjectDefinition.coord.z 	= enemy->Coord.z;	
+	gNewObjectDefinition.coord.z 	= enemy->Coord.z;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
-	gNewObjectDefinition.moveCall 	= MoveOnionSlice;	
-	gNewObjectDefinition.rot 		= 0;	
+	gNewObjectDefinition.moveCall 	= MoveOnionSlice;
+	gNewObjectDefinition.rot 		= 0;
 
 
 			/*********************/
@@ -910,47 +910,47 @@ ObjNode	*newObj;
 	for (i = 0; i < 5; i++)
 	{
 		gNewObjectDefinition.scale 		= .7f + RandomFloat2() * .1f;
-	
+
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 		newObj->Delta.y = 400.0f + RandomFloat() * 400.0f;
 		newObj->Delta.x = RandomFloat2() * 500.0f;
 		newObj->Delta.z = RandomFloat2() * 500.0f;
-		
+
 		newObj->DeltaRot.x = RandomFloat2() * 6.0f;
 		newObj->DeltaRot.y = RandomFloat2() * 10.0f;
-		newObj->DeltaRot.z = RandomFloat2() * 6.0f;		
-		
+		newObj->DeltaRot.z = RandomFloat2() * 6.0f;
+
 		gNewObjectDefinition.coord.y += 40.0f;
 	}
 
 			/* MAKE STALK */
-			
+
 	gNewObjectDefinition.scale 		= .7;
 	gNewObjectDefinition.type 		= FARM_ObjType_OnionStalk;
 	gNewObjectDefinition.coord.y 	+= 60.0f;
-			
+
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->Delta.y = 400.0f + RandomFloat() * 400.0f;
 	newObj->Delta.x = RandomFloat2() * 500.0f;
 	newObj->Delta.z = RandomFloat2() * 500.0f;
-	
+
 	newObj->DeltaRot.x = RandomFloat2() * 6.0f;
 	newObj->DeltaRot.y = RandomFloat2() * 10.0f;
-	newObj->DeltaRot.z = RandomFloat2() * 6.0f;		
+	newObj->DeltaRot.z = RandomFloat2() * 6.0f;
 
 
 			/* EXPLODE GEOMETRY */
-				
+
 	ExplodeGeometry(enemy, 300, SHARD_MODE_BOUNCE, 2, .7);
 
-			
+
 	PlayEffect3D(EFFECT_ONIONSPLAT, &enemy->Coord);
 
 			/* DELETE ORIGINAL ONION */
-			
-	DeleteEnemy(enemy);	
+
+	DeleteEnemy(enemy);
 	return(true);
 }
 
@@ -973,7 +973,7 @@ float fps = gFramesPerSecondFrac;
 	theNode->Rot.z += theNode->DeltaRot.z * fps;
 
 			/* SEE IF FALLEN BELOW FLOOR */
-			
+
 	if (gCoord.y < (GetTerrainY(gCoord.x, gCoord.z) - 300.0f))
 	{
 		DeleteObject(theNode);

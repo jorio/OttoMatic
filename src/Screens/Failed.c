@@ -55,7 +55,7 @@ static ObjNode	*gFailedIcons[2];
 Str63	gMenuStrings[2] =
 {
 	{"\pTRY AGAIN"},
-	{"\pRETIRE"},		
+	{"\pRETIRE"},
 };
 
 
@@ -73,38 +73,38 @@ static const OGLColorRGBA gFailedMenuHiliteColor = {.3,.5,.2,1};
 Boolean DoFailedMenu(const Str31	headerString)
 {
 	BuildFailedMenu(headerString);
-	
+
 
 				/*************/
 				/* MAIN LOOP */
 				/*************/
-				
+
 	CalcFramesPerSecond();
-	UpdateInput();		
+	UpdateInput();
 	gNoCarControls = true;									// nobody has control during this
-	
+
 	while(true)
 	{
 			/* SEE IF MAKE SELECTION */
-		
+
 		if (NavigateFailedMenu())
 			break;
 
 			/* MOVE STUFF */
-			
+
 		MoveEverything();
-		
+
 
 			/* DRAW STUFF */
-	
+
 		CalcFramesPerSecond();
-		UpdateInput();		
+		UpdateInput();
 		DoPlayerTerrainUpdate(gPlayerInfo.camera.cameraLocation.x, gPlayerInfo.camera.cameraLocation.z);	// need to call this to keep supertiles active
 		OGL_DrawScene(gGameViewInfoPtr, DrawArea);
-	}	
-	
+	}
+
 	FreeFailedMenu();
-	
+
 	return(gTryAgain);
 }
 
@@ -117,11 +117,11 @@ short	i;
 ObjNode	*obj;
 
 	gFailedMenuSelection = 0;
-	
+
 	gTryAgain = true;
 
 			/* BUILD NEW TEXT STRINGS */
-			
+
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.y 	= -.6;
 	gNewObjectDefinition.coord.z 	= 0;
@@ -133,21 +133,21 @@ ObjNode	*obj;
 
 	obj = MakeFontStringObject(s, &gNewObjectDefinition, gGameViewInfoPtr, true);		// title
 	obj->ColorFilter.a = 0;
-	
+
 	gNewObjectDefinition.coord.y 	-= LINE_SPACING * 1.5f;
 
 	gNewObjectDefinition.scale 	    = FAILED_ICON_SCALE;
 	for (i = 0; i < 2; i++)
 	{
 		Str255	s;
-	
+
 		GetIndString(s, 3000 + gGamePrefs.language, i + 1);
-	
+
 		gFailedIcons[i] = MakeFontStringObject(s, &gNewObjectDefinition, gGameViewInfoPtr, true);
 		gFailedIcons[i]->ColorFilter.a = 0;
 		gNewObjectDefinition.coord.y 	-= LINE_SPACING;
-	}	
-} 
+	}
+}
 
 /****************** MOVE FAILED OBJECT ************************/
 
@@ -184,7 +184,7 @@ short	i;
 
 
 		/* SEE IF CHANGE SELECTION */
-		
+
 	if (GetNewKeyState(KEY_UP) && (gFailedMenuSelection > 0))
 	{
 //		PlayEffect(EFFECT_SELECTCLICK);
@@ -212,14 +212,14 @@ short	i;
 		{
 			gFailedIcons[i]->ColorFilter = gFailedMenuHiliteColor;										// hilite
 		}
-	
+
 	}
-	
-	
+
+
 			/***************************/
 			/* SEE IF MAKE A SELECTION */
 			/***************************/
-			
+
 	if (GetNewKeyState(KEY_SPACE) || GetNewKeyState(KEY_RETURN))
 	{
 		switch(gFailedMenuSelection)
@@ -229,16 +229,16 @@ short	i;
 					gGameOver = false;
 
 					break;
-					
+
 			case	1:								// retire
 					gTryAgain = false;
 					break;
-										
+
 		}
 		return(true);
-	}	
-	
-		
+	}
+
+
 	return(false);
 }
 

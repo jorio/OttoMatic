@@ -96,7 +96,7 @@ static CGrafPtr		gQTDummyPort = nil;
 		/*****************/
 		/* EFFECTS TABLE */
 		/*****************/
-		
+
 static EffectType	gEffectsTable[] =
 {
 	SOUND_BANK_MAIN,SOUND_DEFAULT_BADSELECT,2000,			// EFFECT_BADSELECT
@@ -257,7 +257,7 @@ static EffectType	gEffectsTable[] =
 
 	SOUND_BANK_LOSE,SOUND_LOSE_CONVEYORBELT,3000,				// EFFECT_CONVEYORBELT
 	SOUND_BANK_LOSE,SOUND_LOSE_TRANSFORM,3000,					// EFFECT_TRANSFORM
-	
+
 };
 
 
@@ -271,13 +271,13 @@ ExtSoundHeader	sndHdr;
 double			crap = rate44khz;
 SndCommand 	mySndCmd;
 FSSpec			spec;
-	
+
 
 
 	gMaxChannels = 0;
 
 			/* INIT BANK INFO */
-			
+
 	for (i = 0; i < MAX_SOUND_BANKS; i++)
 		gNumSndsInBank[i] = 0;
 
@@ -286,41 +286,41 @@ FSSpec			spec;
 			/******************/
 
 				/* MAKE DUMMY SOUND HEADER */
-				
+
 	sndHdr.samplePtr 		= nil;
-    sndHdr.sampleRate		= rate44khz;  
-    sndHdr.loopStart		= 0;         
-    sndHdr.loopEnd			= 0;          
-    sndHdr.encode			= extSH;           
-    sndHdr.baseFrequency 	= 0;      
-    sndHdr.numFrames		= 0;              
-    sndHdr.numChannels		= 2;  
-   	dtox80(&crap, &sndHdr.AIFFSampleRate);        
-    sndHdr.markerChunk		= 0;          
-    sndHdr.instrumentChunks	= 0;       
+    sndHdr.sampleRate		= rate44khz;
+    sndHdr.loopStart		= 0;
+    sndHdr.loopEnd			= 0;
+    sndHdr.encode			= extSH;
+    sndHdr.baseFrequency 	= 0;
+    sndHdr.numFrames		= 0;
+    sndHdr.numChannels		= 2;
+   	dtox80(&crap, &sndHdr.AIFFSampleRate);
+    sndHdr.markerChunk		= 0;
+    sndHdr.instrumentChunks	= 0;
     sndHdr.AESRecording		= 0;
-    sndHdr.sampleSize		= 16;           
-    sndHdr.futureUse1		= 0;            
-    sndHdr.futureUse2		= 0;            
-    sndHdr.futureUse3		= 0;    
-    sndHdr.futureUse4		= 0;  
-    sndHdr.sampleArea[0]		= 0;  
+    sndHdr.sampleSize		= 16;
+    sndHdr.futureUse1		= 0;
+    sndHdr.futureUse2		= 0;
+    sndHdr.futureUse3		= 0;
+    sndHdr.futureUse4		= 0;
+    sndHdr.sampleArea[0]		= 0;
 
 
 			/* ALL OTHER CHANNELS */
-				
+
 	for (gMaxChannels = 0; gMaxChannels < MAX_CHANNELS; gMaxChannels++)
 	{
 			/* NEW SOUND CHANNEL */
-			
+
 		iErr = SndNewChannel(&gSndChannel[gMaxChannels],sampledSynth,initMono+initNoInterp,NewSndCallBackUPP(CallBackFn));
 		if (iErr)												// if err, stop allocating channels
 			break;
-			
-			
+
+
 			/* FOR POST- SM 3.6.5 DO THIS! */
-#if 1		
-		mySndCmd.cmd = soundCmd;	
+#if 1
+		mySndCmd.cmd = soundCmd;
 		mySndCmd.param1 = 0;
 		mySndCmd.param2 = (long)&sndHdr;
 		if ((iErr = SndDoImmediate(gSndChannel[gMaxChannels], &mySndCmd)) != noErr)
@@ -328,9 +328,9 @@ FSSpec			spec;
 			DoAlert("\pInitSoundTools: SndDoImmediate failed!");
 			ShowSystemErr_NonFatal(iErr);
 		}
-		
-		
-		mySndCmd.cmd = reInitCmd;	
+
+
+		mySndCmd.cmd = reInitCmd;
 		mySndCmd.param1 = 0;
 		mySndCmd.param2 = initNoInterp|initStereo;
 		if ((iErr = SndDoImmediate(gSndChannel[gMaxChannels], &mySndCmd)) != noErr)
@@ -339,14 +339,14 @@ FSSpec			spec;
 			ShowSystemErr_NonFatal(iErr);
 		}
 
-#endif		
+#endif
 	}
-	
-	
+
+
 		/* LOAD DEFAULT SOUNDS */
-		
+
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Audio:Main.sounds", &spec);
-	LoadSoundBank(&spec, SOUND_BANK_MAIN);	
+	LoadSoundBank(&spec, SOUND_BANK_MAIN);
 }
 
 
@@ -360,18 +360,18 @@ void ShutdownSound(void)
 int	i;
 
 			/* STOP ANY PLAYING AUDIO */
-			
+
 	StopAllEffectChannels();
 	KillSong();
 
 
 		/* DISPOSE OF CHANNELS */
-		
+
 	for (i = 0; i < gMaxChannels; i++)
-		SndDisposeChannel(gSndChannel[i], true);	
+		SndDisposeChannel(gSndChannel[i], true);
 	gMaxChannels = 0;
-	
-	
+
+
 }
 
 #pragma mark -
@@ -389,12 +389,12 @@ OSErr			iErr;
 		DoFatalAlert("\pLoadSoundBank: bankNum >= MAX_SOUND_BANKS");
 
 			/* DISPOSE OF EXISTING BANK */
-			
+
 	DisposeSoundBank(bankNum);
 
 
 			/* OPEN APPROPRIATE REZ FILE */
-			
+
 	srcFile1 = FSpOpenResFile(spec, fsRdPerm);
 	if (srcFile1 == -1)
 		DoFatalAlert("\pLoadSoundBank: OpenResFile failed!");
@@ -411,25 +411,25 @@ OSErr			iErr;
 	for (i=0; i < numSoundsInBank; i++)
 	{
 				/* LOAD SND REZ */
-				
+
 		gSndHandles[bankNum][i] = (SndListResource **)GetResource('snd ',BASE_EFFECT_RESOURCE+i);
-		if (gSndHandles[bankNum][i] == nil) 
+		if (gSndHandles[bankNum][i] == nil)
 		{
 			iErr = ResError();
 			DoAlert("\pLoadSoundBank: GetResource failed!");
 			if (iErr == memFullErr)
-				DoFatalAlert("\pLoadSoundBank: Out of Memory");		
+				DoFatalAlert("\pLoadSoundBank: Out of Memory");
 			else
 				ShowSystemErr(iErr);
 		}
 		DetachResource((Handle)gSndHandles[bankNum][i]);				// detach resource from rez file & make a normal Handle
-			
+
 		HNoPurge((Handle)gSndHandles[bankNum][i]);						// make non-purgeable
 		HLockHi((Handle)gSndHandles[bankNum][i]);
-		
+
 				/* GET OFFSET INTO IT */
-				
-		GetSoundHeaderOffset(gSndHandles[bankNum][i], &gSndOffsets[bankNum][i]);		
+
+		GetSoundHeaderOffset(gSndHandles[bankNum][i], &gSndOffsets[bankNum][i]);
 	}
 
 	UseResFile(gMainAppRezFile );								// go back to normal res file
@@ -443,7 +443,7 @@ OSErr			iErr;
 
 void DisposeSoundBank(short bankNum)
 {
-short	i; 
+short	i;
 
 
 	if (bankNum > MAX_SOUND_BANKS)
@@ -452,7 +452,7 @@ short	i;
 	StopAllEffectChannels();									// make sure all sounds are stopped before nuking any banks
 
 			/* FREE ALL SAMPLES */
-			
+
 	for (i=0; i < gNumSndsInBank[bankNum]; i++)
 		DisposeHandle((Handle)gSndHandles[bankNum][i]);
 
@@ -481,7 +481,7 @@ short		c = *channelNum;
 //	if (theStatus.scChannelBusy)					// if channel busy, then stop it
 	{
 
-		mySndCmd.cmd = flushCmd;	
+		mySndCmd.cmd = flushCmd;
 		mySndCmd.param1 = 0;
 		mySndCmd.param2 = 0;
 		myErr = SndDoImmediate(gSndChannel[c], &mySndCmd);
@@ -491,7 +491,7 @@ short		c = *channelNum;
 		mySndCmd.param2 = 0;
 		myErr = SndDoImmediate(gSndChannel[c], &mySndCmd);
 	}
-	
+
 	*channelNum = -1;
 }
 
@@ -519,7 +519,7 @@ short		c = *channelNum;
 //	if (theStatus.scChannelBusy)					// if channel busy, then stop it
 	{
 
-		mySndCmd.cmd = flushCmd;	
+		mySndCmd.cmd = flushCmd;
 		mySndCmd.param1 = 0;
 		mySndCmd.param2 = 0;
 		myErr = SndDoImmediate(gSndChannel[c], &mySndCmd);
@@ -529,7 +529,7 @@ short		c = *channelNum;
 		mySndCmd.param2 = 0;
 		myErr = SndDoImmediate(gSndChannel[c], &mySndCmd);
 	}
-	
+
 	*channelNum = -1;
 }
 
@@ -544,7 +544,7 @@ short		i;
 	for (i=0; i < gMaxChannels; i++)
 	{
 		short	c;
-		
+
 		c = i;
 		StopAChannel(&c);
 	}
@@ -614,7 +614,7 @@ float	volumeTweaks[]=
 	.7,					// slime boss
 	.8,					// apoc
 	1.0,				// cloud
-	.6,					// jungle	
+	.6,					// jungle
 	1.0,				// jungle boss
 	.8,					// fireice
 	1.1,				// saucer
@@ -630,7 +630,7 @@ float	volumeTweaks[]=
 
 
 		/* ZAP ANY EXISTING SONG */
-		
+
 	gCurrentSong 	= songNum;
 	gLoopSongFlag 	= loopFlag;
 	KillSong();
@@ -645,16 +645,16 @@ float	volumeTweaks[]=
 		DoFatalAlert("\pPlaySong: song file not found");
 
 	volumeTweak = volumeTweaks[songNum];
-	
+
 	gCurrentSong = songNum;
-	
-	
+
+
 				/*****************/
 				/* START PLAYING */
 				/*****************/
 
 			/* GOT TO SET A DUMMY PORT OR QT MAY FREAK */
-			
+
 	if (gQTDummyPort == nil)						// create a blank graf port
 		gQTDummyPort = CreateNewPort();
 
@@ -666,34 +666,34 @@ float	volumeTweaks[]=
 	{
 		iErr = NewMovieFromFile(&gSongMovie, myRefNum, 0, nil, newMovieActive, nil);
 		CloseMovieFile(myRefNum);
-								
+
 		if (iErr == noErr)
 		{
 //			if (gOSX)
 //				LoadMovieIntoRam(gSongMovie, 0, GetMovieDuration(gSongMovie), keepInRam);
-				
+
 			if (loopFlag)
-				SetMoviePlayHints(gSongMovie, hintsLoop, hintsLoop);					
+				SetMoviePlayHints(gSongMovie, hintsLoop, hintsLoop);
 
 
-			SetMovieVolume(gSongMovie, FloatToFixed16(gGlobalVolume * SONG_VOLUME * volumeTweak));						// set volume	
+			SetMovieVolume(gSongMovie, FloatToFixed16(gGlobalVolume * SONG_VOLUME * volumeTweak));						// set volume
 			StartMovie(gSongMovie);
 
 			gSongPlayingFlag = true;
 		}
 	}
 
-	SetPort(oldPort);	
-		
+	SetPort(oldPort);
 
-	
+
+
 			/* SEE IF WANT TO MUTE THE MUSIC */
-			
+
 	if (gMuteMusicFlag)
 	{
 		if (gSongMovie)
 			StopMovie(gSongMovie);
-	
+
 	}
 }
 
@@ -708,7 +708,7 @@ void KillSong(void)
 
 	if (!gSongPlayingFlag)
 		return;
-		
+
 	gSongPlayingFlag = false;											// tell callback to do nothing
 
 	if (gSongMovie)
@@ -716,8 +716,8 @@ void KillSong(void)
 		StopMovie(gSongMovie);
 		DisposeMovie(gSongMovie);
 		gSongMovie = nil;
-	}	
-		
+	}
+
 	gMusicFileRefNum = 0x0ded;
 }
 
@@ -726,7 +726,7 @@ void KillSong(void)
 void ToggleMusic(void)
 {
 	gMuteMusicFlag = !gMuteMusicFlag;
-	
+
 	if (gSongMovie)
 	{
 		if (gMuteMusicFlag)
@@ -758,14 +758,14 @@ Byte					bankNum,soundNum;
 u_long					leftVol, rightVol;
 
 			/* GET BANK & SOUND #'S FROM TABLE */
-			
+
 	bankNum 	= gEffectsTable[effectNum].bank;
 	soundNum 	= gEffectsTable[effectNum].sound;
 
 	if (soundNum >= gNumSndsInBank[bankNum])					// see if illegal sound #
 	{
 		DoAlert("\pIllegal sound number!");
-		ShowSystemErr(effectNum);	
+		ShowSystemErr(effectNum);
 	}
 
 				/* CALC VOLUME */
@@ -779,8 +779,8 @@ u_long					leftVol, rightVol;
 
 	if (theChan != -1)
 		gChannelInfo[theChan].volumeAdjust = 1.0;			// full volume adjust
-						
-	return(theChan);									// return channel #	
+
+	return(theChan);									// return channel #
 }
 
 
@@ -799,14 +799,14 @@ Byte			bankNum,soundNum;
 u_long			leftVol, rightVol;
 
 			/* GET BANK & SOUND #'S FROM TABLE */
-			
+
 	bankNum 	= gEffectsTable[effectNum].bank;
 	soundNum 	= gEffectsTable[effectNum].sound;
 
 	if (soundNum >= gNumSndsInBank[bankNum])					// see if illegal sound #
 	{
 		DoAlert("\pIllegal sound number!");
-		ShowSystemErr(effectNum);	
+		ShowSystemErr(effectNum);
 	}
 
 				/* CALC VOLUME */
@@ -817,13 +817,13 @@ u_long			leftVol, rightVol;
 
 
 				/* PLAY EFFECT */
-				
+
 	theChan = PlayEffect_Parms(effectNum, leftVol, rightVol, rateMultiplier);
-	
+
 	if (theChan != -1)
 		gChannelInfo[theChan].volumeAdjust = volumeAdjust;	// remember volume adjuster
 
-	return(theChan);									// return channel #	
+	return(theChan);									// return channel #
 }
 
 
@@ -842,10 +842,10 @@ short			c;
 
 	if (c == -1)
 		return(true);
-	
+
 
 			/* SEE IF SOUND HAS COMPLETED */
-			
+
 //	SndChannelStatus(gSndChannel[c],sizeof(SCStatus),&theStatus);	// get channel info
 //	if (!theStatus.scChannelBusy)									// see if channel not busy
 //	{
@@ -854,7 +854,7 @@ short			c;
 //	}
 
 			/* MAKE SURE THE SAME SOUND IS STILL ON THIS CHANNEL */
-			
+
 	if (effectNum != gChannelInfo[c].effectNum)
 		goto gone;
 
@@ -864,13 +864,13 @@ short			c;
 	Calc3DEffectVolume(gChannelInfo[c].effectNum, where, gChannelInfo[c].volumeAdjust, &leftVol, &rightVol);
 	if ((leftVol+rightVol) == 0)										// if volume goes to 0, then kill channel
 	{
-gone:	
+gone:
 		StopAChannel(channel);
 		return(false);
 	}
 
 	ChangeChannelVolume(c, leftVol, rightVol);
-	
+
 	return(false);
 }
 
@@ -884,9 +884,9 @@ u_long	volume,left,right;
 u_long	maxLeft,maxRight;
 
 	dist 	= OGLPoint3D_Distance(where, &gEarCoords);		// calc dist to sound for pane 0
-		
+
 			/* DO VOLUME CALCS */
-			
+
 	refDist = gEffectsTable[effectNum].refDistance;			// get ref dist
 
 	dist -= refDist;
@@ -898,10 +898,10 @@ u_long	maxLeft,maxRight;
 		if (volumeFactor > 1.0f)
 			volumeFactor = 1.0f;
 	}
-	
-	volume = (float)FULL_CHANNEL_VOLUME * volumeFactor * volAdjust;	
-	
-				
+
+	volume = (float)FULL_CHANNEL_VOLUME * volumeFactor * volAdjust;
+
+
 	if (volume < 6)							// if really quiet, then just turn it off
 	{
 		*leftVolOut = *rightVolOut = 0;
@@ -911,29 +911,29 @@ u_long	maxLeft,maxRight;
 			/************************/
 			/* DO STEREO SEPARATION */
 			/************************/
-	
-	else		
+
+	else
 	{
 		float		volF = (float)volume;
 		OGLVector2D	earToSound,lookVec;
 		float		dot,cross;
-		
+
 		maxLeft = maxRight = 0;
-		
+
 			/* CALC VECTOR TO SOUND */
-			
+
 		earToSound.x = where->x - gEarCoords.x;
 		earToSound.y = where->z - gEarCoords.z;
 		FastNormalizeVector2D(earToSound.x, earToSound.y, &earToSound, true);
-		
-		
+
+
 			/* CALC EYE LOOK VECTOR */
-			
+
 		FastNormalizeVector2D(gEyeVector.x, gEyeVector.z, &lookVec, true);
-			
+
 
 			/* DOT PRODUCT  TELLS US HOW MUCH STEREO SHIFT */
-			
+
 		dot = 1.0f - fabs(OGLVector2D_Dot(&earToSound,  &lookVec));
 		if (dot < 0.0f)
 			dot = 0.0f;
@@ -943,12 +943,12 @@ u_long	maxLeft,maxRight;
 
 
 			/* CROSS PRODUCT TELLS US WHICH SIDE */
-			
+
 		cross = OGLVector2D_Cross(&earToSound,  &lookVec);
-		
-		
+
+
 				/* DO LEFT/RIGHT CALC */
-				
+
 		if (cross > 0.0f)
 		{
 			left 	= volF + (volF * dot);
@@ -959,19 +959,19 @@ u_long	maxLeft,maxRight;
 			right 	= volF + (volF * dot);
 			left 	= volF - (volF * dot);
 		}
-		
-		
+
+
 				/* KEEP MAX */
-				
+
 		if (left > maxLeft)
 			maxLeft = left;
 		if (right > maxRight)
 			maxRight = right;
-				
+
 	}
 
 	*leftVolOut = maxLeft;
-	*rightVolOut = maxRight;		
+	*rightVolOut = maxRight;
 }
 
 
@@ -995,13 +995,13 @@ OGLVector3D	v;
 	gEarCoords.x = setupInfo->cameraPlacement.cameraLocation.x + (v.x * 300.0f);			// put ear coord in front of camera
 	gEarCoords.y = setupInfo->cameraPlacement.cameraLocation.y + (v.y * 300.0f);
 	gEarCoords.z = setupInfo->cameraPlacement.cameraLocation.z + (v.z * 300.0f);
-	
-	gEyeVector = v;							
+
+	gEyeVector = v;
 }
 
 
 /***************************** PLAY EFFECT ***************************/
-//  
+//
 // OUTPUT: channel # used to play sound
 //
 
@@ -1012,7 +1012,7 @@ short PlayEffect(short effectNum)
 }
 
 /***************************** CALLBACKFN ***************************/
-//  
+//
 // Called by the Sound Manager at interrupt time to let us know that
 // the sound is done playing.
 //
@@ -1048,21 +1048,21 @@ OSErr			myErr;
 u_long			lv2,rv2;
 static UInt32          loopStart, loopEnd;
 SoundHeaderPtr   sndPtr;
-	
-	
+
+
 			/* GET BANK & SOUND #'S FROM TABLE */
-			
+
 	bankNum = gEffectsTable[effectNum].bank;
 	soundNum = gEffectsTable[effectNum].sound;
 
 	if (soundNum >= gNumSndsInBank[bankNum])					// see if illegal sound #
 	{
 		DoAlert("\pIllegal sound number!");
-		ShowSystemErr(effectNum);	
+		ShowSystemErr(effectNum);
 	}
 
 			/* LOOK FOR FREE CHANNEL */
-			
+
 	theChan = FindSilentChannel();
 	if (theChan == -1)
 	{
@@ -1070,14 +1070,14 @@ SoundHeaderPtr   sndPtr;
 	}
 
 	lv2 = (float)leftVolume * gGlobalVolume;							// amplify by global volume
-	rv2 = (float)rightVolume * gGlobalVolume;					
+	rv2 = (float)rightVolume * gGlobalVolume;
 
 
 					/* GET IT GOING */
 
-	chanPtr = gSndChannel[theChan];						
-	
-	mySndCmd.cmd = flushCmd;	
+	chanPtr = gSndChannel[theChan];
+
+	mySndCmd.cmd = flushCmd;
 	mySndCmd.param1 = 0;
 	mySndCmd.param2 = 0;
 	myErr = SndDoImmediate(chanPtr, &mySndCmd);
@@ -1104,9 +1104,9 @@ SoundHeaderPtr   sndPtr;
 	if (myErr)
 		return(-1);
 
-	mySndCmd.cmd 		= rateMultiplierCmd;						// modify the rate to change the frequency 
+	mySndCmd.cmd 		= rateMultiplierCmd;						// modify the rate to change the frequency
 	mySndCmd.param1 	= 0;
-	mySndCmd.param2 	= rateMultiplier;	
+	mySndCmd.param2 	= rateMultiplier;
 	SndDoImmediate(chanPtr, &mySndCmd);
 
     // If the loop start point is before the loop end, then there is a loop
@@ -1123,11 +1123,11 @@ SoundHeaderPtr   sndPtr;
 
 
 			/* SET MY INFO */
-			
+
 	gChannelInfo[theChan].effectNum 	= effectNum;		// remember what effect is playing on this channel
 	gChannelInfo[theChan].leftVolume 	= leftVolume;		// remember requested volume (not the adjusted volume!)
-	gChannelInfo[theChan].rightVolume 	= rightVolume;	
-	return(theChan);										// return channel #	
+	gChannelInfo[theChan].rightVolume 	= rightVolume;
+	return(theChan);										// return channel #
 }
 
 
@@ -1145,7 +1145,7 @@ static void UpdateGlobalVolume(void)
 int		c;
 
 			/* ADJUST VOLUMES OF ALL CHANNELS REGARDLESS IF THEY ARE PLAYING OR NOT */
-			
+
 	for (c = 0; c < gMaxChannels; c++)
 	{
 		ChangeChannelVolume(c, gChannelInfo[c].leftVolume, gChannelInfo[c].rightVolume);
@@ -1153,7 +1153,7 @@ int		c;
 
 
 			/* UPDATE SONG VOLUME */
-			
+
 	if (gSongPlayingFlag)
 		SetMovieVolume(gSongMovie, FloatToFixed16(gGlobalVolume) * SONG_VOLUME);
 
@@ -1174,9 +1174,9 @@ u_long			lv2,rv2;
 		return;
 
 	lv2 = (float)leftVol * gGlobalVolume;				// amplify by global volume
-	rv2 = (float)rightVol * gGlobalVolume;			
+	rv2 = (float)rightVol * gGlobalVolume;
 
-	chanPtr = gSndChannel[channel];						// get the actual channel ptr				
+	chanPtr = gSndChannel[channel];						// get the actual channel ptr
 
 	mySndCmd.cmd = volumeCmd;							// set sound playback volume
 	mySndCmd.param1 = 0;
@@ -1205,11 +1205,11 @@ static	SndChannelPtr	chanPtr;
 	if (channel < 0)									// make sure it's valid
 		return;
 
-	chanPtr = gSndChannel[channel];						// get the actual channel ptr				
+	chanPtr = gSndChannel[channel];						// get the actual channel ptr
 
-	mySndCmd.cmd 		= rateMultiplierCmd;						// modify the rate to change the frequency 
+	mySndCmd.cmd 		= rateMultiplierCmd;						// modify the rate to change the frequency
 	mySndCmd.param1 	= 0;
-	mySndCmd.param2 	= rateMult;	
+	mySndCmd.param2 	= rateMult;
 	SndDoImmediate(chanPtr, &mySndCmd);
 }
 
@@ -1227,16 +1227,16 @@ static	SndChannelPtr	chanPtr;
 void DoSoundMaintenance(void)
 {
 
-	if (gAllowAudioKeys)									
+	if (gAllowAudioKeys)
 	{
 					/* SEE IF TOGGLE MUSIC */
 
 		if (GetNewKeyState(KEY_M))
 		{
-			ToggleMusic();			
+			ToggleMusic();
 		}
-			
-		
+
+
 				/* SEE IF CHANGE VOLUME */
 
 		if (GetKeyState(KEY_PLUS))
@@ -1255,7 +1255,7 @@ void DoSoundMaintenance(void)
 	}
 
 				/* UPDATE SONG */
-				
+
 	if (gSongPlayingFlag && (!gMuteMusicFlag))
 	{
 		if (IsMovieDone(gSongMovie))				// see if the song has completed
@@ -1279,20 +1279,20 @@ void DoSoundMaintenance(void)
 				gMoviesTaskTimer += .4f;
 			}
 		}
-	}				
-	
-	
-
-		/* ALSO CHECK OPTIONS */
-
-		
-	if (GetNewKeyState(KEY_F1))
-	{
-		DoGameSettingsDialog();	
 	}
 
 
-	
+
+		/* ALSO CHECK OPTIONS */
+
+
+	if (GetNewKeyState(KEY_F1))
+	{
+		DoGameSettingsDialog();
+	}
+
+
+
 }
 
 
@@ -1315,10 +1315,10 @@ SCStatus	theStatus;
 			return(theChan);
 		}
 	}
-	
+
 			/* NO FREE CHANNELS */
-	
-	return(-1);										
+
+	return(-1);
 }
 
 

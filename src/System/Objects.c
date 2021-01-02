@@ -45,10 +45,10 @@ static void DrawBoundingBoxes(ObjNode *theNode);
 
 											// OBJECT LIST
 ObjNode		*gFirstNodePtr = nil;
-					
+
 ObjNode		*gCurrentNode,*gMostRecentlyAddedNode,*gNextNode;
-			
-										
+
+
 NewObjectDefinitionType	gNewObjectDefinition;
 
 OGLPoint3D	gCoord;
@@ -76,11 +76,11 @@ void InitObjectManager(void)
 
 				/* INIT LINKED LIST */
 
-															
+
 	gCurrentNode = nil;
-	
+
 					/* CLEAR ENTIRE OBJECT LIST */
-		
+
 	gFirstNodePtr = nil;									// no node yet
 
 	gNumObjectNodes = 0;
@@ -101,7 +101,7 @@ long	slot,i;
 unsigned long flags = newObjDef->flags;
 
 				/* ALLOCATE NEW NODE(CLEARED TO 0'S) */
-					
+
 	newNodePtr = (ObjNode *)AllocPtrClear(sizeof(ObjNode));
 	if (newNodePtr == nil)
 		DoFatalAlert("\pMakeNewObject: Alloc Ptr failed!");
@@ -110,19 +110,19 @@ unsigned long flags = newObjDef->flags;
 
 
 			/* INITIALIZE ALL OF THE FIELDS */
-			
+
 	slot = newObjDef->slot;
 
 	newNodePtr->Slot 		= slot;
 	newNodePtr->Type 		= newObjDef->type;
 	newNodePtr->Group 		= newObjDef->group;
-	newNodePtr->MoveCall 	= newObjDef->moveCall;					
-	
+	newNodePtr->MoveCall 	= newObjDef->moveCall;
+
 	if (flags & STATUS_BIT_ONSPLINE)
 		newNodePtr->SplineMoveCall = newObjDef->moveCall;				// save spline move routine
 	else
 		newNodePtr->SplineMoveCall = nil;
-		
+
 	newNodePtr->Genre = newObjDef->genre;
 	newNodePtr->Coord = newNodePtr->InitCoord = newNodePtr->OldCoord = newObjDef->coord;		// save coords
 	newNodePtr->StatusBits = flags;
@@ -133,16 +133,16 @@ unsigned long flags = newObjDef->flags;
 
 	newNodePtr->BBox.isEmpty = true;
 
-	
+
 	newNodePtr->Rot.y =  newObjDef->rot;
 	newNodePtr->Scale.x =
-	newNodePtr->Scale.y = 
+	newNodePtr->Scale.y =
 	newNodePtr->Scale.z = newObjDef->scale;
 
-	
+
 	newNodePtr->BoundingSphereRadius = 100;
 
-				
+
 	newNodePtr->EffectChannel = -1;						// no streaming sound effect
 	newNodePtr->ParticleGroup = -1;						// no particle group
 	newNodePtr->ParticleMagicNum = 0;
@@ -152,16 +152,16 @@ unsigned long flags = newObjDef->flags;
 	newNodePtr->SplineNum = 0;
 	newNodePtr->SplineObjectIndex = -1;					// no index yet
 	newNodePtr->SplinePlacement = 0;
-	
+
 	newNodePtr->Skeleton = nil;
 
-	newNodePtr->ColorFilter.r = 
-	newNodePtr->ColorFilter.g = 
-	newNodePtr->ColorFilter.b = 
+	newNodePtr->ColorFilter.r =
+	newNodePtr->ColorFilter.g =
+	newNodePtr->ColorFilter.b =
 	newNodePtr->ColorFilter.a = 1.0;
 
 			/* MAKE SURE SCALE != 0 */
-			
+
 	if (newNodePtr->Scale.x == 0.0f)
 		newNodePtr->Scale.x = 0.0001f;
 	if (newNodePtr->Scale.y == 0.0f)
@@ -171,21 +171,21 @@ unsigned long flags = newObjDef->flags;
 
 
 		/* NO VAPOR TRAILS YET */
-		
+
 	for (i = 0; i < MAX_JOINTS; i++)
 		newNodePtr->VaporTrails[i] = -1;
-		
+
 
 				/* INSERT NODE INTO LINKED LIST */
-				
+
 	newNodePtr->StatusBits |= STATUS_BIT_DETACHED;		// its not attached to linked list yet
 	AttachObject(newNodePtr, false);
 
 	gNumObjectNodes++;
-	
+
 
 				/* CLEANUP */
-				
+
 	gMostRecentlyAddedNode = newNodePtr;					// remember this
 	return(newNodePtr);
 }
@@ -203,37 +203,37 @@ Byte	group,type;
 
 
 	newObjDef->genre = DISPLAY_GROUP_GENRE;
-	
-	newObj = MakeNewObject(newObjDef);		
+
+	newObj = MakeNewObject(newObjDef);
 	if (newObj == nil)
 		DoFatalAlert("\pMakeNewDisplayGroupObject: MakeNewObject failed!");
 
 			/* MAKE BASE GROUP & ADD GEOMETRY TO IT */
-	
+
 	CreateBaseGroup(newObj);											// create group object
 	group = newObjDef->group;											// get group #
 	type = newObjDef->type;												// get type #
-	
+
 	if (type >= gNumObjectsInBG3DGroupList[group])							// see if illegal
 	{
 		Str255	s;
-		
+
 		DoAlert("\pMakeNewDisplayGroupObject: type > gNumObjectsInGroupList[]!");
-		
+
 		NumToString(group, s);
 		DoAlert(s);
 		NumToString(type,s);
 		DoFatalAlert(s);
 	}
-	
-	AttachGeometryToDisplayGroupObject(newObj,gBG3DGroupList[group][type]);
-	
 
-			/* SET BOUNDING BOX */	
+	AttachGeometryToDisplayGroupObject(newObj,gBG3DGroupList[group][type]);
+
+
+			/* SET BOUNDING BOX */
 
 	newObj->BBox = gObjectGroupBBoxList[group][type];	// get this model's local bounding box
-	
-	
+
+
 	return(newObj);
 }
 
@@ -253,10 +253,10 @@ void ResetDisplayGroupObject(ObjNode *theNode)
 
 	if (theNode->Type >= gNumObjectsInBG3DGroupList[theNode->Group])							// see if illegal
 		DoFatalAlert("\pResetDisplayGroupObject: type > gNumObjectsInGroupList[]!");
-	
+
 	AttachGeometryToDisplayGroupObject(theNode,gBG3DGroupList[theNode->Group][theNode->Type]);	// attach geometry to group
 
-			/* SET BOUNDING BOX */	
+			/* SET BOUNDING BOX */
 
 	theNode->BBox = gObjectGroupBBoxList[theNode->Group][theNode->Type];
 }
@@ -291,21 +291,21 @@ MOMatrixObject			*transObject;
 
 
 				/* CREATE THE BASE GROUP OBJECT */
-				
+
 	theNode->BaseGroup = MO_CreateNewObjectOfType(MO_TYPE_GROUP, 0, nil);
 	if (theNode->BaseGroup == nil)
 		DoFatalAlert("\pCreateBaseGroup: MO_CreateNewObjectOfType failed!");
 
 
 					/* SETUP BASE MATRIX */
-			
+
 	if ((theNode->Scale.x == 0) || (theNode->Scale.y == 0) || (theNode->Scale.z == 0))
 		DoFatalAlert("\pCreateBaseGroup: A scale component == 0");
-		
-			
+
+
 	OGLMatrix4x4_SetScale(&scaleMatrix, theNode->Scale.x, theNode->Scale.y,		// make scale matrix
 							theNode->Scale.z);
-			
+
 	OGLMatrix4x4_SetRotate_XYZ(&rotMatrix, theNode->Rot.x, theNode->Rot.y,		// make rotation matrix
 								 theNode->Rot.z);
 
@@ -327,7 +327,7 @@ MOMatrixObject			*transObject;
 	if (transObject == nil)
 		DoFatalAlert("\pCreateBaseGroup: MO_CreateNewObjectOfType/Matrix Failed!");
 
-	MO_AttachToGroupStart(theNode->BaseGroup, transObject);						// add to base group		
+	MO_AttachToGroupStart(theNode->BaseGroup, transObject);						// add to base group
 	theNode->BaseTransformObject = transObject;									// keep extra LEGAL ref (remember to dispose later)
 }
 
@@ -347,33 +347,33 @@ void MoveObjects(void)
 ObjNode		*thisNodePtr;
 
 			/* CALL SOUND MAINTENANCE HERE FOR CONVENIENCE */
-			
+
 	DoSoundMaintenance();
-	
+
 
 	if (gFirstNodePtr == nil)								// see if there are any objects
 		return;
 
 	thisNodePtr = gFirstNodePtr;
-	
+
 	do
 	{
 				/* VERIFY NODE */
-				
+
 		if (thisNodePtr->CType == INVALID_NODE_FLAG)
 			DoFatalAlert("\pMoveObjects: CType == INVALID_NODE_FLAG");
-	
+
 		gCurrentNode = thisNodePtr;							// set current object node
 		gNextNode	 = thisNodePtr->NextNode;				// get next node now (cuz current node might get deleted)
-					
-			
+
+
 				/* UPDATE ANIMATION */
-				
+
 		UpdateSkeletonAnimation(thisNodePtr);
 
 
 					/* NEXT TRY TO MOVE IT */
-					
+
 		if (!(thisNodePtr->StatusBits & STATUS_BIT_ONSPLINE))		// make sure don't call a move call if on spline
 		{
 			if ((!(thisNodePtr->StatusBits & STATUS_BIT_NOMOVE)) &&	(thisNodePtr->MoveCall != nil))
@@ -389,7 +389,7 @@ ObjNode		*thisNodePtr;
 
 
 			/* FLUSH THE DELETE QUEUE */
-			
+
 	FlushObjectDeleteQueue();
 }
 
@@ -418,30 +418,30 @@ short			skelType;
 
 
 				/* FIRST DO OUR CULLING */
-				
+
 	CullTestAllObjects();
-	
+
 	theNode = gFirstNodePtr;
 
-	
+
 			/* GET CAMERA COORDS */
-			
+
 	cameraX = setupInfo->cameraPlacement.cameraLocation.x;
 	cameraZ = setupInfo->cameraPlacement.cameraLocation.z;
-	
+
 			/***********************/
 			/* MAIN NODE TASK LOOP */
-			/***********************/			
+			/***********************/
 	do
 	{
 		statusBits = theNode->StatusBits;						// get obj's status bits
 
 		if (statusBits & (STATUS_BIT_ISCULLED|STATUS_BIT_HIDDEN))	// see if is culled or hidden
-			goto next;		
-							
+			goto next;
+
 
 		if (theNode->CType == INVALID_NODE_FLAG)				// see if already deleted
-			goto next;		
+			goto next;
 
 		gGlobalTransparency = theNode->ColorFilter.a;			// get global transparency
 		if (gGlobalTransparency <= 0.0f)						// see if invisible
@@ -455,30 +455,30 @@ short			skelType;
 			/******************/
 			/* CHECK AUTOFADE */
 			/******************/
-			
+
 		if (gAutoFadeStartDist != 0.0f)							// see if this level has autofade
 		{
 			if (statusBits & STATUS_BIT_AUTOFADE)
 			{
 				float		dist;
-				
+
 				dist = CalcQuickDistance(cameraX, cameraZ, theNode->Coord.x, theNode->Coord.z);			// see if in fade zone
-				
+
 				if (!theNode->BBox.isEmpty)
 					dist += (theNode->BBox.max.x - theNode->BBox.min.x) * .2f;		// adjust dist based on size of object in order to fade big objects closer
-				
+
 				if (dist >= gAutoFadeStartDist)
-				{				
+				{
 					dist -= gAutoFadeStartDist;							// calc xparency %
-					dist *= gAutoFadeRange_Frac;				
+					dist *= gAutoFadeRange_Frac;
 					if (dist < 0.0f)
 						goto next;
-					
-					gGlobalTransparency -= dist;	
+
+					gGlobalTransparency -= dist;
 					if (gGlobalTransparency <= 0.0f)
 					{
 						theNode->StatusBits |= STATUS_BIT_ISCULLED;		// set culled flag to that any related Sparkles wont be drawn either
-						goto next;		
+						goto next;
 					}
 				}
 			}
@@ -488,7 +488,7 @@ short			skelType;
 			/*******************/
 			/* CHECK BACKFACES */
 			/*******************/
-			
+
 		if (statusBits & STATUS_BIT_KEEPBACKFACES)
 		{
 			if (!noCullFaces)
@@ -508,7 +508,7 @@ short			skelType;
 			/*********************/
 			/* CHECK NULL SHADER */
 			/*********************/
-			
+
 		if (statusBits & STATUS_BIT_NOLIGHTING)
 		{
 			if (!noLighting)
@@ -523,11 +523,11 @@ short			skelType;
 			noLighting = false;
 			OGL_EnableLighting();
 		}
- 
+
  			/****************/
 			/* CHECK NO FOG */
 			/****************/
-	
+
 		if (setupInfo->useFog)
 		{
 			if (statusBits & STATUS_BIT_NOFOG)
@@ -549,11 +549,11 @@ short			skelType;
 			/********************/
 			/* CHECK GLOW BLEND */
 			/********************/
-	
+
 		if (statusBits & STATUS_BIT_GLOW)
 		{
 			if (!glow)
-			{				
+			{
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 				glow = true;
 			}
@@ -564,12 +564,12 @@ short			skelType;
 			glow = false;
 		    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
-		
-		
+
+
 			/**********************/
 			/* CHECK TEXTURE WRAP */
 			/**********************/
-	
+
 		if (statusBits & STATUS_BIT_NOTEXTUREWRAP)
 		{
 			if (!texWrap)
@@ -584,14 +584,14 @@ short			skelType;
 			texWrap = false;
 		    gGlobalMaterialFlags &= ~(BG3D_MATERIALFLAG_CLAMP_U|BG3D_MATERIALFLAG_CLAMP_V);
 		}
-		
-		
+
+
 
 
 			/****************/
 			/* CHECK ZWRITE */
 			/****************/
-	
+
 		if (statusBits & STATUS_BIT_NOZWRITES)
 		{
 			if (!noZWrites)
@@ -607,11 +607,11 @@ short			skelType;
 			noZWrites = false;
 		}
 
-	
+
 			/*****************/
 			/* CHECK ZBUFFER */
 			/*****************/
-			
+
 		if (statusBits & STATUS_BIT_NOZBUFFER)
 		{
 			if (!noZBuffer)
@@ -631,7 +631,7 @@ short			skelType;
 			/*****************************/
 			/* CHECK EDGE ALPHA CLIPPING */
 			/*****************************/
-			
+
 		if ((statusBits & STATUS_BIT_CLIPALPHA) && (gGlobalTransparency == 1.0f))
 		{
 			if (!clipAlpha)
@@ -649,7 +649,7 @@ short			skelType;
 
 
 			/* AIM AT CAMERA */
-			
+
 		if (statusBits & STATUS_BIT_AIMATCAMERA)
 		{
 			theNode->Rot.y = PI+CalcYAngleFromPointToPoint(theNode->Rot.y,
@@ -665,7 +665,7 @@ short			skelType;
 			/************************/
 			/* SHOW COLLISION BOXES */
 			/************************/
-			
+
 		if (gDebugMode == 2)
 		{
 			DrawCollisionBoxes(theNode,false);
@@ -676,17 +676,17 @@ short			skelType;
 			/***************************/
 			/* SEE IF DO U/V TRANSFORM */
 			/***************************/
-			 
+
 		if (statusBits & STATUS_BIT_UVTRANSFORM)
 		{
 			glMatrixMode(GL_TEXTURE);					// set texture matrix
-			glTranslatef(theNode->TextureTransformU, theNode->TextureTransformV, 0); 
+			glTranslatef(theNode->TextureTransformU, theNode->TextureTransformV, 0);
 			glMatrixMode(GL_MODELVIEW);
 		}
-		
-		
- 
- 
+
+
+
+
 			/***********************/
 			/* SUBMIT THE GEOMETRY */
 			/***********************/
@@ -697,26 +697,26 @@ short			skelType;
  			glDisable(GL_NORMALIZE);
  		else
  			glEnable(GL_NORMALIZE);
-						
+
 		if (theNode->CustomDrawFunction)							// if has custom draw function, then override and use that
 			goto custom_draw;
-						
+
 		switch(theNode->Genre)
 		{
 			MOMaterialObject	*overrideTexture, *oldTexture = nil;
-			
-			case	SKELETON_GENRE:			
+
+			case	SKELETON_GENRE:
 					UpdateSkinnedGeometry(theNode);													// update skeleton geometry
 					numTriMeshes = theNode->Skeleton->skeletonDefinition->numDecomposedTriMeshes;
 					skelType = theNode->Type;
-					
+
 					overrideTexture = theNode->Skeleton->overrideTexture;							// get any override texture ref (illegal ref)
-					
+
 					for (i = 0; i < numTriMeshes; i++)												// submit each trimesh of it
 					{
 						if (overrideTexture)														// set override texture
 						{
-							if (gLocalTriMeshesOfSkelType[skelType][i].numMaterials > 0)			
+							if (gLocalTriMeshesOfSkelType[skelType][i].numMaterials > 0)
 							{
 								oldTexture = gLocalTriMeshesOfSkelType[skelType][i].materials[0];		// get the normal texture for this mesh
 								gLocalTriMeshesOfSkelType[skelType][i].materials[0] = overrideTexture;	// set the override one temporarily
@@ -724,12 +724,12 @@ short			skelType;
 						}
 
 						MO_DrawGeometry_VertexArray(&gLocalTriMeshesOfSkelType[skelType][i], setupInfo);
-						
+
 						if (overrideTexture && oldTexture)											// see if need to set texture back to normal
 							gLocalTriMeshesOfSkelType[skelType][i].materials[0] = oldTexture;
 					}
 					break;
-			
+
 			case	DISPLAY_GROUP_GENRE:
 					if (theNode->BaseGroup)
 					{
@@ -757,15 +757,15 @@ short			skelType;
 
 			case	FONTSTRING_GENRE:
 					OGL_PushState();								// keep state
-					
+
 					for (i = 0; i < theNode->NumStringSprites; i++)
 					{
 						glMatrixMode(GL_PROJECTION);					// clear projection matrix
-						glLoadIdentity();		
+						glLoadIdentity();
 						glOrtho(0, 640, 480, 0, 0, 1);
 						glMatrixMode(GL_MODELVIEW);
-						glLoadIdentity();		
-					
+						glLoadIdentity();
+
 						MO_DrawObject(theNode->StringCharacters[i], setupInfo);
 					}
 
@@ -774,10 +774,10 @@ short			skelType;
 
 
 			case	CUSTOM_GENRE:
-custom_draw:			
+custom_draw:
 					if (theNode->CustomDrawFunction)
 					{
-						theNode->CustomDrawFunction(theNode, setupInfo);					
+						theNode->CustomDrawFunction(theNode, setupInfo);
 					}
 					break;
 		}
@@ -786,17 +786,17 @@ custom_draw:
 				/***************************/
 				/* SEE IF END UV TRANSFORM */
 				/***************************/
-				
+
 		if (statusBits & STATUS_BIT_UVTRANSFORM)
 		{
 			glMatrixMode(GL_TEXTURE);					// set texture matrix
-			glLoadIdentity(); 
+			glLoadIdentity();
 			glMatrixMode(GL_MODELVIEW);
 		}
 
 
 
-			/* NEXT NODE */		
+			/* NEXT NODE */
 next:
 		theNode = (ObjNode *)theNode->NextNode;
 	}while (theNode != nil);
@@ -805,7 +805,7 @@ next:
 				/*****************************/
 				/* RESET SETTINGS TO DEFAULT */
 				/*****************************/
-		
+
 	if (noLighting)
 		OGL_EnableLighting();
 
@@ -829,13 +829,13 @@ next:
 
 	if (noCullFaces)
 		glEnable(GL_CULL_FACE);
-			
+
 	if (texWrap)
 	    gGlobalMaterialFlags &= ~(BG3D_MATERIALFLAG_CLAMP_U|BG3D_MATERIALFLAG_CLAMP_V);
-	
+
 	if (clipAlpha)
 		glAlphaFunc(GL_NOTEQUAL, 0);
-			
+
 
 	gGlobalTransparency = 			// reset this in case it has changed
 	gGlobalColorFilter.r =
@@ -855,13 +855,13 @@ CollisionBoxType	*c;
 float				left,right,top,bottom,front,back;
 
 			/* SET LINE MATERIAL */
-			
+
 	glDisable(GL_TEXTURE_2D);
 
 
 		/* SCAN EACH COLLISION BOX */
-		
-	n = theNode->NumCollisionBoxes;							// get # collision boxes	
+
+	n = theNode->NumCollisionBoxes;							// get # collision boxes
 	c = &theNode->CollisionBoxes[0];						// pt to array
 
 	for (i = 0; i < n; i++)
@@ -878,7 +878,7 @@ float				left,right,top,bottom,front,back;
 			back 	= c[i].oldBack;
 		}
 		else
-		{	
+		{
 			left 	= c[i].left;
 			right 	= c[i].right;
 			top 	= c[i].top;
@@ -935,7 +935,7 @@ float				left,right,top,bottom,front,back;
 		glVertex3f(right, bottom, front);
 		glVertex3f(right, top, front);
 		glEnd();
-		
+
 	}
 }
 
@@ -945,29 +945,29 @@ static void DrawBoundingBoxes(ObjNode *theNode)
 {
 float	left,right,top,bottom,front,back;
 int		i;
-					
+
 			/* SET LINE MATERIAL */
-			
+
 	glDisable(GL_TEXTURE_2D);
 
 
 			/***************************/
 			/* TRANSFORM BBOX TO WORLD */
 			/***************************/
-			
+
 	if (theNode->Genre == SKELETON_GENRE)			// skeletons are already oriented, just need translation
 	{
-		left 	= theNode->BBox.min.x + theNode->Coord.x;	
-		right 	= theNode->BBox.max.x + theNode->Coord.x;	
-		top 	= theNode->BBox.max.y + theNode->Coord.y;	
-		bottom 	= theNode->BBox.min.y + theNode->Coord.y;	
-		front 	= theNode->BBox.max.z + theNode->Coord.z;	
-		back 	= theNode->BBox.min.z + theNode->Coord.z;		
+		left 	= theNode->BBox.min.x + theNode->Coord.x;
+		right 	= theNode->BBox.max.x + theNode->Coord.x;
+		top 	= theNode->BBox.max.y + theNode->Coord.y;
+		bottom 	= theNode->BBox.min.y + theNode->Coord.y;
+		front 	= theNode->BBox.max.z + theNode->Coord.z;
+		back 	= theNode->BBox.min.z + theNode->Coord.z;
 	}
-	else											// non-skeletons need full transform					
+	else											// non-skeletons need full transform
 	{
 		OGLPoint3D	corners[8];
-		
+
 		corners[0].x = theNode->BBox.min.x;			// top far left
 		corners[0].y = theNode->BBox.max.y;
 		corners[0].z = theNode->BBox.min.z;
@@ -999,11 +999,11 @@ int		i;
 		corners[7].x = theNode->BBox.min.x;			// bottom near left
 		corners[7].y = theNode->BBox.min.y;
 		corners[7].z = theNode->BBox.max.z;
-		
+
 		OGLPoint3D_TransformArray(corners, &theNode->BaseTransformMatrix, corners, 8);
 
 					/* FIND NEW BOUNDS */
-					
+
 		left 	= corners[0].x;
 		for (i = 1; i < 8; i ++)
 			if (corners[i].x < left)
@@ -1023,7 +1023,7 @@ int		i;
 		for (i = 1; i < 8; i ++)
 			if (corners[i].y > top)
 				top = corners[i].y;
-		
+
 		back 	= corners[0].z;
 		for (i = 1; i < 8; i ++)
 			if (corners[i].z < back)
@@ -1091,7 +1091,7 @@ int		i;
 /********************* MOVE STATIC OBJECT **********************/
 
 void MoveStaticObject(ObjNode *theNode)
-{		
+{
 
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
@@ -1108,7 +1108,7 @@ void MoveStaticObject(ObjNode *theNode)
 //
 
 void MoveStaticObject2(ObjNode *theNode)
-{		
+{
 
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
@@ -1132,7 +1132,7 @@ void MoveStaticObject2(ObjNode *theNode)
 //
 
 void MoveStaticObject3(ObjNode *theNode)
-{		
+{
 
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
@@ -1141,7 +1141,7 @@ void MoveStaticObject3(ObjNode *theNode)
 	}
 
 	theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - (theNode->BBox.min.y * theNode->Scale.y);
-	
+
 	UpdateObjectTransforms(theNode);
 
 	if (theNode->NumCollisionBoxes > 0)
@@ -1165,7 +1165,7 @@ void DeleteAllObjects(void)
 {
 	while (gFirstNodePtr != nil)
 		DeleteObject(gFirstNodePtr);
-		
+
 	FlushObjectDeleteQueue();
 }
 
@@ -1197,7 +1197,7 @@ int		i;
 			// since it's going to be used next pass thru the moveobjects loop.  This
 			// assumes that all chained nodes are later in list.
 			//
-			
+
 	if (theNode->ChainNode)
 		DeleteObject(theNode->ChainNode);
 
@@ -1206,25 +1206,25 @@ int		i;
 
 
 			/* SEE IF NEED TO FREE UP SPECIAL MEMORY */
-			
+
 	switch(theNode->Genre)
 	{
-		case	SKELETON_GENRE:	
+		case	SKELETON_GENRE:
 				FreeSkeletonBaseData(theNode->Skeleton);		// purge all alloced memory for skeleton data
 				theNode->Skeleton = nil;
 				break;
-	
+
 		case	SPRITE_GENRE:
 				MO_DisposeObjectReference(theNode->SpriteMO);	// dispose reference to sprite meta object
 		   		theNode->SpriteMO = nil;
-				break;			
+				break;
 
 		case	FONTSTRING_GENRE:
 				for (i = 0; i < theNode->NumStringSprites; i++)
 					MO_DisposeObjectReference(theNode->StringCharacters[i]);	// dispose reference to sprite meta objects
-				break;			
+				break;
 	}
-	
+
 	for (i = 0; i < MAX_NODE_SPARKLES; i++)				// free sparkles
 	{
 		if (theNode->Sparkles[i] != -1)
@@ -1233,15 +1233,15 @@ int		i;
 			theNode->Sparkles[i] = -1;
 		}
 	}
-	
+
 			/* SEE IF STOP SOUND CHANNEL */
-			
+
 	StopObjectStreamEffect(theNode);
 
 
 		/* SEE IF NEED TO DEREFERENCE A QD3D OBJECT */
-	
-	DisposeObjectBaseGroup(theNode);		
+
+	DisposeObjectBaseGroup(theNode);
 
 
 			/* REMOVE NODE FROM LINKED LIST */
@@ -1250,14 +1250,14 @@ int		i;
 
 
 			/* SEE IF MARK AS NOT-IN-USE IN ITEM LIST */
-			
+
 	if (theNode->TerrainItemPtr)
 	{
 		theNode->TerrainItemPtr->flags &= ~ITEM_FLAGS_INUSE;		// clear the "in use" flag
-	}	
-		
+	}
+
 		/* OR, IF ITS A SPLINE ITEM, THEN UPDATE SPLINE OBJECT LIST */
-		
+
 	if (theNode->StatusBits & STATUS_BIT_ONSPLINE)
 	{
 		RemoveFromSplineObjectList(theNode);
@@ -1272,7 +1272,7 @@ int		i;
 	gObjectDeleteQueue[gNumObjsInDeleteQueue++] = theNode;
 	if (gNumObjsInDeleteQueue >= OBJ_DEL_Q_SIZE)
 		FlushObjectDeleteQueue();
-	
+
 }
 
 
@@ -1295,7 +1295,7 @@ void DetachObject(ObjNode *theNode, Boolean subrecurse)
 
 	if (theNode->PrevNode == nil)					// special case 1st node
 	{
-		gFirstNodePtr = theNode->NextNode;	
+		gFirstNodePtr = theNode->NextNode;
 		if (gFirstNodePtr)
 			gFirstNodePtr->PrevNode = nil;
 	}
@@ -1309,19 +1309,19 @@ void DetachObject(ObjNode *theNode, Boolean subrecurse)
 		theNode->PrevNode->NextNode = theNode->NextNode;
 		theNode->NextNode->PrevNode = theNode->PrevNode;
 	}
-	
+
 	theNode->PrevNode = nil;						// seal links on original node
 	theNode->NextNode = nil;
-	
-	theNode->StatusBits |= STATUS_BIT_DETACHED;	
-	
+
+	theNode->StatusBits |= STATUS_BIT_DETACHED;
+
 			/* SUBRECURSE CHAINS & SHADOW */
-			
+
 	if (subrecurse)
 	{
 		if (theNode->ChainNode)
 			DetachObject(theNode->ChainNode, subrecurse);
-			
+
 		if (theNode->ShadowNode)
 			DetachObject(theNode->ShadowNode, subrecurse);
 	}
@@ -1348,10 +1348,10 @@ short	slot;
 		theNode->PrevNode = nil;
 		theNode->NextNode = nil;
 	}
-	
+
 			/* INSERT AS FIRST NODE */
 	else
-	if (slot < gFirstNodePtr->Slot)					
+	if (slot < gFirstNodePtr->Slot)
 	{
 		theNode->PrevNode = nil;					// no prev
 		theNode->NextNode = gFirstNodePtr; 			// next pts to old 1st
@@ -1362,10 +1362,10 @@ short	slot;
 	else
 	{
 		ObjNode	 *reNodePtr, *scanNodePtr;
-		
+
 		reNodePtr = gFirstNodePtr;
 		scanNodePtr = gFirstNodePtr->NextNode;		// start scanning for insertion slot on 2nd node
-			
+
 		while (scanNodePtr != nil)
 		{
 			if (slot < scanNodePtr->Slot)					// INSERT IN MIDDLE HERE
@@ -1373,35 +1373,35 @@ short	slot;
 				theNode->NextNode = scanNodePtr;
 				theNode->PrevNode = reNodePtr;
 				reNodePtr->NextNode = theNode;
-				scanNodePtr->PrevNode = theNode;			
+				scanNodePtr->PrevNode = theNode;
 				goto out;
 			}
 			reNodePtr = scanNodePtr;
 			scanNodePtr = scanNodePtr->NextNode;			// try next node
-		} 
-	
+		}
+
 		theNode->NextNode = nil;							// TAG TO END
 		theNode->PrevNode = reNodePtr;
-		reNodePtr->NextNode = theNode;		
+		reNodePtr->NextNode = theNode;
 	}
-out:	
-	
-	
-	theNode->StatusBits &= ~STATUS_BIT_DETACHED;	
-	
-	
-	
+out:
+
+
+	theNode->StatusBits &= ~STATUS_BIT_DETACHED;
+
+
+
 			/* SUBRECURSE CHAINS & SHADOW */
-			
+
 	if (recurse)
 	{
 		if (theNode->ChainNode)
 			AttachObject(theNode->ChainNode, recurse);
-			
+
 		if (theNode->ShadowNode)
 			AttachObject(theNode->ShadowNode, recurse);
 	}
-	
+
 }
 
 
@@ -1415,9 +1415,9 @@ long	i,num;
 
 	gNumObjectNodes -= num;
 
-	
+
 	for (i = 0; i < num; i++)
-		SafeDisposePtr((Ptr)gObjectDeleteQueue[i]);					
+		SafeDisposePtr((Ptr)gObjectDeleteQueue[i]);
 
 	gNumObjsInDeleteQueue = 0;
 }
@@ -1433,7 +1433,7 @@ void DisposeObjectBaseGroup(ObjNode *theNode)
 
 		theNode->BaseGroup = nil;
 	}
-	
+
 	if (theNode->BaseTransformObject != nil)							// also nuke extra ref to transform object
 	{
 		MO_DisposeObjectReference(theNode->BaseTransformObject);
@@ -1457,7 +1457,7 @@ void GetObjectInfo(ObjNode *theNode)
 {
 	gCoord = theNode->Coord;
 	gDelta = theNode->Delta;
-	
+
 }
 
 
@@ -1467,17 +1467,17 @@ void UpdateObject(ObjNode *theNode)
 {
 	if (theNode->CType == INVALID_NODE_FLAG)		// see if already deleted
 		return;
-		
+
 	theNode->Coord = gCoord;
 	theNode->Delta = gDelta;
 	UpdateObjectTransforms(theNode);
-	
+
 	CalcObjectBoxFromNode(theNode);
 
 
 		/* UPDATE ANY SHADOWS */
-				
-	UpdateShadow(theNode);		
+
+	UpdateShadow(theNode);
 }
 
 
@@ -1502,59 +1502,59 @@ u_long			bits;
 
 	OGLMatrix4x4_SetScale(&m, theNode->Scale.x,	theNode->Scale.y, theNode->Scale.z);
 
-	
+
 			/*****************************/
 			/* NOW ROTATE & TRANSLATE IT */
 			/*****************************/
-	
+
 	bits = theNode->StatusBits;
-	
+
 				/* USE ALIGNMENT MATRIX */
-			
+
 	if (bits & STATUS_BIT_USEALIGNMENTMATRIX)
 	{
-		m2 = theNode->AlignmentMatrix;		
+		m2 = theNode->AlignmentMatrix;
 	}
 	else
-	{	
+	{
 					/* DO XZY ROTATION */
-							
+
 		if (bits & STATUS_BIT_ROTXZY)
 		{
 
-			OGLMatrix4x4_SetRotate_X(&mx, theNode->Rot.x);	
-			OGLMatrix4x4_SetRotate_Y(&my, theNode->Rot.y);	
-			OGLMatrix4x4_SetRotate_Z(&mz, theNode->Rot.z);	
-		
+			OGLMatrix4x4_SetRotate_X(&mx, theNode->Rot.x);
+			OGLMatrix4x4_SetRotate_Y(&my, theNode->Rot.y);
+			OGLMatrix4x4_SetRotate_Z(&mz, theNode->Rot.z);
+
 			OGLMatrix4x4_Multiply(&mx,&mz, &mxz);
 			OGLMatrix4x4_Multiply(&mxz,&my, &m2);
 		}
 					/* DO YZX ROTATION */
-							
+
 		else
 		if (bits & STATUS_BIT_ROTYZX)
 		{
-			OGLMatrix4x4_SetRotate_X(&mx, theNode->Rot.x);	
-			OGLMatrix4x4_SetRotate_Y(&my, theNode->Rot.y);	
-			OGLMatrix4x4_SetRotate_Z(&mz, theNode->Rot.z);	
-		
+			OGLMatrix4x4_SetRotate_X(&mx, theNode->Rot.x);
+			OGLMatrix4x4_SetRotate_Y(&my, theNode->Rot.y);
+			OGLMatrix4x4_SetRotate_Z(&mz, theNode->Rot.z);
+
 			OGLMatrix4x4_Multiply(&my,&mz, &mxz);
 			OGLMatrix4x4_Multiply(&mxz,&mx, &m2);
 		}
 
 					/* DO ZXY ROTATION */
-							
+
 		else
 		if (bits & STATUS_BIT_ROTZXY)
 		{
-			OGLMatrix4x4_SetRotate_X(&mx, theNode->Rot.x);	
-			OGLMatrix4x4_SetRotate_Y(&my, theNode->Rot.y);	
-			OGLMatrix4x4_SetRotate_Z(&mz, theNode->Rot.z);	
-		
+			OGLMatrix4x4_SetRotate_X(&mx, theNode->Rot.x);
+			OGLMatrix4x4_SetRotate_Y(&my, theNode->Rot.y);
+			OGLMatrix4x4_SetRotate_Z(&mz, theNode->Rot.z);
+
 			OGLMatrix4x4_Multiply(&mz,&mx, &mxz);
 			OGLMatrix4x4_Multiply(&mxz,&my, &m2);
 		}
-		
+
 					/* STANDARD XYZ ROTATION */
 		else
 		{
@@ -1562,16 +1562,16 @@ u_long			bits;
 		}
 	}
 
-	
+
 	m2.value[M03] = theNode->Coord.x;
 	m2.value[M13] = theNode->Coord.y;
 	m2.value[M23] = theNode->Coord.z;
-	
+
 	OGLMatrix4x4_Multiply(&m,&m2, &theNode->BaseTransformMatrix);
 
 
 				/* UPDATE TRANSFORM OBJECT */
-				
+
 	SetObjectTransformMatrix(theNode);
 }
 
@@ -1588,7 +1588,7 @@ MOMatrixObject	*mo = theNode->BaseTransformObject;
 
 	if (theNode->CType == INVALID_NODE_FLAG)		// see if invalid
 		return;
-		
+
 	if (mo)				// see if this has a trans obj
 	{
 		mo->matrix =  theNode->BaseTransformMatrix;
@@ -1605,14 +1605,14 @@ ObjNode *FindClosestCType(OGLPoint3D *pt, u_long ctype)
 ObjNode		*thisNodePtr,*best = nil;
 float	d,minDist = 10000000;
 
-			
+
 	thisNodePtr = gFirstNodePtr;
-	
+
 	do
 	{
 		if (thisNodePtr->Slot >= SLOT_OF_DUMB)					// see if reach end of usable list
 			break;
-	
+
 		if (thisNodePtr->CType & ctype)
 		{
 			d = CalcQuickDistance(pt->x,pt->z,thisNodePtr->Coord.x, thisNodePtr->Coord.z);
@@ -1621,7 +1621,7 @@ float	d,minDist = 10000000;
 				minDist = d;
 				best = thisNodePtr;
 			}
-		}	
+		}
 		thisNodePtr = (ObjNode *)thisNodePtr->NextNode;		// next node
 	}
 	while (thisNodePtr != nil);
@@ -1637,14 +1637,14 @@ ObjNode *FindClosestCType3D(OGLPoint3D *pt, u_long ctype)
 ObjNode		*thisNodePtr,*best = nil;
 float	d,minDist = 10000000;
 
-			
+
 	thisNodePtr = gFirstNodePtr;
-	
+
 	do
 	{
 		if (thisNodePtr->Slot >= SLOT_OF_DUMB)					// see if reach end of usable list
 			break;
-	
+
 		if (thisNodePtr->CType & ctype)
 		{
 			d = OGLPoint3D_Distance(pt, &thisNodePtr->Coord);
@@ -1653,7 +1653,7 @@ float	d,minDist = 10000000;
 				minDist = d;
 				best = thisNodePtr;
 			}
-		}	
+		}
 		thisNodePtr = (ObjNode *)thisNodePtr->NextNode;		// next node
 	}
 	while (thisNodePtr != nil);

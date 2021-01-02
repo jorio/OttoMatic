@@ -86,72 +86,72 @@ const char urlString[3][256] =
 	{"http://homepage.mac.com/pangea/updatedata/otto/updatedata"},
 };
 #endif
-	
-	
+
+
 				/* DONT DO IT UNLESS THERE'S A TCP/IP CONNECTION */
-				
+
 	if (!IsInternetAvailable())
 	{
 		if (gLittleSnitch)					// if Little Snitch is running then we've got hackers
 			CleanQuit();
-	
+
 		gSuccessfulHTTPRead = true;					// set to true even tho we didn't read - no internet so pass.
 		return;
 	}
-		
-	
-	
+
+
+
 			/* ALLOCATE BUFFER TO STORE DATA */
-			
+
 	if (gHTTPDataHandle == nil)
 	{
 		gHTTPDataSize = 40000;
 		gHTTPDataHandle = AllocHandle(gHTTPDataSize);					// alloc 40k buffer
-	}			
-	
-	
-	
+	}
+
+
+
 			/***************************/
 			/* DOWNLOAD DATA TO BUFFER */
 			/***************************/
-			
+
 	for (i = 0; i < 2; i++)								// try primary URL and then secondary, tertiary if that fails
 	{
 		gHTTPDataIndex = 0;
 
-		err = DownloadURL(urlString[i]);		
+		err = DownloadURL(urlString[i]);
 		if (err)
 		{
 			switch(err)									// check error to see if hackers have messed with our URLs
 			{
 				case	kURLInvalidURLError:
-invalid_url:				
+invalid_url:
 						DoFatalAlert("\pThis application's checksum does not match.  Please reinstall the game.");
 						break;
 
 			}
 			continue;									// try next URL
 		}
-		
+
 				/****************/
 				/* PARSE BUFFER */
 				/****************/
 
-		gSuccessfulHTTPRead = true;						// we read it ok!				
+		gSuccessfulHTTPRead = true;						// we read it ok!
 
 				/* FIND BUFFER START */
-		
+
 		if (FindBufferStart() != noErr)					// if buffer is bad (probably 404 File Not Found) then try next URL
 			continue;
 
 				/* READ AND HANDLE ALL TAGS */
-				
+
 		while (!InterpretTag())
 		{
-		
-		};							
+
+		};
 		return;					// if gets here then it must have worked, so don't do next URL!!
-	}	
+	}
 
 		/***********/
 		/* FAILURE */
@@ -161,10 +161,10 @@ invalid_url:
 		// So, let's check if we can read Apple.com, if so, then someone is playing with us,
 		// or both briangreenstone.com and pangeasoft.net are simultaneously down (unlikely).
 		//
-		
+
 	if (gLittleSnitch)					// if Little Snitch is running then we've got hackers
 		CleanQuit();
-		
+
 	err = DownloadURL("http://www.apple.com");			// try to read apple.com
 	if (err == noErr)									// we got apple.com, so delete the existing registration
 	{
@@ -176,8 +176,8 @@ invalid_url:
 		gGamePrefs.lastVersCheckDate.year = 0;							// reset date so will check again next launch
 		SavePrefs();
 	}
-	
-	
+
+
 }
 
 
@@ -201,7 +201,7 @@ char	*c;
 	name = SwizzleULong(&name);
 
 	switch(name)
-	{	
+	{
 		case	'BVER':												// BEST VERSION name
 				InterpretVersionName();
 				break;
@@ -209,7 +209,7 @@ char	*c;
 		case	'NOTE':												// NOTE name
 				InterpretNoteName();
 				break;
-				
+
 		case	'BSER':												// BAD SERIALS name
 				InterpretBadSerialsName();
 				break;
@@ -217,9 +217,9 @@ char	*c;
 		case	'TEND':												// END name
 				return(true);
 	}
-	
+
 	return(false);
-}			
+}
 
 
 /******************* INTERPRET VERSION NAME ************************/
@@ -236,18 +236,18 @@ Handle		rez;
 UInt32		vers;
 
 			/* READ VERSION STRING */
-			
+
 	ParseNextWord(s);
-	
-		
+
+
 		/* CONVERT VERSION STRING TO NUMVERSION */
-		
+
 	bestVers.majorRev = s[1] - '0';					// convert character to number
 	bestVers.minorAndBugRev = s[3] - '0';
 	bestVers.minorAndBugRev <<= 4;
 	bestVers.minorAndBugRev |= s[5] - '0';
-		
-	
+
+
 			/* GET OUR VERSION */
 
 	vers = CFBundleGetVersionNumber(gBundle);
@@ -255,10 +255,10 @@ UInt32		vers;
 
 
 		/* SEE IF THERE'S AN UPDATE */
-			
+
 	if (bestVers.majorRev > fileVers->majorRev)		// see if there's a major rev better
 	{
-		goto update;	
+		goto update;
 	}
 	else
 	if ((bestVers.majorRev == fileVers->majorRev) &&		// see if there's a minor rev better
@@ -287,17 +287,17 @@ Str255			v = "\pVersion               ";
 
 
 	Enter2D();;
-	
+
 	myDialog = GetNewDialog(130,nil,MOVE_TO_FRONT);
-			
+
 			/* SET VERSION STRING */
-			
-	GetDialogItem(myDialog,3,&itemType,(Handle *)&itemHandle,&itemRect);	
+
+	GetDialogItem(myDialog,3,&itemType,(Handle *)&itemHandle,&itemRect);
 	SetDialogItemText((Handle)itemHandle,v);
-			
-			
+
+
 				/* DO IT */
-				
+
 	while(dialogDone == false)
 	{
 		ModalDialog(nil, &itemHit);
@@ -338,10 +338,10 @@ Str255	s;
 	noteID += (c[gHTTPDataIndex++] - '0') * 100;
 	noteID += (c[gHTTPDataIndex++] - '0') * 10;
 	noteID += (c[gHTTPDataIndex++] - '0');
-	
-		
+
+
 		/* SEE IF THIS NOTE HAS ALREADY BEEN SEEN */
-			
+
 	if (gGamePrefs.didThisNote[noteID])
 		return;
 
@@ -349,7 +349,7 @@ Str255	s;
 			/********************/
 			/* READ NOTE STRING */
 			/********************/
-			
+
 	i = 1;
 	s[0] = 0;
 	while(c[gHTTPDataIndex] != '#')							// scan until next # marker
@@ -359,12 +359,12 @@ Str255	s;
 	}
 
 			/* DO ALERT WITH NOTE */
-			
+
 	Enter2D();;
 	ParamText(s,NIL_STRING,NIL_STRING,NIL_STRING);
 	NoteAlert(130,nil);
 	Exit2D();
-	
+
 	gGamePrefs.didThisNote[noteID] = 0xff;
 	SavePrefs();
 }
@@ -385,54 +385,54 @@ Handle	hand;
 short	fRefNum;
 
 			/* PREPARE TO SAVE BAD SERIALS INTO A DATA FILE */
-		
-			
+
+
 	if (FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Audio:Main.sounds", &spec) == noErr)
 	{
 		fRefNum = FSpOpenResFile(&spec,fsRdWrPerm);
 		if (fRefNum != -1)
 		{
-			UseResFile(fRefNum);	
+			UseResFile(fRefNum);
 		}
 	}
 
 	count = 0;
-	
+
 	while(true)
 	{
 		ParseNextWord(s);												// read next word
 		if (s[1] == '*')												// see if this is the end marker
 			break;
-			
+
 			/* SAVE CODE INTO PERMANENT REZ */
-			
+
 		hand = Get1Resource('savs', 128+count);							// get existing rez
 		if (hand)
 		{
-			BlockMove(&s[1], *hand, SERIAL_LENGTH);						// copy code into handle		
+			BlockMove(&s[1], *hand, SERIAL_LENGTH);						// copy code into handle
 			ChangedResource(hand);
 		}
 		else
 		{
 			hand = AllocHandle(SERIAL_LENGTH);							// alloc handle
-			BlockMove(&s[1], *hand, SERIAL_LENGTH);						// copy code into handle		
+			BlockMove(&s[1], *hand, SERIAL_LENGTH);						// copy code into handle
 			AddResource(hand, 'savs', 128+count, "\p");					// write rez to file
 		}
 		WriteResource(hand);
 		ReleaseResource(hand);
 		count++;
 
-			
-			
-			
+
+
+
 			/* COMPARE THIS ILLEGAL SERIAL WITH OURS */
-			
+
 		for (i = 0; i < SERIAL_LENGTH; i++)
 		{
 			if (gRegInfo[i] != s[1+i])									// doesn't match
 				goto next_code;
 		}
-		
+
 				/* CODE WAS A MATCH, SO WIPE IT */
 
 		iErr = FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, gSerialFileName, &spec);
@@ -445,8 +445,8 @@ short	fRefNum;
 		SavePrefs();
 		CleanQuit();
 		goto bye;
-			
-next_code:;			
+
+next_code:;
 	}
 
 bye:
@@ -460,7 +460,7 @@ bye:
 //
 // Reads the next "word' from the buffer.  A word is text between
 // any spaces or returns.
-// 
+//
 
 static void ParseNextWord(Str255 s)
 {
@@ -468,7 +468,7 @@ char 	*c = *gHTTPDataHandle;														// point to buffer
 int		i = 1;
 
 		/* SKIP BLANKS AT FRONT */
-		
+
 	while((c[gHTTPDataIndex] == ' ') || (c[gHTTPDataIndex] == CHAR_RETURN))
 	{
 		gHTTPDataIndex++;
@@ -476,7 +476,7 @@ int		i = 1;
 
 
 		/* READ THE GOOD CHARS */
-		
+
 	do
 	{
 		s[i] = c[gHTTPDataIndex];												// copy from buffer to string
@@ -494,28 +494,28 @@ int		i = 1;
 
 static OSErr FindBufferStart(void)
 {
-	gHTTPDataIndex = 0; 						// start @ beginning of file		
-	
+	gHTTPDataIndex = 0; 						// start @ beginning of file
+
 	while(true)
 	{
 		char *c = *gHTTPDataHandle;				// point to buffer
-		
+
 		if (SkipToPound() != noErr)
 			return(1);
-		
-		if ((c[gHTTPDataIndex] == '$') &&		// see if $#$ 
+
+		if ((c[gHTTPDataIndex] == '$') &&		// see if $#$
 			(c[gHTTPDataIndex+1] == '#') &&
 			(c[gHTTPDataIndex+2] == '$'))
 		{
 			if (SkipToPound() != noErr)						// skip to next tag
 				return(1);
-			return(noErr);		
+			return(noErr);
 		}
-		
+
 		if (gHTTPDataIndex > gHTTPDataSize)		// see if out of buffer range
 			return(1);
 	};
-	
+
 }
 
 
@@ -555,7 +555,7 @@ OSStatus 	err;
 	if (gHTTPDataHandle == nil)
 	{
 		DoFatalAlert("\pDownloadURL: gHTTPDataHandle == nil");
-	
+
 	}
 
 			/* DOWNLOAD DATA */
@@ -567,11 +567,11 @@ OSStatus 	err;
 						0, 							// no flags
 						nil,						// no callback eventProc
 						nil);							// no userContex
-						
+
 
 
 	return(err);
-	
+
 
 }
 
@@ -603,7 +603,7 @@ Boolean						isReachable;
 SCNetworkConnectionFlags	theFlags;
 
 	// Get the flags
-	
+
 	theFlags    = 0;
 	isReachable = SCNetworkCheckReachabilityByName("www.apple.com", &theFlags);
 
@@ -612,14 +612,14 @@ SCNetworkConnectionFlags	theFlags;
 	 // Check the reachability
 	if (isReachable)
 		isReachable = (theFlags & kSCNetworkFlagsReachable);
-	 
+
 	if (isReachable)
 		isReachable = !(theFlags & kSCNetworkFlagsConnectionRequired);
-	 
+
 	 return(isReachable);
 
 
-#endif	
+#endif
 }
 
 
@@ -633,7 +633,7 @@ ICInstance inst;
 long startSel;
 long endSel;
 
-    err = ICStart(&inst, kGameID);     
+    err = ICStart(&inst, kGameID);
     if (err == noErr)
     {
 	    startSel = 0;

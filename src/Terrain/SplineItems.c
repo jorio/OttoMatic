@@ -50,13 +50,13 @@ static ObjNode	*gSplineObjectList[MAX_SPLINE_OBJECTS];
 Boolean (*gSplineItemPrimeRoutines[MAX_SPLINE_ITEM_NUM+1])(long, SplineItemType *) =
 {
 		NilPrime,							// My Start Coords
-		NilPrime,						
-		NilPrime,						
-		NilPrime,							// 3: squooshy enemy					
+		NilPrime,
+		NilPrime,
+		NilPrime,							// 3: squooshy enemy
 		PrimeHuman,							// 4: human
 		NilPrime,
 		NilPrime,
-		PrimeEnemy_BrainAlien,				// 7:  brain alien			
+		PrimeEnemy_BrainAlien,				// 7:  brain alien
 		PrimeEnemy_Onion,					// 8:  onion
 		PrimeEnemy_Corn,					// 9:  corn
 		PrimeEnemy_Tomato,					// 10: tomato
@@ -83,33 +83,33 @@ Boolean (*gSplineItemPrimeRoutines[MAX_SPLINE_ITEM_NUM+1])(long, SplineItemType 
 		NilPrime,							// 31:
 		NilPrime,							// 32:
 		NilPrime,							// 33:
-		NilPrime,							// 34:		
+		NilPrime,							// 34:
 		PrimeMagnetMonster,					// 35: magnet monster
-		NilPrime,							// 36:		
-		NilPrime,							// 37:		
-		NilPrime,							// 38:		
-		NilPrime,							// 39:				
+		NilPrime,							// 36:
+		NilPrime,							// 37:
+		NilPrime,							// 38:
+		NilPrime,							// 39:
 		PrimeMovingPlatform,				// 40: moving platform
-		NilPrime,							// 41:				
-		NilPrime,							// 42:				
-		NilPrime,							// 43:				
-		NilPrime,							// 44:				
-		NilPrime,							// 45:				
-		NilPrime,							// 46:				
-		NilPrime,							// 47:				
-		NilPrime,							// 48:						
+		NilPrime,							// 41:
+		NilPrime,							// 42:
+		NilPrime,							// 43:
+		NilPrime,							// 44:
+		NilPrime,							// 45:
+		NilPrime,							// 46:
+		NilPrime,							// 47:
+		NilPrime,							// 48:
 		PrimeEnemy_Flamester,				// 49: flamester
 		PrimeEnemy_GiantLizard,				// 50: giant lizard
-		NilPrime,							// 51:				
+		NilPrime,							// 51:
 		PrimeEnemy_Mantis,					// 52: mantis
-		NilPrime,							// 53:				
-		NilPrime,							// 54:				
-		NilPrime,							// 55:				
-		NilPrime,							// 56:				
-		NilPrime,							// 57:				
-		NilPrime,							// 58:				
-		PrimeEnemy_Mutant,					// 59:				
-		PrimeEnemy_MutantRobot,				// 60:				
+		NilPrime,							// 53:
+		NilPrime,							// 54:
+		NilPrime,							// 55:
+		NilPrime,							// 56:
+		NilPrime,							// 57:
+		NilPrime,							// 58:
+		PrimeEnemy_Mutant,					// 59:
+		PrimeEnemy_MutantRobot,				// 60:
 		PrimeScientist,						// 61:  scientist human
 		NilPrime,							// 62:  proximity mine
 		NilPrime,							// 63:  lamp posts
@@ -159,7 +159,7 @@ Boolean (*gSplineItemPrimeRoutines[MAX_SPLINE_ITEM_NUM+1])(long, SplineItemType 
 
 /********************* PRIME SPLINES ***********************/
 //
-// Called during terrain prime function to initialize 
+// Called during terrain prime function to initialize
 // all items on the splines and recalc spline coords
 //
 
@@ -173,31 +173,31 @@ SplinePointType	*points;
 
 
 			/* ADJUST SPLINE TO GAME COORDINATES */
-			
+
 	for (s = 0; s < gNumSplines; s++)
 	{
 		spline = &(*gSplineList)[s];							// point to this spline
 		points = (*spline->pointList);							// point to points list
-		
+
 		for (i = 0; i < spline->numPoints; i++)
 		{
 			points[i].x *= MAP2UNIT_VALUE;
 			points[i].z *= MAP2UNIT_VALUE;
 		}
 
-	}	
-	
-	
+	}
+
+
 				/* CLEAR SPLINE OBJECT LIST */
-				
+
 	gNumSplineObjects = 0;										// no items in spline object node list yet
 
 	for (s = 0; s < gNumSplines; s++)
 	{
 		spline = &(*gSplineList)[s];							// point to this spline
-		
+
 				/* SCAN ALL ITEMS ON THIS SPLINE */
-				
+
 		HLockHi((Handle)spline->itemList);						// make sure this is permanently locked down
 		for (i = 0; i < spline->numItems; i++)
 		{
@@ -205,10 +205,10 @@ SplinePointType	*points;
 			type = itemPtr->type;								// get item type
 			if (type > MAX_SPLINE_ITEM_NUM)
 				DoFatalAlert("\pPrimeSplines: type > MAX_SPLINE_ITEM_NUM");
-	
+
 			flag = gSplineItemPrimeRoutines[type](s,itemPtr); 	// call item's Prime routine
 			if (flag)
-				itemPtr->flags |= ITEM_FLAGS_INUSE;				// set in-use flag	
+				itemPtr->flags |= ITEM_FLAGS_INUSE;				// set in-use flag
 		}
 	}
 }
@@ -258,13 +258,13 @@ int				i;
 
 	numPointsInSpline = splinePtr->numPoints;					// get # points in the spline
 	points = *splinePtr->pointList;								// point to point list
-	
+
 	i = numPointsInSpline * placement;							// get index
 	i++;														// bump it up +1
-	
+
 	if (i >= numPointsInSpline)									// see if wrap around
 		i = 0;
-	
+
 	*x = points[i].x;		// get coord
 	*z = points[i].z;
 }
@@ -281,13 +281,13 @@ Boolean IsSplineItemVisible(ObjNode *theNode)
 {
 Boolean	visible = true;
 long	row,col;
-	
-	
+
+
 			/* IF IS ON AN ACTIVE SUPERTILE, THEN ASSUME VISIBLE */
 
 	row = theNode->Coord.z * TERRAIN_SUPERTILE_UNIT_SIZE_Frac;	// calc supertile row,col
 	col = theNode->Coord.x * TERRAIN_SUPERTILE_UNIT_SIZE_Frac;
-	
+
 	if ((row < 0) || (row >= gNumSuperTilesDeep) || (col < 0) || (col >= gNumSuperTilesWide))		// make sure in bounds
 		visible = false;
 	else
@@ -297,7 +297,7 @@ long	row,col;
 		else
 			visible = false;
 	}
-			/* HANDLE OBJNODE UPDATES */			
+			/* HANDLE OBJNODE UPDATES */
 
 	if (visible)
 	{
@@ -334,11 +334,11 @@ void AddToSplineObjectList(ObjNode *theNode, Boolean setAim)
 
 	theNode->SplineObjectIndex = gNumSplineObjects;					// remember where in list this is
 
-	gSplineObjectList[gNumSplineObjects++] = theNode;	
+	gSplineObjectList[gNumSplineObjects++] = theNode;
 
 
 			/* SET INITIAL AIM */
-				
+
 	if (setAim)
 		SetSplineAim(theNode);
 }
@@ -375,7 +375,7 @@ Boolean RemoveFromSplineObjectList(ObjNode *theNode)
 	}
 	else
 	{
-		return(false);	
+		return(false);
 	}
 }
 
@@ -395,7 +395,7 @@ ObjNode	*o;
 		o = gSplineObjectList[i];
 		if (o)
 			DeleteObject(o);			// This will dispose of all memory used by the node.
-										// RemoveFromSplineObjectList will be called by it. 
+										// RemoveFromSplineObjectList will be called by it.
 	}
 
 }
@@ -446,7 +446,7 @@ long			i;
 
 	numPointsInSpline = splinePtr->numPoints;					// get # points in the spline
 	points = *splinePtr->pointList;								// point to point list
-	
+
 	i = numPointsInSpline * placement;							// calc index
 	theNode->Coord.x = points[i].x;								// get coord
 	theNode->Coord.z = points[i].z;
@@ -497,7 +497,7 @@ float			numPointsInSpline;
 	numPointsInSpline = splinePtr->numPoints;					// get # points in the spline
 
 			/* GOING BACKWARD */
-			
+
 	if (theNode->StatusBits & STATUS_BIT_REVERSESPLINE)			// see if going backward
 	{
 		theNode->SplinePlacement -= speed / numPointsInSpline;
@@ -507,9 +507,9 @@ float			numPointsInSpline;
 			theNode->StatusBits ^= STATUS_BIT_REVERSESPLINE;	// toggle direction
 		}
 	}
-	
+
 		/* GOING FORWARD */
-		
+
 	else
 	{
 		theNode->SplinePlacement += speed / numPointsInSpline;
@@ -533,16 +533,16 @@ void DetachObjectFromSpline(ObjNode *theNode, void *moveCall)
 		/***********************************************/
 		/* MAKE SURE ALL COMPONENTS ARE IN LINKED LIST */
 		/***********************************************/
-				
+
 	AttachObject(theNode, true);
-	
+
 
 			/* REMOVE FROM SPLINE */
-			
+
 	RemoveFromSplineObjectList(theNode);
-			
+
 	theNode->InitCoord  = theNode->Coord;			// remember where started
-	
+
 	theNode->MoveCall = moveCall;
 
 }

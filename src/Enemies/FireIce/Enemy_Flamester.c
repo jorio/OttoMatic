@@ -72,7 +72,7 @@ static void  MoveFlamester_Attack(ObjNode *theNode);
 
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -125,11 +125,11 @@ ObjNode	*newObj;
 				/*******************************/
 				/* MAKE DEFAULT SKELETON ENEMY */
 				/*******************************/
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_FLAMESTER,x,z, FLAMESTER_SCALE_NORMAL, 0, MoveFlamester);
 
 	SetSkeletonAnim(newObj->Skeleton, FLAMESTER_ANIM_STAND);
-	
+
 
 				/*******************/
 				/* SET BETTER INFO */
@@ -139,31 +139,31 @@ ObjNode	*newObj;
 	newObj->Damage 		= FLAMESTER_DAMAGE;
 	newObj->Kind 		= ENEMY_KIND_FLAMESTER;
 
-	
+
 				/* SET COLLISION INFO */
-				
+
 	SetFlamesterCollisionBox(newObj, true);
 	CalcNewTargetOffsets(newObj,FLAMESTER_TARGET_OFFSET);
-	
+
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FLAME] 		= FlamesterHitByFlame;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FLARE] 		= FlamesterHitByFlame;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FREEZE] 		= FlamesterHitByFreeze;
 
 	newObj->HurtCallback = HurtFlamester;							// set hurt callback function
-			
+
 
 
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8,false);
-		
+
 	CreateFlamesterGlow(newObj);
 
-	return(newObj);		
+	return(newObj);
 }
 
 
@@ -177,7 +177,7 @@ static void SetFlamesterCollisionBox(ObjNode *theNode, Boolean atInit)
 
 	CreateCollisionBoxFromBoundingBox_Update(theNode, 1,1);
 
-	
+
 	if (atInit)								// only set old info if initing, otherwise, keep old since dont want to hoze collision on next frame
 		KeepOldCollisionBoxes(theNode);
 
@@ -202,8 +202,8 @@ static	void(*myMoveTable[])(ObjNode *) =
 	}
 
 	GetObjectInfo(theNode);
-	
-	myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -218,10 +218,10 @@ float	angleToTarget,dist;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
-				
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, FLAMESTER_TURN_SPEED, true);			
 
-		
+	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, FLAMESTER_TURN_SPEED, true);
+
+
 
 				/* SEE IF CHASE */
 
@@ -232,22 +232,22 @@ float	angleToTarget,dist;
 	}
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
 
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfFlamesterAttack(theNode, dist);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
 
 
-	UpdateFlamester(theNode);		
+	UpdateFlamester(theNode);
 }
 
 
@@ -262,8 +262,8 @@ float		r,fps,angle,dist;
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
-			
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, FLAMESTER_TURN_SPEED, true);			
+
+	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, FLAMESTER_TURN_SPEED, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * FLAMESTER_WALK_SPEED;
@@ -273,27 +273,27 @@ float		r,fps,angle,dist;
 
 
 				/* SEE IF STAND */
-					
+
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
 	if (dist >= FLAMESTER_CHASE_DIST_MAX)
 		MorphToSkeletonAnim(theNode->Skeleton, FLAMESTER_ANIM_STAND, 4);
-		
-		
+
+
 				/* UPDATE ANIM SPEED */
 
 	if (theNode->Skeleton->AnimNum == FLAMESTER_ANIM_WALK)
 		theNode->Skeleton->AnimSpeed = FLAMESTER_WALK_SPEED * .005f;
-	
+
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfFlamesterAttack(theNode, dist);
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
-		
-	UpdateFlamester(theNode);		
+
+	UpdateFlamester(theNode);
 }
 
 /********************** MOVE FLAMESTER: ATTACK ******************************/
@@ -304,9 +304,9 @@ float	fps = gFramesPerSecondFrac;
 
 
 	gDelta.x = gDelta.z = 0;
-	
+
 			/* SPIN */
-			
+
 	if (theNode->AttackTimer < (ATTACK_DURATION/2))				// see if slow or speed
 	{
 		theNode->DeltaRot.y -= fps * 4.0f;
@@ -323,35 +323,35 @@ float	fps = gFramesPerSecondFrac;
 
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
 
 			/* SEE IF SPEW LAVA BOULDER */
-			
+
 	theNode->SpewLavaTimer -= fps;
 	if (theNode->SpewLavaTimer <= 0.0f)
 	{
 		theNode->SpewLavaTimer = .3f + RandomFloat() * .5f;
-		SpewALavaBoulder(&gCoord, true);	
+		SpewALavaBoulder(&gCoord, true);
 	}
 
 
 			/* SEE IF DONE */
-			
+
 	theNode->AttackTimer -= fps;
 	if (theNode->AttackTimer <= 0.0f)
 	{
-		MorphToSkeletonAnim(theNode->Skeleton, FLAMESTER_ANIM_STAND, 2);	
+		MorphToSkeletonAnim(theNode->Skeleton, FLAMESTER_ANIM_STAND, 2);
 	}
 
-	UpdateFlamester(theNode);		
+	UpdateFlamester(theNode);
 }
 
 
@@ -373,21 +373,21 @@ float			x,z,placement;
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
-	
+	placement = itemPtr->placement;
+
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 
 				/* MAKE OBJECT */
-				
+
 	newObj = MakeEnemy_Flamester(x,z);
-			
+
 	SetSkeletonAnim(newObj->Skeleton, FLAMESTER_ANIM_WALK);
 
 
 				/* SET SPLINE INFO */
-			
-		
+
+
 	newObj->SplineItemPtr = itemPtr;
 	newObj->SplineNum = splineNum;
 
@@ -395,11 +395,11 @@ float			x,z,placement;
 	newObj->StatusBits		|= STATUS_BIT_ONSPLINE;
 	newObj->SplinePlacement = placement;
 	newObj->SplineMoveCall 	= MoveFlamesterOnSpline;					// set move call
-	newObj->MoveCall		= nil;	
-	
-					
+	newObj->MoveCall		= nil;
+
+
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	DetachObject(newObj, true);										// detach this object from the linked list
 	AddToSplineObjectList(newObj, true);
 
@@ -411,7 +411,7 @@ float			x,z,placement;
 
 static void MoveFlamesterOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
 
@@ -422,32 +422,32 @@ Boolean isVisible;
 
 
 			/* UPDATE STUFF IF VISIBLE */
-			
+
 	if (isVisible)
 	{
-		
+
 		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,			// calc y rot aim
-												theNode->Coord.x, theNode->Coord.z);		
+												theNode->Coord.x, theNode->Coord.z);
 
 		theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - theNode->BottomOff;	// calc y coord
 		UpdateObjectTransforms(theNode);											// update transforms
-		UpdateShadow(theNode);	
+		UpdateShadow(theNode);
 		UpdateFlamesterGlow(theNode);												// update glow
-		
+
 				/* DO SOME COLLISION CHECKING */
-				
+
 		GetObjectInfo(theNode);
 		if (DoEnemyCollisionDetect(theNode,CTYPE_HURTENEMY, false))					// just do this to see if explosions hurt
 			return;
-			
-			
-					/* SEE IF LEAVE SPLINE TO CHASE PLAYER */
-					
-		if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < FLAMESTER_DETACH_DIST)
-			DetachEnemyFromSpline(theNode, MoveFlamester);			
 
-		BurnSkeleton(theNode, 60);			
-	}	
+
+					/* SEE IF LEAVE SPLINE TO CHASE PLAYER */
+
+		if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < FLAMESTER_DETACH_DIST)
+			DetachEnemyFromSpline(theNode, MoveFlamester);
+
+		BurnSkeleton(theNode, 60);
+	}
 }
 
 
@@ -456,7 +456,7 @@ Boolean isVisible;
 static void UpdateFlamester(ObjNode *theNode)
 {
 	UpdateEnemy(theNode);
-	UpdateFlamesterGlow(theNode);	
+	UpdateFlamesterGlow(theNode);
 	BurnSkeleton(theNode, 30.0f * theNode->Scale.x);
 }
 
@@ -476,21 +476,21 @@ static Boolean FlamesterHitByFlame(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *
 float	s;
 
 		/* MAKE SCALE GROW */
-		
+
 	s = enemy->Scale.x;
 	if (s < FLAMESTER_SCALE_MAX)
 	{
 		s += .15f;										// grow by some amount
 		if (s > FLAMESTER_SCALE_MAX)						// check if @ max
 			s = FLAMESTER_SCALE_MAX;
-	
+
 		enemy->Scale.x =
 		enemy->Scale.y =
 		enemy->Scale.z = s;
-	
+
 		UpdateObjectTransforms(enemy);
 		SetFlamesterCollisionBox(enemy, false);			// update collision box based on new scale
-		
+
 		enemy->Health = FLAMESTER_HEALTH;					// reset health
 	}
 
@@ -507,14 +507,14 @@ static Boolean FlamesterHitByFreeze(ObjNode *weapon, ObjNode *enemy, OGLPoint3D 
 float	s;
 
 		/* MAKE SCALE SHRINK */
-		
+
 	s = enemy->Scale.x;
 	if (s > FLAMESTER_SCALE_MIN)
 	{
 		s -= .25f;										// shrink by some amount
 		if (s < FLAMESTER_SCALE_MIN)						// check if @ min
 		{
-			KillFlamester(enemy);	
+			KillFlamester(enemy);
 			return(true);
 		}
 
@@ -522,11 +522,11 @@ float	s;
 		enemy->Scale.y =
 		enemy->Scale.z = s;
 
-		UpdateObjectTransforms(enemy);	
+		UpdateObjectTransforms(enemy);
 		SetFlamesterCollisionBox(enemy, false);			// update collision box based on new scale
 
 	}
-	
+
 	return(true);			// stop weapon
 }
 
@@ -539,13 +539,13 @@ static Boolean HurtFlamester(ObjNode *enemy, float damage)
 {
 
 			/* SEE IF REMOVE FROM SPLINE */
-	
+
 	if (enemy->StatusBits & STATUS_BIT_ONSPLINE)
 		DetachEnemyFromSpline(enemy, MoveFlamester);
 
 
 				/* HURT ENEMY & SEE IF KILL */
-				
+
 	enemy->Health -= damage;
 	if (enemy->Health <= 0.0f)
 	{
@@ -555,12 +555,12 @@ static Boolean HurtFlamester(ObjNode *enemy, float damage)
 	else
 	{
 					/* GO INTO HIT ANIM */
-				
+
 //		if (enemy->Skeleton->AnimNum != FLAMESTER_ANIM_GETHIT)
 //			MorphToSkeletonAnim(enemy->Skeleton, FLAMESTER_ANIM_GETHIT, 5);
 
 //		enemy->ButtTimer = 3.0f;
-	}	
+	}
 	return(false);
 }
 
@@ -574,7 +574,7 @@ static void KillFlamester(ObjNode *enemy)
 	if (!enemy->EnemyRegenerate)
 		enemy->TerrainItemPtr = nil;							// dont ever come back
 
-	DeleteEnemy(enemy);	
+	DeleteEnemy(enemy);
 }
 
 
@@ -590,7 +590,7 @@ static void CreateFlamesterGlow(ObjNode *alien)
 int	numJoints,i,s;
 
 	numJoints = alien->Skeleton->skeletonDefinition->NumBones;
-	if (numJoints > MAX_NODE_SPARKLES)				// make sure we don't overflow	
+	if (numJoints > MAX_NODE_SPARKLES)				// make sure we don't overflow
 		numJoints = MAX_NODE_SPARKLES;
 
 	for (i = 0; i < numJoints; i++)
@@ -607,7 +607,7 @@ int	numJoints,i,s;
 
 			gSparkles[s].scale = 150.0f;
 			gSparkles[s].separation = -50.0f;
-			
+
 			gSparkles[s].textureNum = PARTICLE_SObjType_WhiteGlow;
 		}
 	}
@@ -621,7 +621,7 @@ static void UpdateFlamesterGlow(ObjNode *alien)
 int	numJoints,i,s;
 
 	numJoints = alien->Skeleton->skeletonDefinition->NumBones;
-	if (numJoints > MAX_NODE_SPARKLES)				// make sure we don't overflow	
+	if (numJoints > MAX_NODE_SPARKLES)				// make sure we don't overflow
 		numJoints = MAX_NODE_SPARKLES;
 
 	for (i = 0; i < numJoints; i++)
@@ -642,16 +642,16 @@ int	numJoints,i,s;
 /************ SEE IF FLAMESTER ATTACK *********************/
 
 static void SeeIfFlamesterAttack(ObjNode *theNode, float distToPlayer)
-{	
+{
 	if (!gPlayerHasLanded)
 		return;
-		
+
 	if (gPlayerIsDead)
 		return;
-	
+
 	if (gPlayerInfo.invincibilityTimer > 0.0f)
-		return;		
-		
+		return;
+
 	if (distToPlayer < FLAMESTER_ATTACK_DIST)
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, FLAMESTER_ANIM_ATTACK, 4);

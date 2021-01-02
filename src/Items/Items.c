@@ -80,13 +80,13 @@ static void MovePointySlimeTree(ObjNode *theNode);
 void InitItemsManager(void)
 {
 	InitZigZagSlats();
-	
+
 	gSpinningPlatformRot= 0;
-	
+
 	CreateCyclorama();
 
 	gPlayerRocketSled = nil;
-	gSaucerIceBounds = nil;		
+	gSaucerIceBounds = nil;
 	gNumIceCracks = 0;
 	gIceCracked = false;
 }
@@ -108,8 +108,8 @@ ObjNode	*newObj;
 
 		case	100:
 						/* MAKE RINGS */
-						
-				gNewObjectDefinition.group	= MODEL_GROUP_LEVELSPECIFIC;	
+
+				gNewObjectDefinition.group	= MODEL_GROUP_LEVELSPECIFIC;
 				gNewObjectDefinition.type 	= 1;
 				gNewObjectDefinition.scale 	= 300;
 				gNewObjectDefinition.coord.x = 0;
@@ -118,29 +118,29 @@ ObjNode	*newObj;
 				gNewObjectDefinition.flags 	= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOZBUFFER|STATUS_BIT_NOZBUFFER|STATUS_BIT_KEEPBACKFACES|STATUS_BIT_ROTYZX;
 				gNewObjectDefinition.slot 	= TERRAIN_SLOT-1;					// draw before terrain!!
 				gNewObjectDefinition.rot 	= 0;
-						
+
 				newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
-				newObj->CustomDrawFunction = DrawSaturnRing;		
+				newObj->CustomDrawFunction = DrawSaturnRing;
 				newObj->DeltaRot.z = .04;
 				newObj->Rot.x = PI/2.5;
 
 				gNewObjectDefinition.scale 	+= 300;
 				newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-				newObj->CustomDrawFunction = DrawSaturnRing;		
+				newObj->CustomDrawFunction = DrawSaturnRing;
 				newObj->DeltaRot.z = .04;
 				newObj->Rot.x = PI/2.5;
 
 				gNewObjectDefinition.scale 	+= 700;
 				newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-				newObj->CustomDrawFunction = DrawSaturnRing;		
+				newObj->CustomDrawFunction = DrawSaturnRing;
 				newObj->DeltaRot.z = .04;
 				newObj->Rot.x = PI/2.5;
 
 
 					/* MAKE BASIC CYC */
-					
-				gNewObjectDefinition.group	= MODEL_GROUP_LEVELSPECIFIC;	
+
+				gNewObjectDefinition.group	= MODEL_GROUP_LEVELSPECIFIC;
 				gNewObjectDefinition.type 	= 0;						// cyc is always 1st model in level bg3d files
 				gNewObjectDefinition.coord.x = 0;
 				gNewObjectDefinition.coord.y = 0;
@@ -150,13 +150,13 @@ ObjNode	*newObj;
 				gNewObjectDefinition.rot 	= 0;
 				gNewObjectDefinition.scale 	= gGameViewInfoPtr->yon * .995f / 100.0f;
 				newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-				newObj->CustomDrawFunction = DrawCyclorama;		
+				newObj->CustomDrawFunction = DrawCyclorama;
 				newObj->ColorFilter.a = .9f;	//------
 
 				break;
 
 		default:
-				gNewObjectDefinition.group	= MODEL_GROUP_LEVELSPECIFIC;	
+				gNewObjectDefinition.group	= MODEL_GROUP_LEVELSPECIFIC;
 				gNewObjectDefinition.type 	= 0;						// cyc is always 1st model in level bg3d files
 				gNewObjectDefinition.coord.x = 0;
 				gNewObjectDefinition.coord.y = 0;
@@ -168,9 +168,9 @@ ObjNode	*newObj;
 				gNewObjectDefinition.scale 	= gGameViewInfoPtr->yon * .995f / 100.0f;
 				newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
-				newObj->CustomDrawFunction = DrawCyclorama;		
+				newObj->CustomDrawFunction = DrawCyclorama;
 				break;
-	}	
+	}
 }
 
 
@@ -181,14 +181,14 @@ static void DrawCyclorama(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 OGLPoint3D cameraCoord = setupInfo->cameraPlacement.cameraLocation;
 
 		/* UPDATE CYCLORAMA COORD INFO */
-		
+
 	theNode->Coord = cameraCoord;
-	UpdateObjectTransforms(theNode);	
+	UpdateObjectTransforms(theNode);
 
 
 
 			/* DRAW THE OBJECT */
-			
+
 	MO_DrawObject(theNode->BaseGroup, setupInfo);
 }
 
@@ -202,38 +202,38 @@ AGLContext agl_ctx = gAGLContext;
 
 
 		/* UPDATE CYCLORAMA COORD INFO */
-		
+
 	theNode->Coord.x = cameraCoord.x;
 	theNode->Coord.y = cameraCoord.y;
-	theNode->Coord.z = cameraCoord.z + 8000.0f;	
+	theNode->Coord.z = cameraCoord.z + 8000.0f;
 	theNode->Rot.z += gFramesPerSecondFrac * theNode->DeltaRot.z;
 
 //	theNode->Rot.x += gFramesPerSecondFrac * .5f;
 
-	UpdateObjectTransforms(theNode);	
-	
-	
+	UpdateObjectTransforms(theNode);
+
+
 			/* SET MODIFIED PROJECTION MATRIX FOR INFINITE YON */
-							
+
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();														// keep matrix
-	glLoadIdentity();	
+	glLoadIdentity();
 	gluPerspective (OGLMath_RadiansToDegrees(setupInfo->fov),		// fov
 					gCurrentAspectRatio,							// aspect
 					.1,												// hither
 					200000);										// yon
-	
+
 	glMatrixMode(GL_MODELVIEW);
 
 
 
 			/* DRAW THE OBJECT */
-			
+
 	MO_DrawObject(theNode->BaseGroup, setupInfo);
 
 
 			/* RESTORE MATRIX */
-				
+
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
@@ -253,12 +253,12 @@ Boolean AddBarn(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_Barn;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 70;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject;
@@ -284,12 +284,12 @@ Boolean AddSilo(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_Silo;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 	gNewObjectDefinition.slot 		= 90;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject;
@@ -315,12 +315,12 @@ Boolean AddPhonePole(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_PhonePole;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 90;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject3;
@@ -353,12 +353,12 @@ Boolean AddSprout(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 int		type = itemPtr->parm[0];			// get sprout type
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_CornSprout + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits|STATUS_BIT_SAUCERTARGET;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
 	gNewObjectDefinition.moveCall 	= MoveSprout;
@@ -379,7 +379,7 @@ int		type = itemPtr->parm[0];			// get sprout type
 //	CreateCollisionBoxFromBoundingBox(newObj,.7,1);
 
 			/* SET SAUCER INFO */
-			
+
 	newObj->SaucerTargetType = SAUCER_TARGET_TYPE_RADIATE;
 	newObj->SaucerAbductHandler = RadiateSprout;
 
@@ -399,13 +399,13 @@ static void MoveSprout(ObjNode *theNode)
 	}
 
 		/* KEEP ALIGNED ON TERRAIN */
-			
+
 	RotateOnTerrain(theNode, 0, nil);							// set transform matrix
 	SetObjectTransformMatrix(theNode);
-	
+
 
 		/* TRY TO GET THE SAUCER TO COME AFTER THIS */
-				
+
 	if (gNumEnemies < gMaxEnemies)				// dont call if there are too many enemies already
 		CallAlienSaucer(theNode);
 }
@@ -424,18 +424,18 @@ static void RadiateSprout(ObjNode *theNode)
 		case	0:			// corn
 				GrowCorn(theNode->Coord.x, theNode->Coord.z);
 				break;
-		
+
 		case	1:			// onion
 				GrowOnion(theNode->Coord.x, theNode->Coord.z);
 				break;
-		
+
 		case	2:			// tomato
 				GrowTomato(theNode->Coord.x, theNode->Coord.z);
 				break;
 
 	}
-	
-	
+
+
 	DeleteObject(theNode);						// delete the sprout (but it will come back later)
 }
 
@@ -447,12 +447,12 @@ static void RadiateSprout(ObjNode *theNode)
 Boolean AddCornStalk(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_CornStalk;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 388;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject2;
@@ -478,12 +478,12 @@ ObjNode	*newObj;
 Boolean AddBigLeafPlant(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_BigLeafPlant;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 364;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject2;
@@ -521,7 +521,7 @@ u_long	flags = gAutoFadeStatusBits ;
 				gNewObjectDefinition.scale 		= 4.5f + RandomFloat() * 1.5f;
 				flags |= STATUS_BIT_KEEPBACKFACES;
 				break;
-				
+
 		case	1:				// JUNGLE FERN
 				gNewObjectDefinition.type 		= JUNGLE_ObjType_Fern;
 				gNewObjectDefinition.scale 		= 2.5f + RandomFloat() * 1.0f;
@@ -564,15 +564,15 @@ u_long	flags = gAutoFadeStatusBits ;
 				gNewObjectDefinition.type 		= FIREICE_ObjType_SnowTree;
 				gNewObjectDefinition.scale 		= 2.0;
 				break;
-				
+
 		default:
 				DoFatalAlert("\pAddBasicPlant: bad type");
 	}
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-//	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+//	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.coord.y 	= GetMinTerrainY(x, z, gNewObjectDefinition.group, gNewObjectDefinition.type, 1.0);		// pass bogus scale of .x since we don't want true bbox of object just some small inner area
 	gNewObjectDefinition.flags 		= flags;
 	gNewObjectDefinition.slot 		= 60;
@@ -588,31 +588,31 @@ u_long	flags = gAutoFadeStatusBits ;
 
 	newObj->CType 			= CTYPE_MISC|CTYPE_BLOCKCAMERA;
 	newObj->CBits			= CBITS_ALLSOLID;
-	
+
 	switch(type)
 	{
 		case	1:													// GIANT FERN
 				SetObjectCollisionBounds(newObj, 1000, 0, -160, 160, 160, -160);
 				break;
-				
-		default:	
+
+		default:
 				SetObjectCollisionBounds(newObj, 1000, 0, -40, 40, 40, -40);
 	}
 
 			/* SPECIAL FLAGS */
-			
+
 	switch(type)
 	{
 		case	0:				// FARM TREE
 				BG3D_SetContainerMaterialFlags(gNewObjectDefinition.group, gNewObjectDefinition.type, 1,	// no wrapping on the leaves
 												BG3D_MATERIALFLAG_CLAMP_U|BG3D_MATERIALFLAG_CLAMP_V);
 				break;
-				
+
 		default:
 				BG3D_SetContainerMaterialFlags(gNewObjectDefinition.group, gNewObjectDefinition.type, -1,	// no wrapping anywhere
 												BG3D_MATERIALFLAG_CLAMP_U|BG3D_MATERIALFLAG_CLAMP_V);
 	}
-	
+
 
 
 	return(true);													// item was added
@@ -624,12 +624,12 @@ u_long	flags = gAutoFadeStatusBits ;
 Boolean AddMetalTub(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_MetalTub;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 192;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject3;
@@ -654,12 +654,12 @@ ObjNode	*newObj;
 Boolean AddOutHouse(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_OutHouse;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 304;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject2;
@@ -685,12 +685,12 @@ Boolean AddRock(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 int		type = itemPtr->parm[0];			// get sprout type
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_Rock_Small + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 155;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject2;
@@ -715,12 +715,12 @@ Boolean AddHay(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 int		type = itemPtr->parm[0];			// get sprout type
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_HayBrick + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 46;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject2;
@@ -758,31 +758,31 @@ static const float scale[] =
 	3.5,
 	3.5,
 	4.0				// neuron post
-	
+
 };
 
 static const short types[] =
 {
 	FARM_ObjType_WoodPost,
 	FARM_ObjType_MetalPost,
-	
+
 	JUNGLE_ObjType_WoodPost,
-	
+
 	APOCALYPSE_ObjType_CrunchPost,
-	
+
 	CLOUD_ObjType_BrassPost,
-	
+
 	FIREICE_ObjType_RockPost,
 	FIREICE_ObjType_IcePost,
-	
+
 	BRAINBOSS_ObjType_FencePost,
 };
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= types[type];
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits; // | STATUS_BIT_NOLIGHTING;
 	gNewObjectDefinition.slot 		= 40;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject;
@@ -813,16 +813,16 @@ Boolean AddWindmill(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj,*prop;
 float	r;
-					
-					/**********************/		
-					/* MAKE WINDMILL BASE */
-					/**********************/		
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+					/**********************/
+					/* MAKE WINDMILL BASE */
+					/**********************/
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_Windmill;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits | STATUS_BIT_KEEPBACKFACES | STATUS_BIT_NOTEXTUREWRAP;
 	gNewObjectDefinition.slot 		= 100;
 	gNewObjectDefinition.moveCall 	= MoveWindmill;
@@ -840,10 +840,10 @@ float	r;
 	CreateCollisionBoxFromBoundingBox(newObj,1,1);
 
 
-					/**********************/		
+					/**********************/
 					/* MAKE WINDMILL PROP */
-					/**********************/		
-					
+					/**********************/
+
 	gNewObjectDefinition.type 		= FARM_ObjType_Propeller;
 	gNewObjectDefinition.coord.x 	+= sin(r) * 53.0f * WINDMILL_SCALE;
 	gNewObjectDefinition.coord.z 	+= cos(r) * 53.0f * WINDMILL_SCALE;
@@ -853,7 +853,7 @@ float	r;
 
 	newObj->ChainNode = prop;
 
-				
+
 	return(true);													// item was added
 }
 
@@ -871,7 +871,7 @@ ObjNode *prop = base->ChainNode;
 	}
 
 	prop->Rot.z += gFramesPerSecondFrac;
-	
+
 	UpdateObjectTransforms(prop);
 }
 
@@ -885,13 +885,13 @@ Boolean AddSlimePipe(TerrainItemEntryType *itemPtr, long  x, long z)
 ObjNode	*pipe,*slime,*slime2;
 float	r,y,s,x2,z2;
 int		type = itemPtr->parm[0];
-			
-	
-				/*************/		
+
+
+				/*************/
 				/* MAKE PIPE */
-				/*************/		
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+				/*************/
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= SLIME_ObjType_SlimeTube_FancyJ + type;
 	gNewObjectDefinition.scale 		= s = 2.0;
 	gNewObjectDefinition.coord.x 	= x;
@@ -910,40 +910,40 @@ int		type = itemPtr->parm[0];
 
 	pipe->CType 		= CTYPE_MISC|CTYPE_BLOCKCAMERA;
 	pipe->CBits			= CBITS_ALLSOLID;
-				
-				
+
+
 				/**************/
 				/* MAKE SLIME */
-				/**************/			
-	
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;				
+				/**************/
+
+	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOLIGHTING|STATUS_BIT_KEEPBACKFACES|STATUS_BIT_CLIPALPHA|gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+1;
 	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= pipe->Rot.y;	
+	gNewObjectDefinition.rot 		= pipe->Rot.y;
 
 	switch(type)
 	{
 				/* FANCY TUBE */
-				
+
 		case	0:
 				SetObjectCollisionBounds(pipe, 	pipe->BBox.max.y * s, pipe->BBox.min.y * s,				// set collision on pipe
 												pipe->BBox.min.x * .9f * s,pipe->BBox.max.x * .8f * s,
 												pipe->BBox.max.x * .9f * s,pipe->BBox.min.x * .8f * s);
 
 				x -= sin(r) * (242.0f * s);
-				z -= cos(r) * (242.0f * s);		
+				z -= cos(r) * (242.0f * s);
 				y = GetTerrainY(x,z);							// bottom y
-								
+
 				gNewObjectDefinition.coord.x 	= x;
 				gNewObjectDefinition.coord.z 	= z;
 				gNewObjectDefinition.coord.y 	= y;
 				slime = MakeNewObject(&gNewObjectDefinition);
-				break;	
+				break;
 
 				/* NORMAL TUBE */
 				/* SHORT TUBE */
-				
+
 		case	1:
 		case	3:
 				SetObjectCollisionBounds(pipe, 	pipe->BBox.max.y * s, pipe->BBox.min.y * s,				// set collision on pipe
@@ -951,58 +951,58 @@ int		type = itemPtr->parm[0];
 												pipe->BBox.max.x * .9f * s,pipe->BBox.min.x * .9f * s);
 
 				x -= sin(r) * (161.0f * s);
-				z -= cos(r) * (161.0f * s);		
-				y = GetTerrainY(x,z);							
-								
+				z -= cos(r) * (161.0f * s);
+				y = GetTerrainY(x,z);
+
 				gNewObjectDefinition.coord.x 	= x;
 				gNewObjectDefinition.coord.z 	= z;
 				gNewObjectDefinition.coord.y 	= y;
 				slime = MakeNewObject(&gNewObjectDefinition);
-				break;	
+				break;
 
 				/* M TUBE */
-				
+
 		case	2:
 				r += PI/2;
-				
+
 				x2 = sin(r) * (161.0 * s);
 				z2 = cos(r) * (161.0 * s);
 				SetObjectCollisionBounds(pipe, 	600, 0,	x2 - 55.0f * s, x2 + 55.0f,	z2 + 55.0f * s, z2 - 55.0f * s);
-				
-				pipe->NumCollisionBoxes++;				
+
+				pipe->NumCollisionBoxes++;
 				pipe->CollisionBoxes[1].left = x - (x2 + 50.0f * s);
 				pipe->CollisionBoxes[1].right = x - (x2 - 50.0f * s);
 				pipe->CollisionBoxes[1].top = y + 600.0f;
 				pipe->CollisionBoxes[1].bottom = y;
 				pipe->CollisionBoxes[1].front = z - (z2 - 50.0f * s);
-				pipe->CollisionBoxes[1].back = z - (z2 + 50.0f * s);						
+				pipe->CollisionBoxes[1].back = z - (z2 + 50.0f * s);
 				KeepOldCollisionBoxes(pipe);
 
-								
+
 				gNewObjectDefinition.coord.x 	= x;									// make slime
 				gNewObjectDefinition.coord.z 	= z;
 				gNewObjectDefinition.coord.y 	= y;
 				slime = MakeNewObject(&gNewObjectDefinition);
-				break;	
+				break;
 
 				/* T TUBE */
-				
+
 		case	4:
 				SetObjectCollisionBounds(pipe, 	pipe->BBox.max.y * s, pipe->BBox.min.y * s,				// set collision on pipe
 												pipe->BBox.min.z * .9f * s,pipe->BBox.max.z * .9f * s,
 												pipe->BBox.max.z * .9f * s,pipe->BBox.min.z * .9f * s);
 
 				r += PI/2;
-				y = GetTerrainY(x,z);							
-							
+				y = GetTerrainY(x,z);
+
 							/* A */
-								
+
 				gNewObjectDefinition.coord.x 	= x - sin(r) * (162.0f * s);
 				gNewObjectDefinition.coord.z 	= z - cos(r) * (162.0f * s);
 				gNewObjectDefinition.coord.y 	= y;
 				slime = MakeNewObject(&gNewObjectDefinition);
 				slime->Kind = type;
-				slime->CustomDrawFunction = DrawSlimeFlow;				
+				slime->CustomDrawFunction = DrawSlimeFlow;
 				slime->OozeColor = itemPtr->parm[2];	// save ooze color
 				pipe->ChainNode = slime;
 
@@ -1013,58 +1013,58 @@ int		type = itemPtr->parm[0];
 				gNewObjectDefinition.coord.y 	= y;
 				slime2 = MakeNewObject(&gNewObjectDefinition);
 				slime2->Kind = type;
-				slime2->CustomDrawFunction = DrawSlimeFlow;				
+				slime2->CustomDrawFunction = DrawSlimeFlow;
 				slime2->OozeColor = itemPtr->parm[2];	// save ooze color
 				slime->ChainNode = slime2;
 				return(true);
-				break;	
+				break;
 
 				/* GRATE TUBE */
-				
+
 		case	5:
 				SetObjectCollisionBounds(pipe, 	pipe->BBox.max.y, pipe->BBox.min.y,				// set collision on pipe
 												pipe->BBox.min.x * .9f,pipe->BBox.max.x * .9f,
 												pipe->BBox.max.x * .9f,pipe->BBox.min.x * .9f);
 
 				x -= sin(r) * (242.0f * s);
-				z -= cos(r) * (242.0f * s);		
+				z -= cos(r) * (242.0f * s);
 				y = GetTerrainY(x,z);							// bottom y
-								
+
 				gNewObjectDefinition.coord.x 	= x;
 				gNewObjectDefinition.coord.z 	= z;
 				gNewObjectDefinition.coord.y 	= y;
 				slime = MakeNewObject(&gNewObjectDefinition);
-				break;	
+				break;
 
 				/* VALVE TUBE */
-				
+
 		case	6:
 				pipe->MoveCall = MoveSlimePipe_Valve;
 				r += PI/2;
-				
+
 				x2 = sin(r) * (157.0 * s);
 				z2 = cos(r) * (157.0 * s);
 				SetObjectCollisionBounds(pipe, 	600, 0,	x2 - 40.0f, x2 + 40.0f,	z2 + 40.0f, z2 - 40.0f);
-				
-				pipe->NumCollisionBoxes++;				
+
+				pipe->NumCollisionBoxes++;
 				pipe->CollisionBoxes[1].left = x - (x2 + 39.0f);
 				pipe->CollisionBoxes[1].right = x - (x2 - 39.0f);
 				pipe->CollisionBoxes[1].top = y + 600.0f;
 				pipe->CollisionBoxes[1].bottom = y;
 				pipe->CollisionBoxes[1].front = z - (z2 - 39.0f);
 				pipe->CollisionBoxes[1].back = z - (z2 + 39.0f);
-						
+
 				KeepOldCollisionBoxes(pipe);
 				return(true);
-				
+
 	}
-				
+
 	slime->Kind = type;						// save pipe type
 	slime->OozeColor = itemPtr->parm[2];	// save ooze color
-	slime->CustomDrawFunction = DrawSlimeFlow;				
-				
+	slime->CustomDrawFunction = DrawSlimeFlow;
+
 	pipe->ChainNode = slime;
-	
+
 	return(true);													// item was added
 }
 
@@ -1116,10 +1116,10 @@ OGLPoint3D			p;
 	if (theNode->ParticleTimer <= 0.0f)
 	{
 		theNode->ParticleTimer += .05f;										// reset timer
-		
+
 		particleGroup 	= theNode->ParticleGroup;
 		magicNum 		= theNode->ParticleMagicNum;
-		
+
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
 			theNode->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
@@ -1143,11 +1143,11 @@ OGLPoint3D			p;
 			float	r = theNode->Rot.y;
 			float	s = theNode->Scale.x;
 			float	x,y,z;
-			
+
 			x = theNode->Coord.x - sin(r) * (s * 75.0f);
 			z = theNode->Coord.z - cos(r) * (s * 75.0f);
-			y = theNode->Coord.y + (s * 303.0f);			
-			
+			y = theNode->Coord.y + (s * 303.0f);
+
 			for (i = 0; i < 2; i++)
 			{
 				p.x = x + RandomFloat2() * 40.0f;
@@ -1157,14 +1157,14 @@ OGLPoint3D			p;
 				d.x = RandomFloat2() * 20.0f;
 				d.y = 150.0f + RandomFloat() * 40.0f;
 				d.z = RandomFloat2() * 20.0f;
-			
+
 				newParticleDef.groupNum		= particleGroup;
 				newParticleDef.where		= &p;
 				newParticleDef.delta		= &d;
 				newParticleDef.scale		= RandomFloat() + 1.0f;
 				newParticleDef.rotZ			= RandomFloat() * PI2;
 				newParticleDef.rotDZ		= RandomFloat2();
-				newParticleDef.alpha		= .7;		
+				newParticleDef.alpha		= .7;
 				if (AddParticleToGroup(&newParticleDef))
 				{
 					theNode->ParticleGroup = -1;
@@ -1195,7 +1195,7 @@ static OGLPoint3D		coords[4] =
 	-30,30,0,
 	30,30,0,
 	30,-30,0,
-	-30,-30,0	
+	-30,-30,0
 };
 static const float heights[] =
 {
@@ -1210,49 +1210,49 @@ static const float heights[] =
 	v = slime->SpecialF[0] += gFramesPerSecondFrac * 1.9f;
 
 	tubeType = slime->Kind;							// get tube type
-	
+
 
 			/* CALC COORDS OF SLIME */
-			
+
 	s = slime->Scale.x;
-	
+
 	x = slime->Coord.x;
 	y = slime->Coord.y;
 	z = slime->Coord.z;
 
 	y2 = heights[tubeType] * s;							// top y
-	
+
 	r = 45.0f * s;
 
-		
+
 			/* SUBMIT TEXTURE */
-			
-	gGlobalMaterialFlags = BG3D_MATERIALFLAG_CLAMP_U;	
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][SLIME_SObjType_GreenSlime + slime->OozeColor].materialObject, setupInfo);			
+
+	gGlobalMaterialFlags = BG3D_MATERIALFLAG_CLAMP_U;
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][SLIME_SObjType_GreenSlime + slime->OozeColor].materialObject, setupInfo);
 
 
 			/* CALC COORDS OF VERTICES */
-	
+
 	coords[0].x = -r * 1.2f;	coords[0].y = 0;
 	coords[1].x = r * 1.2f;	coords[1].y = 0;
 	coords[2].x = r;	coords[2].y = y2;
 	coords[3].x = -r;	coords[3].y = y2;
-				
+
 	SetLookAtMatrixAndTranslate(&m, &up, &slime->Coord, &setupInfo->cameraPlacement.cameraLocation);		// aim at camera & translate
 	OGLPoint3D_TransformArray(&coords[0], &m, tc, 4);
 
 
 
 			/* DRAW IT */
-			
-	glBegin(GL_QUADS);				
+
+	glBegin(GL_QUADS);
 	glTexCoord2f(0,v);		glVertex3fv((GLfloat *)&tc[0]);
 	glTexCoord2f(1,v);		glVertex3fv((GLfloat *)&tc[1]);
 	glTexCoord2f(1,1+v);	glVertex3fv((GLfloat *)&tc[2]);
 	glTexCoord2f(0,1+v);	glVertex3fv((GLfloat *)&tc[3]);
-	glEnd();	
+	glEnd();
 
-	gGlobalMaterialFlags = 0;	
+	gGlobalMaterialFlags = 0;
 }
 
 /************************* ADD SLIME MECH *********************************/
@@ -1262,7 +1262,7 @@ Boolean AddSlimeMech(TerrainItemEntryType *itemPtr, long  x, long z)
 ObjNode	*newObj,*top;
 int		type = itemPtr->parm[0];
 float	s;
-															
+
 	switch(type)
 	{
 				/*******************/
@@ -1270,14 +1270,14 @@ float	s;
 				/*******************/
 
 		case	0:
-		
+
 						/* POLE */
-						
-				gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+				gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 				gNewObjectDefinition.type 		= SLIME_ObjType_Mech_OnAStick_Pole;
 				gNewObjectDefinition.coord.x 	= x;
 				gNewObjectDefinition.coord.z 	= z;
-				gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+				gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 				gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 				gNewObjectDefinition.slot 		= 221;
 				gNewObjectDefinition.moveCall 	= MoveMechOnAStick;
@@ -1293,28 +1293,28 @@ float	s;
 				newObj->CType 			= CTYPE_MISC|CTYPE_BLOCKCAMERA;
 				newObj->CBits			= CBITS_ALLSOLID;
 				CreateCollisionBoxFromBoundingBox(newObj,1,1);
-				
+
 						/* TOP */
-						
+
 				gNewObjectDefinition.type 		= SLIME_ObjType_Mech_OnAStick_Top;
 				gNewObjectDefinition.moveCall 	= nil;
 				gNewObjectDefinition.rot 		= RandomFloat() * PI2;
 				gNewObjectDefinition.scale 		= s = 2.5f;
-				top = MakeNewDisplayGroupObject(&gNewObjectDefinition);				
-				newObj->ChainNode = top;								
+				top = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+				newObj->ChainNode = top;
 				break;
-				
-				
+
+
 				/**********/
 				/* BOILER */
 				/**********/
 
 		case	1:
-				gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+				gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 				gNewObjectDefinition.type 		= SLIME_ObjType_Mech_Boiler;
 				gNewObjectDefinition.coord.x 	= x;
 				gNewObjectDefinition.coord.z 	= z;
-				gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+				gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 				gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 				gNewObjectDefinition.slot 		= 221;
 				gNewObjectDefinition.moveCall 	= MoveSlimeMech_Boiler;
@@ -1330,9 +1330,9 @@ float	s;
 				newObj->CBits			= CBITS_ALLSOLID;
 				CreateCollisionBoxFromBoundingBox(newObj,.5,1);
 				break;
-				
+
 	}
-	
+
 	return(true);													// item was added
 }
 
@@ -1384,10 +1384,10 @@ OGLPoint3D			p;
 	if (theNode->ParticleTimer <= 0.0f)
 	{
 		theNode->ParticleTimer += .05f;										// reset timer
-		
+
 		particleGroup 	= theNode->ParticleGroup;
 		magicNum 		= theNode->ParticleMagicNum;
-		
+
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
 			theNode->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
@@ -1411,11 +1411,11 @@ OGLPoint3D			p;
 			float	r = theNode->Rot.y;
 			float	s = theNode->Scale.x;
 			float	x,y,z;
-			
+
 			x = theNode->Coord.x + sin(r) * (s * 77.0f);
 			z = theNode->Coord.z + cos(r) * (s * 77.0f);
-			y = theNode->Coord.y + (s * 588.0f);			
-			
+			y = theNode->Coord.y + (s * 588.0f);
+
 			for (i = 0; i < 2; i++)
 			{
 				p.x = x + RandomFloat2() * 40.0f;
@@ -1425,14 +1425,14 @@ OGLPoint3D			p;
 				d.x = RandomFloat2() * 20.0f;
 				d.y = 150.0f + RandomFloat() * 40.0f;
 				d.z = RandomFloat2() * 20.0f;
-			
+
 				newParticleDef.groupNum		= particleGroup;
 				newParticleDef.where		= &p;
 				newParticleDef.delta		= &d;
 				newParticleDef.scale		= RandomFloat() + 1.0f;
 				newParticleDef.rotZ			= RandomFloat() * PI2;
 				newParticleDef.rotDZ		= RandomFloat2();
-				newParticleDef.alpha		= .7;		
+				newParticleDef.alpha		= .7;
 				if (AddParticleToGroup(&newParticleDef))
 				{
 					theNode->ParticleGroup = -1;
@@ -1451,17 +1451,17 @@ Boolean AddBasicCrystal(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 float	s;
-int		type = itemPtr->parm[0];		
-	
-	
+int		type = itemPtr->parm[0];
+
+
 	if (type > 3)
 		DoFatalAlert("\pAddBasicCrystal: illegal crystal type (parm 0)");
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= SLIME_ObjType_CrystalCluster_Blue + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB-10;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject2;
@@ -1487,9 +1487,9 @@ int		type = itemPtr->parm[0];
 													-70.0f * s, 70.0f * s,
 													70.0f * s, -70.0f * s);
 				break;
-	
+
 					/* COLUMN */
-		default:			
+		default:
 				CreateCollisionBoxFromBoundingBox(newObj, .7, 1);
 				break;
 	}
@@ -1505,15 +1505,15 @@ int		type = itemPtr->parm[0];
 Boolean AddSlimeTree(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-	
+
 
 	switch(itemPtr->parm[0])
 	{
 			/* ANIMATING SLIME TREE */
-			
-		case	0:				
+
+		case	0:
 				gNewObjectDefinition.type 		= SKELETON_TYPE_SLIMETREE;
-				gNewObjectDefinition.animNum 	= 0;					
+				gNewObjectDefinition.animNum 	= 0;
 				gNewObjectDefinition.coord.x 	= x;
 				gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 				gNewObjectDefinition.coord.z 	= z;
@@ -1536,16 +1536,16 @@ ObjNode	*newObj;
 
 				newObj->Skeleton->AnimSpeed += RandomFloat2() * .2f;
 				break;
-	
-	
+
+
 				/* BIG STILL SLIME TREE */
-				
+
 		case	1:
-				gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+				gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 				gNewObjectDefinition.type 		= SLIME_ObjType_SlimeTree_Big;
 				gNewObjectDefinition.coord.x 	= x;
 				gNewObjectDefinition.coord.z 	= z;
-				gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+				gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 				gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 				gNewObjectDefinition.slot 		= 301;
 				gNewObjectDefinition.moveCall 	= MovePointySlimeTree;
@@ -1561,16 +1561,16 @@ ObjNode	*newObj;
 				SetObjectCollisionBounds(newObj, 	newObj->BBox.max.y * SLIME_TREE_SCALE, 0,
 													-15.0f * SLIME_TREE_SCALE, 15.0f * SLIME_TREE_SCALE,
 													15.0f * SLIME_TREE_SCALE, -15.0f * SLIME_TREE_SCALE);
-				break;					
+				break;
 
 				/* SMALL STILL SLIME TREE */
-				
+
 		case	2:
-				gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+				gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 				gNewObjectDefinition.type 		= SLIME_ObjType_SlimeTree_Small;
 				gNewObjectDefinition.coord.x 	= x;
 				gNewObjectDefinition.coord.z 	= z;
-				gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+				gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 				gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 				gNewObjectDefinition.slot 		= 300;
 				gNewObjectDefinition.moveCall 	= MovePointySlimeTree;
@@ -1586,7 +1586,7 @@ ObjNode	*newObj;
 				SetObjectCollisionBounds(newObj, 	newObj->BBox.max.y * gNewObjectDefinition.scale, 0,
 													-60.0f, 60.0f,
 													60.0f, -60.0f);
-				break;					
+				break;
 	}
 
 	return(true);
@@ -1615,9 +1615,9 @@ static const OGLPoint3D	bigPts[5] =
 {
 	-1.5,	73.9,	120.5,
 	-95.5,	50.3,	17.8,
-	-54.5,	71.2,	-65.5,	
-	49.1,	49.3,	-54.0,	
-	81.8,	71.2,	30.0	
+	-54.5,	71.2,	-65.5,
+	49.1,	49.3,	-54.0,
+	81.8,	71.2,	30.0
 };
 
 OGLPoint3D	tPts[7];
@@ -1625,7 +1625,7 @@ OGLPoint3D	tPts[7];
 			/*********************/
 			/* DO BASIC TRACKING */
 			/*********************/
-			
+
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
 		DeleteObject(theNode);
@@ -1633,7 +1633,7 @@ OGLPoint3D	tPts[7];
 	}
 
 	theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - (theNode->BBox.min.y * theNode->Scale.y);
-	
+
 	UpdateObjectTransforms(theNode);
 
 	if (theNode->NumCollisionBoxes > 0)
@@ -1653,22 +1653,22 @@ OGLPoint3D	tPts[7];
 	z = theNode->Coord.z;
 
 			/* SEE IF ANYWHERE IN RANGE */
-			
+
 	if (CalcQuickDistance(x,z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) > 600.0f)
 		return;
 
 	switch(theNode->Type)
 	{
 				/* DO SMALL TREE */
-				
+
 		case	SLIME_ObjType_SlimeTree_Small:
 				OGLPoint3D_TransformArray(&smallPts[0], &theNode->BaseTransformMatrix, &tPts[0], 7);		// transform pts
-		
+
 				for (i = 0; i < 7; i++)
 				{
 					if (OGLPoint3D_Distance(&tPts[i], &gPlayerInfo.coord) < 130.0f)
 					{
-						PopSoapBubble(gSoapBubble);	
+						PopSoapBubble(gSoapBubble);
 						break;
 					}
 				}
@@ -1678,14 +1678,14 @@ OGLPoint3D	tPts[7];
 
 
 				/* DO BIG TREE */
-				
+
 		case	SLIME_ObjType_SlimeTree_Big:
 				OGLPoint3D_TransformArray(&bigPts[0], &theNode->BaseTransformMatrix, &tPts[0], 5);		// transform pts
 				for (i = 0; i < 5; i++)
 				{
 					if (OGLPoint3D_Distance(&tPts[i], &gPlayerInfo.coord) < 130.0f)
 					{
-						PopSoapBubble(gSoapBubble);	
+						PopSoapBubble(gSoapBubble);
 						break;
 					}
 				}
@@ -1710,48 +1710,48 @@ int				type = itemPtr->parm[0];
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
+	placement = itemPtr->placement;
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 
 				/***************/
 				/* MAKE OBJECT */
 				/***************/
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= BLOBBOSS_ObjType_MovingPlatform_Blue + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z) + 500.0f;	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z) + 500.0f;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits|STATUS_BIT_ONSPLINE;
 	gNewObjectDefinition.slot 		= PLAYER_SLOT - 4;				// good idea to move this before the player
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= s = 2.0;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);		
-		
+	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+
 	newObj->SplineItemPtr = itemPtr;
 	newObj->SplineNum = splineNum;
-			
+
 
 				/* SET BETTER INFO */
-			
+
 	newObj->SplinePlacement = placement;
 	newObj->SplineMoveCall 	= MovePlatformOnSpline;		// set move call
 
 	newObj->CType 			= CTYPE_MISC | CTYPE_MPLATFORM | CTYPE_BLOCKCAMERA | CTYPE_BLOCKSHADOW;
 	newObj->CBits			= CBITS_ALLSOLID;
 	CreateCollisionBoxFromBoundingBox_Rotated(newObj, 	1, 1);
-	
+
 
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	AddToSplineObjectList(newObj, false);
 
 
 			/* DETACH FROM LINKED LIST */
-			
+
 	DetachObject(newObj, true);
 
 	return(true);
@@ -1762,7 +1762,7 @@ int				type = itemPtr->parm[0];
 
 static void MovePlatformOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 float	oldX, oldZ;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
@@ -1771,7 +1771,7 @@ float	oldX, oldZ;
 
 	oldX = theNode->Coord.x;
 	oldZ = theNode->Coord.z;
-	IncreaseSplineIndex(theNode, 100);		
+	IncreaseSplineIndex(theNode, 100);
 	GetObjectCoordOnSpline(theNode);
 
 	theNode->Delta.x = (theNode->Coord.x - oldX) * gFramesPerSecond;	// set deltas that we just moved
@@ -1780,7 +1780,7 @@ float	oldX, oldZ;
 			/***************************/
 			/* UPDATE STUFF IF VISIBLE */
 			/***************************/
-			
+
 	if (isVisible)
 	{
 		UpdateObjectTransforms(theNode);					// update transforms
@@ -1797,13 +1797,13 @@ Boolean AddBlobBossTube(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*pipe;
 int		type = itemPtr->parm[0];
-float	s;			
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+float	s;
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= BLOBBOSS_ObjType_Tube_Bent + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 	gNewObjectDefinition.slot 		= 88;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject;
@@ -1818,7 +1818,7 @@ float	s;
 
 	pipe->CType 		= CTYPE_MISC;
 	pipe->CBits			= CBITS_ALLSOLID;
-	CreateCollisionBoxFromBoundingBox_Rotated(pipe,1,1);				
+	CreateCollisionBoxFromBoundingBox_Rotated(pipe,1,1);
 
 	return(true);
 }
@@ -1832,13 +1832,13 @@ float	s;
 Boolean AddScaffoldingPost(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-short	type = itemPtr->parm[0];	
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+short	type = itemPtr->parm[0];
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= CLOUD_ObjType_Post0 + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY_Undeformed(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY_Undeformed(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 300;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject;
@@ -1851,11 +1851,11 @@ short	type = itemPtr->parm[0];
 	newObj->CType = CTYPE_MISC;
 	newObj->CBits = CBITS_ALLSOLID;
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
-	
+
 
 			/* MAKE SPARKLE */
-		
-#if 1			
+
+#if 1
 	if (type == 3)
 	{
 		short	i = newObj->Sparkles[0] = GetFreeSparkle(newObj);				// get free sparkle slot
@@ -1872,13 +1872,13 @@ short	type = itemPtr->parm[0];
 			gSparkles[i].color.a = 1;
 
 			gSparkles[i].scale = 60.0f;
-			
+
 			gSparkles[i].separation = 20.0f;
-						
+
 			gSparkles[i].textureNum = PARTICLE_SObjType_GreenSpark;
 		}
 	}
-#endif	
+#endif
 	return(true);
 }
 
@@ -1889,16 +1889,16 @@ short	type = itemPtr->parm[0];
 Boolean AddCloudTunnel(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*frame,*tube;
-			
-			/**************/	
+
+			/**************/
 			/* MAKE FRAME */
-			/**************/	
-			
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+			/**************/
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= CLOUD_ObjType_CloudTunnel_Frame;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY_Undeformed(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY_Undeformed(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject;
@@ -1943,17 +1943,17 @@ static void MoveCloudTunnel(ObjNode *tube)
 Boolean AddLampPost(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-int		type = itemPtr->parm[0];		
-	
-	
+int		type = itemPtr->parm[0];
+
+
 	if (type > 2)
 		DoFatalAlert("\pAddLampPost: illegal type (parm 0)");
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_LampPost + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 141;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject2;
@@ -1983,17 +1983,17 @@ int		type = itemPtr->parm[0];
 Boolean AddCrashedShip(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-int		type = itemPtr->parm[0];		
-	
-	
+int		type = itemPtr->parm[0];
+
+
 	if (type > 1)
 		DoFatalAlert("\pAddCrashedShip: illegal type (parm 0)");
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_CrashedRocket + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 	gNewObjectDefinition.slot 		= 289;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject3;
@@ -2007,7 +2007,7 @@ int		type = itemPtr->parm[0];
 
 	newObj->CType 			= CTYPE_MISC|CTYPE_BLOCKCAMERA;
 	newObj->CBits			= CBITS_ALLSOLID;
-	
+
 	if (type == 0)
 	{
 		SetObjectCollisionBounds(newObj, 500, 0, -100, 100, 100, -100);
@@ -2029,13 +2029,13 @@ int		type = itemPtr->parm[0];
 Boolean AddRubble(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-int		type = itemPtr->parm[0];		
-	
-	
+int		type = itemPtr->parm[0];
+
+
 	if (type > 6)
 		DoFatalAlert("\pAddRubble: illegal type (parm 0)");
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_Rubble0 + type;
 	gNewObjectDefinition.scale 		= 2.0;
 	gNewObjectDefinition.coord.x 	= x;
@@ -2065,17 +2065,17 @@ int		type = itemPtr->parm[0];
 Boolean AddTeleporterMap(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-int		type = itemPtr->parm[0];		
-	
-	
+int		type = itemPtr->parm[0];
+
+
 	if (type > 4)
 		DoFatalAlert("\pAddTeleporterMap: illegal type (parm 0)");
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_TeleporterMap0; // + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 70;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject;
@@ -2103,27 +2103,27 @@ Boolean AddGreenSteam(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 
-	gNewObjectDefinition.genre		= EVENT_GENRE;				
+	gNewObjectDefinition.genre		= EVENT_GENRE;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= 0;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB-10;
 	gNewObjectDefinition.moveCall 	= MoveGreenSteam;
 	newObj = MakeNewObject(&gNewObjectDefinition);
-	
+
 	newObj->TerrainItemPtr = itemPtr;								// keep ptr to item list
 
 	newObj->ParticleTimer = 0;
-	
+
 			/* SET COLLISION STUFF */
 
 	newObj->CType 	= CTYPE_HURTME;
 	newObj->CBits	= CBITS_TOUCHABLE;
 	SetObjectCollisionBounds(newObj, 50, 0, -50, 50, 50, -50);
-	
+
 	newObj->Damage	= .15f;
-	
+
 	return(true);
 }
 
@@ -2156,11 +2156,11 @@ OGLPoint3D			p;
 
 		particleGroup 	= theNode->ParticleGroup;
 		magicNum 		= theNode->ParticleMagicNum;
-		
+
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
 			theNode->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
-			
+
 			groupDef.magicNum				= magicNum;
 			groupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 			groupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND;
@@ -2180,7 +2180,7 @@ OGLPoint3D			p;
 			float	x = theNode->Coord.x;
 			float	y = theNode->Coord.y;
 			float	z = theNode->Coord.z;
-			
+
 			for (i = 0; i < 2; i++)
 			{
 				p.x = x + RandomFloat2() * 40.0f;
@@ -2190,14 +2190,14 @@ OGLPoint3D			p;
 				d.x = RandomFloat2() * 100.0f;
 				d.y = 300.0f + RandomFloat() * 150.0f;
 				d.z = RandomFloat2() * 100.0f;
-			
+
 				newParticleDef.groupNum		= particleGroup;
 				newParticleDef.where		= &p;
 				newParticleDef.delta		= &d;
 				newParticleDef.scale		= RandomFloat() + 1.0f;
 				newParticleDef.rotZ			= RandomFloat()*PI2;
 				newParticleDef.rotDZ		= RandomFloat2() * .1f;
-				newParticleDef.alpha		= .6;		
+				newParticleDef.alpha		= .6;
 				if (AddParticleToGroup(&newParticleDef))
 				{
 					theNode->ParticleGroup = -1;
@@ -2217,20 +2217,20 @@ OGLPoint3D			p;
 Boolean AddGraveStone(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-int		type = itemPtr->parm[0];		
-	
+int		type = itemPtr->parm[0];
+
 				/*******************/
 				/* MAKE GRAVESTONE */
 				/*******************/
-				
+
 	if (type > 4)
 		DoFatalAlert("\pAddGraveStone: illegal type (parm 0)");
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_GraveStone + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 289;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject2;
@@ -2247,7 +2247,7 @@ int		type = itemPtr->parm[0];
 	CreateCollisionBoxFromBoundingBox_Rotated(newObj, 1, 1);
 
 			/* SET SAUCER INFO */
-			
+
 	newObj->SaucerTargetType = SAUCER_TARGET_TYPE_RADIATE;
 	newObj->SaucerAbductHandler = RadiateGrave;
 

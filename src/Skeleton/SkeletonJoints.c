@@ -37,7 +37,7 @@ extern	NewObjectDefinitionType	gNewObjectDefinition;
 
 /******************** UPDATE JOINT TRANSFORMS ****************************/
 //
-// Updates ALL of the transforms in a joint's transform group based on the theNode->Skeleton->JointCurrentPosition 
+// Updates ALL of the transforms in a joint's transform group based on the theNode->Skeleton->JointCurrentPosition
 //
 // INPUT:	jointNum = joint # to rotate
 //
@@ -56,32 +56,32 @@ const JointKeyframeType	*kfPtr;
 	if ((kfPtr->scale.x != 1.0f) || (kfPtr->scale.y != 1.0f) || (kfPtr->scale.z != 1.0f))				// SEE IF CAN IGNORE SCALE
 	{
 						/* ROTATE IT */
-				
+
 		OGLMatrix4x4_SetRotate_XYZ(&matrix1, kfPtr->rotation.x, kfPtr->rotation.y, kfPtr->rotation.z);	// set matrix for x/y/z rot
 
 
 					/* SCALE & TRANSLATE */
-	
-		matrix2.value[M00] = kfPtr->scale.x;									
-												matrix2.value[M11] = kfPtr->scale.y;											
+
+		matrix2.value[M00] = kfPtr->scale.x;
+												matrix2.value[M11] = kfPtr->scale.y;
 																						matrix2.value[M22] = kfPtr->scale.z;
 		matrix2.value[M03] = kfPtr->coord.x;	matrix2.value[M13] = kfPtr->coord.y;	matrix2.value[M23] = kfPtr->coord.z;
-		
-		OGLMatrix4x4_Multiply(&matrix1,&matrix2,destMatPtr);		
+
+		OGLMatrix4x4_Multiply(&matrix1,&matrix2,destMatPtr);
 	}
 	else
 	{
 						/* ROTATE IT */
-				
+
 		OGLMatrix4x4_SetRotate_XYZ(destMatPtr, kfPtr->rotation.x, kfPtr->rotation.y, kfPtr->rotation.z);	// set matrix for x/y/z rot
-	
+
 						/* NOW TRANSLATE IT */
-	
+
 		destMatPtr->value[M03] =  kfPtr->coord.x;
 		destMatPtr->value[M13] =  kfPtr->coord.y;
 		destMatPtr->value[M23] =  kfPtr->coord.z;
 	}
-													
+
 }
 
 
@@ -142,7 +142,7 @@ Byte			i,numEvents;
 		if (skeleton->skeletonDefinition->AnimEventsList[skeleton->AnimNum][i].type == ANIMEVENT_TYPE_SETFLAG)
 		{
 			time = skeleton->skeletonDefinition->AnimEventsList[skeleton->AnimNum][i].time;
-			break;	
+			break;
 		}
 	}
 
@@ -154,14 +154,14 @@ Byte			i,numEvents;
 
 
 				/* CALC THE COORD */
-				
+
 	FindJointFullMatrix(theNode,jointNum,&matrix);		// calc matrix
 	OGLPoint3D_Transform(inPoint, &matrix, outPoint);	// apply matrix to origin @ 0,0,0 to get new 3-space coords
 
 
 				/* SET THINGS BACK TO NORMAL */
-				
-	skeleton->CurrentAnimTime = oldTime;				
+
+	skeleton->CurrentAnimTime = oldTime;
 	GetModelCurrentPosition(skeleton);					// reset all of the matrices to original positions
 }
 
@@ -184,7 +184,7 @@ Byte			i,numEvents;
 		if (skeleton->skeletonDefinition->AnimEventsList[skeleton->AnimNum][i].type == ANIMEVENT_TYPE_SETFLAG)
 		{
 			time = skeleton->skeletonDefinition->AnimEventsList[skeleton->AnimNum][i].time;
-			break;	
+			break;
 		}
 	}
 
@@ -196,13 +196,13 @@ Byte			i,numEvents;
 
 
 				/* CALC THE COORD */
-				
+
 	FindJointFullMatrix(theNode,jointNum,m);			// calc matrix
 
 
 				/* SET THINGS BACK TO NORMAL */
-				
-	skeleton->CurrentAnimTime = oldTime;				
+
+	skeleton->CurrentAnimTime = oldTime;
 	GetModelCurrentPosition(skeleton);					// reset all of the matrices to original positions
 }
 
@@ -220,7 +220,7 @@ SkeletonObjDataType	*skeletonPtr;
 BoneDefinitionType	*bonePtr;
 
 			/* ACCUMULATE A MATRIX DOWN THE CHAIN */
-			
+
 	*outMatrix = theNode->Skeleton->jointTransformMatrix[jointNum];		// init matrix
 
 	skeletonPtr =  theNode->Skeleton;									// point to skeleton
@@ -229,7 +229,7 @@ BoneDefinitionType	*bonePtr;
 		OGLMatrix4x4_SetTranslate(outMatrix, theNode->Coord.x, theNode->Coord.y, theNode->Coord.z);
 		return;
 	}
-		
+
 	skeletonDefPtr = skeletonPtr->skeletonDefinition;					// point to skeleton defintion
 
 	if ((jointNum >= skeletonDefPtr->NumBones)	||						// check for illegal joints
@@ -241,10 +241,10 @@ BoneDefinitionType	*bonePtr;
 	while(bonePtr[jointNum].parentBone != NO_PREVIOUS_JOINT)
 	{
 		jointNum = bonePtr[jointNum].parentBone;
-		
-  		OGLMatrix4x4_Multiply(outMatrix,&skeletonPtr->jointTransformMatrix[jointNum],outMatrix);				
+
+  		OGLMatrix4x4_Multiply(outMatrix,&skeletonPtr->jointTransformMatrix[jointNum],outMatrix);
 	}
-	
+
 			/* ALSO FACTOR IN THE BASE MATRIX */
 			//
 			// Caller should make sure this is up to date!

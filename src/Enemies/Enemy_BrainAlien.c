@@ -74,7 +74,7 @@ static void MoveBrainWave_Dissipate(ObjNode *theNode);
 #define	BRAINALIEN_HEALTH				.7f
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -89,7 +89,7 @@ enum
 
 
 		/* JOINTS */
-		
+
 enum
 {
 	BRAINALIEN_JOINT_HEAD	= 	4
@@ -141,11 +141,11 @@ ObjNode	*newObj;
 				/*******************************/
 				/* MAKE DEFAULT SKELETON ENEMY */
 				/*******************************/
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_BRAINALIEN,x,z, BRAINALIEN_SCALE, 0, MoveBrainAlien);
 
 	SetSkeletonAnim(newObj->Skeleton, BRAINALIEN_ANIM_STAND);
-	
+
 
 				/*******************/
 				/* SET BETTER INFO */
@@ -155,16 +155,16 @@ ObjNode	*newObj;
 	newObj->Damage 		= .1;
 	newObj->Kind 		= ENEMY_KIND_BRAINALIEN;
 
-	newObj->FrozenTimer	= 0;			
-	
+	newObj->FrozenTimer	= 0;
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,BRAINALIEN_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= BrainAlienHitByWeapon;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FREEZE] 		= BrainAlienHitByFreeze;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] 	= BrainAlienHitBySuperNova;
@@ -173,17 +173,17 @@ ObjNode	*newObj;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FLARE] 		= BrainAlienHitByWeapon;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_DART] 		= BrainAlienHitByWeapon;
 	newObj->HitByJumpJetHandler 						= BrainAlienHitByJumpJet;
-			
+
 	newObj->HurtCallback = HurtBrainAlien;							// set hurt callback function
 
 
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8,false);
-		
+
 	CreateBrainAlienGlow(newObj);
-		
+
 	gNumEnemies++;
 	gNumEnemyOfKind[ENEMY_KIND_BRAINALIEN]++;
 
@@ -208,7 +208,7 @@ static	void(*myMoveTable[])(ObjNode *) =
 					MoveBrainAlien_Death,
 					MoveBrainAlien_BrainAttack,
 					MoveBrainAlien_GotHit,
-					MoveBrainAlien_Run,	
+					MoveBrainAlien_Run,
 					MoveBrainAlien_HeadButt,
 				};
 
@@ -219,13 +219,13 @@ static	void(*myMoveTable[])(ObjNode *) =
 	}
 
 	GetObjectInfo(theNode);
-	
+
 			/* SEE IF FROZEN */
-			
+
 	if (theNode->FrozenTimer > 0.0f)
 		MoveBrainAlien_Frozen(theNode);
-	else	
-		myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+	else
+		myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -240,10 +240,10 @@ float	angleToTarget,dist;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
-				
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, BRAINALIEN_TURN_SPEED, true);			
 
-		
+	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, BRAINALIEN_TURN_SPEED, true);
+
+
 
 				/* SEE IF CHASE */
 
@@ -263,23 +263,23 @@ float	angleToTarget,dist;
 		}
 	}
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;									// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
 
 
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfBrainAlienAttack(theNode, angleToTarget, dist);
 
 
-	UpdateBrainAlien(theNode);		
+	UpdateBrainAlien(theNode);
 }
 
 
@@ -294,8 +294,8 @@ float		r,fps,angle,dist;
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
-			
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, BRAINALIEN_TURN_SPEED, true);			
+
+	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, BRAINALIEN_TURN_SPEED, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * BRAINALIEN_WALK_SPEED;
@@ -305,7 +305,7 @@ float		r,fps,angle,dist;
 
 
 				/* SEE IF STAND */
-					
+
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
 
 	if (IsBottomlessPitInFrontOfEnemy(r))							// check for bottomless pits on Cloud level
@@ -320,23 +320,23 @@ float		r,fps,angle,dist;
 				MorphToSkeletonAnim(theNode->Skeleton, BRAINALIEN_ANIM_STAND, 4);
 		}
 	}
-		
+
 				/* UPDATE ANIM SPEED */
 
 	if (theNode->Skeleton->AnimNum == BRAINALIEN_ANIM_WALK)
 		theNode->Skeleton->AnimSpeed = BRAINALIEN_WALK_SPEED * .01f;
-	
-	
+
+
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfBrainAlienAttack(theNode, angle, dist);
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
-		
-	UpdateBrainAlien(theNode);		
+
+	UpdateBrainAlien(theNode);
 }
 
 
@@ -349,8 +349,8 @@ float		r,fps,angle,dist;
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
-			
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, BRAINALIEN_TURN_SPEED, true);			
+
+	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, BRAINALIEN_TURN_SPEED, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * BRAINALIEN_RUN_SPEED;
@@ -360,7 +360,7 @@ float		r,fps,angle,dist;
 
 
 				/* SEE IF STAND */
-					
+
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
 	if (IsBottomlessPitInFrontOfEnemy(r))							// check for bottomless pits on Cloud level
 	{
@@ -372,23 +372,23 @@ float		r,fps,angle,dist;
 		if ((dist >= BRAINALIEN_CHASE_DIST_MAX) || (dist <= BRAINALIEN_CHASE_DIST_MIN))
 			MorphToSkeletonAnim(theNode->Skeleton, BRAINALIEN_ANIM_STAND, 4);
 	}
-		
+
 				/* UPDATE ANIM SPEED */
 
 	if (theNode->Skeleton->AnimNum == BRAINALIEN_ANIM_RUN)
 		theNode->Skeleton->AnimSpeed = BRAINALIEN_RUN_SPEED * .003f;
-	
-	
+
+
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfBrainAlienAttack(theNode, angle, dist);
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
-		
-	UpdateBrainAlien(theNode);		
+
+	UpdateBrainAlien(theNode);
 }
 
 
@@ -401,14 +401,14 @@ static void  MoveBrainAlien_GotHit(ObjNode *theNode)
 
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if on ground, add friction
 		ApplyFrictionToDeltas(1200.0,&gDelta);
-		
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;			// add gravity
 
 	MoveEnemy(theNode);
 
 
 				/* SEE IF DONE */
-			
+
 	theNode->ButtTimer -= gFramesPerSecondFrac;
 	if (theNode->ButtTimer <= 0.0)
 	{
@@ -417,7 +417,7 @@ static void  MoveBrainAlien_GotHit(ObjNode *theNode)
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
@@ -437,24 +437,24 @@ float	fps = gFramesPerSecondFrac;
 
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 			/* SHOOT BRAIN WAVE */
-			
+
 	theNode->WaveSpacer -= fps;
 	if (theNode->WaveSpacer <= 0.0f)
 	{
-		theNode->WaveSpacer += .2f;		
+		theNode->WaveSpacer += .2f;
 		ShootBrainWave(theNode);
 	}
 
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
 
@@ -465,7 +465,7 @@ float	fps = gFramesPerSecondFrac;
 	if (theNode->AttackDuration <= 0.0f)
 		MorphToSkeletonAnim(theNode->Skeleton, BRAINALIEN_ANIM_STAND, 8);
 
-	UpdateBrainAlien(theNode);		
+	UpdateBrainAlien(theNode);
 }
 
 /********************** MOVE BRAINALIEN: HEAD BUTT ******************************/
@@ -478,20 +478,20 @@ OGLPoint3D	headCoord;
 
 
 			/* MOVE */
-				
-	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, BRAINALIEN_TURN_SPEED, false);			
+
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, BRAINALIEN_TURN_SPEED, false);
 	ApplyFrictionToDeltas(3000.0,&gDelta);
 	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
 
 				/* SEE IF HEAD HIT PLAYER */
-				
+
 	FindCoordOnJoint(theNode, BRAINALIEN_JOINT_HEAD, &headOff, &headCoord);			// calc coord of forehead
 
 	if (DoSimpleBoxCollision(headCoord.y + 30.0f, headCoord.y - 30.0f, headCoord.x - 30.0f, headCoord.x + 30.0f,
@@ -502,7 +502,7 @@ OGLPoint3D	headCoord;
 
 		theNode->Damage = .1;									// set damage of headbutt
 		PlayerGotHit(theNode, 0);			// hurt the player
-		
+
 	}
 
 
@@ -511,7 +511,7 @@ OGLPoint3D	headCoord;
 	if (theNode->Skeleton->AnimHasStopped)
 		MorphToSkeletonAnim(theNode->Skeleton, BRAINALIEN_ANIM_STAND, 6);
 
-	UpdateBrainAlien(theNode);		
+	UpdateBrainAlien(theNode);
 }
 
 
@@ -521,22 +521,22 @@ OGLPoint3D	headCoord;
 static void  MoveBrainAlien_Death(ObjNode *theNode)
 {
 			/* SEE IF GONE */
-			
+
 	if (theNode->StatusBits & STATUS_BIT_ISCULLED)		// if was culled on last frame and is far enough away, then delete it
 	{
 		if (CalcQuickDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) > 1000.0f)
 		{
 			DeleteEnemy(theNode);
 			return;
-		}		
+		}
 	}
 
 
 				/* MOVE IT */
-				
+
 	if (theNode->Speed3D > 500.0f)
 		TurnObjectTowardTarget(theNode, &gCoord, gCoord.x - gDelta.x, gCoord.z - gDelta.z, 10, false);	// aim with motion
-				
+
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)		// if on ground, add friction
 		ApplyFrictionToDeltas(1500.0,&gDelta);
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;		// add gravity
@@ -544,16 +544,16 @@ static void  MoveBrainAlien_Death(ObjNode *theNode)
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEATH_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 
 				/* UPDATE */
-			
-	UpdateBrainAlien(theNode);		
-	
-	
+
+	UpdateBrainAlien(theNode);
+
+
 }
 
 
@@ -567,21 +567,21 @@ float	fps = gFramesPerSecondFrac;
 	theNode->Skeleton->AnimSpeed = 0;							// make sure animation is frozen solid
 
 				/* MOVE IT */
-				
+
 	ApplyFrictionToDeltas(1100.0,&gDelta);
 	gDelta.y -= ENEMY_GRAVITY*fps;								// add gravity
 	MoveEnemy(theNode);
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEATH_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 
 				/* UPDATE */
-			
-	UpdateBrainAlien(theNode);		
+
+	UpdateBrainAlien(theNode);
 
 	theNode->FrozenTimer -= fps;								// dec the frozen timer & see if thawed
 	if (theNode->FrozenTimer <= 0.0f)
@@ -591,7 +591,7 @@ float	fps = gFramesPerSecondFrac;
 		ExplodeGeometry(theNode, 300, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 2, 1.0);	// shatter frozen shell
 		PlayEffect3D(EFFECT_SHATTER, &theNode->Coord);
 		theNode->Skeleton->overrideTexture = nil;				// don't override the texture any more
-	
+
 	}
 
 }
@@ -615,43 +615,43 @@ float			x,z,placement;
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
-	
+	placement = itemPtr->placement;
+
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 
 				/* MAKE DEFAULT SKELETON ENEMY */
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_BRAINALIEN,x,z, BRAINALIEN_SCALE, 0, nil);
-		
-		
+
+
 	newObj->SplineItemPtr = itemPtr;
 	newObj->SplineNum = splineNum;
-	
+
 	SetSkeletonAnim(newObj->Skeleton, BRAINALIEN_ANIM_WALK);
 	newObj->Skeleton->AnimSpeed = 2.0f;
 
 				/* SET BETTER INFO */
-			
+
 	newObj->InitCoord 		= newObj->Coord;							// remember where started
 	newObj->StatusBits		|= STATUS_BIT_ONSPLINE;
 	newObj->SplinePlacement = placement;
-	newObj->Coord.y 		-= newObj->BottomOff;			
+	newObj->Coord.y 		-= newObj->BottomOff;
 	newObj->SplineMoveCall 	= MoveBrainAlienOnSpline;					// set move call
 	newObj->Health 			= BRAINALIEN_HEALTH;
 	newObj->Damage 			= 0;
 	newObj->Kind 			= ENEMY_KIND_BRAINALIEN;
-	
+
 	newObj->FrozenTimer		= 0.0f;
-	
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,BRAINALIEN_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= BrainAlienHitByWeapon;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FREEZE] 		= BrainAlienHitByFreeze;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] 	= BrainAlienHitBySuperNova;
@@ -666,14 +666,14 @@ float			x,z,placement;
 
 
 				/* MAKE SHADOW & GLOW */
-				
+
 	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8, false);
 
 	CreateBrainAlienGlow(newObj);
 
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	DetachObject(newObj, true);										// detach this object from the linked list
 	AddToSplineObjectList(newObj, true);
 
@@ -685,7 +685,7 @@ float			x,z,placement;
 
 static void MoveBrainAlienOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
 
@@ -696,31 +696,31 @@ Boolean isVisible;
 
 
 			/* UPDATE STUFF IF VISIBLE */
-			
+
 	if (isVisible)
 	{
-		
+
 		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,			// calc y rot aim
-												theNode->Coord.x, theNode->Coord.z);		
+												theNode->Coord.x, theNode->Coord.z);
 
 		theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - theNode->BottomOff;	// calc y coord
 		UpdateObjectTransforms(theNode);											// update transforms
-		UpdateShadow(theNode);	
+		UpdateShadow(theNode);
 		UpdateBrainAlienGlow(theNode);												// update glow
-		
+
 				/* DO SOME COLLISION CHECKING */
-				
+
 		GetObjectInfo(theNode);
 		if (DoEnemyCollisionDetect(theNode,CTYPE_HURTENEMY, false))					// just do this to see if explosions hurt
 			return;
-			
-			
+
+
 					/* SEE IF LEAVE SPLINE TO CHASE PLAYER */
-					
+
 		if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < BRAINALIEN_DETACH_DIST)
-			DetachEnemyFromSpline(theNode, MoveBrainAlien);			
-			
-	}	
+			DetachEnemyFromSpline(theNode, MoveBrainAlien);
+
+	}
 }
 
 
@@ -730,7 +730,7 @@ static void UpdateBrainAlien(ObjNode *theNode)
 {
 	UpdateEnemy(theNode);
 	UpdateBrainAlienGlow(theNode);
-	
+
 			/* UPDATE SOUND */
 
 	if (theNode->Skeleton->AnimNum == BRAINALIEN_ANIM_BRAINATTACK)
@@ -742,8 +742,8 @@ static void UpdateBrainAlien(ObjNode *theNode)
 	}
 	else
 		StopAChannel(&theNode->EffectChannel);					// make sure off since not doing brain wave attack
-	
-	
+
+
 }
 
 
@@ -759,10 +759,10 @@ static void UpdateBrainAlien(ObjNode *theNode)
 Boolean BrainAlienHitByWeapon(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weaponCoord)
-	
+
 
 			/* HURT IT */
-			
+
 	HurtBrainAlien(enemy, weapon->Damage);
 
 
@@ -783,7 +783,7 @@ Boolean BrainAlienHitByFreeze(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weapo
 #pragma unused (weapon, weaponCoord, weaponDelta)
 
 			/* CHANGE THE TEXTURE */
-				
+
 	enemy->Skeleton->overrideTexture = gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_FrozenBrainAlien].materialObject;
 
 
@@ -812,24 +812,24 @@ Boolean BrainAlienGotPunched(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *fistCo
 float	r;
 
 #pragma unused (fistCoord, weaponDelta, weapon)
-	
+
 			/********************************/
 			/* SEE IF PUNCHING FROZEN ALIEN */
 			/********************************/
-			
+
 	if (enemy->FrozenTimer > 0.0f)
 	{
 		KillBrainAlien(enemy);
 	}
-	
+
 			/**********************************/
 			/* NOT FROZEN, SO HANDLE NORMALLY */
 			/**********************************/
 	else
 	{
-		
+
 				/* HURT IT */
-				
+
 		HurtBrainAlien(enemy, .4);
 
 
@@ -839,9 +839,9 @@ float	r;
 
 		enemy->Delta.x = -sin(r) * 1000.0f;
 		enemy->Delta.z = -cos(r) * 1000.0f;
-		enemy->Delta.y = 500.0f;	
+		enemy->Delta.y = 500.0f;
 	}
-		
+
 	return(true);
 }
 
@@ -853,16 +853,16 @@ void BrainAlienHitByJumpJet(ObjNode *enemy)
 float	r;
 
 		/* HURT IT */
-			
+
 	HurtBrainAlien(enemy, 1.0);
 
 
 			/* GIVE MOMENTUM */
-			
+
 	r = gPlayerInfo.objNode->Rot.y;
 	enemy->Delta.x = -sin(r) * 1000.0f;
 	enemy->Delta.z = -cos(r) * 1000.0f;
-	enemy->Delta.y = 500.0f;	
+	enemy->Delta.y = 500.0f;
 }
 
 /************** BRAIN ALIEN GOT HIT BY SUPERNOVA *****************/
@@ -870,9 +870,9 @@ float	r;
 Boolean BrainAlienHitBySuperNova(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord, weaponDelta)
-	
+
 	KillBrainAlien(enemy);
-	
+
 	return(false);
 }
 
@@ -885,13 +885,13 @@ Boolean HurtBrainAlien(ObjNode *enemy, float damage)
 {
 
 			/* SEE IF REMOVE FROM SPLINE */
-	
+
 	if (enemy->StatusBits & STATUS_BIT_ONSPLINE)
 		DetachEnemyFromSpline(enemy, MoveBrainAlien);
 
 
 				/* HURT ENEMY & SEE IF KILL */
-				
+
 	enemy->Health -= damage;
 	if (enemy->Health <= 0.0f)
 	{
@@ -901,13 +901,13 @@ Boolean HurtBrainAlien(ObjNode *enemy, float damage)
 	else
 	{
 					/* GO INTO HIT ANIM */
-				
+
 		if (enemy->Skeleton->AnimNum != BRAINALIEN_ANIM_GETHIT)
 			MorphToSkeletonAnim(enemy->Skeleton, BRAINALIEN_ANIM_GETHIT, 5);
 
 		enemy->ButtTimer = 3.0f;
-	}	
-	
+	}
+
 	return(false);
 }
 
@@ -921,24 +921,24 @@ int	i;
 			/*******************************/
 			/* IF FROZEN THEN JUST SHATTER */
 			/*******************************/
-			
+
 	if (enemy->FrozenTimer > 0.0f)
 	{
 		ExplodeGeometry(enemy, 400, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 2, .6);
 		PlayEffect3D(EFFECT_SHATTER, &enemy->Coord);
 		if (!enemy->EnemyRegenerate)
 			enemy->TerrainItemPtr = nil;							// dont ever come back
-		DeleteEnemy(enemy);	
+		DeleteEnemy(enemy);
 	}
-	
+
 			/**************/
 			/* NOT FROZEN */
 			/**************/
 	else
-	{	
+	{
 		enemy->CType = CTYPE_MISC;
 		enemy->TopOff = 10;
-					
+
 		if (enemy->Skeleton->AnimNum != BRAINALIEN_ANIM_DEATH)
 		{
 			MorphToSkeletonAnim(enemy->Skeleton, BRAINALIEN_ANIM_DEATH, 5);
@@ -947,14 +947,14 @@ int	i;
 
 
 				/* DISABLE THE HANDLERS */
-				
+
 		for (i = 0; i < NUM_WEAPON_TYPES; i++)
 			enemy->HitByWeaponHandler[i] = nil;
 		enemy->HitByJumpJetHandler 	= nil;
 	}
-	
+
 			/* SPEW ATOMS */
-			
+
 	switch(gLevelNum)
 	{
 		case	LEVEL_NUM_BRAINBOSS:
@@ -963,7 +963,7 @@ int	i;
 				else
 					SpewAtoms(&where, 1,0, 1, false);
 				break;
-	
+
 		default:
 				SpewAtoms(&where, 0,1, 2, false);
 	}
@@ -975,29 +975,29 @@ int	i;
 /************ SEE IF BRAIN ALIEN ATTACK *********************/
 
 static void SeeIfBrainAlienAttack(ObjNode *theNode, float angleToPlayer, float distToPlayer)
-{	
+{
 	if (!gPlayerHasLanded)
 		return;
-	
+
 	if (gPlayerInfo.invincibilityTimer > 0.0f)
 		return;
 
 			/* DON'T ATTACK THRU THINGS */
-				
+
 	if (SeeIfLineSegmentHitsAnything(&gCoord, &gPlayerInfo.coord, nil, CTYPE_FENCE|CTYPE_BLOCKRAYS))
 		return;
-	
-	
+
+
 			/*************/
 			/* HEAD BUTT */
 			/*************/
-						
+
 	if ((distToPlayer < HEAD_BUTT_ATTACK_DIST) && (angleToPlayer < (PI/4.0f)))
 	{
-		MorphToSkeletonAnim(theNode->Skeleton, BRAINALIEN_ANIM_HEADBUTT, 7);	
+		MorphToSkeletonAnim(theNode->Skeleton, BRAINALIEN_ANIM_HEADBUTT, 7);
 		PlayEffect3D(EFFECT_HEADSWOOSH, &gCoord);
 	}
-	
+
 			/**************/
 			/* BRAIN WAVE */
 			/**************/
@@ -1008,19 +1008,19 @@ static void SeeIfBrainAlienAttack(ObjNode *theNode, float angleToPlayer, float d
 		if (theNode->DelayUntilAttack <= 0.0f)
 		{
 			if (theNode->Kind == ENEMY_KIND_ELITEBRAINALIEN)		// quicker attacks if elite dudes
-				theNode->DelayUntilAttack = 1.5f;			
+				theNode->DelayUntilAttack = 1.5f;
 			else
 				theNode->DelayUntilAttack = 2.5f;
 			if (angleToPlayer < (PI/6.0f))
-			{	
+			{
 				if (distToPlayer < BRAINALIEN_ATTACK_DIST)
 				{
-					MorphToSkeletonAnim(theNode->Skeleton, BRAINALIEN_ANIM_BRAINATTACK, 5);	
+					MorphToSkeletonAnim(theNode->Skeleton, BRAINALIEN_ANIM_BRAINATTACK, 5);
 					theNode->WaveSpacer = .3f;
 					theNode->AttackDuration = 1.5f;
 				}
-			}		
-		}	
+			}
+		}
 	}
 }
 
@@ -1031,15 +1031,15 @@ static void ShootBrainWave(ObjNode *enemy)
 {
 ObjNode	*wave;
 static const OGLPoint3D brainOff = {0,20,-30};
-			
+
 				/* CALC COORD ON BRAIN */
-			
+
 	FindCoordOnJoint(enemy, BRAINALIEN_JOINT_HEAD, &brainOff, &gNewObjectDefinition.coord);
 
 
 				/* CREATE WEAPON OBJECT */
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;
 	gNewObjectDefinition.type 		= GLOBAL_ObjType_BrainWave;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOFOG|STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOLIGHTING|
 									STATUS_BIT_NOTEXTUREWRAP|STATUS_BIT_ROTXZY|STATUS_BIT_NOZWRITES|STATUS_BIT_GLOW;
@@ -1069,9 +1069,9 @@ static void MoveBrainWave(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 	GetObjectInfo(theNode);
-	
+
 			/* MOVE IT */
-			
+
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
 	gCoord.z += gDelta.z * fps;
@@ -1081,21 +1081,21 @@ float	fps = gFramesPerSecondFrac;
 	theNode->Scale.z += fps * .2f;
 	theNode->Scale.x = theNode->Scale.z + RandomFloat()*.4f;
 	theNode->Scale.y = theNode->Scale.z + RandomFloat()*.4f;
-	
-	
+
+
 				/* COLLISION */
-				
+
 	if (HandleCollisions(theNode, CTYPE_MISC, 0))
 		theNode->MoveCall = MoveBrainWave_Dissipate;
 	if (gCoord.y < GetTerrainY(gCoord.x, gCoord.z))
 		theNode->MoveCall = MoveBrainWave_Dissipate;
-	
 
-	
-	
+
+
+
 			/* DECAY IT */
 
-	theNode->Health -= fps * 1.3f;	
+	theNode->Health -= fps * 1.3f;
 	if (theNode->Health < 0.0f)								// see if fading now
 	{
 		theNode->ColorFilter.a -= fps * 3.0f;
@@ -1105,25 +1105,25 @@ float	fps = gFramesPerSecondFrac;
 			return;
 		}
 	}
-		
+
 	theNode->ColorFilter.g -= fps;
 	if (theNode->ColorFilter.g < 0.0f)
 		theNode->ColorFilter.g = 0;
 
 
 		/* SEE IF HIT PLAYER */
-			
+
 	if (gPlayerInfo.invincibilityTimer <= 0.0f)
 	{
 		if (CalcDistance3D(gCoord.x, gCoord.y, gCoord.z,
 						 gPlayerInfo.coord.x, gPlayerInfo.coord.y, gPlayerInfo.coord.z) < 100.0f)
 		{
-			PlayerGotHit(theNode, 0);	
+			PlayerGotHit(theNode, 0);
 			theNode->MoveCall = MoveBrainWave_Dissipate;
 		}
-	}	
-	
-	
+	}
+
+
 			/* UPDATE */
 
 	UpdateObject(theNode);
@@ -1159,7 +1159,7 @@ void CreateBrainAlienGlow(ObjNode *alien)
 int	numJoints,i,s;
 
 	numJoints = alien->Skeleton->skeletonDefinition->NumBones;
-	if (numJoints > MAX_NODE_SPARKLES)				// make sure we don't overflow	
+	if (numJoints > MAX_NODE_SPARKLES)				// make sure we don't overflow
 		numJoints = MAX_NODE_SPARKLES;
 
 	for (i = 0; i < numJoints; i++)
@@ -1169,7 +1169,7 @@ int	numJoints,i,s;
 		{
 			gSparkles[s].flags = SPARKLE_FLAG_OMNIDIRECTIONAL;
 			gSparkles[s].where = alien->Coord;
-			
+
 			if (alien->Type == SKELETON_TYPE_ELITEBRAINALIEN)
 			{
 				gSparkles[s].color.r = 1;
@@ -1186,7 +1186,7 @@ int	numJoints,i,s;
 
 			gSparkles[s].scale = 150.0f;
 			gSparkles[s].separation = -50.0f;
-			
+
 			gSparkles[s].textureNum = PARTICLE_SObjType_WhiteGlow;
 		}
 	}
@@ -1242,7 +1242,7 @@ static const float scale[] =
 
 
 	numJoints = alien->Skeleton->skeletonDefinition->NumBones;
-	if (numJoints > MAX_NODE_SPARKLES)				// make sure we don't overflow	
+	if (numJoints > MAX_NODE_SPARKLES)				// make sure we don't overflow
 		numJoints = MAX_NODE_SPARKLES;
 
 	for (i = 0; i < numJoints; i++)
@@ -1279,7 +1279,7 @@ float		r,fps,c,a;
 
 
 				/* SEE IF DONE */
-		
+
 	theNode->Timer -= fps;
 	if (theNode->Timer <= 0.0f)
 	{
@@ -1287,37 +1287,37 @@ float		r,fps,c,a;
 		MorphToSkeletonAnim(theNode->Skeleton, BRAINALIEN_ANIM_RUN, 4);
 
 					/* SET WEAPON HANDLERS */
-					
+
 		theNode->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= BrainAlienHitByWeapon;
 		theNode->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] 	= BrainAlienHitBySuperNova;
 		theNode->HitByWeaponHandler[WEAPON_TYPE_FIST] 		= BrainAlienGotPunched;
 		theNode->HitByWeaponHandler[WEAPON_TYPE_FLAME] 		= BrainAlienHitByWeapon;
 		theNode->HitByWeaponHandler[WEAPON_TYPE_FLARE] 		= BrainAlienHitByWeapon;
-				
+
 		theNode->HurtCallback = HurtBrainAlien;							// set hurt callback function
 	}
-		
+
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
-	
-	
+
+
 			/* UPDATE FADE-IN COLORING */
-			
+
 	c = theNode->ColorFilter.r += fps;
 	if (c > 1.0f)
 		c = 1.0f;
-		
+
 	a = theNode->ColorFilter.a += fps;
 	if (a >= 1.0f)
 		a = 1.0f;
-	
+
 	theNode->ColorFilter.r = theNode->ColorFilter.g = theNode->ColorFilter.b = c;
 	theNode->ColorFilter.a = a;
-		
-		
-	UpdateBrainAlien(theNode);		
+
+
+	UpdateBrainAlien(theNode);
 }
 
 

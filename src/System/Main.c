@@ -127,31 +127,31 @@ Boolean		noRTL,RTL;
 
 
 	MyFlushEvents();
-	
+
 	gMainAppRezFile = CurResFile();
 
 
 			/*****************/
 			/* INIT NIB INFO */
 			/*****************/
-			
+
 	gBundle = CFBundleGetMainBundle();
 	if (gBundle == nil)
 		DoFatalAlert("\pToolBoxInit: CFBundleGetMainBundle() failed!");
 	if (CreateNibReferenceWithCFBundle(gBundle, CFSTR(kDefaultNibFileName), &gNibs) != noErr)
 		DoFatalAlert("\pToolBoxInit: CreateNibReferenceWithCFBundle() failed!");
-	
+
 
 
 
 
 		/* FIRST VERIFY SYSTEM BEFORE GOING TOO FAR */
-				
+
 	VerifySystem();
 
 
 			/* BOOT OGL */
-			
+
 	OGL_Boot();
 
 
@@ -160,7 +160,7 @@ Boolean		noRTL,RTL;
 			/******************/
 
 			/* SEE IF QT INSTALLED */
-									
+
 	iErr = Gestalt(gestaltQuickTime,&response);
 	if(iErr != noErr)
 		DoFatalAlert("\pThis application requires Quicktime 4 or newer");
@@ -175,14 +175,14 @@ Boolean		noRTL,RTL;
 
 
 			/* START QUICKTIME */
-			
+
 	EnterMovies();
-	
-    
+
+
 
 
 		/* SEE IF PROCESSOR SUPPORTS frsqrte */
-	
+
 	if (!Gestalt(gestaltNativeCPUtype, &response))
 	{
 		switch(response)
@@ -192,26 +192,26 @@ Boolean		noRTL,RTL;
 					break;
 		}
 	}
-	
+
 			/* DETERMINE IF SHAREWARE OR BOXED VERSION */
-			
+
 #if DEMO || OEM
 	gShareware = false;
 	noRTL = RTL = false;
-#else	
+#else
 	{
 		FSSpec	spc;
-		
+
 		noRTL = (FSMakeFSSpec(0, 0, "\p:Data:Images:NORTL", &spc) == noErr);		// the presence of this file will tell us if it's shareware or boxed
-		RTL = (FSMakeFSSpec(0, 0, "\p:Data:Images:RTL", &spc) == noErr);		
-				
+		RTL = (FSMakeFSSpec(0, 0, "\p:Data:Images:RTL", &spc) == noErr);
+
 		if (noRTL)
-			gShareware = true;	
+			gShareware = true;
 		else
 			gShareware = false;
 	}
 #endif
-	
+
 
  	InitInput();
 
@@ -219,11 +219,11 @@ Boolean		noRTL,RTL;
 			/********************/
 			/* INIT PREFERENCES */
 			/********************/
-	
+
 	InitDefaultPrefs();
-	LoadPrefs(&gGamePrefs);	
-	
-	
+	LoadPrefs(&gGamePrefs);
+
+
 			/************************************/
             /* SEE IF GAME IS REGISTERED OR NOT */
 			/************************************/
@@ -246,24 +246,24 @@ Boolean		noRTL,RTL;
 	{
 		DateTimeRec	dateTime;
 		u_long		seconds, seconds2;
-	
+
 		GetTime(&dateTime);											// get date time
-		DateToSeconds(&dateTime, &seconds);			
-				
-		DateToSeconds(&gGamePrefs.lastVersCheckDate, &seconds2);			
-		
+		DateToSeconds(&dateTime, &seconds);
+
+		DateToSeconds(&gGamePrefs.lastVersCheckDate, &seconds2);
+
 		if ((seconds - seconds2) > 86400)							// see if 1 days have passed since last check
 		{
 			MyFlushEvents();
 			gGamePrefs.lastVersCheckDate = dateTime;				// update time
 
-			
+
 					/* READ THE UPDATEDATA FILE & PARSE */
-					
+
 			gSuccessfulHTTPRead = false;							// assume the HTTP read will fail
 			ReadHTTPData_VersionInfo();								// do version check (also checks serial #'s)
-			
-			
+
+
 				/* FOR UNKNOWN REASONS THE HTTP READ FAILED - POSSIBLE PIRATE ACTIVITY */
 				//
 				// If trying to read our UpdateData file from all of the URL's in the list fails then that's very suspicious.
@@ -272,10 +272,10 @@ Boolean		noRTL,RTL;
 				// If apple.com fails, then the internet connection is really down, but if it loads, then someone is probably
 				// blocking our URL's.  We'll let this happen a few times before we warn the user.
 				//
-					
+
 			if (!gSuccessfulHTTPRead)
 			{
-				if (gHTTPDataHandle)								// only bother if we've got a handle to read into			
+				if (gHTTPDataHandle)								// only bother if we've got a handle to read into
 				{
 					if (DownloadURL("http://www.apple.com") == noErr) // let's be safe and verify we have an internet connection by reading apple.com
 					{
@@ -284,7 +284,7 @@ Boolean		noRTL,RTL;
 						{
 							gGamePrefs.lastVersCheckDate.year = 0;	// make sure it checks the next time we run the game
 							SavePrefs();
-						
+
 							DoHTTPMultipleFailureWarning();
 						}
 					}
@@ -294,20 +294,20 @@ Boolean		noRTL,RTL;
 				gGamePrefs.numHTTPReadFails = 0;					// we read the UpdateData fine, so reset our failure counter
 
 			SavePrefs();
-		}	
+		}
 	}
-#endif	
-	
-	
-	
-	
+#endif
+
+
+
+
 			/*********************************/
 			/* DO BOOT CHECK FOR SCREEN MODE */
 			/*********************************/
-			
-	DoScreenModeDialog();	
-						
-			
+
+	DoScreenModeDialog();
+
+
 	MyFlushEvents();
 }
 
@@ -319,10 +319,10 @@ void InitDefaultPrefs(void)
 long 		keyboardScript, languageCode, i;
 
 		/* DETERMINE WHAT LANGUAGE IS ON THIS MACHINE */
-					
+
 	keyboardScript = GetScriptManagerVariable(smKeyScript);
-	languageCode = GetScriptVariable(keyboardScript, smScriptLang);			
-		
+	languageCode = GetScriptVariable(keyboardScript, smScriptLang);
+
 	switch(languageCode)
 	{
 		case	langFrench:
@@ -340,12 +340,12 @@ long 		keyboardScript, languageCode, i;
 		case	langItalian:
 				gGamePrefs.language 			= LANGUAGE_ITALIAN;
 				break;
-	
+
 		default:
 				gGamePrefs.language 			= LANGUAGE_ENGLISH;
 	}
-			
-	gGamePrefs.difficulty			= 0;	
+
+	gGamePrefs.difficulty			= 0;
 	gGamePrefs.showScreenModeDialog = true;
 	gGamePrefs.depth				= 32;
 	gGamePrefs.screenWidth			= 1024;
@@ -353,7 +353,7 @@ long 		keyboardScript, languageCode, i;
 	gGamePrefs.hz					= 0;
 	gGamePrefs.monitorNum			= 0;			// main monitor by default
 	gGamePrefs.playerRelControls	= false;
-	
+
 	gGamePrefs.lastVersCheckDate.year = 0;
 	gGamePrefs.customerHasRegistered = false;
 	gGamePrefs.numHTTPReadFails		= 0;
@@ -364,20 +364,20 @@ long 		keyboardScript, languageCode, i;
 	gGamePrefs.anaglyphCalibrationGreen = DEFAULT_ANAGLYPH_G;
 	gGamePrefs.anaglyphCalibrationBlue = DEFAULT_ANAGLYPH_B;
 	gGamePrefs.doAnaglyphChannelBalancing = true;
-	
+
 	gGamePrefs.dontUseHID			= false;
-	
+
 	gGamePrefs.reserved[0] 			= 0;
-	gGamePrefs.reserved[1] 			= 0;				
+	gGamePrefs.reserved[1] 			= 0;
 	gGamePrefs.reserved[2] 			= 0;
-	gGamePrefs.reserved[3] 			= 0;				
+	gGamePrefs.reserved[3] 			= 0;
 	gGamePrefs.reserved[4] 			= 0;
-	gGamePrefs.reserved[5] 			= 0;				
-	gGamePrefs.reserved[6] 			= 0;				
-	gGamePrefs.reserved[7] 			= 0;				
+	gGamePrefs.reserved[5] 			= 0;
+	gGamePrefs.reserved[6] 			= 0;
+	gGamePrefs.reserved[7] 			= 0;
 
 	for (i = 0; i < MAX_HTTP_NOTES; i++)
-		gGamePrefs.didThisNote[i] = false;				
+		gGamePrefs.didThisNote[i] = false;
 }
 
 
@@ -390,11 +390,11 @@ long 		keyboardScript, languageCode, i;
 /******************** PLAY GAME ************************/
 
 static void PlayGame(void)
-{	
+{
 	if (!gSerialWasVerified)							// check if hackers bypassed the reg verify - if so, de-register us
 	{
 		FSSpec	spec;
-		
+
 		gGameIsRegistered = false;
 
 		if (FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, gSerialFileName, &spec) == noErr)	// delete the serial # file
@@ -405,9 +405,9 @@ static void PlayGame(void)
 			/***********************/
 			/* GAME INITIALIZATION */
 			/***********************/
-			
+
 	gDoDeathExit = false;
-	
+
 	InitPlayerInfo_Game();					// init player info for entire game
 	InitHelpMessages();						// init all help messages
 
@@ -419,81 +419,81 @@ static void PlayGame(void)
 	if (!gPlayingFromSavedGame)				// start on Level 0 if not loading from saved game
 	{
 		gLevelNum = 0;
-		
-#if !DEMO		
+
+#if !DEMO
 		if (GetKeyState(KEY_F10))		// see if do Level cheat
 			if (DoLevelCheatDialog())
 				CleanQuit();
-#endif				
+#endif
 	}
 
 	GammaFadeOut();
-		    
+
 	for (;gLevelNum < 10; gLevelNum++)
-	{       
+	{
 				/* DO LEVEL INTRO */
-				
+
 		DoLevelIntro();
-			        
+
 		MyFlushEvents();
-	
-	
+
+
 	        /* LOAD ALL OF THE ART & STUFF */
 
 		InitArea();
 
-		
+
 			/***********/
 	        /* PLAY IT */
 	        /***********/
 
 		PlayArea();
-	    
+
 			/* CLEANUP LEVEL */
-						
+
 		MyFlushEvents();
 		GammaFadeOut();
 		CleanupLevel();
-		GameScreenToBlack();	
-		
-#if DEMO		
+		GameScreenToBlack();
+
+#if DEMO
 		break;
 #else
-		
+
 			/***************/
 			/* SEE IF LOST */
 			/***************/
-			
+
 		if (gGameOver)									// bail out if game has ended
 		{
 			DoLoseScreen();
 			break;
 		}
-			
-			
+
+
 		/* DO END-LEVEL BONUS SCREEN */
-		
+
 		DoBonusScreen();
-#endif	
-			
+#endif
+
 	}
-	
-#if !DEMO		
-	
+
+#if !DEMO
+
 			/**************/
 			/* SEE IF WON */
 			/**************/
-			
+
 	if (gLevelNum == 10)
 	{
-		DoWinScreen();	
+		DoWinScreen();
 	}
-	
-	
+
+
 			/* DO HIGH SCORES */
-			
+
 	NewScore();
-#endif	
+#endif
 }
 
 
@@ -502,7 +502,7 @@ static void PlayGame(void)
 /**************** PLAY AREA ************************/
 
 static void PlayArea(void)
-{	
+{
 
 			/* PREP STUFF */
 
@@ -510,7 +510,7 @@ static void PlayArea(void)
 	CalcFramesPerSecond();
 	CalcFramesPerSecond();
 	gDisableHiccupTimer = true;
-	
+
 		/******************/
 		/* MAIN GAME LOOP */
 		/******************/
@@ -524,16 +524,16 @@ static void PlayArea(void)
 
 #if DEMO
 		gDemoVersionTimer += gFramesPerSecondFrac;							// count the seconds for DEMO
-#endif	
+#endif
 
-						
+
 		UpdateInput();									// read local keys
-		
+
 				/* MOVE OBJECTS */
-				
+
 		MoveEverything();
-		
-	
+
+
 			/* UPDATE THE TERRAIN */
 
 		DoPlayerTerrainUpdate(gPlayerInfo.camera.cameraLocation.x, gPlayerInfo.camera.cameraLocation.z);
@@ -541,28 +541,28 @@ static void PlayArea(void)
 
 			/* DRAW IT ALL */
 
-					
+
 		OGL_DrawScene(gGameViewInfoPtr,DrawArea);
 
 
-						
-			/**************/					
+
+			/**************/
 			/* MISC STUFF */
-			/**************/					
-		
+			/**************/
+
 			/* SEE IF PAUSED */
-		
+
 		if (GetNewKeyState(KEY_ESC))
 			DoPaused();
-			
-		CalcFramesPerSecond();		
-		
+
+		CalcFramesPerSecond();
+
 		if (gGameFrameNum == 0)						// if that was 1st frame, then create a fade event
 			MakeFadeEvent(true, 1.0);
-				
+
 		gGameFrameNum++;
-		
-		
+
+
 				/* SEE IF TRACK IS COMPLETED */
 
 		if (GetNewKeyState(KEY_F10))			//------- win level cheat
@@ -571,18 +571,18 @@ static void PlayArea(void)
 
 		if (gGameOver)													// if we need immediate abort, then bail now
 			break;
-				
+
 		if (gLevelCompleted)
 		{
 			gLevelCompletedCoolDownTimer -= gFramesPerSecondFrac;		// game is done, but wait for cool-down timer before bailing
 			if (gLevelCompletedCoolDownTimer <= 0.0f)
 				break;
 		}
-		
+
 		gDisableHiccupTimer = false;									// reenable this after the 1st frame
-		
+
 	}
-	
+
 }
 
 
@@ -591,16 +591,16 @@ static void PlayArea(void)
 void DrawArea(OGLSetupOutputType *setupInfo)
 {
 		/* DRAW OBJECTS & TERAIN */
-			
+
 	DrawObjects(setupInfo);												// draw objNodes which includes fences, terrain, etc.
 
 
 			/* DRAW MISC */
 
-	DrawShards(setupInfo);												// draw shards			
+	DrawShards(setupInfo);												// draw shards
 	DrawVaporTrails(setupInfo);											// draw vapor trails
 	DrawSparkles(setupInfo);											// draw light sparkles
-	DrawInfobar(setupInfo);												// draw infobar last		
+	DrawInfobar(setupInfo);												// draw infobar last
 	DrawLensFlare(setupInfo);											// draw lens flare
 	DrawDeathExit(setupInfo);											// draw death exit stuff
 
@@ -619,16 +619,16 @@ float	fps = gFramesPerSecondFrac;
 	MoveSplineObjects();
 	MoveShards();
 	UpdateCamera();								// update camera
-	
+
 	/* LEVEL SPECIFIC UPDATES */
-	
+
 	switch(gLevelNum)
 	{
 		case	LEVEL_NUM_BLOB:
 				MO_Object_OffsetUVs(gBG3DGroupList[MODEL_GROUP_LEVELSPECIFIC][SLIME_ObjType_BumperBubble], fps * .3, 0);	// scroll bumper bubble
 				MO_Geometry_OffserUVs(MODEL_GROUP_LEVELSPECIFIC, SLIME_ObjType_BlobArrow, 0, fps * -.4, 0);	// scroll arrow texture
 				break;
-				
+
 		case	LEVEL_NUM_BLOBBOSS:
 				gSpinningPlatformRot += SPINNING_PLATFORM_SPINSPEED * fps;
 				if (gSpinningPlatformRot > PI2)																			// wrap back rather than getting bigger and bigger
@@ -642,13 +642,13 @@ float	fps = gFramesPerSecondFrac;
 
 				MO_Geometry_OffserUVs(MODEL_GROUP_LEVELSPECIFIC, BLOBBOSS_ObjType_TubeSegment,1, 0, -fps);
 				break;
-								
+
 		case	LEVEL_NUM_CLOUD:
 				UpdateZigZagSlats();
 				break;
 
 	}
-	
+
 }
 
 
@@ -677,18 +677,18 @@ DeformationType		defData;
 			/*************/
 			/* MAKE VIEW */
 			/*************/
-				
-				
+
+
 
 			/* SETUP VIEW DEF */
-			
+
 	OGL_NewViewDef(&viewDef);
-	
+
 	viewDef.camera.hither 			= 50;
 	viewDef.camera.yon 				= (SUPERTILE_ACTIVE_RANGE * SUPERTILE_SIZE * TERRAIN_POLYGON_SIZE) * .95f;
 	viewDef.camera.fov 				= GAME_FOV;
-				
-	
+
+
 	switch(gLevelNum)
 	{
 		case	LEVEL_NUM_BLOB:
@@ -696,11 +696,11 @@ DeformationType		defData;
 				viewDef.styles.useFog			= true;
 				viewDef.view.clearColor.r 		= .8;
 				viewDef.view.clearColor.g 		= .6;
-				viewDef.view.clearColor.b		= .8;	
+				viewDef.view.clearColor.b		= .8;
 				viewDef.view.clearBackBuffer	= true;
 				viewDef.styles.fogStart			= viewDef.camera.yon * .1f;
-				viewDef.styles.fogEnd			= viewDef.camera.yon * .95f;				
-				gDrawLensFlare = true;				
+				viewDef.styles.fogEnd			= viewDef.camera.yon * .95f;
+				gDrawLensFlare = true;
 				break;
 
 
@@ -708,7 +708,7 @@ DeformationType		defData;
 				viewDef.styles.useFog			= true;
 				viewDef.view.clearColor.r 		= .17;
 				viewDef.view.clearColor.g 		= .05;
-				viewDef.view.clearColor.b		= .29;	
+				viewDef.view.clearColor.b		= .29;
 				viewDef.view.clearBackBuffer	= true;
 				viewDef.styles.fogStart			= viewDef.camera.yon * .4f;
 				viewDef.styles.fogEnd			= viewDef.camera.yon * 1.1f;
@@ -719,7 +719,7 @@ DeformationType		defData;
 				viewDef.styles.useFog			= true;
 				viewDef.view.clearColor.r 		= 0;
 				viewDef.view.clearColor.g 		= 0;
-				viewDef.view.clearColor.b		= 0;	
+				viewDef.view.clearColor.b		= 0;
 				viewDef.view.clearBackBuffer	= true;
 				viewDef.styles.fogStart			= viewDef.camera.yon * .15f;
 				viewDef.styles.fogEnd			= viewDef.camera.yon * 1.05f;
@@ -730,7 +730,7 @@ DeformationType		defData;
 				viewDef.styles.useFog			= true;
 				viewDef.view.clearColor.r 		= .686;
 				viewDef.view.clearColor.g 		= .137;
-				viewDef.view.clearColor.b		= .431;	
+				viewDef.view.clearColor.b		= .431;
 				viewDef.view.clearBackBuffer	= false;
 				viewDef.styles.fogStart			= viewDef.camera.yon * .3f;
 				viewDef.styles.fogEnd			= viewDef.camera.yon * .8f;
@@ -742,7 +742,7 @@ DeformationType		defData;
 				viewDef.styles.useFog			= true;
 				viewDef.view.clearColor.r 		= .6;
 				viewDef.view.clearColor.g 		= .6;
-				viewDef.view.clearColor.b		= .3;	
+				viewDef.view.clearColor.b		= .3;
 				viewDef.view.clearBackBuffer	= false;
 				viewDef.styles.fogStart			= viewDef.camera.yon * .4f;
 				viewDef.styles.fogEnd			= viewDef.camera.yon * 1.1f;
@@ -753,20 +753,20 @@ DeformationType		defData;
 				viewDef.styles.useFog			= true;
 				viewDef.view.clearColor.r 		= 0;
 				viewDef.view.clearColor.g 		= 0;
-				viewDef.view.clearColor.b		= 0;	
+				viewDef.view.clearColor.b		= 0;
 				viewDef.view.clearBackBuffer	= false;
 				viewDef.styles.fogStart			= viewDef.camera.yon * .4f;
 				viewDef.styles.fogEnd			= viewDef.camera.yon * 1.1f;
 				gDrawLensFlare = false;
 				break;
-	
+
 		case	LEVEL_NUM_SAUCER:
 				viewDef.camera.yon				*= .8f;						// bring it in a little for this
-				
+
 				viewDef.styles.useFog			= true;
 				viewDef.view.clearColor.r 		= .2;
 				viewDef.view.clearColor.g 		= .4;
-				viewDef.view.clearColor.b		= .7;	
+				viewDef.view.clearColor.b		= .7;
 				viewDef.view.clearBackBuffer	= true;
 				viewDef.styles.fogStart			= viewDef.camera.yon * .2f;
 				viewDef.styles.fogEnd			= viewDef.camera.yon * .9f;
@@ -778,25 +778,25 @@ DeformationType		defData;
 				viewDef.styles.useFog			= true;
 				viewDef.view.clearColor.r 		= .1; //.4;
 				viewDef.view.clearColor.g 		= 0; //.7;
-				viewDef.view.clearColor.b		= 0; //.2;	
+				viewDef.view.clearColor.b		= 0; //.2;
 				viewDef.view.clearBackBuffer	= true;
 				viewDef.styles.fogStart			= viewDef.camera.yon * .6f;
 				viewDef.styles.fogEnd			= viewDef.camera.yon * 1.0f;
 				gDrawLensFlare = false;
 				break;
-	
-	
+
+
 		default:
 				viewDef.styles.useFog			= false;
 				viewDef.view.clearColor.r 		= .1;
 				viewDef.view.clearColor.g 		= .5;
-				viewDef.view.clearColor.b		= .1;	
+				viewDef.view.clearColor.b		= .1;
 				viewDef.view.clearBackBuffer	= false;
 				viewDef.styles.fogStart			= viewDef.camera.yon * .8f;
 				viewDef.styles.fogEnd			= viewDef.camera.yon * 1.0f;
 				gDrawLensFlare = true;
-	}	
-		
+	}
+
 		/**************/
 		/* SET LIGHTS */
 		/**************/
@@ -809,7 +809,7 @@ DeformationType		defData;
 				gWorldSunDirection.z 	= .8;
 				OGLVector3D_Normalize(&gWorldSunDirection,&gWorldSunDirection);
 
-				viewDef.lights.numFillLights 		= 1;	
+				viewDef.lights.numFillLights 		= 1;
 				viewDef.lights.ambientColor.r 		= .2;
 				viewDef.lights.ambientColor.g 		= .2;
 				viewDef.lights.ambientColor.b 		= .2;
@@ -823,7 +823,7 @@ DeformationType		defData;
 				gWorldSunDirection.z 	= .8;
 				OGLVector3D_Normalize(&gWorldSunDirection,&gWorldSunDirection);
 
-				viewDef.lights.numFillLights 		= 1;	
+				viewDef.lights.numFillLights 		= 1;
 				viewDef.lights.ambientColor.r 		= .2;
 				viewDef.lights.ambientColor.g 		= .2;
 				viewDef.lights.ambientColor.b 		= .2;
@@ -839,27 +839,27 @@ DeformationType		defData;
 				gWorldSunDirection.z 	= .8;
 				OGLVector3D_Normalize(&gWorldSunDirection,&gWorldSunDirection);
 
-				viewDef.lights.numFillLights 		= 1;	
+				viewDef.lights.numFillLights 		= 1;
 				viewDef.lights.ambientColor.r 		= .3;
 				viewDef.lights.ambientColor.g 		= .3;
 				viewDef.lights.ambientColor.b 		= .3;
 				viewDef.lights.fillDirection[0] 	= gWorldSunDirection;
 				viewDef.lights.fillColor[0] 		= gFillColor1;
 				break;
-				
+
 		case	LEVEL_NUM_JUNGLEBOSS:
 				gWorldSunDirection.x 	= .1;
 				gWorldSunDirection.y 	= -.5;
 				gWorldSunDirection.z 	= -1;
 				OGLVector3D_Normalize(&gWorldSunDirection,&gWorldSunDirection);
 
-				viewDef.lights.numFillLights 		= 1;	
+				viewDef.lights.numFillLights 		= 1;
 				viewDef.lights.ambientColor.r 		= .3;
 				viewDef.lights.ambientColor.g 		= .3;
 				viewDef.lights.ambientColor.b 		= .3;
 				viewDef.lights.fillDirection[0] 	= gWorldSunDirection;
 				viewDef.lights.fillColor[0] 		= gFillColor1;
-				break;				
+				break;
 
 		case	LEVEL_NUM_FIREICE:
 				gWorldSunDirection.x 	= .5;
@@ -867,21 +867,21 @@ DeformationType		defData;
 				gWorldSunDirection.z 	= 0;
 				OGLVector3D_Normalize(&gWorldSunDirection,&gWorldSunDirection);
 
-				viewDef.lights.numFillLights 		= 1;	
+				viewDef.lights.numFillLights 		= 1;
 				viewDef.lights.ambientColor.r 		= .3;
 				viewDef.lights.ambientColor.g 		= .3;
 				viewDef.lights.ambientColor.b 		= .2;
 				viewDef.lights.fillDirection[0] 	= gWorldSunDirection;
 				viewDef.lights.fillColor[0]			= gFireIceColor;
 				break;
-				
+
 		case	LEVEL_NUM_SAUCER:
 				gWorldSunDirection.x 	= .5;
 				gWorldSunDirection.y 	= -.35;
 				gWorldSunDirection.z 	= -.8;
 				OGLVector3D_Normalize(&gWorldSunDirection,&gWorldSunDirection);
 
-				viewDef.lights.numFillLights 		= 1;	
+				viewDef.lights.numFillLights 		= 1;
 				viewDef.lights.ambientColor.r 		= .3;
 				viewDef.lights.ambientColor.g 		= .25;
 				viewDef.lights.ambientColor.b 		= .25;
@@ -895,22 +895,22 @@ DeformationType		defData;
 				gWorldSunDirection.z 	= .8;
 				OGLVector3D_Normalize(&gWorldSunDirection,&gWorldSunDirection);
 
-				viewDef.lights.numFillLights 		= 1;	
+				viewDef.lights.numFillLights 		= 1;
 				viewDef.lights.ambientColor.r 		= .3;
 				viewDef.lights.ambientColor.g 		= .3;
 				viewDef.lights.ambientColor.b 		= .3;
 				viewDef.lights.fillDirection[0] 	= gWorldSunDirection;
 				viewDef.lights.fillColor[0] 		= gFillColor1;
 				break;
-				
+
 		default:
-				
+
 				gWorldSunDirection.x = .5;
 				gWorldSunDirection.y = -.35;
 				gWorldSunDirection.z = .8;
 				OGLVector3D_Normalize(&gWorldSunDirection,&gWorldSunDirection);
 
-				viewDef.lights.numFillLights 		= 1;	
+				viewDef.lights.numFillLights 		= 1;
 				viewDef.lights.ambientColor.r 		= .4;
 				viewDef.lights.ambientColor.g 		= .4;
 				viewDef.lights.ambientColor.b 		= .36;
@@ -921,8 +921,8 @@ DeformationType		defData;
 
 			/*********************/
 			/* SET ANAGLYPH INFO */
-			/*********************/			
-			
+			/*********************/
+
 	if (gGamePrefs.anaglyph)
 	{
 		if (!gGamePrefs.anaglyphColor)
@@ -931,21 +931,21 @@ DeformationType		defData;
 			viewDef.lights.ambientColor.g 		+= .1f;
 			viewDef.lights.ambientColor.b 		+= .1f;
 		}
-				
+
 		gAnaglyphFocallength	= 300.0f;
 		gAnaglyphEyeSeparation 	= 40.0f;
 	}
 
 
 
-	
+
 	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
 
 
 			/**********************/
 			/* SET AUTO-FADE INFO */
 			/**********************/
-			
+
 	switch(gLevelNum)
 	{
 		case	LEVEL_NUM_BLOB:
@@ -961,37 +961,37 @@ DeformationType		defData;
 				gAutoFadeStartDist	= gGameViewInfoPtr->yon * .90;
 				gAutoFadeEndDist	= gGameViewInfoPtr->yon * 1.0f;
 				break;
-					
+
 		default:
 				gAutoFadeStartDist	= gGameViewInfoPtr->yon * .80;
 				gAutoFadeEndDist	= gGameViewInfoPtr->yon * .90f;
-				
+
 	}
-	
-	
+
+
 	if (!gG4)												// bring it in a little for slow machines
 	{
 		gAutoFadeStartDist *= .85f;
 		gAutoFadeEndDist *= .85f;
 	}
-	
+
 	gAutoFadeRange_Frac	= 1.0f / (gAutoFadeEndDist - gAutoFadeStartDist);
 
 	if (gAutoFadeStartDist != 0.0f)
 		gAutoFadeStatusBits = STATUS_BIT_AUTOFADE;
 	else
 		gAutoFadeStatusBits = 0;
-		
 
-	
+
+
 			/**********************/
 			/* LOAD ART & TERRAIN */
 			/**********************/
 			//
 			// NOTE: only call this *after* draw context is created!
 			//
-	
-	LoadLevelArt(gGameViewInfoPtr);			
+
+	LoadLevelArt(gGameViewInfoPtr);
 	InitInfobar(gGameViewInfoPtr);
 	gAlienSaucer = nil;
 
@@ -1005,15 +1005,15 @@ DeformationType		defData;
 	InitItemsManager();
 	InitSky(gGameViewInfoPtr);
 
-	
-	
+
+
 			/****************/
 			/* INIT SPECIAL */
 			/****************/
-	
+
 	gGravity = NORMAL_GRAVITY;					// assume normal gravity
 	gTileSlipperyFactor = 0.0f;					// assume normal slippery
-	
+
 	switch(gLevelNum)
 	{
 		case	LEVEL_NUM_BLOB:
@@ -1021,57 +1021,57 @@ DeformationType		defData;
 				gTileSlipperyFactor = .1f;
 
 				/* INIT DEFORMATIONS */
-				
+
 				if (gG4)										// only do this on a G4 since we need the horsepower
 				{
 					defData.type 				= DEFORMATION_TYPE_JELLO;
-					defData.amplitude 			= 15; 
-					defData.radius 				= 0; 
-					defData.speed 				= 200; 
-					defData.origin.x			= gTerrainUnitWidth; 
-					defData.origin.y			= 0; 
+					defData.amplitude 			= 15;
+					defData.radius 				= 0;
+					defData.speed 				= 200;
+					defData.origin.x			= gTerrainUnitWidth;
+					defData.origin.y			= 0;
 					defData.oneOverWaveLength 	= 1.0f / 300.0f;
 					NewSuperTileDeformation(&defData);
 
 					defData.type 				= DEFORMATION_TYPE_JELLO;
-					defData.amplitude 			= 10; 
-					defData.radius 				= 0; 
-					defData.speed 				= 300; 
-					defData.origin.x			= 0; 
-					defData.origin.y			= 0; 
+					defData.amplitude 			= 10;
+					defData.radius 				= 0;
+					defData.speed 				= 300;
+					defData.origin.x			= 0;
+					defData.origin.y			= 0;
 					defData.oneOverWaveLength 	= 1.0f / 200.0f;
 					NewSuperTileDeformation(&defData);
 				}
 				break;
-	
+
 		case	LEVEL_NUM_BLOBBOSS:
-						
+
 				gGravity = NORMAL_GRAVITY*3/4;						// low gravity
-						
+
 					/* MAKE THE BLOB BOSS MACHINE */
-					
+
 				MakeBlobBossMachine();
-						
-				
+
+
 				if (gG4)										// only do this on a G4 since we need the horsepower
 				{
 					/* INIT DEFORMATIONS */
-					
+
 					defData.type 				= DEFORMATION_TYPE_JELLO;
-					defData.amplitude 			= 90; 
-					defData.radius 				= 0; 
-					defData.speed 				= 900; 
-					defData.origin.x			= gTerrainUnitWidth; 
-					defData.origin.y			= 0; 
+					defData.amplitude 			= 90;
+					defData.radius 				= 0;
+					defData.speed 				= 900;
+					defData.origin.x			= gTerrainUnitWidth;
+					defData.origin.y			= 0;
 					defData.oneOverWaveLength 	= 1.0f / 300.0f;
 					NewSuperTileDeformation(&defData);
-					
+
 					defData.type 				= DEFORMATION_TYPE_JELLO;
-					defData.amplitude 			= 60; 
-					defData.radius 				= 0; 
-					defData.speed 				= 600; 
-					defData.origin.x			= 0; 
-					defData.origin.y			= 0; 
+					defData.amplitude 			= 60;
+					defData.radius 				= 0;
+					defData.speed 				= 600;
+					defData.origin.x			= 0;
+					defData.origin.y			= 0;
 					defData.oneOverWaveLength 	= 1.0f / 400.0f;
 					NewSuperTileDeformation(&defData);
 				}
@@ -1082,42 +1082,42 @@ DeformationType		defData;
 				InitTeleporters();
 				InitSpacePods();
 				break;
-				
+
 		case	LEVEL_NUM_CLOUD:
 				InitBumperCars();
 				break;
-					 
+
 		case	LEVEL_NUM_JUNGLEBOSS:
 				InitJungleBossStuff();
 				break;
-				
+
 		case	LEVEL_NUM_FIREICE:
 				InitZipLines();
 				break;
-				
+
 		case	LEVEL_NUM_BRAINBOSS:
 				InitBrainBoss();
 				break;
 
 	}
-		
+
 		/* INIT THE PLAYER & RELATED STUFF */
-	
+
 	PrimeWater();								// NOTE:  must do this before items get added since some items may be on the water
 	InitPlayersAtStartOfLevel();				// NOTE:  this will also cause the initial items in the start area to be created
-			
+
 	PrimeSplines();
 	PrimeFences();
-						
+
 			/* INIT CAMERAS */
-			
+
 	InitCamera();
-			
+
 	HideCursor();								// do this again to be sure!
-	
+
 	GammaFadeOut();
-	
-	
+
+
  }
 
 
@@ -1137,13 +1137,13 @@ static void CleanupLevel(void)
 	DisposeParticleSystem();
 	DisposeAllSpriteGroups();
 	DisposeFences();
-	
+
 	DisposeAllBG3DContainers();
-	
-	
+
+
 	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
-	
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);	// do this last!			
+
+	OGL_DisposeWindowSetup(&gGameViewInfoPtr);	// do this last!
 }
 
 
@@ -1162,7 +1162,7 @@ unsigned long	someLong;
 				/**************/
 				/* BOOT STUFF */
 				/**************/
-				
+
 	ToolBoxInit();
 
 			/* INIT SOME OF MY STUFF */
@@ -1176,39 +1176,39 @@ unsigned long	someLong;
 
 
 			/* INIT MORE MY STUFF */
-					
+
 	InitObjectManager();
-	
+
 	GetDateTime ((unsigned long *)(&someLong));		// init random seed
 	SetMyRandomSeed(someLong);
 	HideCursor();
 
 			/* SEE IF DEMO VERSION EXPIRED */
-			
+
 #if DEMO
 	GetDemoTimer();
 
 #else
 //	DoWinScreen();	//---------
-#endif	
+#endif
 
 
 
 		/* SHOW LEGAL SCREEN */
-		
+
 	DoLegalScreen();
 
 
 		/* MAIN LOOP */
-			
+
 	while(true)
-	{		
+	{
 		MyFlushEvents();
 		DoMainMenuScreen();
-					
+
 		PlayGame();
 	}
-	
+
 }
 
 

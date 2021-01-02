@@ -101,20 +101,20 @@ float	gRocketScaleAdjust;
 //
 
 void InitPlayerInfo_Game(void)
-{	
+{
 
 			/* INIT SOME THINGS IF NOT LOADING SAVED GAME */
-			
+
 	if (!gPlayingFromSavedGame)
 	{
 		gScore = 0;
-	
+
 		gPlayerInfo.lives			= 4;
 		gPlayerInfo.health 			= 1.0;
-		gPlayerInfo.jumpJet 		= 0;	
+		gPlayerInfo.jumpJet 		= 0;
 	}
 
-	
+
 	gShieldObj = nil;
 	gShieldTimer = 0;
 	gDeathTimer = 0;
@@ -125,7 +125,7 @@ void InitPlayerInfo_Game(void)
 	gPlayerInfo.coord.x 		= 0;
 	gPlayerInfo.coord.y 		= 0;
 	gPlayerInfo.coord.z 		= 0;
-	
+
 }
 
 
@@ -139,12 +139,12 @@ void InitPlayersAtStartOfLevel(void)
 	InitWeaponInventory();								// always clear weapon inventory on each level
 
 	gExitRocket = nil;
-	
+
 	if (gLevelNum == LEVEL_NUM_SAUCER)							// scale down rocket for saucer level
 		gRocketScaleAdjust = .4f;
 	else
 		gRocketScaleAdjust = 1.0f;
-		
+
 
 	gPlayerFellIntoBottomlessPit = false;
 
@@ -152,54 +152,54 @@ void InitPlayersAtStartOfLevel(void)
 	gPlayerInfo.scale 		= PLAYER_DEFAULT_SCALE;
 	gPlayerInfo.scaleRatio 	= 1.0;
 	gPlayerInfo.giantTimer 	= 0;
-	
+
 	gPlayerInfo.leftHandObj = gPlayerInfo.rightHandObj = nil;
 	gPlayerInfo.jumpJetSpeed = 0;
 
 	gPlayerInfo.superNovaCharge = 0;
 	gPlayerInfo.superNovaStatic = nil;
-	
+
 	gPlayerInfo.invincibilityTimer = 0;
-	
+
 	if ((gLevelNum == LEVEL_NUM_BLOBBOSS) ||				// player still has full fuel on Blob Boss from prev level
 		(gLevelNum == LEVEL_NUM_JUNGLEBOSS))
-		gPlayerInfo.fuel = 1;	
+		gPlayerInfo.fuel = 1;
 	else
 		gPlayerInfo.fuel = 0;
-	
+
 	gPlayerInfo.autoAimTimer = 0;
 	gPlayerInfo.burnTimer = 0;
-	
+
 	gPlayerIsDead = false;
 
 		/* FIRST PRIME THE TERRAIN TO CAUSE ALL OBJECTS TO BE GENERATED BEFORE WE PUT THE PLAYER DOWN */
-			
-	InitCurrentScrollSettings();
-	DoPlayerTerrainUpdate(gPlayerInfo.coord.x, gPlayerInfo.coord.z);					
 
-	
+	InitCurrentScrollSettings();
+	DoPlayerTerrainUpdate(gPlayerInfo.coord.x, gPlayerInfo.coord.z);
+
+
 			/**************************/
 			/* THEN CREATE THE PLAYER */
 			/**************************/
-			
+
 	gFreezeCameraFromY 		= false;					// assume no camera freeze
 	gFreezeCameraFromXZ		= false;
-			
+
 	gPlayerHasLanded = true;							// assume true, will get overridden by rocket init code if not true
 	switch(gLevelNum)
 	{
 		case	LEVEL_NUM_BLOBBOSS:
 				InitPlayer_Robot(&gPlayerInfo.coord, gPlayerInfo.startRotY);
 				break;
-				
+
 		case	LEVEL_NUM_SAUCER:
 				InitPlayer_Saucer(&gPlayerInfo.coord);
 				break;
-				
-		default:			
+
+		default:
 				InitRocketShip(&gPlayerInfo.coord, gPlayerInfo.startRotY);
 				InitPlayer_Robot(&gPlayerInfo.coord, gPlayerInfo.startRotY);
-				
+
 				gPlayerInfo.objNode->StatusBits |= STATUS_BIT_NOMOVE;		// disable player's move function until ship has landed
 	}
 
@@ -232,20 +232,20 @@ ObjNode	*player = gPlayerInfo.objNode;
 
 
 			/* SPECIAL CASE IF WAS RIDING A BUBBLE */
-			
+
 	if ((player->Skeleton->AnimNum == PLAYER_ANIM_BUBBLE) && gSoapBubble)
 	{
-		PopSoapBubble(gSoapBubble);	
+		PopSoapBubble(gSoapBubble);
 	}
-	
+
 			/*****************/
 			/* DEFAULT STUFF */
 			/*****************/
-			
+
 	else
 	{
 				/* DO HIT ANIM UNLESS SPECIAL */
-				
+
 		switch(player->Skeleton->AnimNum)
 		{
 			case	PLAYER_ANIM_GOTHIT:
@@ -258,7 +258,7 @@ ObjNode	*player = gPlayerInfo.objNode;
 			case	PLAYER_ANIM_BUMPERCAR:
 			case	PLAYER_ANIM_GRABBEDBYSTRONGMAN:
 					break;
-					
+
 			default:
 					MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_GOTHIT, 7);
 		}
@@ -273,20 +273,20 @@ ObjNode	*player = gPlayerInfo.objNode;
 			r = player->Rot.y;
 			PlayerLoseHealth(altDamage, PLAYER_DEATH_TYPE_EXPLODE);
 		}
-			
+
 		player->Delta.x = -sin(r) * 1000.0f;
 		player->Delta.z = -cos(r) * 1000.0f;
 		player->Delta.y = 400.0f;
-		
+
 			/* SEE IF RESET POWERUP THAT WASN'T PICKED UP */
-			
+
 		if (gTargetPickup)
 		{
 			gTargetPickup->MoveCall = MovePowerup;	// restore the Move Call
 			gTargetPickup = nil;
 		}
 	}
-		
+
 	gPlayerInfo.invincibilityTimer = 2.5;
 }
 
@@ -303,20 +303,20 @@ Boolean	killed = false;
 
 	if (gPlayerInfo.health < 0.0f)				// see if already dead
 		return(true);
-		
+
 	gPlayerInfo.health -= damage;
-	
+
 		/* SEE IF DEAD */
-		
+
 	if (gPlayerInfo.health <= 0.0f)
 	{
 		gPlayerInfo.health = 0;
-	
+
 		KillPlayer(deathType);
 		killed = true;
 	}
-	
-	
+
+
 	return(killed);
 }
 
@@ -328,7 +328,7 @@ void KillPlayer(Byte deathType)
 ObjNode	*player = gPlayerInfo.objNode;
 
 		/* VERIFY ANIM IF ALREADY DEAD */
-		
+
 	if (gPlayerIsDead)						// see if already dead
 	{
 		switch(deathType)
@@ -343,14 +343,14 @@ ObjNode	*player = gPlayerInfo.objNode;
 						SetSkeletonAnim(player->Skeleton,PLAYER_ANIM_FALL);
 					gPlayerFellIntoBottomlessPit = true;
 					break;
-		
+
 		}
 		return;
 	}
-		
-		
+
+
 			/* KILL US NOW */
-			
+
 	gPlayerIsDead = true;
 	gPlayerInfo.health = 0;					// make sure this is set correctly
 
@@ -360,14 +360,14 @@ ObjNode	*player = gPlayerInfo.objNode;
 				MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_DROWNED, 5);
 				gDeathTimer = gPlayerInfo.invincibilityTimer = 3.0f;
 				break;
-	
-	
+
+
 		case	PLAYER_DEATH_TYPE_EXPLODE:
 				ExplodePlayer();
 				gDeathTimer = gPlayerInfo.invincibilityTimer = 3.0f;
 				break;
-				
-				
+
+
 		case	PLAYER_DEATH_TYPE_FALL:
 				if (player->Skeleton->AnimNum != PLAYER_ANIM_FALL)
 					MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_FALL, 5);
@@ -376,21 +376,21 @@ ObjNode	*player = gPlayerInfo.objNode;
 				gPlayerFellIntoBottomlessPit = true;
 				PlayEffect_Parms3D(EFFECT_FALLYAA, &player->Coord, NORMAL_CHANNEL_RATE, 1.5);
 				break;
-				
+
 		case	PLAYER_DEATH_TYPE_SAUCERBOOM:
 				BlowUpSaucer(player);
 				break;
 	}
-	
-	
+
+
 			/* STOP ANY SUPERNOVA THAT WAS CHARGING */
-		
+
 	if (gPlayerInfo.superNovaStatic)
 	{
 		gPlayerInfo.superNovaCharge = 0;			// reset charget to 0
 		DischargeSuperNova();						// kill it
 	}
-	
+
 }
 
 
@@ -404,14 +404,14 @@ ObjNode	*rightHand = gPlayerInfo.rightHandObj;
 
 
 		/* HIDE & DISABLE THE REAL PLAYER */
-		
+
 	HidePlayer(player);
 
 
 			/***************/
 			/* MAKE SPARKS */
 			/***************/
-			
+
 	MakeSparkExplosion(player->Coord.x, player->Coord.y, player->Coord.z, 400, 1.0, PARTICLE_SObjType_BlueSpark, 0);
 
 	ExplodeGeometry(player, 150.0, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 2, .4);
@@ -421,7 +421,7 @@ ObjNode	*rightHand = gPlayerInfo.rightHandObj;
 	PlayEffect3D(EFFECT_PLAYERCRASH, &player->Coord);
 
 	StartDeathExit(2.5);
-	
+
 }
 
 
@@ -432,10 +432,10 @@ void HidePlayer(ObjNode *player)
 ObjNode	*leftHand = gPlayerInfo.leftHandObj;
 ObjNode	*rightHand = gPlayerInfo.rightHandObj;
 
-	player->StatusBits |= STATUS_BIT_HIDDEN | STATUS_BIT_NOMOVE;	
+	player->StatusBits |= STATUS_BIT_HIDDEN | STATUS_BIT_NOMOVE;
 	player->CType = 0;
-	leftHand->StatusBits |= STATUS_BIT_HIDDEN | STATUS_BIT_NOMOVE;	
-	rightHand->StatusBits |= STATUS_BIT_HIDDEN | STATUS_BIT_NOMOVE;	
+	leftHand->StatusBits |= STATUS_BIT_HIDDEN | STATUS_BIT_NOMOVE;
+	rightHand->StatusBits |= STATUS_BIT_HIDDEN | STATUS_BIT_NOMOVE;
 }
 
 
@@ -448,24 +448,24 @@ ObjNode	*player = gPlayerInfo.objNode;
 
 	gPlayerInfo.coord.x = player->Coord.x = gBestCheckpointCoord.x;
 	gPlayerInfo.coord.z = player->Coord.z = gBestCheckpointCoord.y;
-	DoPlayerTerrainUpdate(gPlayerInfo.coord.x, gPlayerInfo.coord.z);		// do this to prime any objecs/platforms there before we calc our new y Coord					
+	DoPlayerTerrainUpdate(gPlayerInfo.coord.x, gPlayerInfo.coord.z);		// do this to prime any objecs/platforms there before we calc our new y Coord
 
-	player->OldCoord = player->Coord;	
+	player->OldCoord = player->Coord;
 	player->Delta.x = player->Delta.y = player->Delta.z = 0;
-	
+
 	player->CType = CTYPE_PLAYER;										// make sure collision is set
 	player->StatusBits &= ~(STATUS_BIT_HIDDEN | STATUS_BIT_NOMOVE);		// make sure not hidden and movable
-	
+
 	gPlayerInfo.health = player->Health = 1.0;
 	gPlayerInfo.burnTimer = 0;
-	
+
 	gPlayerIsDead 					= false;
 	gPlayerFellIntoBottomlessPit 	= false;
 	gExplodePlayerAfterElectrocute 	= false;
 
 
 	if (gLevelNum != LEVEL_NUM_SAUCER)									// dont do some of this on saucer level
-	{	
+	{
 		ObjNode	*leftHand = gPlayerInfo.leftHandObj;
 		ObjNode	*rightHand = gPlayerInfo.rightHandObj;
 
@@ -473,24 +473,24 @@ ObjNode	*player = gPlayerInfo.objNode;
 		gPlayerInfo.coord.y = gPlayerInfo.objNode->Coord.y = FindHighestCollisionAtXZ(gPlayerInfo.coord.x, gPlayerInfo.coord.z, CTYPE_MISC|CTYPE_MPLATFORM|CTYPE_TERRAIN) - player->BottomOff + 20.0f;
 
 		player->Rot.y = gBestCheckpointAim;										// set the aim
-		
+
 		gPlayerInfo.scale 		= player->Scale.x = player->Scale.y = player->Scale.z = PLAYER_DEFAULT_SCALE;
 		gPlayerInfo.scaleRatio 	= 1.0;
 		gPlayerInfo.growMode 	= GROWTH_MODE_SHRINK;							// set to shrink to cause things to reset fully on 1st frame
 		gPlayerInfo.giantTimer 	= 0;
 
-		SetPlayerStandAnim(player, 100);	
+		SetPlayerStandAnim(player, 100);
 
-		leftHand->StatusBits &= ~(STATUS_BIT_HIDDEN | STATUS_BIT_NOMOVE);		
-		rightHand->StatusBits &= ~(STATUS_BIT_HIDDEN | STATUS_BIT_NOMOVE);		
+		leftHand->StatusBits &= ~(STATUS_BIT_HIDDEN | STATUS_BIT_NOMOVE);
+		rightHand->StatusBits &= ~(STATUS_BIT_HIDDEN | STATUS_BIT_NOMOVE);
 	}
-	
-	
+
+
 			/* PLACE CAMERA */
-			
+
 	InitCamera();
-	
-	
+
+
 	PlayEffect_Parms(EFFECT_NEWLIFE, FULL_CHANNEL_VOLUME * 3, FULL_CHANNEL_VOLUME/3, NORMAL_CHANNEL_RATE / 1.5);
 }
 
@@ -506,12 +506,12 @@ ObjNode	*door, *rocket;
 				/*************/
 				/* MAKE SHIP */
 				/*************/
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;
 	gNewObjectDefinition.type 		= GLOBAL_ObjType_Rocket;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= FindHighestCollisionAtXZ(x,z,CTYPE_MPLATFORM|CTYPE_TERRAIN);	
+	gNewObjectDefinition.coord.y 	= FindHighestCollisionAtXZ(x,z,CTYPE_MPLATFORM|CTYPE_TERRAIN);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 99;
 	gNewObjectDefinition.moveCall 	= MoveRocketShip;
@@ -551,7 +551,7 @@ ObjNode	*door, *rocket;
 
 
 				/* OTHER STUFF */
-				
+
 	AttachShadowToObject(rocket, GLOBAL_SObjType_Shadow_Circular, 30.0f * gRocketScaleAdjust,30.0f * gRocketScaleAdjust, false);
 
 
@@ -571,21 +571,21 @@ static void InitRocketShip(OGLPoint3D *where, float rot)
 ObjNode	*door, *rocket;
 
 	gAutoRotateCamera 		= true;
-	gAutoRotateCameraSpeed 	= -.06f;	
+	gAutoRotateCameraSpeed 	= -.06f;
 	gPlayerHasLanded 		= false;
-	
-	gFreezeCameraFromY 		= true;	
+
+	gFreezeCameraFromY 		= true;
 	gFreezeCameraFromXZ		= true;
 
 				/*************/
 				/* MAKE SHIP */
 				/*************/
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;
 	gNewObjectDefinition.type 		= GLOBAL_ObjType_Rocket;
 	gNewObjectDefinition.coord.x 	= where->x;
 	gNewObjectDefinition.coord.z 	= where->z;
-	gNewObjectDefinition.coord.y 	= FindHighestCollisionAtXZ(where->x, where->z, CTYPE_MPLATFORM|CTYPE_TERRAIN) + 6000.0f;	
+	gNewObjectDefinition.coord.y 	= FindHighestCollisionAtXZ(where->x, where->z, CTYPE_MPLATFORM|CTYPE_TERRAIN) + 6000.0f;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 99;
 	gNewObjectDefinition.moveCall 	= MoveRocketShip;
@@ -622,7 +622,7 @@ ObjNode	*door, *rocket;
 									-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);	// set this model to be sphere mapped
 
 
-				/* OTHER STUFF */				
+				/* OTHER STUFF */
 
 	MakeRocketFlame(rocket);
 	AttachShadowToObject(rocket, GLOBAL_SObjType_Shadow_Circular, 30,30, false);
@@ -635,26 +635,26 @@ void MakeRocketFlame(ObjNode *rocket)
 {
 ObjNode	*newObj, *door = rocket->ChainNode;
 int		i;
-	
+
 	if (door == nil)									// if no door, then probably using rocket on Bonus screen
 		door = rocket;
-					
+
 				/* MAKE FLAME OBJECT */
-				
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;				
+
+	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.coord 		= rocket->Coord;
-	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOTEXTUREWRAP|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_GLOW|STATUS_BIT_KEEPBACKFACES;									
+	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOTEXTUREWRAP|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_GLOW|STATUS_BIT_KEEPBACKFACES;
 	gNewObjectDefinition.slot 		= PARTICLE_SLOT+1;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= 1;
-	
+
 	newObj = MakeNewObject(&gNewObjectDefinition);
 
 	newObj->CustomDrawFunction = DrawRocketFlame;
-	
+
 	door->ChainNode = newObj;
-	
+
 	newObj->ChainHead = door;				// point back to door
 
 
@@ -677,9 +677,9 @@ int		i;
 			gSparkles[i].color.b = .9;
 			gSparkles[i].color.a = .5;
 
-			gSparkles[i].scale = 300.0f; 
+			gSparkles[i].scale = 300.0f;
 			gSparkles[i].separation = 400.0f * gRocketScaleAdjust;
-			
+
 			gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark;
 		}
 	}
@@ -693,7 +693,7 @@ void DrawRocketFlame(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 AGLContext agl_ctx = setupInfo->drawContext;
 float		x,y,z,r,s;
 OGLMatrix4x4	m;
-const static OGLPoint3D vOff[4] = 
+const static OGLPoint3D vOff[4] =
 {
 	-100, -800, 0,
 	100, -800, 0,
@@ -706,15 +706,15 @@ ObjNode			*rocket;
 	rocket = theNode->ChainHead->ChainHead;					// assume landing mode
 	if (rocket == nil)										// nope, must be bonus screen
 		rocket = theNode->ChainHead;
-		
+
 
 			/* SUBMIT FLAME TEXTURE */
-			
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_PARTICLES][PARTICLE_SObjType_RocketFlame0+theNode->Special[0]].materialObject, setupInfo);			
+
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_PARTICLES][PARTICLE_SObjType_RocketFlame0+theNode->Special[0]].materialObject, setupInfo);
 
 
 		/* CALC COORDS */
-	
+
 	x = rocket->Coord.x;
 	y = rocket->Coord.y + EXHAUST_YOFF * gRocketScaleAdjust;
 	z = rocket->Coord.z;
@@ -723,21 +723,21 @@ ObjNode			*rocket;
 												setupInfo->cameraPlacement.cameraLocation.x,
 												setupInfo->cameraPlacement.cameraLocation.z);
 	OGLMatrix4x4_SetRotate_Y(&m, r);
-	
+
 	OGLPoint3D_TransformArray(vOff, &m, verts, 4);
 
-	
+
 	s = gRocketScaleAdjust;
-	
-	
+
+
 		/* DRAW IT */
-		
-	glBegin(GL_QUADS);				
+
+	glBegin(GL_QUADS);
 	glTexCoord2f(0,0);	glVertex3f(x+verts[0].x * s, y+verts[0].y * s, z+verts[0].z);
 	glTexCoord2f(1,0);	glVertex3f(x+verts[1].x * s, y+verts[1].y * s, z+verts[1].z);
 	glTexCoord2f(1,1);	glVertex3f(x+verts[2].x * s, y+verts[2].y * s, z+verts[2].z);
 	glTexCoord2f(0,1);	glVertex3f(x+verts[3].x * s, y+verts[3].y * s, z+verts[3].z);
-	glEnd();	
+	glEnd();
 
 	theNode->SpecialF[0] -= gFramesPerSecondFrac;			// animate
 	if (theNode->SpecialF[0] <= 0.0f)
@@ -761,11 +761,11 @@ static void MoveRocketShip(ObjNode *rocket)
 				MoveRocketShip_Landing(rocket);
 				MakeRocketExhaust(rocket);
 				break;
-				
+
 		case	ROCKET_MODE_OPENDOOR:
 				MoveRocketShip_OpenDoor(rocket);
 				break;
-				
+
 		case	ROCKET_MODE_DEPLANE:
 				MoveRocketShip_Deplane(rocket);
 				break;
@@ -778,7 +778,7 @@ static void MoveRocketShip(ObjNode *rocket)
 				MoveRocketShip_Leave(rocket);
 				MakeRocketExhaust(rocket);
 				break;
-				
+
 		case	ROCKET_MODE_WAITING:
 				MoveRocketShip_Waiting(rocket);
 				break;
@@ -791,18 +791,18 @@ static void MoveRocketShip(ObjNode *rocket)
 				MoveRocketShip_Enter(rocket);
 				break;
 	}
-				
-	
+
+
 	/* SEE IF DISPLAY HELP */
-	
-	
+
+
 	switch(gLevelNum)
 	{
 		case	LEVEL_NUM_BRAINBOSS:				// no help on these levels
 		case	LEVEL_NUM_JUNGLEBOSS:
 		case	LEVEL_NUM_SAUCER:
 				break;
-				
+
 		default:
 				if (rocket->Kind == ROCKET_KIND_EXIT)
 				{
@@ -810,32 +810,32 @@ static void MoveRocketShip(ObjNode *rocket)
 					{
 						if (CalcQuickDistance(rocket->Coord.x, rocket->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < 900.0f)
 						{
-							DisplayHelpMessage(HELP_MESSAGE_ENTERSHIP, .5f, false);	
+							DisplayHelpMessage(HELP_MESSAGE_ENTERSHIP, .5f, false);
 						}
 					}
-				}	
+				}
 	}
 }
-	
-	
+
+
 /*********************** MAKE ROCKET EXHAUST *********************/
 
 void MakeRocketExhaust(ObjNode *rocket)
-{	
+{
 int	i;
 float	x,y,z;
 
 	x = rocket->Coord.x;
 	y = rocket->Coord.y + EXHAUST_YOFF * gRocketScaleAdjust;
 	z = rocket->Coord.z;
-		
-	
+
+
 			/******************/
 			/* CREATE EXHAUST */
 			/******************/
 
 				/* SMOKE */
-				
+
 	rocket->ParticleTimer -= gFramesPerSecondFrac;									// see if add smoke
 	if (rocket->ParticleTimer <= 0.0f)
 	{
@@ -844,16 +844,16 @@ float	x,y,z;
 		NewParticleDefType	newParticleDef;
 		OGLVector3D			d;
 		OGLPoint3D			p;
-	
+
 		rocket->ParticleTimer += .05f;										// reset timer
-		
+
 		particleGroup 	= rocket->ParticleGroup;
 		magicNum 		= rocket->ParticleMagicNum;
-		
+
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
 			rocket->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
-			
+
 			groupDef.magicNum				= magicNum;
 			groupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 			groupDef.flags					= PARTICLE_FLAGS_BOUNCE|PARTICLE_FLAGS_DISPERSEIFBOUNCE;
@@ -879,16 +879,16 @@ float	x,y,z;
 				d.x = RandomFloat2() * (150.0f * gRocketScaleAdjust);
 				d.y = rocket->Delta.y - (800.0f + RandomFloat() * 100.0f * gRocketScaleAdjust);
 				d.z =  RandomFloat2() * (150.0f * gRocketScaleAdjust);
-			
+
 				newParticleDef.groupNum		= particleGroup;
 				newParticleDef.where		= &p;
 				newParticleDef.delta		= &d;
 				newParticleDef.scale		= RandomFloat() + 1.0f;
 				newParticleDef.rotZ			= RandomFloat() * PI2;
 				newParticleDef.rotDZ		= RandomFloat2();
-				
-				newParticleDef.alpha		= .8;		
-				
+
+				newParticleDef.alpha		= .8;
+
 				if (AddParticleToGroup(&newParticleDef))
 				{
 					rocket->ParticleGroup = -1;
@@ -897,26 +897,26 @@ float	x,y,z;
 			}
 		}
 	}
-}	
+}
 
 
 /****************** MOVE ROCKET SHIP: LANDING *******************/
 
 static void MoveRocketShip_Landing(ObjNode *rocket)
-{	
+{
 float	y,r;
 int		i;
 ObjNode	*door = rocket->ChainNode;
-	
-	
+
+
 	GetObjectInfo(rocket);
-	
+
 	y = FindHighestCollisionAtXZ(gCoord.x, gCoord.z, CTYPE_MPLATFORM|CTYPE_TERRAIN);
-	
+
 	gDelta.y = -((gCoord.y - y) * .9f + 100.0f);
 	if (gDelta.y < -3000.0f)
 		gDelta.y = -3000.0f;
-		
+
 	gCoord.y += gDelta.y * gFramesPerSecondFrac;
 
 			/* MAKE SURE SOUND IS GOING */
@@ -925,10 +925,10 @@ ObjNode	*door = rocket->ChainNode;
 		rocket->EffectChannel = PlayEffect3D(EFFECT_ROCKET, &gCoord);
 	else
 		Update3DSoundChannel(EFFECT_ROCKET, &rocket->EffectChannel, &gCoord);
-	
-	
+
+
 			/* SEE IF TOUCHDOWN */
-			
+
 	if (gCoord.y <= y)
 	{
 		gCoord.y = y;
@@ -940,34 +940,34 @@ ObjNode	*door = rocket->ChainNode;
 			DeleteSparkle(i);
 			rocket->Sparkles[0] = -1;
 		}
-			
+
 		if (door->ChainNode)				// stop fire
 		{
 			DeleteObject(door->ChainNode);
 			door->ChainNode = nil;
 		}
-		
+
 		StopAChannelIfEffectNum(&rocket->EffectChannel, EFFECT_ROCKET);	// stop sound
 		PlayEffect3D(EFFECT_ROCKETLANDED, &gCoord);							// play landed
 	}
-	
+
 	UpdateObject(rocket);
 
 
 			/* UPDATE DOOR */
-			
+
 	AlignRocketDoor(rocket);
 
-	
+
 			/* UPDATE PLAYER INFO */
-	
-	r = rocket->Rot.y;		
+
+	r = rocket->Rot.y;
 	gPlayerInfo.objNode->Coord.x = gPlayerInfo.coord.x = gCoord.x + sin(r) * PLAYER_OFF_Z;
 	gPlayerInfo.objNode->Coord.y = gPlayerInfo.coord.y = gCoord.y + PLAYER_OFF_Y - gPlayerInfo.objNode->BottomOff;
 	gPlayerInfo.objNode->Coord.z = gPlayerInfo.coord.z = gCoord.z + cos(r) * PLAYER_OFF_Z;
 	UpdateObjectTransforms(gPlayerInfo.objNode);
 	UpdateRobotHands(gPlayerInfo.objNode);
-	
+
 
 }
 
@@ -975,26 +975,26 @@ ObjNode	*door = rocket->ChainNode;
 /****************** MOVE ROCKET SHIP: LEAVE *******************/
 
 static void MoveRocketShip_Leave(ObjNode *rocket)
-{	
+{
 float	y;
 
 
 	GetObjectInfo(rocket);
-	
+
 	y = FindHighestCollisionAtXZ(gCoord.x, gCoord.z, CTYPE_MPLATFORM|CTYPE_TERRAIN);
 
 	if (gCoord.y < y)
 		gCoord.y = y;
-	
+
 	gDelta.y = (gCoord.y - y) * .9f + 100.0f;
 	if (gDelta.y < -2000.0f)
 		gDelta.y = -2000.0f;
 
-		
+
 	gCoord.y += gDelta.y * gFramesPerSecondFrac;
-	
+
 			/* SEE IF GONE */
-			
+
 	if (gCoord.y > (GetTerrainY(gCoord.x, gCoord.z) + 9000.0f))
 	{
 		if (rocket->Kind == ROCKET_KIND_EXIT)			// see if that's the end of the level
@@ -1002,11 +1002,11 @@ float	y;
 			gLevelCompleted = true;
 			gLevelCompletedCoolDownTimer = 0;
 		}
-	
+
 		DeleteObject(rocket);
 		return;
 	}
-	
+
 	UpdateObject(rocket);
 
 			/* MAKE SURE SOUND IS GOING */
@@ -1018,69 +1018,69 @@ float	y;
 
 
 			/* UPDATE DOOR */
-			
+
 	AlignRocketDoor(rocket);
-	
-	
+
+
 	if (!gPlayerHasLanded)
 	{
 		float	r = rocket->Rot.y;
-		
+
 					/* UPDATE PLAYER INFO */
-				
+
 		gPlayerInfo.objNode->Coord.x = gPlayerInfo.coord.x = gCoord.x + sin(r) * PLAYER_OFF_Z;
 		gPlayerInfo.objNode->Coord.y = gPlayerInfo.coord.y = gCoord.y + PLAYER_OFF_Y - gPlayerInfo.objNode->BottomOff;
 		gPlayerInfo.objNode->Coord.z = gPlayerInfo.coord.z = gCoord.z + cos(r) * PLAYER_OFF_Z;
 		UpdateObjectTransforms(gPlayerInfo.objNode);
 		UpdateRobotHands(gPlayerInfo.objNode);
-	}	
+	}
 }
 
 
 /****************** MOVE ROCKET SHIP: OPEN DOOR *******************/
 
 static void MoveRocketShip_OpenDoor(ObjNode *rocket)
-{	
+{
 ObjNode *door = rocket->ChainNode;
 
 
 			/* ROTATE DOOR */
-			
+
 	door->Rot.x += gFramesPerSecondFrac * 1.9f;
 
-	
+
 		/* SEE IF DONE OPENING */
-			
+
 	if (door->Rot.x > 2.5f)
 	{
 		door->Rot.x = 2.5f;
-		
+
 		if (rocket->Kind == ROCKET_KIND_EXIT)
 		{
 			rocket->Mode = ROCKET_MODE_WAITING2;
 		}
 		else
 		{
-			rocket->Mode = ROCKET_MODE_DEPLANE;	
+			rocket->Mode = ROCKET_MODE_DEPLANE;
 			gDeplaneTimer = 2.5;
-			
+
 			MorphToSkeletonAnim(gPlayerInfo.objNode->Skeleton, PLAYER_ANIM_WALK, 8);	// start robot walking
 			gPlayerInfo.objNode->Skeleton->AnimSpeed = 2.0f;
 		}
 	}
-	
+
 	UpdateObjectTransforms(door);
-	
+
 }
 
 /****************** MOVE ROCKET SHIP: CLOSE DOOR *******************/
 
 static void MoveRocketShip_CloseDoor(ObjNode *rocket)
-{	
+{
 ObjNode	*door = rocket->ChainNode;
 
 			/* ROTATE DOOR */
-			
+
 	door->Rot.x -= gFramesPerSecondFrac * 1.9f;
 	if (door->Rot.x <= 0.0f)
 	{
@@ -1110,31 +1110,31 @@ ObjNode	*door = rocket->ChainNode;
 			}
 			else
 			{
-leave:			
+leave:
 				if (rocket->Kind == ROCKET_KIND_EXIT)
 					HidePlayer(gPlayerInfo.objNode);												// hide otto so gun doesnt poke thru hull
-				rocket->Mode = ROCKET_MODE_LEAVE;						
+				rocket->Mode = ROCKET_MODE_LEAVE;
 				MakeRocketFlame(rocket);
 			}
 		}
 	}
-	
+
 	UpdateObjectTransforms(door);
-	
+
 }
 
 
 /****************** MOVE ROCKET SHIP: DEPLANE *******************/
 
 static void MoveRocketShip_Deplane(ObjNode *rocket)
-{	
+{
 float	fps = gFramesPerSecondFrac;
 float	 r;
 ObjNode	*player = gPlayerInfo.objNode;
 
 	r = rocket->Rot.y;
-	
-	
+
+
 	GetObjectInfo(player);
 
 	gDelta.x = sin(r) * 250.0f;
@@ -1145,16 +1145,16 @@ ObjNode	*player = gPlayerInfo.objNode;
 
 
 			/* SEE IF GO DOWN RAMP */
-				
+
 	if (CalcDistance(gCoord.x, gCoord.z, rocket->Coord.x, rocket->Coord.z) > 170.0f)
 	{
 		gCoord.y -= 380.0f * fps;
-		
+
 					/* SEE IF ON GROUND */
-					
+
 		if ((gCoord.y + player->BottomOff) <= FindHighestCollisionAtXZ(gCoord.x, gCoord.z, CTYPE_MPLATFORM|CTYPE_TERRAIN))
 		{
-			gCoord.y = FindHighestCollisionAtXZ(gCoord.x, gCoord.z, CTYPE_MPLATFORM|CTYPE_TERRAIN) - player->BottomOff;		
+			gCoord.y = FindHighestCollisionAtXZ(gCoord.x, gCoord.z, CTYPE_MPLATFORM|CTYPE_TERRAIN) - player->BottomOff;
 		}
 	}
 
@@ -1163,19 +1163,19 @@ ObjNode	*player = gPlayerInfo.objNode;
 	{
 		gPlayerInfo.objNode->StatusBits &= ~STATUS_BIT_NOMOVE;
 		gFreezeCameraFromXZ = false;
-		gFreezeCameraFromY = false;	
+		gFreezeCameraFromY = false;
 		gAutoRotateCamera = false;
-		rocket->Mode = ROCKET_MODE_CLOSEDOOR;	
+		rocket->Mode = ROCKET_MODE_CLOSEDOOR;
 		gPlayerHasLanded = true;
 		PlayEffect3D(EFFECT_HATCH, &rocket->Coord);
 
 
 		gBestCheckpointCoord.x = gCoord.x;					// set the start checkpoint to here
 		gBestCheckpointCoord.y = gCoord.z;
-	}	
-	
+	}
+
 	UpdateObject(player);
-	gPlayerInfo.coord = gCoord;				// update player coord		
+	gPlayerInfo.coord = gCoord;				// update player coord
 	UpdatePlayerSparkles(player);
 	UpdateRobotHands(player);
 }
@@ -1184,7 +1184,7 @@ ObjNode	*player = gPlayerInfo.objNode;
 /****************** MOVE ROCKET SHIP: ENTER *******************/
 
 static void MoveRocketShip_Enter(ObjNode *rocket)
-{	
+{
 float	fps = gFramesPerSecondFrac;
 float	 r,dist,oldDist;
 ObjNode	*player = gPlayerInfo.objNode;
@@ -1193,8 +1193,8 @@ ObjNode	*player = gPlayerInfo.objNode;
 	DisableHelpType(HELP_MESSAGE_ENTERSHIP);				// player is going up, so we don't need this help anymore
 
 	r = rocket->Rot.y;
-	
-	
+
+
 	GetObjectInfo(player);
 
 	oldDist = CalcDistance(gCoord.x, gCoord.z, rocket->Coord.x, rocket->Coord.z);
@@ -1212,25 +1212,25 @@ ObjNode	*player = gPlayerInfo.objNode;
 	if (dist < (360.0f * ROCKET_SCALE))
 	{
 		gCoord.y += 400.0f * fps;
-		
+
 		if ((gCoord.y + player->BottomOff) > (rocket->Coord.y + PLAYER_OFF_Y))		// dont go higher than where we want it
 			gCoord.y = rocket->Coord.y + PLAYER_OFF_Y - player->BottomOff;
-		
+
 	}
 
 			/* SEE IF DONE */
-			
+
 	if ((dist <= PLAYER_OFF_Z) || (dist > oldDist))
 	{
-		rocket->Mode = ROCKET_MODE_CLOSEDOOR;	
+		rocket->Mode = ROCKET_MODE_CLOSEDOOR;
 		gPlayerHasLanded = false;
 		MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_STAND, 6);
 		PlayEffect3D(EFFECT_HATCH, &rocket->Coord);
 
 	}
 
-	
-	UpdatePlayer_Robot(player);	
+
+	UpdatePlayer_Robot(player);
 }
 
 
@@ -1240,21 +1240,21 @@ ObjNode	*player = gPlayerInfo.objNode;
 //
 
 static void MoveRocketShip_Waiting(ObjNode *rocket)
-{	
+{
 ObjNode	*door = rocket->ChainNode;
 
 	GetObjectInfo(rocket);
 
 			/* SEE IF OUT OF RANGE */
-	
+
 	switch(gLevelNum)									// keep the rocket here on the Jungle Boss level, et.al.
 	{
 		case	LEVEL_NUM_JUNGLEBOSS:
 		case	LEVEL_NUM_SAUCER:
 		case	LEVEL_NUM_BRAINBOSS:
 				break;
-				
-		default:		
+
+		default:
 				if (TrackTerrainItem(rocket))
 				{
 					DeleteObject(rocket);
@@ -1264,12 +1264,12 @@ ObjNode	*door = rocket->ChainNode;
 	}
 
 			/* UPDATE DOOR */
-			
+
 	AlignRocketDoor(rocket);
 
 
 		/* SEE IF SHOULD OPEN DOOR */
-		
+
 	if (gLevelNum == LEVEL_NUM_JUNGLEBOSS)			// on this level, the door can't open until the tractor beam is gone
 	{
 		if (gTractorBeamObj)
@@ -1283,28 +1283,28 @@ ObjNode	*door = rocket->ChainNode;
 			if (!gBrainBossDead)
 				goto update;
 		}
-		
+
 		if (gPlayerInfo.fuel < 1.0f)								// see if have enough fuel to leave
 		{
 			if (gLevelNum == LEVEL_NUM_JUNGLEBOSS)					// don't need fuel on Jungle Boss
 				goto open_door;
-		
+
 			if (gLevelNum == LEVEL_NUM_SAUCER)						// or Saucer
 				goto open_door;
-			
-			DisplayHelpMessage(HELP_MESSAGE_NOTENOUGHFUELTOLEAVE, 1.0, true);	
+
+			DisplayHelpMessage(HELP_MESSAGE_NOTENOUGHFUELTOLEAVE, 1.0, true);
 		}
 		else														// we've got the fuel, so open the door
 		{
-open_door:		
+open_door:
 			rocket->Mode = ROCKET_MODE_OPENDOOR;
 			PlayEffect3D(EFFECT_HATCH, &door->Coord);
 		}
-	
+
 	}
-	
+
 		/* UPDATE */
-		
+
 update:
 	UpdateObject(rocket);
 }
@@ -1316,23 +1316,23 @@ update:
 //
 
 static void MoveRocketShip_Waiting2(ObjNode *rocket)
-{	
+{
 ObjNode	*player = gPlayerInfo.objNode;
 ObjNode	*door = rocket->ChainNode;
 
 	GetObjectInfo(rocket);
 
-		
+
 			/* SEE IF OUT OF RANGE */
-	
+
 	switch(gLevelNum)									// keep the rocket here on the Jungle Boss level, et.al.
 	{
 		case	LEVEL_NUM_JUNGLEBOSS:
 		case	LEVEL_NUM_SAUCER:
 		case	LEVEL_NUM_BRAINBOSS:
 				break;
-				
-		default:		
+
+		default:
 				if (TrackTerrainItem(rocket))
 				{
 					DeleteObject(rocket);
@@ -1340,30 +1340,30 @@ ObjNode	*door = rocket->ChainNode;
 					return;
 				}
 	}
-	
+
 
 
 			/* UPDATE DOOR */
-			
+
 	AlignRocketDoor(rocket);
 
 
 		/* SEE IF SHOULD CLOSE DOOR */
-		
+
 	if (CalcQuickDistance(rocket->Coord.x, rocket->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) > 1200.0f)
 	{
 		if (gLevelNum != LEVEL_NUM_SAUCER)					// keep door open on this level
 		{
 			rocket->Mode = ROCKET_MODE_CLOSEDOOR;
-			PlayEffect3D(EFFECT_HATCH, &door->Coord);			
+			PlayEffect3D(EFFECT_HATCH, &door->Coord);
 		}
 	}
-	
-	
+
+
 			/*******************************/
 			/* SEE IF PLAYER CAN ENTER NOW */
 			/*******************************/
-			
+
 	else
 	if (player->StatusBits & STATUS_BIT_ONGROUND)
 	{
@@ -1372,10 +1372,10 @@ ObjNode	*door = rocket->ChainNode;
 			CheckIfPlayerSuckedIntoBlobWell(player, rocket);
 		}
 		else
-		{	
+		{
 			float r = rocket->Rot.y;
 			OGLMatrix3x3	m;
-			const OGLPoint2D inArea[4] = 
+			const OGLPoint2D inArea[4] =
 			{
 				-40, ROCKET_SCALE * 370.0f,
 				40, ROCKET_SCALE * 370.0f,
@@ -1383,8 +1383,8 @@ ObjNode	*door = rocket->ChainNode;
 				-50, ROCKET_SCALE * 490.0f
 			};
 			OGLPoint2D	area[4];
-					
-			
+
+
 					/* CALC ZONE @ BASE OF RAMP */
 
 			OGLMatrix3x3_SetRotate(&m, -r);											// rotate the hot zone
@@ -1392,11 +1392,11 @@ ObjNode	*door = rocket->ChainNode;
 
 			if (IsPointInPoly2D(gPlayerInfo.coord.x - rocket->Coord.x,
 								gPlayerInfo.coord.z - rocket->Coord.z, 4, area))	// see if play in hot zone
-			{		
+			{
 				player->CType = 0;
-				
+
 				if (player->Skeleton->AnimNum != PLAYER_ANIM_WALK)
-					MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_WALK, 9);		// start robot walking				
+					MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_WALK, 9);		// start robot walking
 				player->Skeleton->AnimSpeed = 2.0f;
 				player->Rot.y = rocket->Rot.y;;										// aim directly at rocket
 				player->StatusBits |= STATUS_BIT_NOMOVE;							// rocket now controls player
@@ -1405,13 +1405,13 @@ ObjNode	*door = rocket->ChainNode;
 				gPlayerHasLanded = false;
 
 				gFreezeCameraFromXZ = true;											// camera is frozen
-				gFreezeCameraFromY = true;	
+				gFreezeCameraFromY = true;
 			}
 		}
 	}
 
 	UpdateObject(rocket);
-	
+
 }
 
 
@@ -1422,8 +1422,8 @@ static void AlignRocketDoor(ObjNode *rocket)
 ObjNode	*door = rocket->ChainNode;
 
 float	r = rocket->Rot.y;
-	
-			
+
+
 	door->Coord.x = gCoord.x + sin(r) * (DOOR_OFF_Z * ROCKET_SCALE * gRocketScaleAdjust);
 	door->Coord.y = gCoord.y + (DOOR_OFF_Y * ROCKET_SCALE * gRocketScaleAdjust);
 	door->Coord.z = gCoord.z + cos(r) * (DOOR_OFF_Z * ROCKET_SCALE * gRocketScaleAdjust);
@@ -1435,7 +1435,7 @@ float	r = rocket->Rot.y;
 static void CheckIfPlayerSuckedIntoBlobWell(ObjNode *player, ObjNode *rocket)
 {
 OGLMatrix3x3	m;
-const OGLPoint2D inArea[4] = 
+const OGLPoint2D inArea[4] =
 {
 	-200, ROCKET_SCALE * 360.0f,
 	200, ROCKET_SCALE * 360.0f,
@@ -1444,7 +1444,7 @@ const OGLPoint2D inArea[4] =
 };
 OGLPoint2D	area[4];
 DeformationType		defData;
-	
+
 
 			/* CALC ZONE @ BASE OF RAMP */
 
@@ -1452,32 +1452,32 @@ DeformationType		defData;
 	OGLPoint2D_TransformArray(inArea, &m, area, 4);
 
 			/* SEE IF PLAYER IN THAT ZONE */
-			
+
 	if (IsPointInPoly2D(gPlayerInfo.coord.x - rocket->Coord.x,
 						gPlayerInfo.coord.z - rocket->Coord.z, 4, area))	// see if play in hot zone
-	{		
+	{
 		player->CType = 0;
-		
+
 		if (player->Skeleton->AnimNum != PLAYER_ANIM_SUCKEDINTOWELL)
 		{
-			MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_SUCKEDINTOWELL, 9);		// start robot walking				
+			MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_SUCKEDINTOWELL, 9);		// start robot walking
 
 			gPlayerHasLanded = false;
 
 			player->Delta.x = player->Delta.z = 0;					// stop player
-		
+
 			gLevelCompleted = true;									// level is completed...
 			gLevelCompletedCoolDownTimer = 4.0;						// .. but do a cooldown to give time to see player sink
-			
-			
+
+
 				/* MAKE DEFORMATION WELL */
-						
+
 			defData.type 				= DEFORMATION_TYPE_WELL;
-			defData.amplitude 			= 0; 
-			defData.radius 				= 90; 
-			defData.speed 				= 300; 
-			defData.origin.x			= gPlayerInfo.coord.x; 
-			defData.origin.y			= gPlayerInfo.coord.z; 
+			defData.amplitude 			= 0;
+			defData.radius 				= 90;
+			defData.speed 				= 300;
+			defData.origin.x			= gPlayerInfo.coord.x;
+			defData.origin.y			= gPlayerInfo.coord.z;
 			defData.oneOverWaveLength 	= 1.0f;
 			defData.radialWidth			= 0.0f;
 			defData.decayRate			= 0.0f;
@@ -1507,13 +1507,13 @@ ObjNode	*novaObj;
 		topY = gWaterBBox[patchNum].max.y;
 
 			/* SPLASH */
-			
+
 	if (gDelta.y < -700.0f)
 		MakeSplash(gCoord.x, topY, gCoord.z);
 
 
 			/* SPARKS */
-			
+
 	MakeSparkExplosion(gCoord.x, topY, gCoord.z, 200.0f, 1.0, PARTICLE_SObjType_WhiteSpark, 0);
 
 	if (theNode->Skeleton->AnimNum != PLAYER_ANIM_ZAPPED)
@@ -1521,18 +1521,18 @@ ObjNode	*novaObj;
 		SetSkeletonAnim(theNode->Skeleton, PLAYER_ANIM_ZAPPED);
 		theNode->ZappedTimer = 1.7f;
 	}
-	
+
 	PlayEffect3D(EFFECT_ZAP, &gCoord);
 
 
 			/* DISCHARGE A SUPERNOVA */
-		
+
 	if (gDischargeTimer <= 0.0f)
 	{
-		gNewObjectDefinition.genre		= CUSTOM_GENRE;				
+		gNewObjectDefinition.genre		= CUSTOM_GENRE;
 		gNewObjectDefinition.coord 		= gCoord;
 		gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOTEXTUREWRAP|
-											STATUS_BIT_GLOW|STATUS_BIT_KEEPBACKFACES;									
+											STATUS_BIT_GLOW|STATUS_BIT_KEEPBACKFACES;
 		gNewObjectDefinition.slot 		= SPRITE_SLOT-1;
 		gNewObjectDefinition.moveCall 	= nil;
 		novaObj = MakeNewObject(&gNewObjectDefinition);
@@ -1558,25 +1558,25 @@ float	y;
 
 	if (player->Skeleton->AnimNum != PLAYER_ANIM_ACCORDIAN)
 	{
-		MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_ACCORDIAN, 5);				
+		MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_ACCORDIAN, 5);
 		PlayerLoseHealth(.3, PLAYER_DEATH_TYPE_EXPLODE);
 		player->AccordianTimer = 2.0;
-		PlayEffect3D(EFFECT_PLAYERCRUSH, &player->Coord);					
+		PlayEffect3D(EFFECT_PLAYERCRUSH, &player->Coord);
 	}
-	
+
 	gPlayerInfo.invincibilityTimer = 2.0;			// this gets reset @ end of flatten anim, but set here so others know what's going on
-	
-	
+
+
 			/* POSITION SO FLAT ON GROUND */
-			
+
 	y = FindHighestCollisionAtXZ(player->Coord.x, player->Coord.z, CTYPE_TERRAIN | CTYPE_MISC | CTYPE_MPLATFORM);
-	
+
 	player->Coord.y = y + player->BBox.min.y + 2.0f;
 	player->Delta.y = 50.0f;
 
 
 			/* SEE IF WAS PICKING UP SOMETHING */
-			
+
 	if (gTargetPickup)
 	{
 		gTargetPickup->MoveCall = MovePowerup;	// restore the Move Call

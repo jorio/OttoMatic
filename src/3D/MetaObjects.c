@@ -96,27 +96,27 @@ MetaObjectPtr MO_GetNewReference(MetaObjectPtr mo)
 MetaObjectHeader *h = mo;
 
 	h->refCount++;
-	
+
 		/********************************/
 		/* SEE IF NEED TO SUB INCREMENT */
 		/********************************/
-		
+
 	switch(h->type)
 	{
 		case	MO_TYPE_GROUP:
 				MO_GetNewGroupReference(mo);
 				break;
-				
-				
+
+
 		case	MO_TYPE_GEOMETRY:
 				switch(h->subType)
 				{
 					case	MO_GEOMETRY_SUBTYPE_VERTEXARRAY:
-							MO_GetNewVertexArrayReference(mo);	
+							MO_GetNewVertexArrayReference(mo);
 							break;
 				}
 	}
-	
+
 	return(mo);
 }
 
@@ -169,47 +169,47 @@ MetaObjectPtr	MO_CreateNewObjectOfType(u_long type, u_long subType, void *data)
 MetaObjectPtr	mo;
 
 			/* ALLOCATE EMPTY OBJECT */
-			
+
 	mo = AllocateEmptyMetaObject(type,subType);
 	if (mo == nil)
 		return(nil);
 
 
 			/* SET OBJECT INFO */
-			
+
 	switch(type)
 	{
 		case	MO_TYPE_GROUP:
 				SetMetaObjectToGroup(mo);
 				break;
-				
+
 		case	MO_TYPE_GEOMETRY:
 				SetMetaObjectToGeometry(mo, subType, data);
 				break;
-				
+
 		case	MO_TYPE_MATERIAL:
 				SetMetaObjectToMaterial(mo, data);
 				break;
-				
+
 		case	MO_TYPE_MATRIX:
 				SetMetaObjectToMatrix(mo, data);
 				break;
 
 		case	MO_TYPE_PICTURE:
 				if (gGamePrefs.depth == 16)		// picture depth depends on display depth (no point in doing 32 bit if display is 16)
-					SetMetaObjectToPicture(mo, (OGLSetupOutputType *)subType, data, GL_RGB5_A1);				
+					SetMetaObjectToPicture(mo, (OGLSetupOutputType *)subType, data, GL_RGB5_A1);
 				else
 					SetMetaObjectToPicture(mo, (OGLSetupOutputType *)subType, data, GL_RGB);
 				break;
-				
+
 		case	MO_TYPE_SPRITE:
 				SetMetaObjectToSprite(mo, (OGLSetupOutputType *)subType, data);
 				break;
-				
+
 		default:
 				DoFatalAlert("\pMO_CreateNewObjectOfType: object type not recognized");
 	}
-	
+
 	return(mo);
 }
 
@@ -225,29 +225,29 @@ MetaObjectHeader	*mo;
 int					size;
 
 			/* DETERMINE SIZE OF DATA TO ALLOC */
-			
+
 	switch(type)
 	{
 		case	MO_TYPE_GROUP:
 				size = sizeof(MOGroupObject);
 				break;
-				
+
 		case	MO_TYPE_GEOMETRY:
 				switch(subType)
 				{
 					case	MO_GEOMETRY_SUBTYPE_VERTEXARRAY:
 							size = sizeof(MOVertexArrayObject);
 							break;
-							
+
 					default:
 							DoFatalAlert("\pAllocateEmptyMetaObject: object subtype not recognized");
 				}
 				break;
-				
+
 		case	MO_TYPE_MATERIAL:
 				size = sizeof(MOMaterialObject);
 				break;
-				
+
 		case	MO_TYPE_MATRIX:
 				size = sizeof(MOMatrixObject);
 				break;
@@ -255,30 +255,30 @@ int					size;
 		case	MO_TYPE_PICTURE:
 				size = sizeof(MOPictureObject);
 				break;
-				
+
 		case	MO_TYPE_SPRITE:
 				size = sizeof(MOSpriteObject);
 				break;
-				
+
 		default:
 				DoFatalAlert("\pAllocateEmptyMetaObject: object type not recognized");
 	}
-			
+
 
 			/* ALLOC MEMORY FOR META OBJECT */
-			
-	mo = AllocPtr(size);	
+
+	mo = AllocPtr(size);
 	if (mo == nil)
 		DoFatalAlert("\pAllocateEmptyMetaObject: AllocPtr failed!");
 
 
 			/* INIT STRUCTURE */
-			
+
 	mo->cookie 		= MO_COOKIE;
 	mo->type 		= type;
 	mo->subType 	= subType;
 	mo->data 		= nil;
-	mo->nextNode 	= nil;		
+	mo->nextNode 	= nil;
 	mo->refCount	= 1;							// initial reference count is always 1
 	mo->parentGroup = nil;
 
@@ -288,21 +288,21 @@ int					size;
 		/***************************/
 
 		/* SEE IF IS ONLY NODE */
-					
+
 	if (gFirstMetaObject == nil)
 	{
 		if (gLastMetaObject)
 			DoFatalAlert("\pAllocateEmptyMetaObject: gFirstMetaObject & gLastMetaObject should be nil");
-	
+
 		mo->prevNode = nil;
 		gFirstMetaObject = gLastMetaObject = mo;
 		gNumMetaObjects = 1;
 	}
-	
+
 		/* ADD TO END OF LINKED LIST */
-		
+
 	else
-	{		
+	{
 		mo->prevNode = gLastMetaObject;		// point new prev to last
 		gLastMetaObject->nextNode = mo;		// point old last to new
 		gLastMetaObject = mo;				// set new last
@@ -319,9 +319,9 @@ int					size;
 
 static void SetMetaObjectToGroup(MOGroupObject *groupObj)
 {
-		
+
 			/* INIT THE DATA */
-			
+
 	groupObj->objectData.numObjectsInGroup = 0;
 }
 
@@ -338,7 +338,7 @@ static void SetMetaObjectToGeometry(MetaObjectPtr mo, u_long subType, void *data
 		case	MO_GEOMETRY_SUBTYPE_VERTEXARRAY:
 				SetMetaObjectToVertexArrayGeometry(mo, data);
 				break;
-				
+
 		default:
 				DoFatalAlert("\pSetMetaObjectToGeometry: unknown subType");
 
@@ -357,20 +357,20 @@ static void SetMetaObjectToGeometry(MetaObjectPtr mo, u_long subType, void *data
 static void SetMetaObjectToVertexArrayGeometry(MOVertexArrayObject *geoObj, MOVertexArrayData *data)
 {
 int	i;
-		
-			/* INIT THE DATA */
-		
-	geoObj->objectData = *data;									// copy from input data		
 
-	
+			/* INIT THE DATA */
+
+	geoObj->objectData = *data;									// copy from input data
+
+
 		/* INCREASE MATERIAL REFERENCE COUNTS */
-			
+
 	for (i = 0; i < data->numMaterials; i++)
 	{
 		if (data->materials[i] != nil)				// make sure this material ref is valid
 			MO_GetNewReference(data->materials[i]);
-	}		
-		
+	}
+
 }
 
 
@@ -378,14 +378,14 @@ int	i;
 //
 // INPUT:	mo = meta object which has already been allocated and added to linked list.
 //
-// This takes the given input data and copies it. 
+// This takes the given input data and copies it.
 //
 
 static void SetMetaObjectToMaterial(MOMaterialObject *matObj, MOMaterialData *inData)
-{	
-	
+{
+
 		/* COPY INPUT DATA */
-		
+
 	matObj->objectData = *inData;
 
 #if 0
@@ -398,8 +398,8 @@ static void SetMetaObjectToMaterial(MOMaterialObject *matObj, MOMaterialData *in
 			glTexCoord2f(1,0); glVertex3f(0,100,0);
 			glTexCoord2f(0,1); glVertex3f(0,0,1000);
 			glEnd();
-		}	
-#endif		
+		}
+#endif
 
 }
 
@@ -408,14 +408,14 @@ static void SetMetaObjectToMaterial(MOMaterialObject *matObj, MOMaterialData *in
 //
 // INPUT:	mo = meta object which has already been allocated and added to linked list.
 //
-// This takes the given input data and copies it. 
+// This takes the given input data and copies it.
 //
 
 static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData)
-{	
-	
+{
+
 		/* COPY INPUT DATA */
-		
+
 	matObj->matrix = *inData;
 }
 
@@ -424,7 +424,7 @@ static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData)
 //
 // INPUT:	mo = meta object which has already been allocated and added to linked list.
 //
-// This takes the given input data and copies it. 
+// This takes the given input data and copies it.
 //
 
 static void SetMetaObjectToPicture(MOPictureObject *pictObj, OGLSetupOutputType *setupInfo, FSSpec *inData, int destPixelFormat)
@@ -471,7 +471,7 @@ Rect		r;
 		/***********************************/
 
 			/* DO WIDTH */
-	
+
 	switch(width)
 	{
 		case	32:
@@ -498,13 +498,13 @@ Rect		r;
 				horizCellSize = 256;
 				numHorizCells = width/horizCellSize;
 				break;
-				
+
 		default:
 				DoFatalAlert("\pSetMetaObjectToPicture: this width not implemented yet");
 	}
 
 			/* DO HEIGHT */
-	
+
 	switch(height)
 	{
 		case	32:
@@ -526,21 +526,21 @@ Rect		r;
 				vertCellSize = 256;
 				numVertCells = height/vertCellSize;
 				break;
-				
+
 		default:
 				DoFatalAlert("\pSetMetaObjectToPicture: this height not implemented yet");
 	}
-	
-	
+
+
 			/********************************/
 			/* SET SOME PICTURE OBJECT DATA */
 			/********************************/
 
 	picData->drawCoord.x	= -1.0;						// assume upper left corner
-	picData->drawCoord.y	= 1.0;	
+	picData->drawCoord.y	= 1.0;
 	picData->drawCoord.z	= .999;						// assume in back
 	picData->drawScaleX		= 1.0;						// scale is normal
-	picData->drawScaleY		= 1.0;						
+	picData->drawScaleY		= 1.0;
 
 	picData->fullWidth 		= width;
 	picData->fullHeight		= height;
@@ -548,9 +548,9 @@ Rect		r;
 	picData->numCellsHigh 	= numVertCells;
 	picData->cellWidth 		= horizCellSize;
 	picData->cellHeight 	= vertCellSize;
-	
+
 	numCells = numHorizCells * numVertCells;
-	
+
 	picData->materials 		= (MOMaterialObject **)AllocPtr(sizeof(MOMaterialObject *) * numCells);	// alloc array of material objects
 	if (picData->materials == nil)
 		DoFatalAlert("\pSetMetaObjectToPicture: AllocPtr failed!");
@@ -561,21 +561,21 @@ Rect		r;
 		/*************************************/
 
 		/* ALLOCATE SEGMENT BUFFER */
-		
+
 	buffer = AllocPtr(horizCellSize * vertCellSize * bytesPerPixel);
 	if (buffer == nil)
 		DoFatalAlert("\pSetMetaObjectToPicture: AllocPtr failed!");
 	bufferRowBytes = horizCellSize * bytesPerPixel;
 
-			
+
 	cellNum = 0;
-			
+
 	for (segRow = 0; segRow < numVertCells; segRow++)
 	{
 		for (segCol = 0; segCol < numHorizCells; segCol++)
 		{
 			Ptr		srcPtr,destPtr;
-			
+
 			srcPtr = pictMapAddr + (segRow * vertCellSize * pictRowBytes) + (segCol * horizCellSize * bytesPerPixel);
 			destPtr = buffer + (vertCellSize-1) * bufferRowBytes;				// start @ bottom of buffer to flip image for OpenGL
 
@@ -587,24 +587,24 @@ Rect		r;
 			if (depth == 32)
 			{
 				u_long	r,g,b,a;
-				int		x,y;	
+				int		x,y;
 				u_long	pixels, *dest = (u_long *)destPtr, *src = (u_long *)srcPtr;
 
 				for (y = 0; y < vertCellSize; y++)
 				{
 					for (x = 0; x < horizCellSize; x++)							// copy & convert a line of pixels
-					{				
+					{
 						pixels = SwizzleULong(&src[x]);										// get pixel
 
 //						if (pixels == 0)
 //							a = 0;
 //						else
 							a = 0xff;											// pictures are opqaue
-								
+
 						r = (pixels & 0x00ff0000) >> 16;
 						g = (pixels & 0x0000ff00) >> 8;
 						b = pixels & 0xff;
-						
+
 						pixels = (r << 24) | (g << 16) | (b << 8) | a;			// save pixel
 						dest[x] = SwizzleULong(&pixels);
 					}
@@ -616,7 +616,7 @@ Rect		r;
 			{
 				DoFatalAlert("\pSetMetaObjectToPicture: 16-bit not implemented yet");
 			}
-			
+
 					/***************************/
 					/* CREATE A TEXTURE OBJECT */
 					/***************************/
@@ -627,45 +627,45 @@ Rect		r;
 			matData.diffuseColor.g	= 1;
 			matData.diffuseColor.b	= 1;
 			matData.diffuseColor.a	= 1;
-			
+
 			matData.numMipmaps		= 1;
 			matData.width			= horizCellSize;
 			matData.height			= vertCellSize;
-			
+
 			switch(depth)
 			{
 				case	32:
 						matData.pixelSrcFormat	= GL_RGBA;
 						break;
-						
+
 			 	default:
 						matData.pixelSrcFormat	= GL_RGB;
 			}
-			
+
 			matData.pixelDstFormat 	= destPixelFormat;
 			matData.texturePixels[0]= nil;						// we're going to preload
 			matData.textureName[0] 	= OGL_TextureMap_Load(buffer, horizCellSize, vertCellSize,
 														 matData.pixelSrcFormat, destPixelFormat, GL_UNSIGNED_BYTE);
-			
+
 			picData->materials[cellNum] = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
-			cellNum++;	
-			
+			cellNum++;
+
 			if (cellNum > numCells)
 				DoFatalAlert("\pSetMetaObjectToPicture: cellNum overflow");
-				
+
 				/* KEEP MUSIC PLAYING */
-						
+
 			if (gSongPlayingFlag && (!gMuteMusicFlag))
-				MoviesTask(gSongMovie, 0);				
+				MoviesTask(gSongMovie, 0);
 		}
 	}
 
 
 			/* CLEANUP */
-			
-	DisposeGWorld (gworld);	
-	SafeDisposePtr(buffer);	
-	
+
+	DisposeGWorld (gworld);
+	SafeDisposePtr(buffer);
+
 }
 
 
@@ -673,7 +673,7 @@ Rect		r;
 //
 // INPUT:	mo = meta object which has already been allocated and added to linked list.
 //
-// This takes the given input data and copies it. 
+// This takes the given input data and copies it.
 //
 
 static void SetMetaObjectToSprite(MOSpriteObject *spriteObj, OGLSetupOutputType *setupInfo, MOSpriteSetupData *inData)
@@ -684,33 +684,33 @@ MOSpriteData	*spriteData = &spriteObj->objectData;
 		/* CREATE MATERIAL OBJECT FROM FSSPEC */
 
 	if (inData->loadFile)
-	{			
+	{
 		GLint	destPixelFormat = inData->pixelFormat;									// use passed in format
-		
+
 		spriteData->material = MO_GetTextureFromFile(&inData->spec, setupInfo, destPixelFormat);
 
 		spriteData->width = spriteData->material->objectData.width;						// get dimensions of the texture
 		spriteData->height = spriteData->material->objectData.width;
 		spriteData->aspectRatio = spriteData->height / spriteData->width;				// calc aspect ratio
 	}
-	
+
 			/* GET MATERIAL FROM SPRITE LIST */
 	else
 	{
 		short	group,type;
-	
+
 		group = inData->group;
 		type = inData->type;
-	
+
 		if (inData->type >= gNumSpritesInGroupList[group])								// make sure type is valid
 			DoFatalAlert("\pSetMetaObjectToSprite: illegal type");
-	
+
 		spriteData->material = gSpriteGroupList[group][type].materialObject;
 		MO_GetNewReference(spriteData->material);										// this is a new reference, so inc ref count
 
 		spriteData->width 		= gSpriteGroupList[group][type].width;					// get width and height of texture
 		spriteData->height 		= gSpriteGroupList[group][type].height;
-		spriteData->aspectRatio = gSpriteGroupList[group][type].aspectRatio;			// get aspect ratio		
+		spriteData->aspectRatio = gSpriteGroupList[group][type].aspectRatio;			// get aspect ratio
 	}
 
 
@@ -722,7 +722,7 @@ MOSpriteData	*spriteData = &spriteObj->objectData;
 
 
 	spriteData->coord.x		= -1.0;								// assume upper left corner
-	spriteData->coord.y		= 1.0;	
+	spriteData->coord.y		= 1.0;
 	spriteData->coord.z		= 0;								// assume in front
 	spriteData->scaleX		= 1.0;								// scale is normal
 	spriteData->scaleY		= 1.0;
@@ -742,13 +742,13 @@ Point			pt;
 int				x,y,w,h;
 
 	SetPort(gDisplayContextGrafPtr);
-	GetMouse(&pt);										// get mouse screen coords	
+	GetMouse(&pt);										// get mouse screen coords
 
 			/* CONVERT SCREEN COORD TO OPENGL COORD */
-			
+
 	OGL_GetCurrentViewport(info, &x, &y, &w, &h);
-	
-	
+
+
 	picData->drawCoord.x = -1.0f + (float)pt.h / (float)w * 2.0f;
 	picData->drawCoord.y = 1.0f - (float)pt.v / (float)h * 2.0f;
 
@@ -801,13 +801,13 @@ int	i,j;
 		DoFatalAlert("\pMO_AttachToGroupStart: too many objects in group!");
 
 	MO_GetNewReference(newObject);					// get new reference to object
-	
-	
+
+
 			/* SHIFT ALL EXISTING OBJECTS UP */
-			
+
 	for (j = i; j > 0; j--)
 		group->objectData.groupContents[j] = group->objectData.groupContents[j-1];
-	
+
 	group->objectData.groupContents[0] = newObject;	// save object ref into group
 }
 
@@ -840,26 +840,26 @@ MOVertexArrayObject	*vObj;
 				{
 					case	MO_GEOMETRY_SUBTYPE_VERTEXARRAY:
 							vObj = object;
-							MO_DrawGeometry_VertexArray(&vObj->objectData, setupInfo);				
+							MO_DrawGeometry_VertexArray(&vObj->objectData, setupInfo);
 							break;
-							
-					default:	
+
+					default:
 						DoFatalAlert("\pMO_DrawObject: unknown sub-type!");
 				}
 				break;
-	
+
 		case	MO_TYPE_MATERIAL:
-				MO_DrawMaterial(object, setupInfo);				
+				MO_DrawMaterial(object, setupInfo);
 				break;
 
 		case	MO_TYPE_GROUP:
-				MO_DrawGroup(object, setupInfo);				
+				MO_DrawGroup(object, setupInfo);
 				break;
-				
+
 		case	MO_TYPE_MATRIX:
 				MO_DrawMatrix(object, setupInfo);
 				break;
-				
+
 		case	MO_TYPE_PICTURE:
 				MO_DrawPicture(object, setupInfo);
 				break;
@@ -867,9 +867,9 @@ MOVertexArrayObject	*vObj;
 		case	MO_TYPE_SPRITE:
 				MO_DrawSprite(object, setupInfo);
 				break;
-				
+
 		default:
-			DoFatalAlert("\pMO_DrawObject: unknown type!");		
+			DoFatalAlert("\pMO_DrawObject: unknown type!");
 	}
 }
 
@@ -881,9 +881,9 @@ void MO_DrawGroup(const MOGroupObject *object, const OGLSetupOutputType *setupIn
 int	numChildren,i;
 
 				/* VERIFY OBJECT TYPE */
-				
+
 	if (object->objectHeader.type != MO_TYPE_GROUP)
-		DoFatalAlert("\pMO_DrawGroup: this isnt a group!");		
+		DoFatalAlert("\pMO_DrawGroup: this isnt a group!");
 
 
 			/*************************************/
@@ -899,7 +899,7 @@ int	numChildren,i;
 				/***************/
 
 	numChildren = object->objectData.numObjectsInGroup;			// get # objects in group
-	
+
 	for (i = 0; i < numChildren; i++)
 	{
 		MO_DrawObject(object->objectData.groupContents[i], setupInfo);
@@ -909,7 +909,7 @@ int	numChildren,i;
 			/******************************/
 			/* POP OLD STATE OFF OF STACK */
 			/******************************/
-			
+
 	OGL_PopState();
 }
 
@@ -923,11 +923,11 @@ AGLContext agl_ctx = setupInfo->drawContext;
 u_long 	materialFlags;
 short	i;
 
-	
+
 			/**********************/
 			/* SETUP VERTEX ARRAY */
 			/**********************/
-			
+
 	glEnableClientState(GL_VERTEX_ARRAY);				// enable vertex arrays
 	glVertexPointer(3, GL_FLOAT, 0, data->points);		// point to point array
 
@@ -937,35 +937,35 @@ short	i;
 			/************************/
 			/* SETUP VERTEX NORMALS */
 			/************************/
-			
+
 	if (data->normals)									// do we have normals
 	{
 		glNormalPointer(GL_FLOAT, 0, data->normals);
 		glEnableClientState(GL_NORMAL_ARRAY);			// enable normal arrays
-		
+
 #if 0
 			/* SHOW VERTEX NORMALS */
 		{
 			int	i;
-			
+
 			OGL_PushState();
 			glDisable(GL_TEXTURE_2D);
 			SetColor4f(1,1,0,1);
 			for (i = 0; i < data->numPoints; i++)
 			{
 				glBegin(GL_LINES);
-		
+
 				glVertex3fv((GLfloat *)&data->points[i]);
 				glVertex3f(data->points[i].x + data->normals[i].x * 20.0f,
 							data->points[i].y + data->normals[i].y * 20.0f,
 							data->points[i].z + data->normals[i].z * 20.0f);
-		
+
 				glEnd();
 			}
 			OGL_PopState();
 		}
-#endif		
-		
+#endif
+
 	}
 	else
 		glDisableClientState(GL_NORMAL_ARRAY);			// disable normal arrays
@@ -979,7 +979,7 @@ short	i;
 			/***********************/
 
 			/* IF LIGHTING, THEN USE COLOR FLOATS */
-			
+
 	if (gMyState_Lighting)
 	{
 		if (data->colorsFloat)									// do we have float colors?
@@ -996,11 +996,11 @@ short	i;
 		else
 			glDisableClientState(GL_COLOR_ARRAY);				// no color data at all, so disable
 	}
-	
+
 			/* IF NOT LIGHTING, THEN USE COLOR BYTES */
-			
+
 	else
-	{		
+	{
 		if (data->colorsByte)									// do we have byte colors?
 		{
 			glColorPointer(4, GL_UNSIGNED_BYTE, 0, data->colorsByte);
@@ -1036,7 +1036,7 @@ short	i;
 		goto use_current;
 	}
 
-	if (data->numMaterials > 0)									// are there any materials?	
+	if (data->numMaterials > 0)									// are there any materials?
 	{
 				/*************************************************/
 				/* SEE IF DO PLAIN MULTI-TEXTURING FROM GEOMETRY */
@@ -1050,34 +1050,34 @@ short	i;
 			{
 				glActiveTextureARB(GL_TEXTURE0_ARB+i);								// activate texture layer #i
 				glClientActiveTextureARB(GL_TEXTURE0_ARB+i);
-				glEnable(GL_TEXTURE_2D);				
+				glEnable(GL_TEXTURE_2D);
 
 				glTexCoordPointer(2, GL_FLOAT, 0,data->uvs[i]);						// enable uv arrays
-				glEnableClientState(GL_TEXTURE_COORD_ARRAY);					
+				glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 				MO_DrawMaterial(data->materials[i], setupInfo);						// submit material #n
-				
+
 				glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 				if (i == 0)
 				{
 					gMostRecentMaterial = nil;							// need duplicate submits to be okay
 				}
-			}		
-			
+			}
+
 			goto go_here;
 		}
-		
-		
+
+
 				/* MAYBE ONLY 1 MATERIAL IN GEOMETRY */
-		
+
 		MO_DrawMaterial(data->materials[0], setupInfo);			// submit material #0 (also applies for multitexture layer 0)
 
 
 			/* IF TEXTURED, THEN ALSO ACTIVATE UV ARRAY */
 
-use_current:		
-			
+use_current:
+
 		materialFlags = gMostRecentMaterial->objectData.flags;	// get material flags
 		if (materialFlags & BG3D_MATERIALFLAG_TEXTURED)
 		{
@@ -1086,13 +1086,13 @@ use_current:
 						/***************************/
 						/* SEE IF DO MULTI-TEXTURE */
 						/***************************/
-						
-				if (materialFlags & BG3D_MATERIALFLAG_MULTITEXTURE)	
+
+				if (materialFlags & BG3D_MATERIALFLAG_MULTITEXTURE)
 				{
 					u_short	multiTextureMode 	= gMostRecentMaterial->objectData.multiTextureMode;
 					u_short	multiTextureCombine = gMostRecentMaterial->objectData.multiTextureCombine;
 					u_short	envMapNum 		= gMostRecentMaterial->objectData.envMapNum;
-					
+
 					if (envMapNum >= gNumSpritesInGroupList[SPRITE_GROUP_SPHEREMAPS])
 						DoFatalAlert("\pMO_DrawGeometry_VertexArray: illegal envMapNum");
 
@@ -1102,92 +1102,92 @@ use_current:
 					switch(multiTextureMode)
 					{
 								/* REFLECTION SPHERE */
-								
+
 						case	MULTI_TEXTURE_MODE_REFLECTIONSPHERE:
 								for (i = 0 ;i < 2; i++)
 								{
 									glActiveTextureARB(GL_TEXTURE0_ARB+i);								// activate texture layer #i
 									glClientActiveTextureARB(GL_TEXTURE0_ARB+i);
-									glEnable(GL_TEXTURE_2D);				
-							
+									glEnable(GL_TEXTURE_2D);
+
 									if (i == 0)
 									{
 										glTexCoordPointer(2, GL_FLOAT, 0,data->uvs[0]);					// enable uv arrays
 										glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-										glEnableClientState(GL_TEXTURE_COORD_ARRAY);					
+										glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 									}
 									else
-									{										
+									{
 										MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_SPHEREMAPS][envMapNum].materialObject, setupInfo);		// activate reflection map texture
 
 #if USE_GL_COLOR_MATERIAL
 										glEnable(GL_COLOR_MATERIAL);
-#endif										
-										
+#endif
+
 										switch(multiTextureCombine)																	// set combining info
 										{
 											case	MULTI_TEXTURE_COMBINE_MODULATE:
 													glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 													break;
-													
-//											case	MULTI_TEXTURE_COMBINE_BLEND:							
+
+//											case	MULTI_TEXTURE_COMBINE_BLEND:
 //													glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
 //													break;
-													
+
 											case	MULTI_TEXTURE_COMBINE_ADD:
 													glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
 													glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_ADD);
 													break;
 										}
-										
+
 										glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);										// activate reflection mapping
-										glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);		
+										glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
 										glEnable(GL_TEXTURE_GEN_S);
 										glEnable(GL_TEXTURE_GEN_T);
 
 									}
-								}		
+								}
 								break;
-								
-#if 0								
+
+#if 0
 								/* OBJECT PLANE PROJECTION */
-								
+
 						case	MULTI_TEXTURE_MODE_OBJECT_PLANE:
 								for (i = 0 ;i < 2; i++)
 								{
 									glActiveTextureARB(GL_TEXTURE0_ARB+i);								// activate texture layer #i
 									glClientActiveTextureARB(GL_TEXTURE0_ARB+i);
-									glEnable(GL_TEXTURE_2D);				
-							
+									glEnable(GL_TEXTURE_2D);
+
 									if (i == 0)
 									{
 										glTexCoordPointer(2, GL_FLOAT, 0,data->uvs[0]);					// enable uv arrays
 										glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-										glEnableClientState(GL_TEXTURE_COORD_ARRAY);					
+										glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 									}
 									else
 									{
 										static const GLfloat s_plane[4] = { .05, 0.03, 0, 0};
 										static const GLfloat t_plane[4] = { 0, 0.03, .05, 0};
-									
+
 										MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_SPHEREMAPS][envMapNum].materialObject, setupInfo);		// activate projection map texture
-																			
+
 										switch(multiTextureCombine)																	// set combining info
 										{
 											case	MULTI_TEXTURE_COMBINE_MODULATE:
 													glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 													break;
-													
-											case	MULTI_TEXTURE_COMBINE_BLEND:							
+
+											case	MULTI_TEXTURE_COMBINE_BLEND:
 													glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
 													break;
-													
+
 											case	MULTI_TEXTURE_COMBINE_ADD:
 													glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_EXT);
 													glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_EXT, GL_ADD);
 													break;
 										}
-										
+
 									    glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
 									    glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
 									    glTexGenfv(GL_S, GL_OBJECT_PLANE, s_plane);
@@ -1196,31 +1196,31 @@ use_current:
 										glEnable(GL_TEXTURE_GEN_T);
 
 									}
-								}		
-								break;								
-#endif								
-					}	
+								}
+								break;
+#endif
+					}
 				}
 							/* JUST 1 TEXTURE LAYER */
 				else
-				{			
+				{
 					glTexCoordPointer(2, GL_FLOAT, 0,data->uvs[0]);
 					glEnableClientState(GL_TEXTURE_COORD_ARRAY);	// enable uv arrays
 				}
-				
+
 				useTexture = true;
 
 				if (OGL_CheckError())
 					DoFatalAlert("\pMO_DrawGeometry_VertexArray: uv!");
-			}			
+			}
 		}
-	}	
+	}
 	else
 		glDisable(GL_TEXTURE_2D);						// no materials, thus no texture, thus turn this off
-		
+
 
 		/* WE DONT HAVE ENOUGH INFO TO DO TEXTURES, SO DISABLE */
-								
+
 	if (!useTexture)
 	{
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -1235,7 +1235,7 @@ go_here:
 			/***********/
 			/* DRAW IT */
 			/***********/
-		
+
 //	glLockArraysEXT(0, data->numPoints);
 	glDrawElements(GL_TRIANGLES,data->numTriangles*3,GL_UNSIGNED_INT,&data->triangles[0]);
 
@@ -1244,10 +1244,10 @@ go_here:
 //	glUnlockArraysEXT();
 
 	gPolysThisFrame += data->numPoints;					// inc poly counter
-	
-	
+
+
 			/* CLEANUP */
-			
+
 	if (multiTexture)
 	{
 		glActiveTextureARB(GL_TEXTURE1_ARB);			// turn off textureing for multi-texture layer 2 since it isnt needed anymore
@@ -1281,42 +1281,42 @@ AGLContext agl_ctx = setupInfo->drawContext;
 u_long				matFlags;
 
 			/* SEE IF THIS MATERIAL IS ALREADY SET AS CURRENT */
-			
+
 	alreadySet = (matObj == gMostRecentMaterial);
-	
-		
+
+
 	matData = &matObj->objectData;									// point to material data
 
-	if (matObj->objectHeader.cookie != MO_COOKIE)					// verify cookie			
+	if (matObj->objectHeader.cookie != MO_COOKIE)					// verify cookie
 		DoFatalAlert("\pMO_DrawMaterial: bad cookie!");
 
 
 				/****************************/
 				/* SEE IF TEXTURED MATERIAL */
 				/****************************/
-				
+
 	matFlags = matData->flags | gGlobalMaterialFlags;				// check flags of material & global
-				
+
 	if (matFlags & BG3D_MATERIALFLAG_TEXTURED)
 	{
 		if (matData->setupInfo != setupInfo)						// make sure texture is loaded for this draw context
 			DoFatalAlert("\pMO_DrawMaterial: texture is not assigned to this draw context");
-	
-		
+
+
 		if (matData->pixelDstFormat == GL_RGBA)						// if 32bit with alpha, then turn blending on (see below)
 			textureHasAlpha = true;
 
-					/* SET APPROPRIATE ALPHA MODE */			
-	
+					/* SET APPROPRIATE ALPHA MODE */
+
 		if (alreadySet)												// see if even need to bother resetting this
 		{
 			glEnable(GL_TEXTURE_2D);								// just make sure textures are on
 		}
 		else
 		{
-		
+
 			OGL_Texture_SetOpenGLTexture(matData->textureName[0]);	// set this texture active
-			
+
 			if (gDebugMode)
 			{
 				int	size;
@@ -1327,16 +1327,16 @@ u_long				matFlags;
 					case	GL_RGB:
 							gVRAMUsedThisFrame += size * 4;
 							break;
-							
+
 					case	GL_RGB5_A1:
 							gVRAMUsedThisFrame += size * 2;
-							break;				
-				}			
+							break;
+				}
 			}
 		}
-		
+
 				/* SET TEXTURE WRAPPING MODE */
-				
+
 		if (matFlags & BG3D_MATERIALFLAG_CLAMP_U)
 		    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		else
@@ -1346,34 +1346,34 @@ u_long				matFlags;
 		    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		else
 		    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		
-		
+
+
 	}
 	else
 		glDisable(GL_TEXTURE_2D);									// not textured, so disable textures
-	
 
-	
+
+
 
 			/********************/
 			/* COLORED MATERIAL */
 			/********************/
 
 	diffuseColor = &matData->diffuseColor;			// point to diffuse color
-		
+
 	if (gGlobalTransparency != 1.0f)				// see if need to factor in global transparency
 	{
 		diffColor2.r = diffuseColor->r;
 		diffColor2.g = diffuseColor->g;
 		diffColor2.b = diffuseColor->b;
-		diffColor2.a = diffuseColor->a * gGlobalTransparency;		
+		diffColor2.a = diffuseColor->a * gGlobalTransparency;
 	}
 	else
 		diffColor2 = *diffuseColor;					// copy to local so we can apply filter to it without munging original
 
 
 			/* APPLY COLOR FILTER */
-			
+
 	diffColor2.r *= gGlobalColorFilter.r;
 	diffColor2.g *= gGlobalColorFilter.g;
 	diffColor2.b *= gGlobalColorFilter.b;
@@ -1381,13 +1381,13 @@ u_long				matFlags;
 
 	SetColor4fv(&diffColor2);						// set current diffuse color
 #if USE_GL_COLOR_MATERIAL
-//	glEnable(GL_COLOR_MATERIAL);	//-------- continuously reenable this since OGL seems to have a bug where it will magically get disabled. 
-#endif										
+//	glEnable(GL_COLOR_MATERIAL);	//-------- continuously reenable this since OGL seems to have a bug where it will magically get disabled.
+#endif
 
 
 		/* SEE IF NEED TO ENABLE BLENDING */
 
-		
+
 	if (textureHasAlpha || (diffColor2.a != 1.0f) || (matFlags & BG3D_MATERIALFLAG_ALWAYSBLEND))		// if has alpha, then we need blending on
 	    glEnable(GL_BLEND);
 	else
@@ -1395,7 +1395,7 @@ u_long				matFlags;
 
 
 			/* SAVE THIS STUFF */
-			
+
 	gMostRecentMaterial = matObj;
 }
 
@@ -1410,7 +1410,7 @@ AGLContext agl_ctx = setupInfo->drawContext;
 	m = &matObj->matrix;							// point to matrix
 
 				/* MULTIPLY CURRENT MATRIX BY THIS */
-	
+
 	glMultMatrixf((GLfloat *)m);
 
 	if (OGL_CheckError())
@@ -1430,19 +1430,19 @@ float			screenScaleX,screenScaleY;
 AGLContext agl_ctx = setupInfo->drawContext;
 
 			/* INIT MATRICES */
-			
+
 	OGL_PushState();
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();		
+	glLoadIdentity();
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();		
+	glLoadIdentity();
 
 			/* SET STATE */
-			
+
 	if (setupInfo->useFog)
 		glDisable(GL_FOG);
 	OGL_DisableLighting();
-	glDisable(GL_CULL_FACE);							
+	glDisable(GL_CULL_FACE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);	// no filtering!
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -1451,7 +1451,7 @@ AGLContext agl_ctx = setupInfo->drawContext;
 
 	w = picData->cellWidth;
 	h = picData->cellHeight;
-	OGL_GetCurrentViewport(setupInfo, &px, &py, &pw, &ph);	
+	OGL_GetCurrentViewport(setupInfo, &px, &py, &pw, &ph);
 
 	screenScaleX = pw/(float)PICTURE_FULL_SCREEN_SIZE_X;
 	screenScaleY = ph/(float)PICTURE_FULL_SCREEN_SIZE_Y;
@@ -1467,35 +1467,35 @@ AGLContext agl_ctx = setupInfo->drawContext;
 	for (row = 0; row < picData->numCellsHigh; row++)
 	{
 		x = picData->drawCoord.x;
-		
+
 		for (col = 0; col < picData->numCellsWide; col++)
 		{
 					/* ACTIVATE THE MATERIAL */
-					
+
 			MO_DrawMaterial(picData->materials[i], setupInfo);			// submit material #0
 
-			glBegin(GL_QUADS);				
+			glBegin(GL_QUADS);
 			glTexCoord2f(0,1);	glVertex3f(x, y + yadj,z);
 			glTexCoord2f(1,1);	glVertex3f(x + xadj, y + yadj,z);
 			glTexCoord2f(1,0);	glVertex3f(x + xadj, y,z);
 			glTexCoord2f(0,0);	glVertex3f(x, y, z);
-			glEnd();	
-						
+			glEnd();
+
 			i++;														// next material index
 			x += xadj;
-			
+
 			gPolysThisFrame += 2;										// 2 more triangles
 		}
 		y -= yadj;
-		
+
 	}
-	
+
 			/* RESTORE STATE */
-			
+
 	OGL_PopState();
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
 /************************ MO: DRAW SPRITE **************************/
@@ -1510,40 +1510,40 @@ void MO_DrawSprite(const MOSpriteObject *spriteObj, const OGLSetupOutputType *se
 const MOSpriteData	*spriteData = &spriteObj->objectData;
 float			scaleX,scaleY,x,y,z;
 AGLContext agl_ctx = setupInfo->drawContext;
-				
+
 	x = spriteData->coord.x;
 	y = spriteData->coord.y;
 	z = spriteData->coord.z;
-	
+
 	scaleX = spriteData->scaleX;
 	scaleY = spriteData->scaleY;
-	
+
 	if (spriteData->rot != 0.0f)
 		glRotatef(OGLMath_RadiansToDegrees(spriteData->rot), 0, 0, 1);			// remember:  rotation is in degrees, not radians!
 
 
 		/* ACTIVATE THE MATERIAL */
-					
-	MO_DrawMaterial(spriteData->material, setupInfo);			
+
+	MO_DrawMaterial(spriteData->material, setupInfo);
 
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);		// set clamp mode after each texture set since OGL just likes it that way
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);	
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 
 			/* DRAW IT */
-			
+
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,1);	glVertex2f(x, y);
 	glTexCoord2f(1,1);	glVertex2f(x+scaleX, y);
 	glTexCoord2f(1,0);	glVertex2f(x+scaleX, y+scaleY);
 	glTexCoord2f(0,0);	glVertex2f(x, y+scaleY);
-	glEnd();	
-			
+	glEnd();
+
 
 		/* CLEAN UP */
-			
+
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);		// set this back to normal
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	gPolysThisFrame += 2;						// 2 more tris
 }
@@ -1568,7 +1568,7 @@ MOVertexArrayObject	*vObj;
 	if (obj == nil)
 		DoFatalAlert("\pMO_DisposeObjectReference: obj == nil");
 
-	if (header->cookie != MO_COOKIE)					// verify cookie			
+	if (header->cookie != MO_COOKIE)					// verify cookie
 		DoFatalAlert("\pMO_DisposeObjectReference: bad cookie!");
 
 
@@ -1585,7 +1585,7 @@ MOVertexArrayObject	*vObj;
 		case	MO_TYPE_GROUP:
 				MO_DisposeObject_Group(obj);
 				break;
-				
+
 		case	MO_TYPE_GEOMETRY:
 				switch(header->subType)
 				{
@@ -1593,31 +1593,31 @@ MOVertexArrayObject	*vObj;
 							vObj = obj;
 							MO_DisposeObject_Geometry_VertexArray(&vObj->objectData);
 							break;
-							
+
 					default:
 							DoFatalAlert("\pMO_DisposeObjectReference: unknown sub-type");
 				}
-				break;	
+				break;
 
 		case	MO_TYPE_PICTURE:
 				MO_DisposeObject_Picture(obj);
 				break;
-				
+
 		case	MO_TYPE_SPRITE:
 				MO_DisposeObject_Sprite(obj);
 				break;
-				
+
 	}
 
 			/**************************************/
 			/* DEC REFERENCE COUNT OF THIS OBJECT */
 			/**************************************/
-	
+
 	header->refCount--;									// dec ref count
-	
+
 	if (header->refCount < 0)							// see if over did it
 		DoFatalAlert("\pMO_DisposeObjectReference: refcount < 0!");
-		
+
 	if (header->refCount == 0)							// see if we can DELETE this node
 	{
 			/* DELETE OBJECT'S SPECIFIC INFO */
@@ -1631,29 +1631,29 @@ MOVertexArrayObject	*vObj;
 								vObj = obj;
 								MO_DeleteObjectInfo_Geometry_VertexArray(&vObj->objectData);
 								break;
-								
+
 						default:
 								DoFatalAlert("\pMO_DisposeObject: unknown sub-type");
 					}
 					break;
-					
+
 			case	MO_TYPE_MATERIAL:
 					MO_DeleteObjectInfo_Material(obj);
-					break;		
-					
+					break;
+
 			case	MO_TYPE_PICTURE:
 					MO_DeleteObjectInfo_Picture(obj);
-					break;							
+					break;
 		}
-	
+
 			/* DELETE THE OBJECT NODE */
-			
+
 		MO_DetachFromLinkedList(obj);					// detach from linked list
 
 		header->cookie = 0xdeadbeef;					// devalidate cookie
 		SafeDisposePtr(obj);								// free memory used by object
 		return;
-	}		
+	}
 }
 
 
@@ -1674,44 +1674,44 @@ MetaObjectHeader	*prev,*next;
 
 	prev = header->prevNode;
 	next = header->nextNode;
-	
+
 			/* SEE IF WAS 1ST NODE IN LIST */
-			
+
 	if (prev == nil)
 	{
 		gFirstMetaObject = next;
 		if (gFirstMetaObject)
 			gFirstMetaObject->prevNode = nil;
 	}
-	
+
 			/* SEE IF WAS LAST NODE IN LIST */
-			
+
 	if (next == nil)
 	{
-		gLastMetaObject = prev;	
+		gLastMetaObject = prev;
 		if (gLastMetaObject)
 			gLastMetaObject->nextNode = nil;
 	}
-	
+
 			/* SOMEWHERE IN THE MIDDLE */
-	
-	else		
+
+	else
 	if (prev != nil)
 	{
 		prev->nextNode = next;
 		next->prevNode = prev;
 	}
-	
-	gNumMetaObjects--;	
-	
+
+	gNumMetaObjects--;
+
 	if (gNumMetaObjects < 0)
 		DoFatalAlert("\pMO_DetachFromLinkedList: counter mismatch");
-		
+
 	if (gNumMetaObjects == 0)
 	{
 		if (prev || next)							// if all gone, then prev & next should be nil
 			DoFatalAlert("\pMO_DetachFromLinkedList: prev/next should be nil!");
-	
+
 		if (gFirstMetaObject != nil)
 			DoFatalAlert("\pMO_DetachFromLinkedList: gFirstMetaObject should be nil!");
 
@@ -1792,7 +1792,7 @@ int					i,n;
 void MO_DeleteObjectInfo_Geometry_VertexArray(MOVertexArrayData *data)
 {
 		/* DISPOSE OF VARIOUS ARRAYS */
-		
+
 	if (data->points)
 	{
 		SafeDisposePtr((Ptr)data->points);
@@ -1809,14 +1809,14 @@ void MO_DeleteObjectInfo_Geometry_VertexArray(MOVertexArrayData *data)
 	{
 		SafeDisposePtr((Ptr)data->uvs[0]);
 		data->uvs[0] = nil;
-		
+
 		if (data->numMaterials == 2)					// see if also nuke secondary uv list
 		{
 			if (data->uvs[1])
 			{
 				SafeDisposePtr((Ptr)data->uvs[1]);
 				data->uvs[1] = nil;
-			}		
+			}
 		}
 	}
 
@@ -1849,7 +1849,7 @@ MOMaterialData		*data = &obj->objectData;
 AGLContext agl_ctx = gAGLContext;
 
 		/* DISPOSE OF TEXTURE NAMES */
-				
+
 	if (data->numMipmaps > 0)
 		glDeleteTextures(data->numMipmaps, &data->textureName[0]);
 }
@@ -1863,8 +1863,8 @@ MOPictureData		*data = &obj->objectData;
 
 		/* DISPOSE OF TEXTURE NAMES ARRAY */
 
-	SafeDisposePtr((Ptr)data->materials);	
-	data->materials = nil;		
+	SafeDisposePtr((Ptr)data->materials);
+	data->materials = nil;
 }
 
 
@@ -1878,24 +1878,24 @@ int	i,n,s;
 			/***********************************/
 			/* GET NEW REFERENCES TO MATERIALS */
 			/***********************************/
-		
+
 	outData->numMaterials = n = inData->numMaterials;
 
 	for (i = 0; i < n; i++)
 	{
 		MO_GetNewReference(inData->materials[i]);
-		outData->materials[i] = inData->materials[i];	
+		outData->materials[i] = inData->materials[i];
 	}
-	
+
 			/************************/
 			/* DUPLICATE THE ARRAYS */
 			/************************/
-			
+
 			/* POINTS */
-			
+
 	n = outData->numPoints = inData->numPoints;
 	s = inData->numPoints * sizeof(OGLPoint3D);
-	
+
 	if (inData->points)
 	{
 		outData->points = AllocPtr(s);
@@ -1908,9 +1908,9 @@ int	i,n,s;
 
 
 			/* NORMALS */
-			
+
 	s = n * sizeof(OGLVector3D);
-	
+
 	if (inData->normals)
 	{
 		outData->normals = AllocPtr(s);
@@ -1923,9 +1923,9 @@ int	i,n,s;
 
 
 			/* UVS */
-			
+
 	s = n * sizeof(OGLTextureCoord);
-	
+
 	if (inData->uvs[0])
 	{
 		outData->uvs[0] = AllocPtr(s);
@@ -1938,9 +1938,9 @@ int	i,n,s;
 
 
 			/* COLORS BYTE */
-			
+
 	s = n * sizeof(OGLColorRGBA_Byte);
-	
+
 	if (inData->colorsByte)
 	{
 		outData->colorsByte = AllocPtr(s);
@@ -1953,9 +1953,9 @@ int	i,n,s;
 
 
 			/* COLORS FLOAT */
-			
+
 	s = n * sizeof(OGLColorRGBA);
-	
+
 	if (inData->colorsFloat)
 	{
 		outData->colorsFloat = AllocPtr(s);
@@ -1968,10 +1968,10 @@ int	i,n,s;
 
 
 			/* TRIANGLES */
-			
+
 	n = outData->numTriangles = inData->numTriangles;
 	s = n * sizeof(GLint) * 3;
-	
+
 	if (inData->triangles)
 	{
 		outData->triangles = AllocPtr(s);
@@ -1991,19 +1991,19 @@ int	i,n,s;
 void MO_CalcBoundingBox(MetaObjectPtr object, OGLBoundingBox *bBox)
 {
 		/* INIT BBOX TO BOGUS VALUES */
-		
-	bBox->min.x = 
+
+	bBox->min.x =
 	bBox->min.y =
 	bBox->min.z = 100000000;
-	
-	bBox->max.x = 
-	bBox->max.y = 
+
+	bBox->max.x =
+	bBox->max.y =
 	bBox->max.z = -bBox->min.x;
 
 	bBox->isEmpty = false;
 
 			/* RECURSIVELY CALC BBOX */
-			
+
 	MO_CalcBoundingBox_Recurse(object, bBox);
 }
 
@@ -2028,25 +2028,25 @@ float				x,y,z;
 	switch(objHead->type)
 	{
 			/* CALC BBOX OF GEOMETRY */
-			
+
 		case	MO_TYPE_GEOMETRY:
 				switch(objHead->subType)
 				{
 					case	MO_GEOMETRY_SUBTYPE_VERTEXARRAY:
 							vObj = object;
 							geoData = &vObj->objectData;
-							
+
 							for (i = 0; i < geoData->numPoints; i++)
 							{
 								x = geoData->points[i].x;
 								y = geoData->points[i].y;
 								z = geoData->points[i].z;
-								
+
 								if (x < bBox->min.x)
 									bBox->min.x = x;
 								if (x > bBox->max.x)
 									bBox->max.x = x;
-							
+
 								if (y < bBox->min.y)
 									bBox->min.y = y;
 								if (y > bBox->max.y)
@@ -2055,26 +2055,26 @@ float				x,y,z;
 								if (z < bBox->min.z)
 									bBox->min.z = z;
 								if (z > bBox->max.z)
-									bBox->max.z = z;							
-							}							
+									bBox->max.z = z;
+							}
 							break;
-							
-					default:	
+
+					default:
 						DoFatalAlert("\pMO_CalcBoundingBox_Recurse: unknown sub-type!");
 				}
 				break;
-	
-	
+
+
 			/* RECURSE THRU GROUP */
-			
+
 		case	MO_TYPE_GROUP:
 				groupObject = object;
-				numChildren = groupObject->objectData.numObjectsInGroup;				
+				numChildren = groupObject->objectData.numObjectsInGroup;
 				for (i = 0; i < numChildren; i++)
 					MO_CalcBoundingBox_Recurse(groupObject->objectData.groupContents[i], bBox);
 				break;
 
-				
+
 		case	MO_TYPE_MATRIX:
 				DoFatalAlert("\pMO_CalcBoundingBox_Recurse: why is there a matrix here?");
 				break;
@@ -2108,16 +2108,16 @@ Rect			r;
 
 	switch(destPixelFormat)
 	{
-		case	GL_RGB:	
+		case	GL_RGB:
 				destHasAlpha 	= false;
 				destDepth 		= 32;
 				break;
 
-		case	GL_RGBA:	
+		case	GL_RGBA:
 				destHasAlpha 	= true;
 				destDepth 		= 32;
 				break;
-	
+
 		case	GL_RGB5_A1:
 				destHasAlpha 	= true;
 				destDepth 		= 16;
@@ -2126,21 +2126,21 @@ Rect			r;
 
 
 		/* LOAD PICTURE INTO GWORLD */
-	
+
 	if (DrawPictureIntoGWorld(spec , &pGWorld, 32))			//--- for now, must be 32bit for OpenGL internal b/c 16bit not supported
 		DoFatalAlert("\pMO_GetTextureFromFile: DrawPictureIntoGWorld failed!");
-	
+
 
 			/* GET GWORLD INFO */
-			
+
 	GetPortBounds(pGWorld, &r);
-			
+
 	width = r.right - r.left;		// get width/height
 	height = r.bottom - r.top;
-	
+
 	if ((!IsPowerOf2(width)) || (!IsPowerOf2(height)))				// make sure its a power of 2
 		DoFatalAlert("\pMO_GetTextureFromFile: dimensions not power of 2");
-	
+
 	hPixMap = GetGWorldPixMap(pGWorld);								// get gworld's pixmap
 	depth = (*hPixMap)->pixelSize;									// get gworld pixel bitdepth
 
@@ -2150,7 +2150,7 @@ Rect			r;
 		/*************************************/
 
 		/* COPY PIXELS FROM GWORLD INTO BUFFER */
-		
+
 	buffer = AllocPtr(width * height * 4);							// alloc enough for a 32bit texture
 	if (buffer == nil)
 		DoFatalAlert("\pMO_GetTextureFromResource: AllocPtr failed!");
@@ -2164,17 +2164,17 @@ Rect			r;
 
 	if (depth == 32)
 	{
-		u_long	r,g,b,a;	
+		u_long	r,g,b,a;
 		u_long	pixels, *dest, *src;
 
 		src = (u_long *)pictMapAddr;
 		dest = (u_long *)buffer;
-		
+
 		for (y = 0; y < height; y++)
-		{		
+		{
 			for (x = 0; x < width; x++)
 			{
-				pixels = src[x];	
+				pixels = src[x];
 				if (destHasAlpha && (destDepth == 32))		// see if use file's alpha channel for 32bit destinations
 					a = (pixels & 0xff000000) >> 24;
 				else										// otherwise just do 0 or ff
@@ -2187,16 +2187,16 @@ Rect			r;
 				r = (pixels & 0x00ff0000) >> 16;
 				g = (pixels & 0x0000ff00) >> 8;
 				b = pixels & 0xff;
-				
+
 				dest[x] = (r << 24) | (g << 16) | (b << 8) | a;
 			}
 			dest += width;
 			src -= pictRowBytes/4;
 		}
 	}
-	
+
 		/* COPY 16-BIT */
-		
+
 	else
 	{
 		DoFatalAlert("\pMO_GetTextureFromFile: 16 bit textures not supported yet.");
@@ -2214,29 +2214,29 @@ Rect			r;
 	matData.diffuseColor.g	= 1;
 	matData.diffuseColor.b	= 1;
 	matData.diffuseColor.a	= 1;
-	
+
 	matData.numMipmaps		= 1;
 	matData.width			= width;
 	matData.height			= height;
-	
+
 	if (depth == 32)
 		matData.pixelSrcFormat	= GL_RGBA;
 	else
 	{
 		DoFatalAlert("\pMO_GetTextureFromFile: 16 bit textures not supported yet.");
-		//-------- TODO	
+		//-------- TODO
 	}
-	
+
 	matData.pixelDstFormat	= destPixelFormat;
 	matData.texturePixels[0]= nil;						// we're going to preload
 	matData.textureName[0] 	= OGL_TextureMap_Load(buffer, width, height,
 												 matData.pixelSrcFormat,
 												 destPixelFormat, GL_UNSIGNED_BYTE);
-	
+
 	obj = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
-	
+
 	SafeDisposePtr(buffer);									// dispose of our copy of the buffer
-	
+
 	return(obj);
 }
 
@@ -2251,35 +2251,35 @@ MOVertexArrayObject	*mo;
 				/****************/
 				/* GROUP OBJECT */
 				/****************/
-				
+
 	if (mo->objectHeader.type == MO_TYPE_GROUP)										// see if need to go into group
 	{
 		MOGroupObject	*groupObj = (MOGroupObject *)mo;
-		
+
 		if (geometryNum >= groupObj->objectData.numObjectsInGroup)					// make sure # is valid
 			DoFatalAlert("\pMO_Geometry_OffserUVs: geometryNum out of range");
-		
+
 				/* POINT TO 1ST GEOMETRY IN THE GROUP */
-						
+
 		if (geometryNum == -1)														// if -1 then assign to all textures for this model
 		{
 			int	i;
 			for (i = 0; i < groupObj->objectData.numObjectsInGroup; i++)
 			{
 				MO_VertexArray_OffsetUVs(groupObj->objectData.groupContents[i], du, dv);
-			}		
+			}
 		}
 		else
 		{
 			MO_VertexArray_OffsetUVs(groupObj->objectData.groupContents[geometryNum], du, dv);
 		}
 	}
-	
+
 			/* NOT A GROUNP, SO ASSUME GEOMETRY */
 	else
 	{
 		MO_VertexArray_OffsetUVs(mo, du, dv);
-	}	
+	}
 }
 
 
@@ -2299,19 +2299,19 @@ MOGroupObject		*group;
 
 
 			/* HANDLE IT */
-			
+
 	switch(objHead->type)
 	{
 		case	MO_TYPE_GEOMETRY:
 				MO_VertexArray_OffsetUVs(object, du, dv);
 				break;
-				
+
 		case	MO_TYPE_GROUP:
 				group = object;
 				data = &group->objectData;
-							
+
 							/* PARSE OBJECTS IN GROUP */
-							
+
 				for (i = 0; i < data->numObjectsInGroup; i++)
 				{
 					switch(data->groupContents[i]->type)
@@ -2319,7 +2319,7 @@ MOGroupObject		*group;
 						case	MO_TYPE_GEOMETRY:
 								MO_VertexArray_OffsetUVs(data->groupContents[i], du, dv);
 								break;
-				
+
 						case	MO_TYPE_GROUP:
 								MO_Object_OffsetUVs(data->groupContents[i], du, dv);		// recurse this sub-group
 								break;
@@ -2327,10 +2327,10 @@ MOGroupObject		*group;
 					}
 				}
 				break;
-	
-	
+
+
 		default:
-			DoFatalAlert("\pMO_Group_OffsetUVs: object type is not supported.");	
+			DoFatalAlert("\pMO_Group_OffsetUVs: object type is not supported.");
 	}
 
 }
@@ -2355,24 +2355,24 @@ MOVertexArrayObject	*vObj;
 		/* MAKE SURE IT IS A VERTEX ARRAY */
 
 	if ((objHead->type != MO_TYPE_GEOMETRY) || (objHead->subType != MO_GEOMETRY_SUBTYPE_VERTEXARRAY))
-		DoFatalAlert("\pMO_VertexArray_OffsetUVs: object is not a Vertex Array!");	
-	
+		DoFatalAlert("\pMO_VertexArray_OffsetUVs: object is not a Vertex Array!");
+
 	vObj = object;
 	data = &vObj->objectData;						// point to data
-	
-	
+
+
 	uvPtr = data->uvs[0];								// point to uv list
 	if (uvPtr == nil)
 		return;
-		
+
 	numPoints = data->numPoints;					// get # points
-	
+
 			/* OFFSET THE UV'S */
-			
+
 	for (i = 0; i < numPoints; i++)
 	{
-		uvPtr[i].u += du;	
-		uvPtr[i].v += dv;	
+		uvPtr[i].u += du;
+		uvPtr[i].v += dv;
 	}
 }
 

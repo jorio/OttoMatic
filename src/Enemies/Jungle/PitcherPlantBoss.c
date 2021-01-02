@@ -93,7 +93,7 @@ typedef struct
 {
 	Boolean		isUsed;
 	Byte		mode;
-	
+
 	ObjNode		*generator;
 	OGLPoint3D	base,tipCoord;
 
@@ -165,14 +165,14 @@ ObjNode	*newObj;
 				/******************/
 				/* INIT TENTACLES */
 				/******************/
-				
+
 	gNumTentacles = 0;
 
 	for (i = 0; i < MAX_TENTACLES; i++)
 		gTentacles[i].isUsed = false;
 
 			/* INIT MESH DATA */
-			
+
 	gTentacleMesh.numMaterials 	= 1;
 	gTentacleMesh.materials[0] 	= gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][JUNGLE_SObjType_Vine].materialObject;	// set illegal ref to material
 	gTentacleMesh.points 		= gTentaclePoints;
@@ -180,35 +180,35 @@ ObjNode	*newObj;
 	gTentacleMesh.normals		= gTentacleNormals;
 	gTentacleMesh.uvs[0]		= gTentacleUVs;
 	gTentacleMesh.colorsByte	= nil;
-	gTentacleMesh.colorsFloat	= nil;	
-	
+	gTentacleMesh.colorsFloat	= nil;
+
 	SetSphereMapInfoOnVertexArrayData(&gTentacleMesh, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_GreenSheen);
-	
-	
+
+
 			/* INIT RING DATA */
-			
+
 	r = 0;
 	for (i = 0; i < NUM_RING_POINTS; i++)
 	{
 		gRingNormals[i].x = sin(r);									// set vector
 		gRingNormals[i].z = cos(r);
 		gRingNormals[i].y = 0;
-	
+
 		gRingPoints[i].x = gRingNormals[i].x * TENTACLE_RADIUS;		// set ring point
 		gRingPoints[i].z = gRingNormals[i].z * TENTACLE_RADIUS;
 		gRingPoints[i].y = 0;
-	
+
 		r += PI2 / (NUM_RING_POINTS-1);
 	}
-	
+
 			/* MAKE DRAW EVENT */
-			
-	gNewObjectDefinition.genre		= EVENT_GENRE;				
+
+	gNewObjectDefinition.genre		= EVENT_GENRE;
 	gNewObjectDefinition.flags 		= 0;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+7;
 	gNewObjectDefinition.moveCall 	= UpdateTentacles;
 	newObj = MakeNewObject(&gNewObjectDefinition);
-	
+
 	newObj->CustomDrawFunction = DrawTentacles;
 }
 
@@ -221,11 +221,11 @@ ObjNode	*newObj;
 u_long	burned = itemPtr->flags & ITEM_FLAGS_USER1;
 
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= JUNGLE_ObjType_TentacleGenerator;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 	gNewObjectDefinition.slot 		= 140;
 	gNewObjectDefinition.moveCall 	= MoveTentacleGenerator;
@@ -236,25 +236,25 @@ u_long	burned = itemPtr->flags & ITEM_FLAGS_USER1;
 	newObj->TerrainItemPtr = itemPtr;								// keep ptr to item list
 
 
-		
+
 				/* SET DEFAULT COLLISION INFO */
-				
+
 	newObj->CType = CTYPE_MISC|CTYPE_BLOCKCAMERA|CTYPE_AUTOTARGETWEAPON;
 	newObj->CBits = CBITS_ALLSOLID;
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
-		
-	newObj->WeaponAutoTargetOff.y = 300.0f;	
-	
+
+	newObj->WeaponAutoTargetOff.y = 300.0f;
+
 	if (burned)														// see if burning
 		KillTentacleGenerator(newObj);
 	else
 	{
 		newObj->Mode = TENTACLE_GEN_MODE_ALIVE;
-		newObj->HasTentacle = false;	
+		newObj->HasTentacle = false;
 		newObj->Timer = RandomFloat() * 3.0f;
-		newObj->HitByWeaponHandler[WEAPON_TYPE_FLAME] = TentacleGeneratorHitByFire;	
+		newObj->HitByWeaponHandler[WEAPON_TYPE_FLAME] = TentacleGeneratorHitByFire;
 	}
-		
+
 	return(true);
 }
 
@@ -280,9 +280,9 @@ static void MoveTentacleGenerator(ObjNode *theNode)
 					theNode->Timer -= gFramesPerSecondFrac;				// check delay
 					if (theNode->Timer < 0.0f)
 					{
-					
+
 								/* IF PLAYER CLOSE ENOUGH THEN START NEW TENTACLE */
-								
+
 						if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < TENTACLE_ATTACK_DIST)
 						{
 							StartTentacle(theNode);
@@ -291,7 +291,7 @@ static void MoveTentacleGenerator(ObjNode *theNode)
 					}
 				}
 				break;
-				
+
 		case	TENTACLE_GEN_MODE_DEAD:
 				BurnFire(theNode, theNode->Coord.x, theNode->Coord.y, theNode->Coord.z, true, PARTICLE_SObjType_Fire, 4.0, 0);
 				break;
@@ -310,11 +310,11 @@ static Boolean TentacleGeneratorHitByFire(ObjNode *weapon, ObjNode *enemy, OGLPo
 		enemy->ColorFilter.r -= .3f;
 		enemy->ColorFilter.g -= .35f;
 		enemy->ColorFilter.b -= .35f;
-		
+
 		if (enemy->ColorFilter.b <= 0.1f)
 		{
 			KillTentacleGenerator(enemy);
-		}	
+		}
 	}
 
 	return(true);			// stop weapon
@@ -333,7 +333,7 @@ static void KillTentacleGenerator(ObjNode *theNode)
 	theNode->CType &= ~CTYPE_AUTOTARGETWEAPON;
 	if (theNode->HasTentacle)							// make tentacle retreat
 		gTentacles[theNode->TentacleIndex].mode = TENTACLE_MODE_AWAY;
-		
+
 	theNode->TerrainItemPtr->flags |= ITEM_FLAGS_USER1;	// when it comes back, it's burned
 }
 
@@ -350,7 +350,7 @@ int		i;
 	{
 		if (!gTentacles[i].isUsed)
 			goto got_it;
-	
+
 	}
 	return(false);
 
@@ -358,7 +358,7 @@ got_it:
 
 	gTentacles[i].isUsed 	= true;								// mark this slot as used
 	gTentacles[i].mode		= TENTACLE_MODE_GROW;
-	
+
 	gTentacles[i].generator	= generator;
 	gTentacles[i].base 		= generator->Coord;					// set base coord
 	gTentacles[i].tipCoord 	= generator->Coord;
@@ -367,7 +367,7 @@ got_it:
 
 	gTentacles[i].growTimer = 0;
 	gTentacles[i].delayToGoAway = 1.0;							// # seconds to stay @ full size before going away
-	
+
 	gTentacles[i].numPoints = 1;								// set 1st point
 	gTentacles[i].splinePoints[0] = generator->Coord;
 
@@ -394,66 +394,66 @@ ObjNode	*player = gPlayerInfo.objNode;
 	{
 		if (!gTentacles[i].isUsed)													// see if skip this slot
 			continue;
-			
+
 		switch(gTentacles[i].mode)
 		{
 					/**********************/
 					/* MAKE TENTACLE GROW */
 					/**********************/
-					
+
 			case	TENTACLE_MODE_GROW:
 
-					fps2 = fps * .2f;					
+					fps2 = fps * .2f;
 					for (q = 0; q < 5; q++)										// do this several times to increase the resolution nicely
 					{
 							/* UPDATE GROWTH */
-							
+
 						n = gTentacles[i].numPoints;								// get # points
 						if (n >= MAX_SPLINE_POINTS)									// see if list is full
 						{
 							gTentacles[i].mode = TENTACLE_MODE_AWAY;			// make go away
 							goto next_i;
 						}
-							
+
 						gTentacles[i].cosIndex += fps2 * 4.0f;						// update the cosing y-index
-							
+
 						TurnPointTowardPoint(&gTentacles[i].rot, &gTentacles[i].splinePoints[n-1], gPlayerInfo.coord.x, gPlayerInfo.coord.z, 1.9f * fps2);	// rotate toward player
 
 							/* CALC A NEW POINT TOWARD ME */
 
 						r = gTentacles[i].rot;
-						gTentacles[i].tipCoord.x -= sin(r) * (400.0f * fps2);			
+						gTentacles[i].tipCoord.x -= sin(r) * (400.0f * fps2);
 						gTentacles[i].tipCoord.z -= cos(r) * (400.0f * fps2);
 						gTentacles[i].tipCoord.y = 60.0f + GetTerrainY(gTentacles[i].tipCoord.x,gTentacles[i].tipCoord.z) + cos(gTentacles[i].cosIndex) * 40.0f;
-								
-			
+
+
 							/* CHECK GROW TIMER TO SEE IF SHOULD ADD THE NEW POINT */
-							
+
 						gTentacles[i].growTimer -= fps2;
 						if (gTentacles[i].growTimer <= 0.0f)
 						{
 							gTentacles[i].growTimer += .025f;
-							
+
 							gTentacles[i].splinePoints[n] = gTentacles[i].tipCoord;					// add the point to the list
 							gTentacles[i].numPoints++;
 						}
 					}
 					break;
-				
+
 					/**************************/
 					/* MAKE TENTACLE GO AWAY */
 					/*************************/
-					
-			case	TENTACLE_MODE_AWAY:			
+
+			case	TENTACLE_MODE_AWAY:
 					gTentacles[i].delayToGoAway -= fps;			// dec wait timer
 					if (gTentacles[i].delayToGoAway <= 0.0f)
 					{
 						n = gTentacles[i].numPoints;			// get # points in list
-						j = fps * 200.0f;						// calc # points to remove this time			
+						j = fps * 200.0f;						// calc # points to remove this time
 						if (j < 1)
 							j = 1;
-							
-						q = n-j;								// calc # points after we remove some			
+
+						q = n-j;								// calc # points after we remove some
 						if (q <= 0)
 						{
 							gTentacles[i].isUsed = false;		// free this one
@@ -466,18 +466,18 @@ ObjNode	*player = gPlayerInfo.objNode;
 						}
 					}
 					break;
-				
-				
+
+
 		}
-		
+
 				/***********************************/
 				/* DO TENTACLE COLLISION DETECTION */
 				/***********************************/
-				
+
 		px = gPlayerInfo.coord.x;											// get player coords
 		py = gPlayerInfo.coord.y + gPlayerInfo.objNode->BBox.min.y;			// y = bottom of player
 		pz = gPlayerInfo.coord.z;
-		
+
 		n = gTentacles[i].numPoints;
 		for (j = 0; j < n; j += SKIP_FACTOR)								// calc at intervals along the spline
 		{
@@ -485,49 +485,49 @@ ObjNode	*player = gPlayerInfo.objNode;
 			float	ty = gTentacles[i].splinePoints[j].y;
 			float	tz = gTentacles[i].splinePoints[j].z;
 			short	numHits,c;
-		
+
 						/* GET HITS */
-						
+
 			numHits = DoSimpleBoxCollision(ty + TENTACLE_RADIUS, ty - TENTACLE_RADIUS,
 											tx - TENTACLE_RADIUS, tx + TENTACLE_RADIUS,
 											tz + TENTACLE_RADIUS, tz - TENTACLE_RADIUS,
 											CTYPE_PLAYER|CTYPE_WEAPON);
-			
+
 			for (c = 0; c < numHits; c++)
 			{
 				ObjNode	*hitObj = gCollisionList[c].objectPtr;
-			
+
 					/* SEE IF TOUCHED PLAYER */
 
 				if (hitObj->CType & CTYPE_PLAYER)
-				{					
-					if (gTentacles[i].mode != TENTACLE_MODE_AWAY)			// make go away	
+				{
+					if (gTentacles[i].mode != TENTACLE_MODE_AWAY)			// make go away
 					{
-						gTentacles[i].mode = TENTACLE_MODE_AWAY;					
+						gTentacles[i].mode = TENTACLE_MODE_AWAY;
 						gTentacles[i].delayToGoAway	= 1.0;
 						MakeSparkExplosion(tx, ty, tz, 200, .3, PARTICLE_SObjType_GreenSpark,0);
 					}
-					
-					player->Delta.x = 
+
+					player->Delta.x =
 					player->Delta.z = 0;									// player stuck
 
-					PlayerGotHit(nil, .2);							// hurt player								
+					PlayerGotHit(nil, .2);							// hurt player
 				}
-				
+
 						/* TOUCHED WEAPON */
 				else
 				if (hitObj->Kind == WEAPON_TYPE_FLAME)				// only hurt by flame
 				{
-					if (gTentacles[i].mode != TENTACLE_MODE_AWAY)			// make go away	
+					if (gTentacles[i].mode != TENTACLE_MODE_AWAY)			// make go away
 					{
-						gTentacles[i].mode = TENTACLE_MODE_AWAY;					
+						gTentacles[i].mode = TENTACLE_MODE_AWAY;
 						gTentacles[i].delayToGoAway	= 1.0;
 					}
 				}
-			
+
 			}
-		}		
-next_i:;		
+		}
+next_i:;
 	}
 }
 
@@ -546,7 +546,7 @@ MOTriangleIndecies	*triPtr;
 #pragma unused (theNode)
 
 	OGL_PushState();
-	
+
 	OGL_EnableLighting();
 
 
@@ -557,17 +557,17 @@ MOTriangleIndecies	*triPtr;
 
 		numSplinePoints = gTentacles[i].numPoints;					// get # spline points
 
-	
+
 		numRings = numSplinePoints / SKIP_FACTOR;					// calc # geometry rings to build
 		if (numRings < 2)											// gotta be at least 2 to do anything
 			continue;
 		if (numRings > MAX_TENTACLE_SEGMENTS)
 			DoFatalAlert("\pDrawTentacles: numRings > MAX_TENTACLE_SEGMENTS");
-		
+
 		gTentacleMesh.numPoints 	= numRings * NUM_RING_POINTS;								// set # points in mesh
 		gTentacleMesh.numTriangles 	= (numRings-1) * (NUM_RING_POINTS-1) * 2;	// set # triangles in mesh
 
-	
+
 					/**************************************************/
 					/* FIRST BUILD ALL OF THE POINTS FOR THE GEOMETRY */
 					/**************************************************/
@@ -575,17 +575,17 @@ MOTriangleIndecies	*triPtr;
 					// Remember that the last and 1st ring points overlap so that we can
 					// do proper uv wrapping all the way around.
 					//
-				
+
 		s = .001f;																		// start scale small @ tip
-		
-		p = numSplinePoints-1;															// start @ end of spline and work toward base		
-		for (j = 0; j < numRings; j++)								
+
+		p = numSplinePoints-1;															// start @ end of spline and work toward base
+		for (j = 0; j < numRings; j++)
 		{
 			if (j == (numRings-1))														// last ring is always base
 				p = 0;
-				
+
 					/* CALC VECTOR TO NEXT RING */
-					
+
 			if (p >= SKIP_FACTOR)																// (use previous normal if this is the last segment)
 			{
 				dir.x = gTentacles[i].splinePoints[p-SKIP_FACTOR].x - gTentacles[i].splinePoints[p].x;
@@ -595,46 +595,46 @@ MOTriangleIndecies	*triPtr;
 			}
 
 					/* ROTATE RING INTO POSITION */
-					
+
 			OGLMatrix4x4_SetScale(&m2, s, s, s);
 			OGLCreateFromToRotationMatrix(&m, &from, &dir);										// generate a rotation matrix
 			OGLMatrix4x4_Multiply(&m2, &m, &m);
-			
+
 			m.value[M03] = gTentacles[i].splinePoints[p].x;										// insert translate
 			m.value[M13] = gTentacles[i].splinePoints[p].y;
-			m.value[M23] = gTentacles[i].splinePoints[p].z;		
-			
+			m.value[M23] = gTentacles[i].splinePoints[p].z;
+
 			OGLPoint3D_TransformArray(&gRingPoints[0], &m, &gTentaclePoints[j * NUM_RING_POINTS],  NUM_RING_POINTS);	// transform the points into master array
-			
+
 			OGLVector3D_TransformArray(&gRingNormals[0], &m, &gTentacleNormals[j * NUM_RING_POINTS],  NUM_RING_POINTS);	// transform the normals into master array
-			
+
 			p -= SKIP_FACTOR;
 			s += .15f;															// increase scale to full size
 			if (s > 1.0f)
 				s = 1.0f;
 		}
-	
+
 				/*******************************************/
 				/* NOW BUILD THE TRIANGLES FROM THE POINTS */
 				/*******************************************/
-		
+
 		triPtr = &gTentacleTriangles[0];										// point to triangle list
-		
+
 		for (p = 0; p < numRings; p++)											// for each segment
 		{
 			pointNum = p * NUM_RING_POINTS;										// calc index into point list to start this ring
-		
+
 			for (j = 0; j < (NUM_RING_POINTS-1); j++)							// build 2 triangles for each point in the ring
 			{
 						/* TRIANGLE A */
-						
+
 				triPtr->vertexIndices[0] = pointNum + j;
-				triPtr->vertexIndices[1] = pointNum + j + 1;				// next pt over				
+				triPtr->vertexIndices[1] = pointNum + j + 1;				// next pt over
 				triPtr->vertexIndices[2] = pointNum + j + NUM_RING_POINTS;		// pt in next segment
 				triPtr++;														// point to next triangle
 
 						/* TRIANGLE B */
-				
+
 				triPtr->vertexIndices[0] = pointNum + j + 1;					// next pt over
 				triPtr->vertexIndices[1] = pointNum + j + 1 + NUM_RING_POINTS;		// pt in next segment
 
@@ -646,31 +646,31 @@ MOTriangleIndecies	*triPtr;
 				/*************************/
 				/* SET RING COLORS & UVS */
 				/*************************/
-				
+
 		v = 0;
 		for (p = 0; p < numRings; p++)
-		{	
+		{
 			OGLTextureCoord	*uvs 	= &gTentacleUVs[p * NUM_RING_POINTS];
 
-			
+
 			u = 0;
 			for (j = 0; j < NUM_RING_POINTS; j++)
 			{
 				uvs[j].u = u;
 				uvs[j].v = v;
-				
+
 				u += 3.0f / (float)(NUM_RING_POINTS-1);
 			}
 			v += .5f;
 		}
-	
+
 				/***********************/
 				/* SUBMIT VERTEX ARRAY */
 				/***********************/
-						
+
 		MO_DrawGeometry_VertexArray(&gTentacleMesh, setupInfo);
-				
-		
+
+
 	}
 
 	OGL_PopState();
@@ -693,7 +693,7 @@ ObjNode	*newObj,*grass;
 			/****************************/
 
 	gNewObjectDefinition.type 		= SKELETON_TYPE_PITCHERPLANT;
-	gNewObjectDefinition.animNum 	= PITCHER_ANIM_WAIT;							
+	gNewObjectDefinition.animNum 	= PITCHER_ANIM_WAIT;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.coord.z 	= z;
@@ -704,18 +704,18 @@ ObjNode	*newObj,*grass;
 	gNewObjectDefinition.scale 		= PITCHER_PLANT_SCALE;
 
 	newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
-	
+
 	newObj->Coord.y -= newObj->BBox.min.y;						// offset so bottom touches ground
 	UpdateObjectTransforms(newObj);
 
-	
+
 				/* SET DEFAULT COLLISION INFO */
-				
+
 	newObj->CType = CTYPE_HURTME|CTYPE_BLOCKCAMERA;
 	newObj->CBits = CBITS_ALLSOLID;
 	CreateCollisionBoxFromBoundingBox(newObj, .8, 1);
 
-	newObj->WeaponAutoTargetOff.y = 40.0f * PITCHER_PLANT_SCALE;	
+	newObj->WeaponAutoTargetOff.y = 40.0f * PITCHER_PLANT_SCALE;
 
 				/* SET BETTER INFO */
 
@@ -723,16 +723,16 @@ ObjNode	*newObj,*grass;
 	newObj->Damage 		= .1;							// also hurt if touched
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FLAME] 		= PitcherPlantHitByFire;
-			
+
 
 
 				/*************/
 				/* ADD GRASS */
 				/*************/
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= JUNGLE_ObjType_PitcherPlant_Grass;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits | STATUS_BIT_KEEPBACKFACES;
 	gNewObjectDefinition.slot		= SLOT_OF_DUMB;
@@ -740,8 +740,8 @@ ObjNode	*newObj,*grass;
 	grass = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->ChainNode = grass;
-				
-					
+
+
 	return(true);
 }
 
@@ -756,10 +756,10 @@ static	void(*myMoveTable[])(ObjNode *) =
 					MovePitcherPlant_Attack,
 					MovePitcherPlant_GotHit
 				};
-	
-	
-	myMoveTable[theNode->Skeleton->AnimNum](theNode);	
-	
+
+
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
+
 }
 
 
@@ -795,8 +795,8 @@ static void  MovePitcherPlant_Attack(ObjNode *theNode)
 		short	i;
 
 		for (i = 0; i < 6; i++)
-		{				
-			gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+		{
+			gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 			gNewObjectDefinition.type 		= JUNGLE_ObjType_PitcherPod_Pollen;
 
 			gNewObjectDefinition.coord.x = theNode->Coord.x + RandomFloat2() * 40.0f;
@@ -816,26 +816,26 @@ static void  MovePitcherPlant_Attack(ObjNode *theNode)
 
 			AttachShadowToObject(spore, SHADOW_TYPE_CIRCULAR, 4, 4, true);
 		}
-		
+
 		theNode->ShootNow = false;
 	}
 
 		/************************/
 		/* SEE IF IS VULNERABLE */
 		/************************/
-		
+
 	if (theNode->Vulnerable)
-	{	
+	{
 		float	s = theNode->Scale.x;
-		
+
 		SetObjectCollisionBounds(theNode, 62.0f * s, 18.0f * s, -14.0f * s, 14.0f * s, 22.0f * s, -11.0f * s);
-			
+
 		theNode->CType |= CTYPE_AUTOTARGETWEAPON;
 	}
 	else
 		theNode->CType &= ~CTYPE_AUTOTARGETWEAPON;
-	
-	
+
+
 		/***************/
 		/* SEE IF DONE */
 		/***************/
@@ -881,21 +881,21 @@ ObjNode	*newObj;
 	plant->ColorFilter.r -= .06f;
 	plant->ColorFilter.g -= .11f;
 	plant->ColorFilter.b -= .11f;
-	
+
 				/*********************/
 				/* SEE IF GOT KILLED */
 				/*********************/
-				
+
 	if (plant->ColorFilter.g <= .1f)
 	{
 		ExplodeGeometry(plant, 600, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 1, 1);
 		MakeSparkExplosion(plant->Coord.x, plant->Coord.y, plant->Coord.z, 700, 30.0, PARTICLE_SObjType_GreenSpark,0);
 
-		PlayEffect_Parms3D(EFFECT_PITCHERBOOM, &plant->Coord, NORMAL_CHANNEL_RATE, 3.0);							
+		PlayEffect_Parms3D(EFFECT_PITCHERBOOM, &plant->Coord, NORMAL_CHANNEL_RATE, 3.0);
 
 				/* MAKE CORPSE */
-						
-		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 		gNewObjectDefinition.type 		= JUNGLE_ObjType_PitcherPlant_Dead;
 		gNewObjectDefinition.coord.x	= plant->Coord.x;
 		gNewObjectDefinition.coord.z	= plant->Coord.z;
@@ -906,24 +906,24 @@ ObjNode	*newObj;
 		gNewObjectDefinition.rot 		= plant->Rot.y;
 		gNewObjectDefinition.scale 		= plant->Scale.x;
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-		
+
 				/* DELETE PITCHER PLANT */
-				
+
 		DeleteObject(plant);
-		
+
 				/* DELETE TRACTOR BEAM */
-				
+
 		DeleteObject(gTractorBeamObj);
 		gTractorBeamObj = nil;
 	}
-	
+
 			/*****************/
 			/* JUST GOT HURT */
 			/*****************/
 	else
 	{
 		MorphToSkeletonAnim(plant->Skeleton, PITCHER_ANIM_GOTHIT, 4.0f);
-		PlayEffect_Parms3D(EFFECT_PITCHERPAIN, &plant->Coord, NORMAL_CHANNEL_RATE, 1.5);							
+		PlayEffect_Parms3D(EFFECT_PITCHERPAIN, &plant->Coord, NORMAL_CHANNEL_RATE, 1.5);
 		plant->Vulnerable = false;
 	}
 
@@ -943,12 +943,12 @@ ObjNode	*stem, *pod;
 u_long	podDestroyed = itemPtr->flags & ITEM_FLAGS_USER1;
 
 			/* CREATE STEM */
-			
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= JUNGLE_ObjType_PitcherPod_Stem;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z) - 100.0f;	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z) - 100.0f;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 387;
 	gNewObjectDefinition.moveCall 	= MovePitcherPod;
@@ -967,8 +967,8 @@ u_long	podDestroyed = itemPtr->flags & ITEM_FLAGS_USER1;
 		gNewObjectDefinition.type 		= JUNGLE_ObjType_PitcherPod_Pod;
 
 	gNewObjectDefinition.coord.z 	+= 164.6f * gNewObjectDefinition.scale;
-	gNewObjectDefinition.coord.y 	+= 336.7f * gNewObjectDefinition.scale;	
-	
+	gNewObjectDefinition.coord.y 	+= 336.7f * gNewObjectDefinition.scale;
+
 	gNewObjectDefinition.slot++;
 	gNewObjectDefinition.moveCall 	= nil;
 	pod = MakeNewDisplayGroupObject(&gNewObjectDefinition);
@@ -984,7 +984,7 @@ u_long	podDestroyed = itemPtr->flags & ITEM_FLAGS_USER1;
 
 		pod->WeaponAutoTargetOff.y = POD_MOUTH_OFF_Y * pod->Scale.x;
 		pod->WeaponAutoTargetOff.z = POD_MOUTH_OFF_Z * pod->Scale.x;
-		
+
 		pod->HitByWeaponHandler[WEAPON_TYPE_FLAME] 		= PitcherPodHitByFire;
 	}
 	else
@@ -1014,20 +1014,20 @@ float	fps = gFramesPerSecondFrac;
 			/* MAKE IT STEAM */
 
 			MakePitcherPodSteam(pod);
-		
-		
+
+
 				/* SEE IF SHOOT */
-				
+
 			theNode->Timer -= fps;
 			if (theNode->Timer <= 0.0f)
 			{
 				theNode->Timer = 2.0f + RandomFloat() * 3.0f;			// reset timer
-				
+
 				if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < 3500.0f)
-				{		
+				{
 					PitcherPodShoot(pod);
 				}
-			}	
+			}
 		}
 	}
 }
@@ -1053,11 +1053,11 @@ OGLPoint3D			p;
 
 		particleGroup 	= theNode->ParticleGroup;
 		magicNum 		= theNode->ParticleMagicNum;
-		
+
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
 			theNode->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
-			
+
 			groupDef.magicNum				= magicNum;
 			groupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 			groupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND;
@@ -1077,7 +1077,7 @@ OGLPoint3D			p;
 			float	x = theNode->Coord.x;
 			float	y = theNode->Coord.y + (POD_MOUTH_OFF_Y * theNode->Scale.x);
 			float	z = theNode->Coord.z + (POD_MOUTH_OFF_Z * theNode->Scale.x);
-			
+
 			for (i = 0; i < 2; i++)
 			{
 				p.x = x + RandomFloat2() * 30.0f;
@@ -1087,14 +1087,14 @@ OGLPoint3D			p;
 				d.x = RandomFloat2() * 90.0f;
 				d.y = 300.0f + RandomFloat() * 160.0f;
 				d.z = RandomFloat2() * 90.0f;
-			
+
 				newParticleDef.groupNum		= particleGroup;
 				newParticleDef.where		= &p;
 				newParticleDef.delta		= &d;
 				newParticleDef.scale		= RandomFloat() + 1.0f;
 				newParticleDef.rotZ			= RandomFloat()*PI2;
 				newParticleDef.rotDZ		= RandomFloat2() * .1f;
-				newParticleDef.alpha		= .2;		
+				newParticleDef.alpha		= .2;
 				if (AddParticleToGroup(&newParticleDef))
 				{
 					theNode->ParticleGroup = -1;
@@ -1116,8 +1116,8 @@ int		i;
 			/****************/
 			/* CREATE SPORE */
 			/****************/
-			
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= JUNGLE_ObjType_PitcherPod_Pollen;
 
 	gNewObjectDefinition.coord.x = pod->Coord.x;
@@ -1141,7 +1141,7 @@ int		i;
 
 
 				/* CREATE SPARKLE */
-				
+
 	i = spore->Sparkles[0] = GetFreeSparkle(spore);				// get free sparkle slot
 	if (i != -1)
 	{
@@ -1157,11 +1157,11 @@ int		i;
 
 		gSparkles[i].scale = 200.0f;
 		gSparkles[i].separation = -40.0f;
-		
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark4;
 	}
-	
-	
+
+
 	PlayEffect3D(EFFECT_PODSHOOT, &spore->Coord);
 }
 
@@ -1177,45 +1177,45 @@ float		speed;
 	GetObjectInfo(spore);
 
 			/* MOVE IT */
-			
+
 	gDelta.y -= 250.0f * fps;								// gravity
 
 	v.x = gPlayerInfo.coord.x - gCoord.x;					// calc vector to player
-	v.y = gPlayerInfo.coord.z - gCoord.z;		
+	v.y = gPlayerInfo.coord.z - gCoord.z;
 	FastNormalizeVector2D(v.x, v.y, &v, false);
-	
+
 	gDelta.x += v.x * (350.0f * fps);						// accelerate toward player
 	gDelta.z += v.y * (350.0f * fps);
-	
+
 	speed = CalcVectorLength(&gDelta);						// calc speed & pin max
 	if (speed > 450.0f)
 	{
 		speed = 450.0f / speed;
 		gDelta.x *= speed;
 		gDelta.y *= speed;
-		gDelta.z *= speed;	
+		gDelta.z *= speed;
 	}
-	
+
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
 	gCoord.z += gDelta.z * fps;
-	
+
 	spore->Rot.x += 4.0f * fps;							// spin
 	spore->Rot.y += 2.0f * fps;
-	
-	
+
+
 				/* SEE IF HIT GROUND */
-				
+
 	if (gCoord.y < GetTerrainY(gCoord.x, gCoord.z))
 	{
-poof:	
+poof:
 		MakePuff(&gCoord, 20.0, PARTICLE_SObjType_RedFumes, GL_SRC_ALPHA, GL_ONE, 1.2);
 		DeleteObject(spore);
 		return;
 	}
 
 			/* SEE IF HIT PLAYER */
-			
+
 	if (DoSimpleBoxCollisionAgainstPlayer(gCoord.y + 20.0f, gCoord.y - 20.0f,
 										gCoord.x - 20.0f, gCoord.x + 20.0f,
 										gCoord.z + 20.0f, gCoord.z - 20.0f))
@@ -1231,7 +1231,7 @@ poof:
 							gCoord.z + 20.0f, gCoord.z - 20.0f,
 							CTYPE_MISC))
 	{
-		goto poof;	
+		goto poof;
 	}
 
 	UpdateObject(spore);
@@ -1248,21 +1248,21 @@ static Boolean PitcherPodHitByFire(ObjNode *weapon, ObjNode *pod, OGLPoint3D *we
 	pod->ColorFilter.r -= .15f;
 	pod->ColorFilter.g -= .3f;
 	pod->ColorFilter.b -= .3f;
-	
+
 	if (pod->ColorFilter.g <= .2f)
 	{
 		ObjNode	*stem = pod->ChainHead;
-		
+
 		MakePuff(&pod->Coord, 30.0, PARTICLE_SObjType_RedFumes, GL_SRC_ALPHA, GL_ONE,.5);
 		ExplodeGeometry(pod, 600, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 1, 1.1);
 		stem->TerrainItemPtr->flags |= ITEM_FLAGS_USER1;	// make sure the pod part doesn't come back
 		gNumDestroyedPods++;
-		
+
 		pod->PodBlown = true;
-		
+
 		pod->Type = JUNGLE_ObjType_PitcherPod_DeadPod;		// change to blown up pod
 		ResetDisplayGroupObject(pod);
-		
+
 		pod->CType = 0;
 		pod->StatusBits = gAutoFadeStatusBits;
 		pod->HitByWeaponHandler[WEAPON_TYPE_FLAME] 	= nil;
@@ -1270,8 +1270,8 @@ static Boolean PitcherPodHitByFire(ObjNode *weapon, ObjNode *pod, OGLPoint3D *we
 		pod->ColorFilter.g =
 		pod->ColorFilter.b = 1;
 		pod->NumCollisionBoxes = 0;
-		
-		PlayEffect_Parms3D(EFFECT_PODBOOM, &pod->Coord, NORMAL_CHANNEL_RATE, 3.0);									
+
+		PlayEffect_Parms3D(EFFECT_PODBOOM, &pod->Coord, NORMAL_CHANNEL_RATE, 3.0);
 	}
 
 	return(true);			// stop weapon
@@ -1287,8 +1287,8 @@ static void InitTractorBeam(void)
 {
 
 						/* MAKE BEAM */
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= JUNGLE_ObjType_TractorBeam;
 	gNewObjectDefinition.coord.x	= gPlayerInfo.startX;
 	gNewObjectDefinition.coord.z	= gPlayerInfo.startZ;
@@ -1313,10 +1313,10 @@ static void MoveTractorBeam(ObjNode *beam)
 	GetObjectInfo(beam);
 
 			/* UPDATE BEAM */
-			
+
 	beam->ColorFilter.a = .99f - RandomFloat()*.1f;					// flicker
-	beam->Scale.x = beam->Scale.z = 13.0f - RandomFloat() * 1.0f;	
-	
+	beam->Scale.x = beam->Scale.z = 13.0f - RandomFloat() * 1.0f;
+
 	TurnObjectTowardTarget(beam, &gCoord, gPlayerInfo.camera.cameraLocation.x, gPlayerInfo.camera.cameraLocation.z, 100, false);	// aim at camera
 	UpdateObjectTransforms(beam);
 
@@ -1324,7 +1324,7 @@ static void MoveTractorBeam(ObjNode *beam)
 	MO_Object_OffsetUVs(beam->BaseGroup, 0, gFramesPerSecondFrac * 2.0f);
 
 			/* UPDATE AUDIO */
-			
+
 	if (beam->EffectChannel != -1)
 		Update3DSoundChannel(EFFECT_TRACTORBEAM, &beam->EffectChannel, &gCoord);
 	else
@@ -1339,12 +1339,12 @@ Boolean AddTractorBeamPost(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 int	i;
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= JUNGLE_ObjType_TractorBeamPost;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 67;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject;
@@ -1362,7 +1362,7 @@ int	i;
 
 
 			/* SPARKLE */
-			
+
 	i = newObj->Sparkles[0] = GetFreeSparkle(newObj);				// get free sparkle slot
 	if (i != -1)
 	{
@@ -1377,9 +1377,9 @@ int	i;
 		gSparkles[i].color.a = 1;
 
 		gSparkles[i].scale = 200.0f;
-		
+
 		gSparkles[i].separation = 30.0f;
-					
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_BlueGlint;
 	}
 

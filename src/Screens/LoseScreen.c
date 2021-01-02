@@ -98,9 +98,9 @@ void DoLoseScreen(void)
 float	timer = 43.0f;
 
 	GammaFadeOut();
-	
+
 			/* SETUP */
-		
+
 	SetupLoseScreen();
 	MakeFadeEvent(true, 1.0);
 
@@ -109,34 +109,34 @@ float	timer = 43.0f;
 			/********/
 
 	do
-	{	
+	{
 			/* MOVE */
-					
+
 		CalcFramesPerSecond();
-		UpdateInput();		
+		UpdateInput();
 		MoveObjects();
-		
+
 		/* UPDATE CONVEYOR BELT */
-		
-		UpdateConveyorBelt();	
-		
+
+		UpdateConveyorBelt();
+
 			/* UPDATE TRANSFORM */
-			
+
 		if (gIsTransforming)
 			UpdateTransformEffect();
-			
-		
+
+
 			/* DRAW */
-						
-		OGL_DrawScene(gGameViewInfoPtr, DrawLoseCallback);	
-		
+
+		OGL_DrawScene(gGameViewInfoPtr, DrawLoseCallback);
+
 		timer -= gFramesPerSecondFrac;
 		if (timer <= 0.0f)
 			break;
-		
+
 	}while(!AreAnyNewKeysPressed());
-			
-	
+
+
 			/* CLEANUP */
 
 	GammaFadeOut();
@@ -159,11 +159,11 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 
 
 			/* INIT HUMANS */
-			
+
 	gNumHumansOnBelt = 0;
 	for (i = 0; i < MAX_HUMANS_ON_BELT; i++)
 		gHumansOnBelt[i] = nil;
-		
+
 	gBeltMode = BELT_MODE_STOP;
 	gBeltTimer = 0.0f;
 	gBeltIndex = 0;
@@ -174,8 +174,8 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 			/**************/
 			/* SETUP VIEW */
 			/**************/
-			
-	OGL_NewViewDef(&viewDef);	
+
+	OGL_NewViewDef(&viewDef);
 
 	viewDef.camera.fov 			= 1.1;
 	viewDef.camera.hither 		= 20;
@@ -183,16 +183,16 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 
 	viewDef.camera.from.x		= 300;
 	viewDef.camera.from.z		= 600;
-	viewDef.camera.from.y		= 250;	
+	viewDef.camera.from.y		= 250;
 	viewDef.camera.to.y 			= 150.0f;
-	
+
 	viewDef.lights.fillDirection[0] = fillDirection1;
-	
-	
+
+
 			/*********************/
 			/* SET ANAGLYPH INFO */
-			/*********************/			
-			
+			/*********************/
+
 	if (gGamePrefs.anaglyph)
 	{
 		if (!gGamePrefs.anaglyphColor)
@@ -201,11 +201,11 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 			viewDef.lights.ambientColor.g 		+= .1f;
 			viewDef.lights.ambientColor.b 		+= .1f;
 		}
-				
+
 		gAnaglyphFocallength	= 350.0f;
 		gAnaglyphEyeSeparation 	= 25.0f;
 	}
-	
+
 	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
 
 
@@ -214,14 +214,14 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 				/************/
 
 	InitSparkles();
-	
+
 				/* LOAD AUDIO */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Audio:lose.sounds", &spec);
 	LoadSoundBank(&spec, SOUND_BANK_LOSE);
 
 			/* LOAD SPRITES */
-			
+
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:particle.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
@@ -241,15 +241,15 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 
 
 			/* LOAD SKELETONS */
-			
+
 	LoadASkeleton(SKELETON_TYPE_FARMER, gGameViewInfoPtr);
 	LoadASkeleton(SKELETON_TYPE_BEEWOMAN, gGameViewInfoPtr);
 	LoadASkeleton(SKELETON_TYPE_SCIENTIST, gGameViewInfoPtr);
 	LoadASkeleton(SKELETON_TYPE_SKIRTLADY, gGameViewInfoPtr);
 	LoadASkeleton(SKELETON_TYPE_BRAINALIEN, gGameViewInfoPtr);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_BRAINALIEN,
-								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
-	
+								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
+
 
 
 		/****************/
@@ -257,8 +257,8 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 		/****************/
 
 				/* BACKGROUND */
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LOSESCREEN;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LOSESCREEN;
 	gNewObjectDefinition.type 		= LOSE_ObjType_Background;
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.y 	= 0;
@@ -272,15 +272,15 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 
 
 			/* POST SPARKLES */
-			
+
 	for (j = 0; j < 2; j++)
-	{	
+	{
 		static const OGLPoint3D	where[2] =
 		{
 			0,175.0f * 2.0f, 65.0f * 2.0f,
 			0,175.0f * 2.0f, -65.0f * 2.0f,
 		};
-		
+
 		i = newObj->Sparkles[j] = GetFreeSparkle(newObj);
 		if (i != -1)
 		{
@@ -293,18 +293,18 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 			gSparkles[i].color.a = .8;
 
 			gSparkles[i].scale = 60.0f;
-			
+
 			gSparkles[i].separation = 100.0f;
-						
+
 			gSparkles[i].textureNum = PARTICLE_SObjType_RedGlint;
-		}	
+		}
 	}
 
 			/* HUMANS */
-			
+
 	PrimeInitialHumansOnBelt();
-	
-	
+
+
 }
 
 
@@ -312,7 +312,7 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 /********************** FREE LOSE SCREEN **********************/
 
 static void FreeLoseScreen(void)
-{				
+{
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
@@ -325,7 +325,7 @@ static void FreeLoseScreen(void)
 /***************** DRAW LOSE CALLBACK *******************/
 
 static void DrawLoseCallback(OGLSetupOutputType *info)
-{			
+{
 	DrawObjects(info);
 	DrawSparkles(info);											// draw light sparkles
 
@@ -335,12 +335,12 @@ static void DrawLoseCallback(OGLSetupOutputType *info)
 			/****************/
 
 	OGL_PushState();
-			
+
 	SetInfobarSpriteState();
 
 				/* DRAW GAME OVER */
-				
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	DrawInfobarSprite2(320-200, 10, 400, SPRITE_GROUP_LOSE, LOSE_SObjType_GameOver, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -367,33 +367,33 @@ int		i;
 					gBeltMode = BELT_MODE_MOVE;
 					PutNewHumanOnBelt(0);
 					PlayEffect_Parms(EFFECT_CONVEYORBELT, FULL_CHANNEL_VOLUME/4, FULL_CHANNEL_VOLUME * 3/4, NORMAL_CHANNEL_RATE);
-				
+
 				}
 				break;
-	
+
 		case	BELT_MODE_MOVE:
-		
+
 					/* MOVE ALL HUMANS FORWARD */
-					
+
 				for (i = 0; i < MAX_HUMANS_ON_BELT; i++)
 				{
 					human = gHumansOnBelt[i];
 					if (human)
 					{
-						human->Coord.x += 200.0f * fps;		
+						human->Coord.x += 200.0f * fps;
 						if (human->Coord.x > 700.0f)						// see if scrolled off
 						{
 							DeleteObject(human);
-							gHumansOnBelt[i] = nil;						
+							gHumansOnBelt[i] = nil;
 							continue;
 						}
-								
+
 						UpdateObjectTransforms(human);
 					}
 				}
-				
+
 						/* SEE IF HEAD HUMAN IS IN PLACE */
-						
+
 				human = gHumansOnBelt[gHeadHuman];
 				if (human)
 				{
@@ -404,17 +404,17 @@ int		i;
 
 						human->StatusBits |= STATUS_BIT_NOZWRITES;			// do this so will transform nicer
 						StartTransformationEffect(gHeadHuman);						// start to transform human
-						
+
 						if (++gHeadHuman >= MAX_HUMANS_ON_BELT)				// set next head human
 							gHeadHuman = 0;
-							
+
 					}
 				}
-				
+
 				break;
-				
-			
-				
+
+
+
 	}
 }
 
@@ -431,13 +431,13 @@ ObjNode	*human;
 	for (i = 0; i < (HUMANS_IN_LINE-1); i++)
 	{
 		human = PutNewHumanOnBelt(xoff);
-		
+
 		if (human)
 		{
 			SetSkeletonAnimTime(human->Skeleton, RandomFloat());	// set random time index so all of these are not in sync
-		
+
 		}
-		
+
 		xoff -= HUMAN_SPACING;
 	}
 }
@@ -458,8 +458,8 @@ static const short	skels[4] =
 
 ObjNode	*newObj;
 
-	gNewObjectDefinition.type 		= skels[MyRandomLong()&0x3];	
-	gNewObjectDefinition.animNum	= 0;	
+	gNewObjectDefinition.type 		= skels[MyRandomLong()&0x3];
+	gNewObjectDefinition.animNum	= 0;
 	gNewObjectDefinition.coord.x 	= -HUMANS_IN_LINE * HUMAN_SPACING + xoff;
 	gNewObjectDefinition.coord.y 	= 20;
 	gNewObjectDefinition.coord.z 	= 0;
@@ -469,15 +469,15 @@ ObjNode	*newObj;
 	gNewObjectDefinition.rot 		= -PI/2;
 	gNewObjectDefinition.scale 		= 2.0;
 	newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
-	
-	newObj->Coord.y 	-= newObj->BBox.min.y;	
+
+	newObj->Coord.y 	-= newObj->BBox.min.y;
 	UpdateObjectTransforms(newObj);
 
 	newObj->CType = CTYPE_HUMAN;
 
 
 			/* ADD TO LIST */
-			
+
 	if (gHumansOnBelt[gBeltIndex] != nil)							// make sure this slot free
 		DoFatalAlert("\pPutNewHumanOnBelt: slot overflow!");
 	gHumansOnBelt[gBeltIndex++] = newObj;
@@ -504,12 +504,12 @@ int		i;
 	gTransformFade = 0;
 	gIsTransforming = true;
 	gTransformTimer = .9f;
-	
+
 
 				/********************/
 				/* MAKE BRAIN ALIEN */
 				/********************/
-				
+
 	gNewObjectDefinition.type 		= SKELETON_TYPE_BRAINALIEN;
 	gNewObjectDefinition.animNum 	= 0;
 	gNewObjectDefinition.coord.x 	= 0;
@@ -523,21 +523,21 @@ int		i;
 
 	gTransformingAlien = MakeNewSkeletonObject(&gNewObjectDefinition);
 
-	gTransformingAlien->Coord.y 	-= gTransformingAlien->BBox.min.y;	
+	gTransformingAlien->Coord.y 	-= gTransformingAlien->BBox.min.y;
 	UpdateObjectTransforms(gTransformingAlien);
-	
+
 	gTransformingAlien->ColorFilter.a = 0;						// start faded out
 
 
 	CreateBrainAlienGlow(gTransformingAlien);
-	
-	
+
+
 
 				/********************/
 				/* MAKE WARP EFFECT */
 				/********************/
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LOSESCREEN;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LOSESCREEN;
 	gNewObjectDefinition.type 		= LOSE_ObjType_Warp;
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.y 	= 200;
@@ -548,12 +548,12 @@ int		i;
 	gNewObjectDefinition.rot 		= PI/2;
 	gNewObjectDefinition.scale 	    = .2;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 	newObj->ColorFilter.a = .99;
 	newObj->Timer = 1.0f;
 
 				/* SPARKLE */
-				
+
 	i = newObj->Sparkles[0] = GetFreeSparkle(newObj);
 	if (i != -1)
 	{
@@ -566,14 +566,14 @@ int		i;
 		gSparkles[i].color.a = .8;
 
 		gSparkles[i].scale = 200.0f;
-		
+
 		gSparkles[i].separation = 200.0f;
-					
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark4;
-	}	
-	
+	}
+
 	PlayEffect_Parms(EFFECT_TRANSFORM, FULL_CHANNEL_VOLUME, FULL_CHANNEL_VOLUME/2, NORMAL_CHANNEL_RATE);
-	
+
 }
 
 
@@ -584,7 +584,7 @@ static void UpdateTransformEffect(void)
 ObjNode	*human;
 
 			/* SEE IF STOP */
-			
+
 	gTransformTimer -= gFramesPerSecondFrac;
 	if (gTransformTimer <= 0.0f)
 	{
@@ -595,16 +595,16 @@ ObjNode	*human;
 
 
 				/* FADE */
-				
+
 	gTransformFade += gFramesPerSecondFrac * 1.5f;
 	if (gTransformFade >= 1.0f)
 	{
 		gTransformFade = 1.0f;
 	}
-	
-	
+
+
 			/* SET HUMAN FADE VALUE */
-			
+
 	human = gHumansOnBelt[gTransformingHumanIndex];						// get human
 	if (human->CType & CTYPE_HUMAN)										// make sure human and not alien
 	{
@@ -614,7 +614,7 @@ ObjNode	*human;
 			DeleteObject(human);										// delete the human
 			gHumansOnBelt[gTransformingHumanIndex] = gTransformingAlien;	// put the alien in its place
 		}
-	}	
+	}
 }
 
 
@@ -649,10 +649,10 @@ float	fps = gFramesPerSecondFrac;
 	if (s > 2.1f)
 		s = .4f;
 
-	theNode->Scale.x = 
-	theNode->Scale.y = 
+	theNode->Scale.x =
+	theNode->Scale.y =
 	theNode->Scale.z = s;
-	
+
 	theNode->Rot.z = RandomFloat()*PI2;
 
 	UpdateObjectTransforms(theNode);

@@ -73,9 +73,9 @@ float	timer = 90.0f;
 float	delayToTabloid = 6.0f;
 
 	GammaFadeOut();
-	
+
 			/* SETUP */
-		
+
 	SetupWinScreen();
 	MakeFadeEvent(true, 1.0);
 
@@ -84,25 +84,25 @@ float	delayToTabloid = 6.0f;
 			/********/
 
 	while(true)
-	{	
+	{
 			/* MOVE */
-					
+
 		CalcFramesPerSecond();
-		UpdateInput();		
+		UpdateInput();
 		MoveObjects();
-		
-				
+
+
 			/* DRAW */
-						
-		OGL_DrawScene(gGameViewInfoPtr, DrawWinCallback);	
-		
-		
+
+		OGL_DrawScene(gGameViewInfoPtr, DrawWinCallback);
+
+
 			/* CHECK TIMERS */
-			
+
 		timer -= gFramesPerSecondFrac;					// see if done w/ this screen
 		if (timer <= 0.0f)
 			break;
-		
+
 		if (!gTabloid)
 		{
 			delayToTabloid -= gFramesPerSecondFrac;			// see if bring up tabloid
@@ -112,17 +112,17 @@ float	delayToTabloid = 6.0f;
 		else
 		if (AreAnyNewKeysPressed())
 			break;
-		
+
 	}
-			
+
 			/****************/
 			/* DO "THE END" */
 			/****************/
-			
+
 	DoTheEnd();
 
-			
-	
+
+
 			/* CLEANUP */
 
 	GammaFadeOut();
@@ -144,8 +144,8 @@ float	timer;
 			/****************/
 
 			/* DARKEN PANE */
-	
-	gNewObjectDefinition.group 		= SPRITE_GROUP_LOSE;	
+
+	gNewObjectDefinition.group 		= SPRITE_GROUP_LOSE;
 	gNewObjectDefinition.type 		= WIN_SObjType_BlackOut;
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.y 	= 0;
@@ -160,11 +160,11 @@ float	timer;
 	pane->Scale.x = 640;
 	pane->Scale.y = 480;
 	pane->ColorFilter.a = 0;
-	
+
 
 
 			/* GLOW */
-		
+
 	gNewObjectDefinition.type 		= WIN_SObjType_TheEnd_Glow;
 	gNewObjectDefinition.coord.x 	= 640/2 - scale.x/2;
 	gNewObjectDefinition.coord.y 	= 480/2 - scale.y/2 - 100;
@@ -177,7 +177,7 @@ float	timer;
 
 
 			/* TEXT */
-		
+
 	gNewObjectDefinition.type 		= WIN_SObjType_TheEnd_Text;
 	gNewObjectDefinition.flags 		= 0;
 	text = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
@@ -187,7 +187,7 @@ float	timer;
 
 
 			/* Q-GLOW */
-		
+
 	gNewObjectDefinition.type 		= WIN_SObjType_QGlow;
 	gNewObjectDefinition.coord.x 	= 640/2 - scale2.x/2;
 	gNewObjectDefinition.coord.y 	= 480/2 - scale2.y/2 + 40;
@@ -200,7 +200,7 @@ float	timer;
 
 
 			/* Q-TEXT */
-		
+
 	gNewObjectDefinition.type 		= WIN_SObjType_QText;
 	gNewObjectDefinition.flags 		= 0;
 	text = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
@@ -214,9 +214,9 @@ float	timer;
 		/*************************/
 		/* SHOW IN ANIMATED LOOP */
 		/*************************/
-	
+
 	timer = 30.0f;
-	
+
 	while((timer-=gFramesPerSecondFrac) > 0.0f)
 	{
 		UpdateInput();
@@ -224,10 +224,10 @@ float	timer;
 			break;
 
 			/* DRAW STUFF */
-	
+
 		CalcFramesPerSecond();
-		MoveObjects();				
-		OGL_DrawScene(gGameViewInfoPtr, DrawObjects);	
+		MoveObjects();
+		OGL_DrawScene(gGameViewInfoPtr, DrawObjects);
 	}
 
 }
@@ -249,7 +249,7 @@ static void MoveTheEndText(ObjNode *theNode)
 	theNode->SpecialF[0] += gFramesPerSecondFrac * .6f;
 	if (theNode->SpecialF[0] > 1.0f)
 		theNode->SpecialF[0] = 1.0f;
-				
+
 	if (theNode->StatusBits & STATUS_BIT_GLOW)
 		theNode->ColorFilter.a = theNode->SpecialF[0] * .7f + RandomFloat()*.29f;
 	else
@@ -305,16 +305,16 @@ static OGLPoint3D	humanPt[] =
 	gTabloid = nil;
 
 	KillSong();
-	
+
 			/**************/
 			/* SETUP VIEW */
 			/**************/
-			
-	OGL_NewViewDef(&viewDef);	
+
+	OGL_NewViewDef(&viewDef);
 
 	viewDef.view.clearColor.r 		= .1;
 	viewDef.view.clearColor.g 		= .5;
-	viewDef.view.clearColor.b		= .1;	
+	viewDef.view.clearColor.b		= .1;
 
 	viewDef.camera.fov 			= 1.1;
 	viewDef.camera.hither 		= 100;
@@ -322,14 +322,14 @@ static OGLPoint3D	humanPt[] =
 
 	viewDef.camera.from.x		= 1200;
 	viewDef.camera.from.z		= 150;
-	viewDef.camera.from.y		= 250;	
-	
+	viewDef.camera.from.y		= 250;
+
 	viewDef.camera.to.x 		= 700.0f;
 	viewDef.camera.to.y 		= 150.0f;
 	viewDef.camera.to.z 		= -1000;
-		
+
 	viewDef.lights.fillDirection[0] = fillDirection1;
-	
+
 	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
 
 
@@ -338,7 +338,7 @@ static OGLPoint3D	humanPt[] =
 				/************/
 
 	InitSparkles();
-	
+
 
 			/* LOAD MODELS */
 
@@ -346,7 +346,7 @@ static OGLPoint3D	humanPt[] =
 	ImportBG3D(&spec, MODEL_GROUP_WINSCREEN, gGameViewInfoPtr);
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_WINSCREEN, WIN_ObjType_Rocket,
-								 -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);			
+								 -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
 
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:global.bg3d", &spec);
@@ -354,7 +354,7 @@ static OGLPoint3D	humanPt[] =
 
 
 			/* LOAD SPRITES */
-			
+
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:particle.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
@@ -367,16 +367,16 @@ static OGLPoint3D	humanPt[] =
 
 
 			/* LOAD SKELETONS */
-			
+
 	LoadASkeleton(SKELETON_TYPE_OTTO, gGameViewInfoPtr);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_OTTO,
-								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);			
+								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
 	LoadASkeleton(SKELETON_TYPE_FARMER, gGameViewInfoPtr);
 	LoadASkeleton(SKELETON_TYPE_BEEWOMAN, gGameViewInfoPtr);
 	LoadASkeleton(SKELETON_TYPE_SCIENTIST, gGameViewInfoPtr);
 	LoadASkeleton(SKELETON_TYPE_SKIRTLADY, gGameViewInfoPtr);
-	
+
 
 
 
@@ -385,8 +385,8 @@ static OGLPoint3D	humanPt[] =
 		/****************/
 
 				/* BACKGROUND */
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_WINSCREEN;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_WINSCREEN;
 	gNewObjectDefinition.type 		= WIN_ObjType_Background;
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.y 	= 0;
@@ -398,11 +398,11 @@ static OGLPoint3D	humanPt[] =
 	gNewObjectDefinition.scale 	    = 3;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
-	
+
 				/* ROCKET */
-		
-		
-	gNewObjectDefinition.group 		= MODEL_GROUP_WINSCREEN;	
+
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_WINSCREEN;
 	gNewObjectDefinition.type 		= WIN_ObjType_Rocket;
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.y 	= 0;
@@ -416,8 +416,8 @@ static OGLPoint3D	humanPt[] =
 
 
 				/* CYC */
-		
-	gNewObjectDefinition.group 		= MODEL_GROUP_WINSCREEN;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_WINSCREEN;
 	gNewObjectDefinition.type 		= WIN_ObjType_Cyc;
 	gNewObjectDefinition.coord	 	= viewDef.camera.from;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOFOG | STATUS_BIT_NOLIGHTING;
@@ -427,13 +427,13 @@ static OGLPoint3D	humanPt[] =
 	gNewObjectDefinition.scale 	    = viewDef.camera.yon / 100.0f * .98f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
-		
+
 		/* HUMANS */
-		
+
 	for (i = 0; i < 8; i++)
 	{
-		gNewObjectDefinition.type 		= skels[i];	
-		gNewObjectDefinition.animNum	= anim[i];	
+		gNewObjectDefinition.type 		= skels[i];
+		gNewObjectDefinition.animNum	= anim[i];
 		gNewObjectDefinition.coord	 	= humanPt[i];
 		gNewObjectDefinition.flags 		= 0;
 		gNewObjectDefinition.slot 		= 205;
@@ -441,18 +441,18 @@ static OGLPoint3D	humanPt[] =
 		gNewObjectDefinition.rot 		= PI/3 + RandomFloat2() * .2f;
 		gNewObjectDefinition.scale 		= 1.0;
 		newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
-		
-		newObj->Coord.y 	-= newObj->BBox.min.y;	
+
+		newObj->Coord.y 	-= newObj->BBox.min.y;
 		UpdateObjectTransforms(newObj);
 
 		SetSkeletonAnimTime(newObj->Skeleton, RandomFloat());	// set random time index so all of these are not in sync
 	}
-	
-	
+
+
 			/* OTTO */
-			
-	gNewObjectDefinition.type 		= SKELETON_TYPE_OTTO;	
-	gNewObjectDefinition.animNum	= 0;	
+
+	gNewObjectDefinition.type 		= SKELETON_TYPE_OTTO;
+	gNewObjectDefinition.animNum	= 0;
 	gNewObjectDefinition.coord.x	= 500;
 	gNewObjectDefinition.coord.y	= 0;
 	gNewObjectDefinition.coord.z	= -400;
@@ -462,44 +462,44 @@ static OGLPoint3D	humanPt[] =
 	gNewObjectDefinition.rot 		= -PI/2;
 	gNewObjectDefinition.scale 		= 1.0;
 	gPlayerInfo.objNode = newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
-	
-	newObj->Coord.y 	-= newObj->BBox.min.y;	
+
+	newObj->Coord.y 	-= newObj->BBox.min.y;
 	UpdateObjectTransforms(newObj);
-	
+
 	CreatePlayerSparkles(newObj);
 
-	
+
 			/* LEFT HAND */
-			
-	gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;
 	gNewObjectDefinition.type 		= GLOBAL_ObjType_OttoLeftHand;
 	gNewObjectDefinition.slot		= SLOT_OF_DUMB;
 	gNewObjectDefinition.moveCall 	= nil;
 	gPlayerInfo.leftHandObj 		= MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
-	
+
 
 			/* RIGHT HAND */
-			
+
 	gNewObjectDefinition.type 	= GLOBAL_ObjType_OttoRightHand;
 	gPlayerInfo.rightHandObj 	= MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	gPlayerInfo.rightHandObj->Kind = WEAPON_TYPE_FIST;			// set weapon type since this gets passed to weapon handlers
-	
-	
-	
+
+
+
 	PlaySong(SONG_WIN, false);
-	
+
 }
 
 
 /********************** FREE WIN SCREEN **********************/
 
 static void FreeWinScreen(void)
-{				
+{
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
-	DisposeAllSpriteGroups();	
+	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 //	DisposeSoundBank(SOUND_BANK_WIN);
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
@@ -509,7 +509,7 @@ static void FreeWinScreen(void)
 /***************** DRAW WIN CALLBACK *******************/
 
 static void DrawWinCallback(OGLSetupOutputType *info)
-{			
+{
 	UpdateRobotHands(gPlayerInfo.objNode);
 	UpdatePlayerSparkles(gPlayerInfo.objNode);
 
@@ -529,7 +529,7 @@ static void StartTabloid(void)
 ObjNode	*newObj;
 
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_WINSCREEN;	
+	gNewObjectDefinition.group 		= MODEL_GROUP_WINSCREEN;
 	gNewObjectDefinition.type 		= WIN_ObjType_Tabloid;
 	gNewObjectDefinition.coord.x 	= 640/2;
 	gNewObjectDefinition.coord.y 	= 480/2;
@@ -542,8 +542,8 @@ ObjNode	*newObj;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->ColorFilter.a = 0;
-	
-	newObj->CustomDrawFunction = DrawTabloid;	
+
+	newObj->CustomDrawFunction = DrawTabloid;
 
 
 	gTabloid = newObj;
@@ -574,8 +574,8 @@ float	s;
 	else
 	{
 		theNode->Rot.z = PI - (PI/30);
-	
-	
+
+
 	}
 
 
@@ -589,12 +589,12 @@ float	s;
 static void DrawTabloid(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
 	OGL_PushState();
-	
+
 	SetInfobarSpriteState();
 
 	MO_DrawObject(theNode->BaseGroup, setupInfo);
-	
-	OGL_PopState();	
+
+	OGL_PopState();
 }
 
 

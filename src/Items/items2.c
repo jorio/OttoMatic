@@ -84,11 +84,11 @@ Boolean AddZigZagSlats(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= CLOUD_ObjType_ZigZag_Blue + itemPtr->parm[0];	// blue or red?
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY2(x,z) + 10.0f;	
+	gNewObjectDefinition.coord.y 	= GetTerrainY2(x,z) + 10.0f;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 78;
 	gNewObjectDefinition.moveCall 	= MoveZigZagSlats;
@@ -126,17 +126,17 @@ float	off;
 
 
 			/* DO HORIZ */
-			
+
 	if (theNode->Rot.y == 0.0f)
 	{
 		if (theNode->ZigOrZag)
 			gCoord.x = theNode->InitCoord.x + off;
 		else
 			gCoord.x = theNode->InitCoord.x - off;
-			
+
 		gDelta.x = (gCoord.x - theNode->OldCoord.x) * gFramesPerSecond;
 	}
-	
+
 			/* DO VERT */
 	else
 	{
@@ -160,35 +160,35 @@ float	off;
 Boolean AddCloudPlatform(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-							
+
 					/* MAIN OBJECT */
-							
-	gNewObjectDefinition.genre		= EVENT_GENRE;				
+
+	gNewObjectDefinition.genre		= EVENT_GENRE;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY2(x,z) + 40.0f;	
+	gNewObjectDefinition.coord.y 	= GetTerrainY2(x,z) + 40.0f;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits | STATUS_BIT_KEEPBACKFACES | STATUS_BIT_NOLIGHTING |
 									 STATUS_BIT_NOZWRITES | STATUS_BIT_NOFOG | STATUS_BIT_NOTEXTUREWRAP;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB-5;
 	gNewObjectDefinition.moveCall 	= MoveCloudPlatform;
 	newObj = MakeNewObject(&gNewObjectDefinition);
-	
+
 	newObj->TerrainItemPtr = itemPtr;									// keep ptr to item list
 
-	newObj->CustomDrawFunction = DrawCloudPlatform;		
-	
+	newObj->CustomDrawFunction = DrawCloudPlatform;
+
 	newObj->CType 			= CTYPE_MISC|CTYPE_BLOCKCAMERA;
 	newObj->CBits			= CBITS_ALLSOLID;
 	SetObjectCollisionBounds(newObj, 10, -200, -CLOUD_RADIUS, CLOUD_RADIUS, CLOUD_RADIUS, -CLOUD_RADIUS);
-	
-	
+
+
 	newObj->SpecialF[0] = RandomFloat()*PI2;
 	newObj->SpecialF[1] = RandomFloat()*PI2;
 	newObj->SpecialF[2] = RandomFloat()*PI2;
 	newObj->SpecialF[3] = RandomFloat()*PI2;
-	
+
 	newObj->SpecialF[4] = RandomFloat2() * PI2;
-	
+
 	return(true);
 }
 
@@ -200,7 +200,7 @@ static void MoveCloudPlatform(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 		/* SEE IF OUT OF RANGE */
-		
+
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
 		DeleteObject(theNode);
@@ -209,7 +209,7 @@ float	fps = gFramesPerSecondFrac;
 
 
 		/* SPIN THE LAYERS */
-		
+
 	theNode->SpecialF[0] += fps * .5f;
 	theNode->SpecialF[1] -= fps * .6f;
 	theNode->SpecialF[2] += fps * .1f;
@@ -217,7 +217,7 @@ float	fps = gFramesPerSecondFrac;
 
 
 		/* WOBBLE */
-		
+
 	theNode->SpecialF[4] += fps * 1.1f;
 	theNode->Coord.y = theNode->InitCoord.y + sin(theNode->SpecialF[4]) * 30.0f;
 	CalcObjectBoxFromNode(theNode);
@@ -245,40 +245,40 @@ const static float	scale[4] = {.5, .7, .9, .6};
 	z = theNode->Coord.z;
 
 
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][CLOUD_SObjType_Cloud].materialObject, setupInfo);			
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][CLOUD_SObjType_Cloud].materialObject, setupInfo);
 
 			/*******************/
 			/* DRAW ALL LAYERS */
 			/*******************/
-			
+
 	for (i = 0; i < 4; i++)
 	{
 		s = CLOUD_RADIUS * scale[i];
-	
+
 		glPushMatrix();
-	
+
 		OGLMatrix4x4_SetRotate_Y(&m, theNode->SpecialF[i]);				// set rot
 		m.value[M03] = x;												// translate
 		m.value[M13] = y;
 		m.value[M23] = z;
 		glMultMatrixf((GLfloat *)&m);
 
-	
+
 		glBegin(GL_QUADS);
-		
+
 		glTexCoord2f(0,0);			glVertex3f(-s,0,-s);
 		glTexCoord2f(0,1);			glVertex3f(s,0,-s);
 		glTexCoord2f(1,1);			glVertex3f(s,0,s);
 		glTexCoord2f(1,0);			glVertex3f(-s,0,s);
-		
+
 		glEnd();
-		
+
 		glPopMatrix();
-		
+
 		y += 30.0f;
 	}
-	
-	
+
+
 }
 
 
@@ -296,12 +296,12 @@ OGLMatrix3x3	m;
 static const OGLPoint2D hengeOff = {-150.0f * LAVA_STONE_SCALE,0};
 OGLPoint2D	hengePt;
 CollisionBoxType *boxPtr;
-																
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FIREICE_ObjType_Stone_Blance + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-//	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+//	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.coord.y 	= GetMinTerrainY(x, z, gNewObjectDefinition.group, gNewObjectDefinition.type, LAVA_STONE_SCALE);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 	gNewObjectDefinition.slot 		= 70;
@@ -316,12 +316,12 @@ CollisionBoxType *boxPtr;
 
 	newObj->CType 			= CTYPE_MISC|CTYPE_BLOCKCAMERA;
 	newObj->CBits			= CBITS_ALLSOLID;
-	
-	
+
+
 	switch(type)
 	{
 				/* BALANCE, B2, DONUT, CLAW */
-				
+
 		case	0:
 		case	3:
 		case	4:
@@ -333,30 +333,30 @@ CollisionBoxType *boxPtr;
 				e = 71.0f * newObj->Scale.x;
 				SetObjectCollisionBounds(newObj, 1000,0,-e,e,e,-e);
 				break;
-				
-				
+
+
 				/* MONOLITH */
-				
+
 		case	1:
 		case	7:
 				CreateCollisionBoxFromBoundingBox(newObj,1,1);
 				break;
-				
-				
+
+
 				/* STONEHENGE */
-				
+
 		case	2:
 		case	8:
 				newObj->NumCollisionBoxes = 2;						// 2 collision boxes
 				boxPtr = &newObj->CollisionBoxes[0];				// get ptr to box array
-				
+
 				OGLMatrix3x3_SetRotate(&m, -rot);					// calc pts of the columns
 				OGLPoint2D_Transform(&hengeOff, &m, &hengePt);
 
 				r = 85.0f * LAVA_STONE_SCALE;						// calc radius of each column
-								
+
 						/* FIRST COLUMN */
-						
+
 				boxPtr[0].top 		= newObj->Coord.y + 1000.0f;
 				boxPtr[0].bottom 	= newObj->Coord.y;
 				boxPtr[0].left 		= (newObj->Coord.x + hengePt.x) - r;
@@ -365,7 +365,7 @@ CollisionBoxType *boxPtr;
 				boxPtr[0].back 		= (newObj->Coord.z + hengePt.y) - r;
 
 						/* SECOND COLUMN */
-						
+
 				boxPtr[1].top 		= newObj->Coord.y + 1000.0f;
 				boxPtr[1].bottom 	= newObj->Coord.y;
 				boxPtr[1].left 		= (newObj->Coord.x - hengePt.x) - r;
@@ -373,7 +373,7 @@ CollisionBoxType *boxPtr;
 				boxPtr[1].front 	= (newObj->Coord.z - hengePt.y) + r;
 				boxPtr[1].back 		= (newObj->Coord.z - hengePt.y) - r;
 
-				KeepOldCollisionBoxes(newObj);	
+				KeepOldCollisionBoxes(newObj);
 				break;
 	}
 	return(true);													// item was added
@@ -388,16 +388,16 @@ CollisionBoxType *boxPtr;
 Boolean AddRadarDish(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*base,*dish;
-				
+
 				/*************/
 				/* MAKE BASE */
 				/*************/
-												
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= SAUCER_ObjType_DishBase;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits ;
 	gNewObjectDefinition.slot 		= 70;
 	gNewObjectDefinition.moveCall 	= MoveRadarDish;
@@ -410,14 +410,14 @@ ObjNode	*base,*dish;
 			/* SET COLLISION STUFF */
 
 	base->CType 		= CTYPE_MISC;
-	base->CBits			= CBITS_ALLSOLID;	
-	CreateCollisionBoxFromBoundingBox(base, 1,1);	
+	base->CBits			= CBITS_ALLSOLID;
+	CreateCollisionBoxFromBoundingBox(base, 1,1);
 
 
 				/*************/
 				/* MAKE DISH */
 				/*************/
-												
+
 	gNewObjectDefinition.type 		= SAUCER_ObjType_Dish;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= RandomFloat()*PI2;
@@ -452,13 +452,13 @@ ObjNode	*dish = base->ChainNode;
 Boolean AddBlobArrow(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-				
-												
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= SLIME_ObjType_BlobArrow;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= FindHighestCollisionAtXZ(x,z, CTYPE_TERRAIN | CTYPE_WATER);	
+	gNewObjectDefinition.coord.y 	= FindHighestCollisionAtXZ(x,z, CTYPE_TERRAIN | CTYPE_WATER);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 70;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject2;
@@ -471,8 +471,8 @@ ObjNode	*newObj;
 			/* SET COLLISION STUFF */
 
 	newObj->CType 			= CTYPE_MISC;
-	newObj->CBits			= CBITS_ALLSOLID;	
-	SetObjectCollisionBounds(newObj, 200, -300, -20,20,20,-20);	
+	newObj->CBits			= CBITS_ALLSOLID;
+	SetObjectCollisionBounds(newObj, 200, -300, -20,20,20,-20);
 
 	return(true);
 }
@@ -484,13 +484,13 @@ ObjNode	*newObj;
 Boolean AddNeuronStrand(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-				
-												
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= BRAINBOSS_ObjType_NeuronStrand;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits | STATUS_BIT_KEEPBACKFACES | STATUS_BIT_NOLIGHTING;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB-1;
 	gNewObjectDefinition.moveCall 	= MoveNeuronStrand;
@@ -503,8 +503,8 @@ ObjNode	*newObj;
 			/* SET COLLISION STUFF */
 
 	newObj->CType 			= CTYPE_MISC;
-	newObj->CBits			= CBITS_ALLSOLID;	
-	CreateCollisionBoxFromBoundingBox_Maximized(newObj);	
+	newObj->CBits			= CBITS_ALLSOLID;
+	CreateCollisionBoxFromBoundingBox_Maximized(newObj);
 
 	newObj->Timer = RandomFloat() * 2.0f;
 
@@ -531,14 +531,14 @@ short	i;
 
 
 		/* SEE IF FIRE NEURON */
-		
+
 	if (theNode->Sparkles[0] == -1)
 	{
 		theNode->Timer -= fps;
 		if (theNode->Timer <= 0.0f)
 		{
 			theNode->Timer = RandomFloat() * 2.0f;							// reset timer
-			
+
 			i = theNode->Sparkles[0] = GetFreeSparkle(theNode);				// get free sparkle slot
 			if (i != -1)
 			{
@@ -551,16 +551,16 @@ short	i;
 				gSparkles[i].color.a = 1;
 
 				gSparkles[i].scale = 300.0f;
-				
+
 				gSparkles[i].separation = 20.0f;
-							
+
 				gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark4;
 			}
 		}
 	}
-	
+
 		/* UPDATE EXISTING SPARKLE */
-		
+
 	else
 	{
 		i = theNode->Sparkles[0];

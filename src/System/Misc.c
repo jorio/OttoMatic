@@ -75,10 +75,10 @@ Str255		numStr;
 	UseResFile(gMainAppRezFile);
 	NumToString(err, numStr);
 	DoAlert (numStr);
-	
-	
+
+
 	Exit2D();
-	
+
 	CleanQuit();
 }
 
@@ -99,9 +99,9 @@ Str255		numStr;
 	MyFlushEvents();
 	NumToString(err, numStr);
 	DoAlert (numStr);
-	
+
 	Exit2D();
-			
+
 }
 
 
@@ -121,9 +121,9 @@ void DoAlert(Str255 s)
 	MyFlushEvents();
 	ParamText(s,NIL_STRING,NIL_STRING,NIL_STRING);
 	NoteAlert(ERROR_ALERT_ID,nil);
-	
+
 	Exit2D();
-	
+
 	HideCursor();
 }
 
@@ -137,13 +137,13 @@ void DoAlertNum(int n)
 	Enter2D();
 
 	NoteAlert(n,nil);
-	
+
 	Exit2D();
-	
+
 }
 
 
-		
+
 /*********************** DO FATAL ALERT *******************/
 
 void DoFatalAlert(Str255 s)
@@ -153,7 +153,7 @@ OSErr	iErr;
 	GammaOn();
 
 	Enter2D();
-	
+
 	UseResFile(gMainAppRezFile);
 
 	ParamText(s,NIL_STRING,NIL_STRING,NIL_STRING);
@@ -169,17 +169,17 @@ OSErr	iErr;
 /************ CLEAN QUIT ***************/
 
 void CleanQuit(void)
-{	
+{
 static Boolean	beenHere = false;
 
 	if (!beenHere)
 	{
 		beenHere = true;
-		
+
 #if DEMO
 		DeleteAllObjects();
-#endif		
-		
+#endif
+
 		ShutdownSound();								// cleanup sound stuff
 
 		DisposeTerrain();								// dispose of any memory allocated by terrain manager
@@ -198,16 +198,16 @@ static Boolean	beenHere = false;
 
 	GameScreenToBlack();
 	CleanupDisplay();								// unloads Draw Sprocket
-    
+
 
 	UseResFile(gMainAppRezFile);
-	
+
 	InitCursor();
 	MyFlushEvents();
 
 	SavePrefs();							// save prefs before bailing
 
-	ExitToShell();		
+	ExitToShell();
 }
 
 
@@ -244,7 +244,7 @@ u_long		range, t;
 	qdRdm = MyRandomLong();
 	range = max+1 - min;
 	t = (qdRdm * range)>>16;	 							// now 0 <= t <= range
-	
+
 	return( t+min );
 }
 
@@ -260,15 +260,15 @@ float RandomFloat(void)
 unsigned long	r;
 float	f;
 
-	r = MyRandomLong() & 0xfff;		
+	r = MyRandomLong() & 0xfff;
 	if (r == 0)
 		return(0);
 
 	f = (float)r;							// convert to float
 	f = f * (1.0f/(float)0xfff);			// get # between 0..1
 	return(f);
-} 
- 
+}
+
 
 /************** RANDOM FLOAT 2 ********************/
 //
@@ -280,7 +280,7 @@ float RandomFloat2(void)
 unsigned long	r;
 float	f;
 
-	r = MyRandomLong() & 0xfff;		
+	r = MyRandomLong() & 0xfff;
 	if (r == 0)
 		return(0);
 
@@ -288,7 +288,7 @@ float	f;
 	f = f * (2.0f/(float)0xfff);			// get # between 0..2
 	f -= 1.0f;								// get -1..+1
 	return(f);
-} 
+}
 
 
 
@@ -298,8 +298,8 @@ void SetMyRandomSeed(unsigned long seed)
 {
 	seed0 = seed;
 	seed1 = 0;
-	seed2 = 0;	
-	
+	seed2 = 0;
+
 }
 
 /**************** INIT MY RANDOM SEED *******************/
@@ -308,7 +308,7 @@ void InitMyRandomSeed(void)
 {
 	seed0 = 0x2a80ce30;
 	seed1 = 0;
-	seed2 = 0;	
+	seed2 = 0;
 }
 
 
@@ -323,9 +323,9 @@ Str255	sf;
 long	i,f;
 
 	i = num;						// get integer part
-	
-	
-	f = (fabs(num)-fabs((float)i)) * 10000;		// reduce num to fraction only & move decimal --> 5 places	
+
+
+	f = (fabs(num)-fabs((float)i)) * 10000;		// reduce num to fraction only & move decimal --> 5 places
 
 	if ((i==0) && (num < 0))		// special case if (-), but integer is 0
 	{
@@ -335,11 +335,11 @@ long	i,f;
 	}
 	else
 		NumToString(i,string);		// make integer into string
-		
+
 	NumToString(f,sf);				// make fraction into string
-	
+
 	string[++string[0]] = '.';		// add "." into string
-	
+
 	if (f >= 1)
 	{
 		if (f < 1000)
@@ -349,7 +349,7 @@ long	i,f;
 		if (f < 10)
 			string[++string[0]] = '0';	// add 10's zero
 	}
-	
+
 	for (i = 0; i < sf[0]; i++)
 	{
 		string[++string[0]] = sf[i+1];	// copy fraction into string
@@ -381,7 +381,7 @@ float	sign = 1;												// assume positive
 	for (i = 1; i <= length; i++)
 	{
 		c  = textStr[i];										// get this char
-		
+
 		if (c == '-')											// see if negative
 		{
 			sign = -1;
@@ -396,8 +396,8 @@ float	sign = 1;												// assume positive
 		else
 		if ((c < '0') || (c > '9'))								// skip all but #'s
 			continue;
-	
-	
+
+
 		if (mode == 0)
 			integer = (integer * 10) + (c - '0');
 		else
@@ -408,7 +408,7 @@ float	sign = 1;												// assume positive
 	}
 
 			/* BUILT A FLOAT FROM IT */
-			
+
 	f = (float)integer + ((float)mantissa/tens[mantissaSize]);
 	f *= sign;
 
@@ -439,10 +439,10 @@ OSErr	err;
 			return(nil);
 		}
 		else
-			return(hand);							
+			return(hand);
 	}
-	return(hand);		
-								
+	return(hand);
+
 }
 
 
@@ -460,7 +460,7 @@ u_long	*cookiePtr;
 	pr = malloc(size);
 #else
 	pr = NewPtr(size);
-#endif	
+#endif
 	if (pr == nil)
 		DoFatalAlert("\pAllocPtr: NewPtr failed");
 
@@ -472,9 +472,9 @@ u_long	*cookiePtr;
 	*cookiePtr = 'PTR4';
 
 	pr += 16;
-	
+
 	gNumPointers++;
-	
+
 	return(pr);
 }
 
@@ -492,7 +492,7 @@ u_long	*cookiePtr;
 	pr = calloc(1, size);
 #else
 	pr = NewPtrClear(size);						// alloc in Application
-#endif	
+#endif
 
 	if (pr == nil)
 		DoFatalAlert("\pAllocPtr: NewPtr failed");
@@ -505,9 +505,9 @@ u_long	*cookiePtr;
 	*cookiePtr = 'PTC4';
 
 	pr += 16;
-	
+
 	gNumPointers++;
-	
+
 	return(pr);
 }
 
@@ -519,20 +519,20 @@ void SafeDisposePtr(Ptr ptr)
 u_long	*cookiePtr;
 
 	ptr -= 16;					// back up to pt to cookie
-	
+
 	cookiePtr = (u_long *)ptr;
-	
+
 	if (*cookiePtr != 'FACE')
 		DoFatalAlert("\pSafeSafeDisposePtr: invalid cookie!");
-		
+
 	*cookiePtr = 0;
-	
-#if USE_MALLOC	
+
+#if USE_MALLOC
 	free(ptr);
 #else
 	DisposePtr(ptr);
 #endif
-	
+
 	gNumPointers--;
 }
 
@@ -547,7 +547,7 @@ void CopyPString(Str255 from, Str255 to)
 short	i,n;
 
 	n = from[0];			// get length
-	
+
 	for (i = 0; i <= n; i++)
 		to[i] = from[i];
 
@@ -561,10 +561,10 @@ void PStringToC(char *pString, char *cString)
 Byte	pLength,i;
 
 	pLength = pString[0];
-	
+
 	for (i=0; i < pLength; i++)					// copy string
 		cString[i] = pString[i+1];
-		
+
 	cString[pLength] = 0x00;					// add null character to end of c string
 }
 
@@ -590,12 +590,12 @@ NumVersion	vers;
 
 
 			/* VERIFY & MAKE FSSPEC FOR DATA FOLDER */
-	
+
 #if DEMO
 	iErr = FSMakeFSSpec(0, 0, "\p:DemoData:Images", &gDataSpec);
-#else			
+#else
 	iErr = FSMakeFSSpec(0, 0, "\p:Data:Images", &gDataSpec);
-#endif	
+#endif
 	if (iErr)
 	{
 		DoAlertNum(133);
@@ -606,7 +606,7 @@ NumVersion	vers;
 
 	if (!gG4)																// if not G4, check processor speed to see if on really fast G3
 	{
-		iErr = Gestalt(gestaltProcClkSpeed,&cpuSpeed);							
+		iErr = Gestalt(gestaltProcClkSpeed,&cpuSpeed);
 		if (iErr != noErr)
 			DoFatalAlert("\pVerifySystem: gestaltProcClkSpeed failed!");
 
@@ -620,21 +620,21 @@ NumVersion	vers;
 	iErr = Gestalt(gestaltSystemVersion,(long *)&vers);
 	if (iErr != noErr)
 		DoFatalAlert("\pVerifySystem: gestaltSystemVersion failed!");
-				
+
 	if (vers.stage >= 0x10)													// see if at least OS 10
 	{
 		gOSX = true;
 		if ((vers.stage == 0x10) && (vers.nonRelRev < 0x10))				// must be at least OS 10.1 !!!
-			DoFatalAlert("\pThis game requires OS 10.1 or later to run on OS X.  Either upgrade to 10.1 or run the game on OS 9."); 
+			DoFatalAlert("\pThis game requires OS 10.1 or later to run on OS X.  Either upgrade to 10.1 or run the game on OS 9.");
 	}
 	else
 	{
 		gOSX = false;
 		if (vers.stage == 8)						// check for 8.6 also
 			if (vers.nonRelRev < 0x60)
-				DoFatalAlert("\pThis game requires at least OS 8.6 with all the updates."); 
+				DoFatalAlert("\pThis game requires at least OS 8.6 with all the updates.");
 	}
-	
+
 		/* REQUIRE CARBONLIB 1.2 */
 
 	iErr = Gestalt(gestaltCarbonVersion,(long *)&vers);
@@ -647,7 +647,7 @@ NumVersion	vers;
 	{
 		if (vers.nonRelRev < 0x20)
 		{
-carbonerr:		
+carbonerr:
 			DoFatalAlert("\pThis application requires CarbonLib 1.2 or newer.  Run Software Update, or install it from the Otto Matic CD.");
 		}
 	}
@@ -661,7 +661,7 @@ carbonerr:
 //
 //		GetDateTime(&secs);
 //		SecondsToDate(secs, &d);
-//		
+//
 //		if ((d.year > 2001) ||
 //			((d.year == 2001) && (d.month > 11)))
 //		{
@@ -672,7 +672,7 @@ carbonerr:
 
 
 			/* CHECK PREFERENCES FOLDER */
-			
+
 	iErr = FindFolder(kOnSystemDisk,kPreferencesFolderType,kDontCreateFolder,			// locate the folder
 					&gPrefsFolderVRefNum,&gPrefsFolderDirID);
 	if (iErr != noErr)
@@ -689,57 +689,57 @@ carbonerr:
 		if (iErr == noErr)
 		{
 					/* CHECK FOR LOW-MEMORY SITUATIONS */
-					
+
 			mem /= 1024;
-			mem /= 1024;			
+			mem /= 1024;
 			if (mem <= 64)						// see if have only 64 MB of real RAM or less installed
 			{
 				u_long	vmAttr;
-				
+
 						/* MUST HAVE VM ON */
-						
+
 				Gestalt(gestaltVMAttr,(long *)&vmAttr);	// get VM attribs to see if its ON
 				if (!(vmAttr & (1 << gestaltVMPresent)))
 				{
 					DoFatalAlert("\pThis game needs at least 96MB of real RAM to run, however, turn on Virtual Memory, reboot your computer, and it might work.");
 				}
-				gLowMemMode = true;					
+				gLowMemMode = true;
 			}
 		}
 	}
-	
-	
 
-	
+
+
+
 		/***********************************/
 		/* SEE IF LITTLE-SNITCH IS RUNNING */
 		/***********************************/
-		
-		
+
+
 	gLittleSnitch = false;
-	
+
 #if ((DEMO == 0) && (OEM == 0))
-	
-	{	
+
+	{
 		ProcessSerialNumber psn = {kNoProcess, kNoProcess};
 		ProcessInfoRec	info;
 		Str255		s;
-		
+
 		info.processName = s;
 		info.processInfoLength = sizeof(ProcessInfoRec);
 		info.processAppSpec = nil;
-		
+
 		while(GetNextProcess(&psn) == noErr)
 		{
 			char	pname[256];
 			char	*matched;
-			
+
 			iErr = GetProcessInformation(&psn, &info);
 			if (iErr)
 				break;
-				
+
 			p2cstrcpy(pname, &s[0]);					// convert pstring to cstring
-			
+
 			matched = strstr (pname, "Snitc");			// does "Snitc" appear anywhere in the process name?
 			if (matched != nil)
 			{
@@ -748,7 +748,7 @@ carbonerr:
 			}
 		}
 	}
-#endif	
+#endif
 
 
 
@@ -756,17 +756,17 @@ carbonerr:
 		/* SEE IF QUICKEN SCHEDULER IS RUNNING */
 		/***************************************/
 
-	{	
+	{
 		ProcessSerialNumber psn = {kNoProcess, kNoProcess};
 		ProcessInfoRec	info;
 		short			i;
 		Str255		s;
 		const char snitch[] = "\pQuicken Scheduler";
-		
+
 		info.processName = s;
 		info.processInfoLength = sizeof(ProcessInfoRec);
 		info.processAppSpec = nil;
-		
+
 		while(GetNextProcess(&psn) == noErr)
 		{
 			iErr = GetProcessInformation(&psn, &info);
@@ -775,7 +775,7 @@ carbonerr:
 
 			if (s[0] != snitch[0])					// see if string matches
 				goto next_process2;
-				
+
 			for (i = 1; i <= s[0]; i++)
 			{
 				if (s[i] != snitch[i])
@@ -784,7 +784,7 @@ carbonerr:
 
 			DoAlert("\pIMPORTANT:  Quicken Scheduler is known to cause certain keyboard access functions in OS X to malfunction.  If the keyboard does not appear to be working in this game, quit Quicken Scheduler to fix it.");
 
-next_process2:;			
+next_process2:;
 		}
 	}
 
@@ -797,7 +797,7 @@ void RegulateSpeed(short fps)
 {
 u_long	n;
 static u_long oldTick = 0;
-	
+
 	n = 60 / fps;
 	while ((TickCount() - oldTick) < n) {}			// wait for n ticks
 	oldTick = TickCount();							// remember current time
@@ -809,7 +809,7 @@ static u_long oldTick = 0;
 void CopyPStr(ConstStr255Param	inSourceStr, StringPtr	outDestStr)
 {
 short	dataLen = inSourceStr[0] + 1;
-	
+
 	BlockMoveData(inSourceStr, outDestStr, dataLen);
 	outDestStr[0] = dataLen - 1;
 }
@@ -839,7 +839,7 @@ slow_down:
 
 	gFramesPerSecond = 1000000.0f / (float)nano.lo;
 	gFramesPerSecond *= 1000.0f;
-	
+
 	if (gFramesPerSecond > 100)					// keep from going over 100fps (there were problems in 2.0 of frame rate precision loss)
 		goto slow_down;
 
@@ -857,14 +857,14 @@ slow_down:
 Boolean IsPowerOf2(int num)
 {
 int		i;
-	
+
 	i = 2;
 	do
 	{
 		if (i == num)				// see if this power of 2 matches
 			return(true);
-		i *= 2;						// next power of 2	
-	}while(i <= num);				// search until power is > number			
+		i *= 2;						// next power of 2
+	}while(i <= num);				// search until power is > number
 
 	return(false);
 }
@@ -880,18 +880,18 @@ void MyFlushEvents(void)
 {
 EventRecord 	theEvent;
 
-	FlushEvents (everyEvent, REMOVE_ALL_EVENTS);	
+	FlushEvents (everyEvent, REMOVE_ALL_EVENTS);
 	FlushEventQueue(GetMainEventQueue());
 
 #if 1
 			/* POLL EVENT QUEUE TO BE SURE THINGS ARE FLUSHED OUT */
-			
+
 	while (GetNextEvent(mDownMask|mUpMask|keyDownMask|keyUpMask|autoKeyMask, &theEvent));
 
 
-	FlushEvents (everyEvent, REMOVE_ALL_EVENTS);	
+	FlushEvents (everyEvent, REMOVE_ALL_EVENTS);
 	FlushEventQueue(GetMainEventQueue());
-#endif	
+#endif
 }
 
 
@@ -910,7 +910,7 @@ short	theShort = *shortPtr;
 
 	Byte	b1 = theShort & 0xff;
 	Byte	b2 = (theShort & 0xff00) >> 8;
-	
+
 	theShort = (b1 << 8) | b2;
 #endif
 
@@ -928,7 +928,7 @@ u_short	theShort = *shortPtr;
 
 	Byte	b1 = theShort & 0xff;
 	Byte	b2 = (theShort & 0xff00) >> 8;
-	
+
 	theShort = (b1 << 8) | b2;
 #endif
 
@@ -942,16 +942,16 @@ u_short	theShort = *shortPtr;
 long SwizzleLong(long *longPtr)
 {
 long	theLong = *longPtr;
-	
+
 #if __LITTLE_ENDIAN__
 
 	Byte	b1 = theLong & 0xff;
 	Byte	b2 = (theLong & 0xff00) >> 8;
 	Byte	b3 = (theLong & 0xff0000) >> 16;
 	Byte	b4 = (theLong & 0xff000000) >> 24;
-	
+
 	theLong = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
-	
+
 #endif
 
 	return(theLong);
@@ -963,16 +963,16 @@ long	theLong = *longPtr;
 u_long SwizzleULong(u_long *longPtr)
 {
 u_long	theLong = *longPtr;
-	
+
 #if __LITTLE_ENDIAN__
 
 	Byte	b1 = theLong & 0xff;
 	Byte	b2 = (theLong & 0xff00) >> 8;
 	Byte	b3 = (theLong & 0xff0000) >> 16;
 	Byte	b4 = (theLong & 0xff000000) >> 24;
-	
+
 	theLong = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
-	
+
 #endif
 
 	return(theLong);

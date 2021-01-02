@@ -56,11 +56,11 @@ int		i;
 
 	for (i = 0; i < MAX_SPARKLES; i++)
 	{
-		gSparkles[i].isActive = false;	
+		gSparkles[i].isActive = false;
 	}
-	
+
 	gPlayerSparkleColor = 0;
-	
+
 	gNumSparkles = 0;
 }
 
@@ -75,7 +75,7 @@ short GetFreeSparkle(ObjNode *theNode)
 int		i;
 
 			/* FIND A FREE SLOT */
-			
+
 	for (i = 0; i < MAX_SPARKLES; i++)
 	{
 		if (!gSparkles[i].isActive)
@@ -89,8 +89,8 @@ got_it:
 	gSparkles[i].isActive = true;
 	gSparkles[i].owner = theNode;
 	gNumSparkles++;
-	
-	return(i);	
+
+	return(i);
 }
 
 
@@ -102,10 +102,10 @@ void DeleteSparkle(short i)
 {
 	if (i == -1)
 		return;
-		
+
 	if (gSparkles[i].isActive)
 	{
-		gSparkles[i].isActive = false;	
+		gSparkles[i].isActive = false;
 		gNumSparkles--;
 	}
 //	else
@@ -131,36 +131,36 @@ static OGLPoint3D		frame[4] =
 	-130,130,0,
 	130,130,0,
 	130,-130,0,
-	-130,-130,0	
+	-130,-130,0
 };
 
 
 	OGL_PushState();
-	
+
 	OGL_DisableLighting();									// deactivate lighting
 	glDisable(GL_NORMALIZE);								// disable vector normalizing since scale == 1
 	glDisable(GL_CULL_FACE);								// deactivate culling
 	glDisable(GL_FOG);										// deactivate fog
 	glDepthMask(GL_FALSE);									// no z-writes
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		// set blending mode		
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		// set blending mode
 
 
 			/*********************/
 			/* DRAW EACH SPARKLE */
 			/*********************/
-			
+
 	cameraLocation = &setupInfo->cameraPlacement.cameraLocation;		// point to camera coord
-			
+
 	for (i = 0; i < MAX_SPARKLES; i++)
 	{
 		ObjNode	*owner;
-		
+
 		if (!gSparkles[i].isActive)							// must be active
-			continue;	
-	
+			continue;
+
 		flags = gSparkles[i].flags;							// get sparkle flags
-	
+
 		owner = gSparkles[i].owner;
 		if (owner != nil)									// if owner is culled then dont draw
 		{
@@ -184,27 +184,27 @@ static OGLPoint3D		frame[4] =
 
 		v.x = cameraLocation->x - where.x;			// calc vector from sparkle to camera
 		v.y = cameraLocation->y - where.y;
-		v.z = cameraLocation->z - where.z;			
+		v.z = cameraLocation->z - where.z;
 		FastNormalizeVector(v.x, v.y, v.z, &v);
-		
-		separation = gSparkles[i].separation;		
+
+		separation = gSparkles[i].separation;
 		where.x += v.x * separation;									// offset the base point
 		where.y += v.y * separation;
 		where.z += v.z * separation;
-	
+
 		if (!(flags & SPARKLE_FLAG_OMNIDIRECTIONAL))		// if not omni then calc alpha based on angle
-		{				
+		{
 			dot = OGLVector3D_Dot(&v, &gSparkles[i].aim);				// calc angle between
 			if (dot <= 0.0f)
 				continue;
-				
+
 			gSparkles[i].color.a = dot;									// make brighter as we look head-on
 		}
-		
-		
-	
+
+
+
 			/* CALC TRANSFORM MATRIX */
-	
+
 		frame[0].x = -gSparkles[i].scale;								// set size of quad
 		frame[0].y = gSparkles[i].scale;
 		frame[1].x = gSparkles[i].scale;
@@ -213,45 +213,45 @@ static OGLPoint3D		frame[4] =
 		frame[2].y = -gSparkles[i].scale;
 		frame[3].x = -gSparkles[i].scale;
 		frame[3].y = -gSparkles[i].scale;
-	
+
 		SetLookAtMatrixAndTranslate(&m, &up, &where, cameraLocation);	// aim at camera & translate
 		OGLPoint3D_TransformArray(&frame[0], &m, tc, 4);
-	
-	
-	
+
+
+
 			/* DRAW IT */
-				
+
 		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_PARTICLES][gSparkles[i].textureNum].materialObject, setupInfo);	// submit material
-					
+
 		if (flags & SPARKLE_FLAG_FLICKER)								// set transparency
 		{
 			OGLColorRGBA	c = gSparkles[i].color;
-		
+
 			c.a += RandomFloat2() * .5f;
 			if (c.a < 0.0)
 				continue;
 			else
 			if (c.a > 1.0f)
 				c.a = 1.0;
-		
-			SetColor4fv((GLfloat *)&c);		
+
+			SetColor4fv((GLfloat *)&c);
 		}
 		else
-			SetColor4fv((GLfloat *)&gSparkles[i].color);		
-			
-			
-		glBegin(GL_QUADS);				
+			SetColor4fv((GLfloat *)&gSparkles[i].color);
+
+
+		glBegin(GL_QUADS);
 		glTexCoord2f(0,0);	glVertex3fv((GLfloat *)&tc[0]);
 		glTexCoord2f(1,0);	glVertex3fv((GLfloat *)&tc[1]);
 		glTexCoord2f(1,1);	glVertex3fv((GLfloat *)&tc[2]);
 		glTexCoord2f(0,1);	glVertex3fv((GLfloat *)&tc[3]);
-		glEnd();	
+		glEnd();
 	}
 
 
 			/* RESTORE STATE */
-			
-	OGL_PopState();	
+
+	OGL_PopState();
 }
 
 
@@ -265,7 +265,7 @@ void CreatePlayerSparkles(ObjNode *theNode)
 short	i;
 
 			/* CREATE CHEST LIGHTS */
-			
+
 	i = theNode->Sparkles[PLAYER_SPARKLE_CHEST] = GetFreeSparkle(theNode);				// get free sparkle slot
 	if (i == -1)
 		return;
@@ -286,7 +286,7 @@ short	i;
 
 	gSparkles[i].scale = 80.0f;
 	gSparkles[i].separation = 30.0f;
-	
+
 	gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark4;
 }
 
@@ -297,7 +297,7 @@ void CreatePlayerJumpJetSparkles(ObjNode *theNode)
 short	i;
 
 			/* LEFT FOOT */
-			
+
 	i = theNode->Sparkles[PLAYER_SPARKLE_LEFTFOOT] = GetFreeSparkle(theNode);				// get free sparkle slot
 	if (i == -1)
 		return;
@@ -318,12 +318,12 @@ short	i;
 
 	gSparkles[i].scale = 300.0f  * gPlayerInfo.scaleRatio;
 	gSparkles[i].separation = 10.0f;
-	
+
 	gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark3;
 
 
 			/* RIGHT FOOT */
-			
+
 	i = theNode->Sparkles[PLAYER_SPARKLE_RIGHTFOOT] = GetFreeSparkle(theNode);				// get free sparkle slot
 	if (i == -1)
 		return;
@@ -344,7 +344,7 @@ short	i;
 
 	gSparkles[i].scale = 300.0f  * gPlayerInfo.scaleRatio;
 	gSparkles[i].separation = 10.0f;
-	
+
 	gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark3;
 
 }
@@ -369,7 +369,7 @@ float			fps = gFramesPerSecondFrac;
 		const static OGLPoint3D	p = {0,0,0};
 
 				/* GET MATRIX FOR JOINT */
-				
+
 		FindJointFullMatrix(theNode, PLAYER_JOINT_TORSO, &m);
 
 
@@ -377,19 +377,19 @@ float			fps = gFramesPerSecondFrac;
 
 		OGLPoint3D_Transform(&p, &m, &gSparkles[i].where);
 
-		
+
 		gPlayerSparkleColor += fps * 10.0f;
 		gSparkles[i].color.r = (1.0f + sin(gPlayerSparkleColor)) * .5f;
 		gSparkles[i].scale = 80.0f * gPlayerInfo.scaleRatio;
 	}
-	
-	
+
+
 			/***************************/
 			/* UPDATE JUMP-JET SPARKLE */
 			/***************************/
 
 				/* LEFT FOOT */
-				
+
 	i = theNode->Sparkles[PLAYER_SPARKLE_LEFTFOOT];								// get sparkle index
 	if (i != -1)
 	{
@@ -398,18 +398,18 @@ float			fps = gFramesPerSecondFrac;
 
 		FindJointFullMatrix(theNode, PLAYER_JOINT_LEFTFOOT, &m);
 		OGLPoint3D_Transform(&p, &m, &gSparkles[i].where);
-		
+
 		gSparkles[i].color.a -= fps * .6f;						// fade out
 		if (gSparkles[i].color.a <= 0.0f)
 		{
 			DeleteSparkle(i);
 			theNode->Sparkles[PLAYER_SPARKLE_LEFTFOOT] = -1;
-		}			
+		}
 	}
 
 
 				/* RIGHT FOOT */
-				
+
 	i = theNode->Sparkles[PLAYER_SPARKLE_RIGHTFOOT];								// get sparkle index
 	if (i != -1)
 	{
@@ -423,19 +423,19 @@ float			fps = gFramesPerSecondFrac;
 		{
 			DeleteSparkle(i);
 			theNode->Sparkles[PLAYER_SPARKLE_RIGHTFOOT] = -1;
-		}			
+		}
 	}
 
 
 			/*************************/
 			/* UPDATE MUZZLE SPARKLE */
 			/*************************/
-				
+
 	i = theNode->Sparkles[PLAYER_SPARKLE_MUZZLEFLASH];								// get sparkle index
 	if (i != -1)
 	{
 		FindCoordOnJoint(theNode, PLAYER_JOINT_LEFTHAND, &gPlayerMuzzleTipOff, &gSparkles[i].where);
-		
+
 		gSparkles[i].color.a -= fps * 4.0f;						// fade out
 		if (gSparkles[i].color.a <= 0.0f)
 		{
@@ -459,7 +459,7 @@ u_char	flicker = itemPtr->parm[3] & 1;						// see if flicker
 ObjNode	*newObj;
 short	i,numSparkles,j,t;
 float	r,dx,dz,x2,z2;
-static const short textureTable[] = 
+static const short textureTable[] =
 {
 	PARTICLE_SObjType_WhiteSpark,
 	PARTICLE_SObjType_WhiteSpark2,
@@ -485,15 +485,15 @@ static const short textureTable[] =
 			/* MAKE EVENT OBJECT */
 			/*********************/
 
-	gNewObjectDefinition.genre		= EVENT_GENRE;				
+	gNewObjectDefinition.genre		= EVENT_GENRE;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= 0;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+20;
 	gNewObjectDefinition.moveCall 	= MoveStaticObject;
 	newObj = MakeNewObject(&gNewObjectDefinition);
-	
+
 	newObj->TerrainItemPtr = itemPtr;								// keep ptr to item list
 
 
@@ -502,9 +502,9 @@ static const short textureTable[] =
 			/*********************/
 
 	r = (float)itemPtr->parm[0] * (PI/8);
-		
+
 	dx = -sin(r) * (TERRAIN_POLYGON_SIZE/2);
-	dz = -cos(r) * (TERRAIN_POLYGON_SIZE/2);	
+	dz = -cos(r) * (TERRAIN_POLYGON_SIZE/2);
 	x2 = x;
 	z2 = z;
 
@@ -517,7 +517,7 @@ static const short textureTable[] =
 				gSparkles[i].flags = SPARKLE_FLAG_OMNIDIRECTIONAL|SPARKLE_FLAG_FLICKER;
 			else
 				gSparkles[i].flags = SPARKLE_FLAG_OMNIDIRECTIONAL;
-				
+
 			gSparkles[i].where.x = x2;
 			gSparkles[i].where.z = z2;
 			gSparkles[i].where.y = GetTerrainY(x2,z2) + 20.0f;
@@ -528,13 +528,13 @@ static const short textureTable[] =
 			gSparkles[i].color.a = 1;
 
 			gSparkles[i].scale = 60.0f;
-			
+
 			gSparkles[i].separation = 40.0f;
-						
+
 			gSparkles[i].textureNum = t;
 		}
-	
-	
+
+
 		x2 += dx;
 		z2 += dz;
 	}

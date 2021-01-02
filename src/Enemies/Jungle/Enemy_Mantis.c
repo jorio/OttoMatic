@@ -69,7 +69,7 @@ static void MantisShoot(ObjNode *enemy);
 
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -117,13 +117,13 @@ int		i;
 				/*******************************/
 				/* MAKE DEFAULT SKELETON ENEMY */
 				/*******************************/
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_MANTIS,x,z, MANTIS_SCALE, 0, MoveMantis);
 	newObj->TerrainItemPtr = itemPtr;
 	newObj->EnemyRegenerate = itemPtr->parm[3] & (1<<1);
 
 	SetSkeletonAnim(newObj->Skeleton, MANTIS_ANIM_STAND);
-	
+
 
 				/*******************/
 				/* SET BETTER INFO */
@@ -133,16 +133,16 @@ int		i;
 	newObj->Damage 		= .1;
 	newObj->Kind 		= ENEMY_KIND_MANTIS;
 
-	newObj->AttackDelay = 0;		
-	
+	newObj->AttackDelay = 0;
+
 				/* SET COLLISION INFO */
-				
+
 	SetObjectCollisionBounds(newObj, 200,-500,-120,120,120,-120);
 	CalcNewTargetOffsets(newObj,MANTIS_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	for (i = 0; i < NUM_WEAPON_TYPES; i++)
 		newObj->HitByWeaponHandler[i] = MantisHitByWeapon;
 	newObj->HitByJumpJetHandler = MantisHitByJumpJet;
@@ -152,10 +152,10 @@ int		i;
 
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 15, 15,false);
-		
-		
+
+
 	gNumEnemies++;
 	gNumEnemyOfKind[ENEMY_KIND_MANTIS]++;
 	return(true);
@@ -181,8 +181,8 @@ static	void(*myMoveTable[])(ObjNode *) =
 	}
 
 	GetObjectInfo(theNode);
-	
-	myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -197,10 +197,10 @@ float	angle,dist;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
-				
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, MANTIS_TURN_SPEED, true);			
 
-		
+	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, MANTIS_TURN_SPEED, true);
+
+
 
 				/* SEE IF CHASE */
 
@@ -211,21 +211,21 @@ float	angle,dist;
 	}
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfMantisAttack(theNode, angle, dist);
 
-	UpdateMantis(theNode);		
+	UpdateMantis(theNode);
 }
 
 
@@ -241,7 +241,7 @@ float		r,fps,angle,dist;
 
 			/* MOVE TOWARD PLAYER */
 
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, MANTIS_TURN_SPEED, true);			
+	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, MANTIS_TURN_SPEED, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * MANTIS_WALK_SPEED;
@@ -251,29 +251,29 @@ float		r,fps,angle,dist;
 
 
 				/* SEE IF STAND */
-					
+
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
 	if (dist >= MANTIS_CHASE_DIST_MAX)
 		MorphToSkeletonAnim(theNode->Skeleton, MANTIS_ANIM_STAND, 4);
-		
-		
+
+
 				/* UPDATE ANIM SPEED */
 
 	if (theNode->Skeleton->AnimNum == MANTIS_ANIM_WALK)
 		theNode->Skeleton->AnimSpeed = MANTIS_WALK_SPEED * .005f;
-	
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
-		
+
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfMantisAttack(theNode, angle, dist);
-		
-		
-	UpdateMantis(theNode);		
+
+
+	UpdateMantis(theNode);
 }
 
 
@@ -287,30 +287,30 @@ float	fps = gFramesPerSecondFrac;
 
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 			/* SHOOT SPEW */
-			
+
 	MantisShoot(theNode);
-	
+
 
 			/* SEE IF DONE */
-			
+
 	theNode->SpewTimer -= fps;
 	if (theNode->SpewTimer <= 0.0f)
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, MANTIS_ANIM_STAND, 2);
-	}	
+	}
 
-	UpdateMantis(theNode);		
+	UpdateMantis(theNode);
 }
 
 
@@ -323,14 +323,14 @@ static void  MoveMantis_GotHit(ObjNode *theNode)
 
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if on ground, add friction
 		ApplyFrictionToDeltas(1200.0,&gDelta);
-		
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;			// add gravity
 
 	MoveEnemy(theNode);
 
 
 				/* SEE IF DONE */
-			
+
 	theNode->ButtTimer -= gFramesPerSecondFrac;
 	if (theNode->ButtTimer <= 0.0)
 	{
@@ -339,7 +339,7 @@ static void  MoveMantis_GotHit(ObjNode *theNode)
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
@@ -353,22 +353,22 @@ static void  MoveMantis_GotHit(ObjNode *theNode)
 static void  MoveMantis_Death(ObjNode *theNode)
 {
 			/* SEE IF GONE */
-			
+
 	if (theNode->StatusBits & STATUS_BIT_ISCULLED)		// if was culled on last frame and is far enough away, then delete it
 	{
 		if (CalcQuickDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) > 1000.0f)
 		{
 			DeleteEnemy(theNode);
 			return;
-		}		
+		}
 	}
 
 
 				/* MOVE IT */
-				
+
 	if (theNode->Speed3D > 500.0f)
 		TurnObjectTowardTarget(theNode, &gCoord, gCoord.x - gDelta.x, gCoord.z - gDelta.z, 10, false);	// aim with motion
-				
+
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)		// if on ground, add friction
 		ApplyFrictionToDeltas(1500.0,&gDelta);
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;		// add gravity
@@ -376,16 +376,16 @@ static void  MoveMantis_Death(ObjNode *theNode)
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEATH_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 
 				/* UPDATE */
-			
-	UpdateMantis(theNode);		
-	
-	
+
+	UpdateMantis(theNode);
+
+
 }
 
 
@@ -407,24 +407,24 @@ int				i;
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
-	
+	placement = itemPtr->placement;
+
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 
 				/* MAKE DEFAULT SKELETON ENEMY */
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_MANTIS,x,z, MANTIS_SCALE,0,nil);
-		
-		
+
+
 	newObj->SplineItemPtr = itemPtr;
 	newObj->SplineNum = splineNum;
-	
+
 	SetSkeletonAnim(newObj->Skeleton, MANTIS_ANIM_WALK);
 	newObj->Skeleton->AnimSpeed = 2.0f;
 
 				/* SET BETTER INFO */
-			
+
 	newObj->InitCoord 		= newObj->Coord;							// remember where started
 	newObj->StatusBits		|= STATUS_BIT_ONSPLINE;
 	newObj->SplinePlacement = placement;
@@ -432,16 +432,16 @@ int				i;
 	newObj->Health 			= 1.0;
 	newObj->Damage 			= 0;
 	newObj->Kind 			= ENEMY_KIND_MANTIS;
-		
-					
+
+
 				/* SET COLLISION INFO */
-				
+
 	SetObjectCollisionBounds(newObj, 200,-500,-120,120,120,-120);
 	CalcNewTargetOffsets(newObj,MANTIS_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	for (i = 0; i < NUM_WEAPON_TYPES; i++)
 		newObj->HitByWeaponHandler[i] = MantisHitByWeapon;
 	newObj->HitByJumpJetHandler = MantisHitByJumpJet;
@@ -451,13 +451,13 @@ int				i;
 
 
 				/* MAKE SHADOW & GLOW */
-				
+
 	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 15, 15, false);
 
 
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	DetachObject(newObj, true);										// detach this object from the linked list
 	AddToSplineObjectList(newObj, true);
 
@@ -469,7 +469,7 @@ int				i;
 
 static void MoveMantisOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
 
@@ -480,30 +480,30 @@ Boolean isVisible;
 
 
 			/* UPDATE STUFF IF VISIBLE */
-			
+
 	if (isVisible)
 	{
-		
+
 		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,			// calc y rot aim
-												theNode->Coord.x, theNode->Coord.z);		
+												theNode->Coord.x, theNode->Coord.z);
 
 		theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - theNode->BottomOff;	// calc y coord
 		UpdateObjectTransforms(theNode);											// update transforms
-		UpdateShadow(theNode);	
-		
+		UpdateShadow(theNode);
+
 				/* DO SOME COLLISION CHECKING */
-				
+
 		GetObjectInfo(theNode);
 		if (DoEnemyCollisionDetect(theNode,CTYPE_HURTENEMY, false))					// just do this to see if explosions hurt
 			return;
-			
-			
+
+
 					/* SEE IF LEAVE SPLINE TO CHASE PLAYER */
-					
+
 		if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < MANTIS_DETACH_DIST)
-			DetachEnemyFromSpline(theNode, MoveMantis);			
-			
-	}	
+			DetachEnemyFromSpline(theNode, MoveMantis);
+
+	}
 }
 
 
@@ -516,8 +516,8 @@ static void UpdateMantis(ObjNode *theNode)
 	UpdateEnemy(theNode);
 
 			/* UPDATE BURN */
-			
-			
+
+
 	if (theNode->BurnTimer > 0.0f)
 	{
 		theNode->BurnTimer -= gFramesPerSecondFrac;
@@ -536,7 +536,7 @@ static void UpdateMantis(ObjNode *theNode)
 //
 // returns true if want to disable punch/weapon after this
 //
-   
+
 static Boolean MantisHitByWeapon(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 float	r;
@@ -544,41 +544,41 @@ float	r;
 #pragma unused (weaponCoord, weaponDelta)
 
 		/* SEE IF SUPERNOVA */
-		
+
 	if (weapon == nil)
 		KillMantis(enemy);
-		
+
 		/* NOT SUPERNOVA */
-		
+
 	else
 	{
 		switch(weapon->Kind)
-		{	
+		{
 			case	WEAPON_TYPE_FLAME:
 					enemy->BurnTimer = 3.0;
 					if (gPlayerInfo.scaleRatio <= 1.0f)					// minimal damage if player is normal size
 						HurtMantis(enemy, .09f);
 					else
-						HurtMantis(enemy, .3f);				
+						HurtMantis(enemy, .3f);
 					break;
-							
+
 			case	WEAPON_TYPE_STUNPULSE:
 					if (gPlayerInfo.scaleRatio > 1.0f)
 					{
 						HurtMantis(enemy, .2);
-						
+
 						r = gPlayerInfo.objNode->Rot.y;					// give momentum
 						enemy->Delta.x = -sin(r) * 1000.0f;
 						enemy->Delta.z = -cos(r) * 1000.0f;
 						enemy->Delta.y = 500.0f;
 					}
 					break;
-							
+
 			case	WEAPON_TYPE_FIST:
 					if (gPlayerInfo.scaleRatio > 1.0f)
 					{
 						HurtMantis(enemy, .3);
-						
+
 						r = gPlayerInfo.objNode->Rot.y;					// give momentum
 						enemy->Delta.x = -sin(r) * 1000.0f;
 						enemy->Delta.z = -cos(r) * 1000.0f;
@@ -609,13 +609,13 @@ static Boolean HurtMantis(ObjNode *enemy, float damage)
 {
 
 			/* SEE IF REMOVE FROM SPLINE */
-	
+
 	if (enemy->StatusBits & STATUS_BIT_ONSPLINE)
 		DetachEnemyFromSpline(enemy, MoveMantis);
 
 
 				/* HURT ENEMY & SEE IF KILL */
-				
+
 	enemy->Health -= damage;
 	if (enemy->Health <= 0.0f)
 	{
@@ -625,12 +625,12 @@ static Boolean HurtMantis(ObjNode *enemy, float damage)
 	else
 	{
 					/* GO INTO HIT ANIM */
-				
+
 		if (enemy->Skeleton->AnimNum != MANTIS_ANIM_GOTHIT)
 			MorphToSkeletonAnim(enemy->Skeleton, MANTIS_ANIM_GOTHIT, 5);
 
 		enemy->ButtTimer = 3.0f;
-	}	
+	}
 	return(false);
 }
 
@@ -642,7 +642,7 @@ static void KillMantis(ObjNode *enemy)
 int		i;
 
 	enemy->CType = CTYPE_MISC;
-				
+
 	if (enemy->Skeleton->AnimNum != MANTIS_ANIM_DEATH)
 	{
 		MorphToSkeletonAnim(enemy->Skeleton, MANTIS_ANIM_DEATH, 5);
@@ -650,7 +650,7 @@ int		i;
 	}
 
 			/* DISABLE THE HANDLERS */
-			
+
 	for (i = 0; i < NUM_WEAPON_TYPES; i++)
 		enemy->HitByWeaponHandler[i] = nil;
 	enemy->HitByJumpJetHandler 	= nil;
@@ -670,10 +670,10 @@ static void SeeIfMantisAttack(ObjNode *theNode, float angleToPlayer, float distT
 		return;
 
 			/* DON'T ATTACK THRU THINGS */
-				
+
 	if (SeeIfLineSegmentHitsAnything(&gCoord, &gPlayerInfo.coord, nil, CTYPE_FENCE|CTYPE_BLOCKRAYS))
 		return;
-	
+
 
 	theNode->AttackDelay -= gFramesPerSecondFrac;								// see if ready
 	if (theNode->AttackDelay <= 0.0f)
@@ -682,7 +682,7 @@ static void SeeIfMantisAttack(ObjNode *theNode, float angleToPlayer, float distT
 		{
 			MorphToSkeletonAnim(theNode->Skeleton, MANTIS_ANIM_SPEW, 3);
 			theNode->SpewTimer = 3.0;
-			
+
 			theNode->AttackDelay = 2.5;
 		}
 	}
@@ -701,44 +701,44 @@ OGLVector3D	aim;
 OGLMatrix4x4	m;
 
 			/* SEE IF TIME TO FIRE OFF A SHOT */
-			
+
 	enemy->ShotSpacing -= fps;
 	if (enemy->ShotSpacing <= 0.0f)
 	{
 		enemy->ShotSpacing += .1f + RandomFloat() * .2f;						// reset spacing timer
-			
+
 		PlayEffect3D(EFFECT_MANTISSPIT, &gCoord);
-			
+
 			/* CREATE BLOBULE */
 
 		FindJointFullMatrix(enemy, MANTIS_JOINT_HEAD, &m);
 		OGLPoint3D_Transform(&muzzleOff, &m, &gNewObjectDefinition.coord);	// calc start coord
 		OGLVector3D_Transform(&muzzleAim, &m, &aim);						// calc delta/aim vector
-			
-		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 		gNewObjectDefinition.type 		= JUNGLE_ObjType_AcidDrop;
 		gNewObjectDefinition.flags 		= gAutoFadeStatusBits|STATUS_BIT_USEALIGNMENTMATRIX;
 		gNewObjectDefinition.slot 		= 502;
-		gNewObjectDefinition.moveCall 	= MoveMantisBullet;	
-		gNewObjectDefinition.rot 		= 0;	
+		gNewObjectDefinition.moveCall 	= MoveMantisBullet;
+		gNewObjectDefinition.rot 		= 0;
 		gNewObjectDefinition.scale 		= .9;
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 		newObj->Damage 			= .1;
 
 		newObj->BulletBounceCount	 = 0;
-		
+
 
 			/* SET COLLISION */
 
 		newObj->CType 			= CTYPE_HURTME;
 		newObj->CBits			= CBITS_TOUCHABLE;
 		CreateCollisionBoxFromBoundingBox(newObj, 1, 1);
-			
+
 		newObj->Delta.x = aim.x * BULLET_SPEED;
 		newObj->Delta.y = aim.y * BULLET_SPEED;
 		newObj->Delta.z = aim.z * BULLET_SPEED;
-			
+
 		newObj->DeltaRot.x = RandomFloat2() * PI2;
 		newObj->DeltaRot.y = RandomFloat2() * PI2;
 		newObj->DeltaRot.z = RandomFloat2() * PI2;
@@ -746,9 +746,9 @@ OGLMatrix4x4	m;
 				/* SET THE ALIGNMENT MATRIX */
 
 		SetAlignmentMatrix(&newObj->AlignmentMatrix, &aim);
-			
+
 		AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 4, 4, false);
-		
+
 	}
 }
 
@@ -764,7 +764,7 @@ OGLVector3D	aim;
 	GetObjectInfo(theNode);
 
 			/* MOVE IT */
-				
+
 	gDelta.y -= 1600.0f * fps;
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
@@ -778,12 +778,12 @@ OGLVector3D	aim;
 	if (HandleCollisions(theNode, CTYPE_MISC|CTYPE_TERRAIN|CTYPE_FENCE, -.5f))
 	{
 		ExplodeGeometry(theNode, 200, SHARD_MODE_FROMORIGIN, 1, .5);			// impact splat
-		
+
 		MakePuff(&gCoord, 7.0, PARTICLE_SObjType_GreenFumes, GL_SRC_ALPHA, GL_ONE, 1.2);
 
 		if (theNode->BulletBounceCount == 0)
 			PlayEffect3D(EFFECT_ACIDSIZZLE, &gCoord);
-		
+
 		theNode->BulletBounceCount++;
 		if (theNode->BulletBounceCount > 3)
 		{
@@ -794,8 +794,8 @@ OGLVector3D	aim;
 
 
 		/* SET NEW ALIGNMENT & UPDATE */
-		
-	
+
+
 	FastNormalizeVector(gDelta.x, gDelta.y, gDelta.z, &aim);
 	SetAlignmentMatrix(&theNode->AlignmentMatrix, &aim);
 	UpdateObject(theNode);

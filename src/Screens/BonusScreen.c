@@ -82,7 +82,7 @@ enum
 	BONUS_ObjType_TeleportRing,
 	BONUS_ObjType_RocketInside,
 	BONUS_ObjType_GlowDiscs,
-	
+
 	BONUS_ObjType_PulseGun,
 	BONUS_ObjType_SuperNova,
 	BONUS_ObjType_FreezeGun,
@@ -90,17 +90,17 @@ enum
 	BONUS_ObjType_FlareGun,
 	BONUS_ObjType_Dart,
 	BONUS_ObjType_Growth,
-	
+
 	BONUS_ObjType_TractorBeam
 };
 
 
-		
+
 enum
 {
 	BONUS_SObjType_BonusText,
 	BONUS_SObjType_BonusGlow,
-	
+
 	BONUS_SObjType_InventoryText,
 	BONUS_SObjType_InventoryGlow,
 
@@ -129,7 +129,7 @@ enum
 /*    VARIABLES      */
 /*********************/
 
-static const short	gWeaponToIconTable[] = 
+static const short	gWeaponToIconTable[] =
 {
 	BONUS_ObjType_PulseGun,
 	BONUS_ObjType_FreezeGun,
@@ -196,35 +196,35 @@ static	float	gBonusBeamTimer;
 void DoBonusScreen(void)
 {
 	GammaFadeOut();
-	
+
 			/* SETUP */
-		
+
 	SetupBonusScreen();
 	MakeFadeEvent(true, 1.0);
 
 
 		/* DO SHIP DISSOLVE */
-		
+
 	if (gLevelNum != LEVEL_NUM_BLOB)
 		DoBonusShipDissolve();
-	
+
 
 			/* DO HUMANS BONUS */
-	
+
 	DoHumansBonusTally();
 	gBonusTotal += gBonus;
 
 			/* DO INVENTORY BONUS */
-	
+
 	DoInventoryBonusTally();
 	gBonusTotal += gBonus;
 
 			/* ADD BONUS TO TOTAL */
-					
+
 	DoTotalBonusTally();
 
 			/* DO SAVE GAME */
-			
+
 	if (gLevelNum < LEVEL_NUM_BRAINBOSS)		// dont save on last level
 		DoSaveGame();
 
@@ -234,8 +234,8 @@ void DoBonusScreen(void)
 	if (gLevelNum == LEVEL_NUM_JUNGLE)
 		DoTractorBeam();
 
-			
-	
+
+
 			/* CLEANUP */
 
 	GammaFadeOut();
@@ -258,14 +258,14 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 	gShowScoreMode = SHOW_SCORE_MODE_OFF;
 	gBonusTotal = gBonus = 0;
 	gPointBeepChannel = -1;
-	
+
 	gRocketScaleAdjust = .625f;
 
 			/**************/
 			/* SETUP VIEW */
 			/**************/
-			
-	OGL_NewViewDef(&viewDef);	
+
+	OGL_NewViewDef(&viewDef);
 
 	viewDef.camera.fov 			= 1.0;
 	viewDef.camera.hither 		= 20;
@@ -284,8 +284,8 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 		viewDef.camera.from.z		= 800;
 		viewDef.camera.from.y		= 0;
 		viewDef.camera.to.y 		= 0.0f;
-	}	
-	
+	}
+
 	viewDef.lights.ambientColor.r = .2;
 	viewDef.lights.ambientColor.g = .2;
 	viewDef.lights.ambientColor.b = .15;
@@ -294,8 +294,8 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 
 			/*********************/
 			/* SET ANAGLYPH INFO */
-			/*********************/			
-			
+			/*********************/
+
 	if (gGamePrefs.anaglyph)
 	{
 		if (!gGamePrefs.anaglyphColor)
@@ -304,7 +304,7 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 			viewDef.lights.ambientColor.g 		+= .1f;
 			viewDef.lights.ambientColor.b 		+= .1f;
 		}
-				
+
 		gAnaglyphFocallength	= 80.0f;
 		gAnaglyphEyeSeparation 	= 12.0f;
 	}
@@ -326,15 +326,15 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 
 
 			/* LOAD SKELETONS */
-			
+
 	LoadASkeleton(SKELETON_TYPE_FARMER, gGameViewInfoPtr);
 	LoadASkeleton(SKELETON_TYPE_BEEWOMAN, gGameViewInfoPtr);
 	LoadASkeleton(SKELETON_TYPE_SCIENTIST, gGameViewInfoPtr);
 	LoadASkeleton(SKELETON_TYPE_SKIRTLADY, gGameViewInfoPtr);
-	
+
 
 			/* LOAD SPRITES */
-			
+
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:particle.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
@@ -361,7 +361,7 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 				/**************/
 				/* MAKE STARS */
 				/**************/
-		
+
 		for (i = 0; i < 60; i++)
 		{
 			static OGLColorRGBA colors[] =
@@ -370,39 +370,39 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 				1,.6,.6,1,			// red
 				.6,.6,1,1,			// blue
 				.7,.7,8,1,			// grey
-			
+
 			};
-		
-			gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;	
+
+			gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;
 			gNewObjectDefinition.type 		= BONUS_ObjType_Star;
 			gNewObjectDefinition.coord.x 	= RandomFloat2() * 800.0f;
 			gNewObjectDefinition.coord.y 	= 300.0f + RandomFloat2() * 600.0f;
 			gNewObjectDefinition.coord.z 	= -500;
-			gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_GLOW | STATUS_BIT_NOTEXTUREWRAP | 
+			gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_GLOW | STATUS_BIT_NOTEXTUREWRAP |
 											STATUS_BIT_NOZWRITES | STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING;
 			gNewObjectDefinition.slot 		= 50;
 			gNewObjectDefinition.moveCall 	= MoveStar;
 			gNewObjectDefinition.rot 		= 0;
 			gNewObjectDefinition.scale 	    = .1f + RandomFloat() * .2f;
 			newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-		
+
 			newObj->SpecialF[0] = RandomFloat() * PI;
-			
+
 			newObj->ColorFilter = colors[MyRandomLong()&0x3];
-			
+
 			newObj->Delta.y = -(5.0f + RandomFloat() * 15.0f);
 		}
 
 
-			
+
 				/***************/
 				/* MAKE ROCKET */
 				/***************/
-				
-		gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;	
+
+		gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;
 		gNewObjectDefinition.type 		= BONUS_ObjType_Rocket;
 		gNewObjectDefinition.coord.x 	= 0;
-		gNewObjectDefinition.coord.y 	= 200;	
+		gNewObjectDefinition.coord.y 	= 200;
 		gNewObjectDefinition.coord.z 	= -800;
 		gNewObjectDefinition.flags 		= 0;
 		gNewObjectDefinition.slot 		= 500;
@@ -411,7 +411,7 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 		gNewObjectDefinition.scale 		= .5;
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
-		BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_BONUS,BONUS_ObjType_Rocket, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);			
+		BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_BONUS,BONUS_ObjType_Rocket, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
 
 		MakeRocketFlame(newObj);
 	}
@@ -419,12 +419,12 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 			/*****************/
 			/* MAKE INTERIOR */
 			/*****************/
-			
-	gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;
 	gNewObjectDefinition.type 		= BONUS_ObjType_RocketInside;
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.coord.y 	= -300;	
+	gNewObjectDefinition.coord.y 	= -300;
 	gNewObjectDefinition.flags 		= 0;
 	gNewObjectDefinition.slot 		= 100;
 	gNewObjectDefinition.moveCall 	= nil;
@@ -433,10 +433,10 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 	gInteriorObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	if (gLevelNum != LEVEL_NUM_BLOB)
-		gInteriorObj->ColorFilter.a = 0;		
+		gInteriorObj->ColorFilter.a = 0;
 
 		/* MAKE GLOW DISCS */
-		
+
 	gNewObjectDefinition.type 		= BONUS_ObjType_GlowDiscs;
 	gNewObjectDefinition.flags 		= STATUS_BIT_GLOW | STATUS_BIT_NOLIGHTING;
 	gNewObjectDefinition.slot++;
@@ -454,11 +454,11 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 /********************** FREE BONUS SCREEN **********************/
 
 static void FreeBonusScreen(void)
-{				
+{
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
-	DisposeAllSpriteGroups();	
+	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_BONUS);
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
@@ -472,19 +472,19 @@ static void FreeBonusScreen(void)
 static void DoBonusShipDissolve(void)
 {
 	CalcFramesPerSecond();
-	UpdateInput();		
-		
+	UpdateInput();
+
 	while(gShowScoreMode == SHOW_SCORE_MODE_OFF)
 	{
 		float fps = gFramesPerSecondFrac;
-		
+
 		CalcFramesPerSecond();
-		UpdateInput();		
-		MoveObjects();				
-		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);	
-		
+		UpdateInput();
+		MoveObjects();
+		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+
 		OGL_MoveCameraFromTo(gGameViewInfoPtr, fps * 5.0f, 0,0, 0,fps * -80.0f,0);
-	}	
+	}
 }
 
 
@@ -495,35 +495,35 @@ static void DoHumansBonusTally(void)
 {
 	gScoreAlpha = 0;
 	gShowScoreMode = SHOW_SCORE_MODE_HUMANBONUS;
-	
+
 	CreateBonusHumans();
 
 	CalcFramesPerSecond();
-	UpdateInput();		
-	
+	UpdateInput();
+
 	while(true)
 	{
 		float	fps = gFramesPerSecondFrac;
-		
+
 		CalcFramesPerSecond();
-		UpdateInput();		
-		MoveObjects();				
-		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);	
-		
+		UpdateInput();
+		MoveObjects();
+		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+
 		if (gGameViewInfoPtr->cameraPlacement.cameraLocation.x < 0.0f)				// keep @ 0 for icon alignment
 			OGL_MoveCameraFrom(gGameViewInfoPtr, fps * 5.0f, 0, 0);	// slowly move camera
-		
+
 		gBonusTimer -= fps;
 		if (gBonusTimer < 0.0f)
 			break;
-			
+
 			/* FADE IN/OUT BONUS & SCORE */
-			
+
 		if (gBonusTimer > 1.0f)
 		{
 			gScoreAlpha += fps * 2.0f;
 			if (gScoreAlpha > .99f)
-				gScoreAlpha = .99f;		
+				gScoreAlpha = .99f;
 		}
 		else
 		{
@@ -532,7 +532,7 @@ static void DoHumansBonusTally(void)
 				gScoreAlpha = 0;
 		}
 	}
-	
+
 }
 
 
@@ -543,35 +543,35 @@ static void DoInventoryBonusTally(void)
 	CreateInventoryIcons();
 
 	gBonus = 0;
-	
+
 	gScoreAlpha = 0;
 	gInventoryQuantityAlpha = 0;
-	
+
 	gShowScoreMode = SHOW_SCORE_MODE_INVENTORY;
-	
+
 	CalcFramesPerSecond();
-	UpdateInput();		
-	
+	UpdateInput();
+
 	while(true)
 	{
 		float	fps = gFramesPerSecondFrac;
-		
+
 		CalcFramesPerSecond();
-		UpdateInput();		
-		MoveObjects();				
-		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);	
-		
+		UpdateInput();
+		MoveObjects();
+		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+
 		gBonusTimer -= fps;
 		if (gBonusTimer < 0.0f)
 			break;
-			
+
 			/* FADE IN/OUT BONUS & SCORE */
-			
+
 		if (gBonusTimer > 1.0f)
 		{
 			gScoreAlpha += fps * 2.0f;
 			if (gScoreAlpha > .99f)
-				gScoreAlpha = .99f;		
+				gScoreAlpha = .99f;
 		}
 		else
 		{
@@ -594,77 +594,77 @@ float	tick;
 	gBonus = gBonusTotal;								// set this so correct value displays at bottom of screen
 	gScoreAlpha = 0;
 	gInventoryQuantityAlpha = 0;
-	
+
 	gShowScoreMode = SHOW_SCORE_MODE_ADDTOSCORE;
-		
+
 	tick = 1.0f;
 	gBonusTimer = 2.0;										// used as delay when done counting bonus
-		
+
 	CalcFramesPerSecond();
-	UpdateInput();		
-	
+	UpdateInput();
+
 	while(true)
 	{
 		float	fps = gFramesPerSecondFrac;
-		
+
 		CalcFramesPerSecond();
-		UpdateInput();		
-		MoveObjects();				
-		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);	
-		
+		UpdateInput();
+		MoveObjects();
+		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+
 
 
 				/* SEE IF DONE */
-					
+
 		if (gBonusTotal == 0)							// if all out then tick down timer
 		{
 			StopAChannel(&gPointBeepChannel);
 			gBonusTimer -= fps;
 			if (gBonusTimer < 0.0f)
 				break;
-				
+
 			if (gBonusTimer < .6f)						// see if start text fadeout
 				fadeIn = false;
 		}
 		else
 		{
 					/* SEE IF ADD TO SCORE */
-					
+
 			tick -= fps;
 			if (tick <= 0.0f)
 			{
 				tick = .1;
-			
+
 				if (gBonusTotal >= 951)							// tick up by N unless less than N remaining
 				{
 					gScore += 951;
-					gBonusTotal -= 951;			
+					gBonusTotal -= 951;
 				}
 				else
 				{
 					gScore += gBonusTotal;
 					gBonusTotal = 0;
-				}		
+				}
 				gBonus = gBonusTotal;							// keep these the same so that correct thing displays on screen @ bottom
-				
+
 						/* KEEP AUDIO GOING */
-						
+
 				if (gPointBeepChannel == -1)
 					gPointBeepChannel = PlayEffect(EFFECT_POINTBEEP);
-				
+
 			}
 		}
-		
-	
 
-			
+
+
+
 			/* FADE IN/OUT BONUS & SCORE */
-			
+
 		if (fadeIn)
 		{
 			gScoreAlpha += fps * 2.0f;
 			if (gScoreAlpha > .99f)
-				gScoreAlpha = .99f;		
+				gScoreAlpha = .99f;
 		}
 		else
 		{
@@ -688,7 +688,7 @@ short	i;
 			/**********************/
 			/* BUILD TEXT STRINGS */
 			/**********************/
-			
+
 	gNewObjectDefinition.coord.x 	= 320;
 	gNewObjectDefinition.coord.y 	= 240;
 	gNewObjectDefinition.coord.z 	= 0;
@@ -701,39 +701,39 @@ short	i;
 	for (i = 0; i < 2; i++)
 	{
 		Str255	s;
-	
+
 		GetIndString(s, 3000 + gGamePrefs.language, i + 1);
-	
+
 		gSaveIcons[i] = MakeFontStringObject(s, &gNewObjectDefinition, gGameViewInfoPtr, true);
 		gSaveIcons[i]->ColorFilter.a = 0;
 		gNewObjectDefinition.coord.y 	+= SAVE_TEXT_SIZE * .7f;
-	}	
+	}
 
 				/*************/
 				/* MAIN LOOP */
 				/*************/
-				
+
 	CalcFramesPerSecond();
-	UpdateInput();		
-	
+	UpdateInput();
+
 	while(true)
 	{
 		DoSoundMaintenance();
-	
+
 			/* SEE IF MAKE SELECTION */
-		
+
 		if (NavigateSaveMenu())
 			break;
 
 			/* DRAW STUFF */
-	
+
 		CalcFramesPerSecond();
-		UpdateInput();		
+		UpdateInput();
 		OGL_DrawScene(gGameViewInfoPtr, DrawObjects);
 
 
 			/* FADE IN TEXT */
-			
+
 		for (i = 0; i < 2; i++)
 		{
 			gSaveIcons[i]->ColorFilter.a += gFramesPerSecondFrac * 3.0f;
@@ -742,11 +742,11 @@ short	i;
 		}
 
 
-	}	
+	}
 
 
 			/* CLEANUP */
-				
+
 	for (i = 0; i < 2; i++)
 		DeleteObject(gSaveIcons[i]);
 }
@@ -761,7 +761,7 @@ Boolean	continueGame = false;
 static const OGLColorRGBA noHiliteColor = {.3,.5,.2,1};
 
 		/* SEE IF CHANGE SELECTION */
-		
+
 	if (GetNewKeyState(KEY_UP) && (gSaveMenuSelection > 0))
 	{
 		gSaveMenuSelection--;
@@ -787,14 +787,14 @@ static const OGLColorRGBA noHiliteColor = {.3,.5,.2,1};
 		{
 			gSaveIcons[i]->ColorFilter = noHiliteColor;							// hilite
 		}
-	
+
 	}
-	
-	
+
+
 			/***************************/
 			/* SEE IF MAKE A SELECTION */
 			/***************************/
-			
+
 	if (GetNewKeyState(KEY_RETURN) || GetNewKeyState(KEY_SPACE))
 	{
 		switch(gSaveMenuSelection)
@@ -805,15 +805,15 @@ static const OGLColorRGBA noHiliteColor = {.3,.5,.2,1};
 					if (SaveGame())
 						continueGame = true;
 					break;
-					
+
 			case	1:								// CONTINUE
 					continueGame = true;
 					break;
 		}
-	}	
-	
-	
-	
+	}
+
+
+
 	return(continueGame);
 }
 
@@ -827,20 +827,20 @@ static void DoTractorBeam(void)
 	GammaFadeOut();
 
 	InitBonusTractorBeam();
-		
-		
+
+
 	CalcFramesPerSecond();
-	UpdateInput();		
-	
+	UpdateInput();
+
 	MakeFadeEvent(true, 1.0);
-	
+
 	while(gBonusBeamTimer < 12.0f)
 	{
-		
+
 		CalcFramesPerSecond();
-		UpdateInput();		
-		MoveObjects();				
-		OGL_DrawScene(gGameViewInfoPtr, DrawObjects);	
+		UpdateInput();
+		MoveObjects();
+		OGL_DrawScene(gGameViewInfoPtr, DrawObjects);
 	}
 
 }
@@ -857,14 +857,14 @@ ObjNode	*newObj;
 	DeleteObject(gInteriorObj);										// delete the interior
 
 	gBonusBeamTimer = 0;
-	
+
 
 			/* MAKE ROCKET */
-			
-	gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;
 	gNewObjectDefinition.type 		= BONUS_ObjType_Rocket;
 	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= -300;	
+	gNewObjectDefinition.coord.y 	= -300;
 	gNewObjectDefinition.coord.z 	= -800;
 	gNewObjectDefinition.flags 		= 0;
 	gNewObjectDefinition.slot 		= 500;
@@ -873,14 +873,14 @@ ObjNode	*newObj;
 	gNewObjectDefinition.scale 		= .5;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
-	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_BONUS,BONUS_ObjType_Rocket, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);			
+	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_BONUS,BONUS_ObjType_Rocket, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
 
 	MakeRocketFlame(newObj);
 
 
 			/* MAKE TRACTOR BEAM */
-		
-	gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;
 	gNewObjectDefinition.type 		= BONUS_ObjType_TractorBeam;
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.z 	= -800;
@@ -894,7 +894,7 @@ ObjNode	*newObj;
 
 
 			/* SET CAMERA */
-			
+
 	OGL_UpdateCameraFromTo(gGameViewInfoPtr, &from, &to);
 }
 
@@ -914,9 +914,9 @@ u_long	vol;
 	{
 		rocket->SpecialF[0] += fps * 15.0f;
 		gCoord.x = rocket->InitCoord.x + sin(rocket->SpecialF[0]) * 12.0f;
-	
+
 					/* DRAG DOWN */
-					
+
 		gDelta.y -= 50.0f * fps;
 		if (gDelta.y < -300.0f)
 			gDelta.y = -300.0f;
@@ -927,22 +927,22 @@ u_long	vol;
 
 
 		/* UPDATE FLAME */
-		
-	flame = rocket->ChainNode;			
+
+	flame = rocket->ChainNode;
 	if (flame)
 	{
 		flame->Coord = gCoord;
 		UpdateObjectTransforms(flame);
 	}
-	
+
 			/* UPDATE AUDIO */
-			
-	vol = gGammaFadePercent / 100.0f * (FULL_CHANNEL_VOLUME/2);	
+
+	vol = gGammaFadePercent / 100.0f * (FULL_CHANNEL_VOLUME/2);
 	if (rocket->EffectChannel == -1)
 		rocket->EffectChannel = PlayEffect_Parms(EFFECT_BONUSROCKET, vol, vol, NORMAL_CHANNEL_RATE);
 	else
 		ChangeChannelVolume(rocket->EffectChannel, vol, vol);
-	
+
 }
 
 
@@ -954,28 +954,28 @@ float	fps = gFramesPerSecondFrac;
 float	oldTime = gBonusBeamTimer;
 
 			/* SEE IF TURN ON BEAM */
-			
+
 	gBonusBeamTimer += fps;
 	if ((oldTime < 2.0f) && (gBonusBeamTimer >= 2.0f))
 	{
 		beam->StatusBits &= ~STATUS_BIT_HIDDEN;
 		beam->EffectChannel = PlayEffect_Parms(EFFECT_BONUSTRACTORBEAM, FULL_CHANNEL_VOLUME * 2, FULL_CHANNEL_VOLUME * 2, NORMAL_CHANNEL_RATE * 3/2);
 	}
-		
+
 			/* SEE IF FADE OUT */
-			
+
 	else
 	if ((oldTime < 10.0f) && (gBonusBeamTimer >= 10.0f))
 		MakeFadeEvent(false, 1.0);
-	
+
 
 	GetObjectInfo(beam);
 
 			/* UPDATE BEAM */
-			
+
 	beam->ColorFilter.a = .99f - RandomFloat()*.1f;					// flicker
-	beam->Scale.x = beam->Scale.z = 9.0f - RandomFloat() * .4f;	
-	
+	beam->Scale.x = beam->Scale.z = 9.0f - RandomFloat() * .4f;
+
 	TurnObjectTowardTarget(beam, &gCoord, gGameViewInfoPtr->cameraPlacement.cameraLocation.x, gGameViewInfoPtr->cameraPlacement.cameraLocation.z, 100, false);	// aim at camera
 	UpdateObjectTransforms(beam);
 
@@ -990,30 +990,30 @@ float	oldTime = gBonusBeamTimer;
 /***************** DRAW BONUS CALLBACK *******************/
 
 static void DrawBonusCallback(OGLSetupOutputType *info)
-{			
+{
 	DrawObjects(info);
 	DrawSparkles(info);											// draw light sparkles
 
 	switch(gShowScoreMode)
 	{
 				/* DRAW HUMAN BONUS */
-				
+
 		case	SHOW_SCORE_MODE_HUMANBONUS:
 				DrawHumanBonus(info);
 				break;
-				
+
 				/* DRAW INVENTORY BONUS */
-				
+
 		case	SHOW_SCORE_MODE_INVENTORY:
 				DrawInventoryBonus(info);
 				break;
-				
+
 				/* DRAW TOTALS */
-				
+
 		case	SHOW_SCORE_MODE_ADDTOSCORE:
 				DrawBonusToScore(info);
 				break;
-				
+
 	}
 }
 
@@ -1028,28 +1028,28 @@ static void DrawHumanBonus(OGLSetupOutputType *info)
 		/************/
 
 	OGL_PushState();
-				
+
 	SetInfobarSpriteState();
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
-	
+
 
 			/**********************/
 			/* DRAW BONUS VERBAGE */
 			/**********************/
-	
+
 			/* DRAW GLOW */
-			
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
 	DrawInfobarSprite2(320-150, 335, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_BonusGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 			/* DRAW TEXT */
-			
+
 	gGlobalTransparency = gScoreAlpha;
 	DrawInfobarSprite2(320-150, 335, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_BonusText, info);
-				
+
 
 			/************************/
 			/* DRAW THE BONUS VALUE */
@@ -1080,29 +1080,29 @@ static void DrawInventoryBonus(OGLSetupOutputType *info)
 		/************/
 
 	OGL_PushState();
-			
+
 	SetInfobarSpriteState();
-		
+
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
-	
+
 
 			/**********************/
 			/* DRAW BONUS VERBAGE */
 			/**********************/
-	
+
 			/* DRAW GLOW */
-			
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
 	DrawInfobarSprite2(320-150, 335, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_InventoryGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 			/* DRAW TEXT */
-			
+
 	gGlobalTransparency = gScoreAlpha;
 	DrawInfobarSprite2(320-150, 335, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_InventoryText, info);
-				
+
 
 			/************************/
 			/* DRAW THE BONUS VALUE */
@@ -1115,7 +1115,7 @@ static void DrawInventoryBonus(OGLSetupOutputType *info)
 			/************************/
 			/* DRAW WEAPON QUANTITY */
 			/************************/
-			
+
 	if (gInventoryQuantityAlpha != 0.0f)
 	{
 		DrawInventoryQuantity(info);
@@ -1148,8 +1148,8 @@ float	x;
 	n = s[0];										// get str len
 
 	x = 320.0f - ((float)n / 2.0f) * DIGIT_SPACING_Q - (DIGIT_SPACING_Q/2);	// calc starting x
-	
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (i = 1; i <= n; i++)
 	{
 		texNum = CharToSprite(s[i]);				// get texture #
@@ -1159,7 +1159,7 @@ float	x;
 		x += DIGIT_SPACING_Q;
 	}
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 	gGlobalTransparency = 1.0f;
 }
 
@@ -1173,29 +1173,29 @@ static void DrawBonusToScore(OGLSetupOutputType *info)
 		/************/
 
 	OGL_PushState();
-			
+
 	SetInfobarSpriteState();
-		
+
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
-	
+
 
 			/****************************/
 			/* DRAW BONUS TOTAL VERBAGE */
 			/****************************/
-	
+
 			/* DRAW GLOW */
-			
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
 	DrawInfobarSprite2(320-150, 340, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 			/* DRAW TEXT */
-			
+
 	gGlobalTransparency = gScoreAlpha;
 	DrawInfobarSprite2(320-150, 340, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusText, info);
-				
+
 
 			/************************/
 			/* DRAW THE BONUS VALUE */
@@ -1208,21 +1208,21 @@ static void DrawBonusToScore(OGLSetupOutputType *info)
 			/**************/
 			/* DRAW SCORE */
 			/**************/
-			
+
 			/* DRAW GLOW */
-			
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
 	DrawInfobarSprite2(320-150, 210, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 			/* DRAW TEXT */
-			
+
 	gGlobalTransparency = gScoreAlpha;
 	DrawInfobarSprite2(320-150, 210, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreText, info);
 
 			/* DRAW VALUE */
-			
+
 	DrawScore(info);
 
 
@@ -1252,8 +1252,8 @@ float	x;
 	n = s[0];										// get str len
 
 	x = 320.0f - ((float)n / 2.0f) * DIGIT_SPACING - (DIGIT_SPACING/2);	// calc starting x
-	
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (i = 1; i <= n; i++)
 	{
 		texNum = CharToSprite(s[i]);				// get texture #
@@ -1278,8 +1278,8 @@ float	x;
 	n = s[0];										// get str len
 
 	x = 320.0f - ((float)n / 2.0f) * DIGIT_SPACING - (DIGIT_SPACING/2);	// calc starting x
-	
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (i = 1; i <= n; i++)
 	{
 		texNum = CharToSprite(s[i]);				// get texture #
@@ -1310,14 +1310,14 @@ ObjNode	*newObj;
 	for (i = 0; i < MAX_INVENTORY_SLOTS; i++)
 	{
 		type = gPlayerInfo.weaponInventory[i].type;					// get weapon type
-		
+
 //		if (i ==0) type = WEAPON_TYPE_STUNPULSE;	//---------
-		
+
 		if (type == NO_INVENTORY_HERE)								// skip if blank
 			continue;
 		if (type == WEAPON_TYPE_FIST)								// also skip fist
 			continue;
-			
+
 		quantity = gPlayerInfo.weaponInventory[i].quantity;			// get quantity
 
 //		if (i == 0)	quantity = 10;		//--------
@@ -1328,7 +1328,7 @@ ObjNode	*newObj;
 
 			/* MAKE OBJECT */
 
-		gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;	
+		gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;
 		gNewObjectDefinition.type 		= gWeaponToIconTable[type];
 		gNewObjectDefinition.coord.x 	= 0;
 		gNewObjectDefinition.coord.y 	= 100 + gWeaponIconYOff[type];
@@ -1341,9 +1341,9 @@ ObjNode	*newObj;
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 		newObj->ColorFilter.a 	= 0;
-		newObj->InvisibleDelay 	= d;		
+		newObj->InvisibleDelay 	= d;
 		newObj->Quantity		= quantity;
-		d += (quantity * INVENTORY_COUNT_DELAY) + 1.0f;		
+		d += (quantity * INVENTORY_COUNT_DELAY) + 1.0f;
 	}
 
 	gBonusTimer = d + 2.0f;
@@ -1358,22 +1358,22 @@ static void MoveBonusInventoryIcon(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 			/* SEE IF SHOW NOW */
-			
+
 	if (theNode->InvisibleDelay > 0.0f)
 	{
 		theNode->InvisibleDelay -= fps;
 		if (theNode->InvisibleDelay <= 0.0f)
 			theNode->InvisibleDelay = 0;
 	}
-	
+
 			/**************/
 			/* SHOWING IT */
 			/**************/
 	else
 	{
-				
+
 			/* FADE IN */
-			
+
 		if ((theNode->ColorFilter.a != 1.0f) && (theNode->Quantity > 0))
 		{
 			theNode->ColorFilter.a += fps * 2.0;
@@ -1383,53 +1383,53 @@ float	fps = gFramesPerSecondFrac;
 				gInventoryCountTimer = INVENTORY_COUNT_DELAY;
 			}
 		}
-		
+
 			/* FADE OUT */
-		
+
 		if (theNode->Quantity == 0)
 		{
 			StopAChannel(&gPointBeepChannel);
-		
+
 			theNode->ColorFilter.a -= fps * 2.0;				// fade out and delete when gone
 			if (theNode->ColorFilter.a <= 0.0f)
 			{
 				DeleteObject(theNode);
 				return;
-			}		
+			}
 		}
-		
-		
+
+
 				/* SPIN THE ICON */
-				
-		theNode->Rot.y +=  fps * PI2;	
+
+		theNode->Rot.y +=  fps * PI2;
 		UpdateObjectTransforms(theNode);
-		
-		
+
+
 				/*************************/
 				/* UPDATE BONUS COUNTING */
 				/*************************/
-					
+
 		if (theNode->ColorFilter.a == 1.0f)							// only count when done fading in
 		{
 					/* SEE IF TIME TO COUNT THIS */
-					
+
 			gInventoryCountTimer -= fps;							// check timer
 			if (gInventoryCountTimer <= 0.0f)
 			{
 				gInventoryCountTimer = INVENTORY_COUNT_DELAY;		// reset timer
 				theNode->Quantity--;								// dec quanitity
 				gBonus += POINTS_INVENTORY;
-				
-				
+
+
 						/* KEEP AUDIO GOING */
-						
+
 				if (gPointBeepChannel == -1)
 					gPointBeepChannel = PlayEffect(EFFECT_POINTBEEP);
 			}
-		}		
-		
+		}
+
 		gInventoryQuantityAlpha = theNode->ColorFilter.a;
-		gInventoryQuantity = theNode->Quantity;				
+		gInventoryQuantity = theNode->Quantity;
 	}
 
 }
@@ -1466,8 +1466,8 @@ const short	humanSkeletons[NUM_HUMAN_TYPES] =
 				/* MAKE HUMAN SKELETON */
 				/***********************/
 
-			gNewObjectDefinition.type 		= humanSkeletons[t];	
-			gNewObjectDefinition.animNum	= 0;	
+			gNewObjectDefinition.type 		= humanSkeletons[t];
+			gNewObjectDefinition.animNum	= 0;
 			if (j++ & 1)											// alternate left/right
 				gNewObjectDefinition.coord.x = 200.0f;
 			else
@@ -1484,7 +1484,7 @@ const short	humanSkeletons[NUM_HUMAN_TYPES] =
 
 			newObj->ColorFilter.a = 0;
 			newObj->InvisibleDelay = d;
-			
+
 			d += 1.25f;
 		}
 	}
@@ -1498,14 +1498,14 @@ static void MoveBonusHuman(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 			/* SEE IF FADE IN NOW */
-			
+
 	if (theNode->InvisibleDelay > 0.0f)
 	{
 		theNode->InvisibleDelay -= fps;
 		if (theNode->InvisibleDelay <= 0.0f)
 		{
 				/* START TELEPORT */
-				
+
 			StartBonusTeleport(theNode);
 			gBonus += POINTS_HUMAN;
 		}
@@ -1526,17 +1526,17 @@ static void MoveBonusHuman_WalkOff(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 			/* SEE IF WALKED OUT OF VIEW */
-			
+
 	if (theNode->StatusBits & STATUS_BIT_ISCULLED)
 	{
 		DeleteObject(theNode);
-		return;	
+		return;
 	}
 
 	GetObjectInfo(theNode);
-		
+
 		/* ACCEL FORWARD */
-		
+
 	gDelta.x += -sin(theNode->Rot.y) * 300.0f * fps;
 	gDelta.z += -cos(theNode->Rot.y) * 300.0f * fps;
 	theNode->Speed2D = CalcVectorLength(&gDelta);
@@ -1549,11 +1549,11 @@ float	fps = gFramesPerSecondFrac;
 	}
 
 			/* SET ANIM SPEED */
-			
+
 	theNode->Skeleton->AnimSpeed = theNode->Speed2D * .009f;
 
 			/* MOVE IT */
-			
+
 	gCoord.x += gDelta.x * fps;
 	gCoord.z += gDelta.z * fps;
 
@@ -1573,21 +1573,21 @@ int		i;
 		/***********************/
 		/* MAKE TELEPORT RINGS */
 		/***********************/
-	
+
 			/* RING 1 */
-			
-	gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;
 	gNewObjectDefinition.type 		= BONUS_ObjType_TeleportRing;
 	gNewObjectDefinition.coord.x 	= human->Coord.x;
 	gNewObjectDefinition.coord.z 	= human->Coord.z;
-	gNewObjectDefinition.coord.y 	= human->Coord.y;	
+	gNewObjectDefinition.coord.y 	= human->Coord.y;
 	gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES|STATUS_BIT_GLOW|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOZWRITES;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+20;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= .6;
-	ring1 = MakeNewDisplayGroupObject(&gNewObjectDefinition);	
-	ring1->RingOffset = 0;	
+	ring1 = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	ring1->RingOffset = 0;
 	ring1->ColorFilter.a = .99;
 	ring1->Rot.x = RandomFloat2() * .3f;
 	ring1->Rot.z = RandomFloat2() * .3f;
@@ -1595,15 +1595,15 @@ int		i;
 
 
 			/* RING 2 */
-			
+
 	ring2 = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	ring2->RingOffset = 0;
 	ring2->ColorFilter.a = .99;
 	ring2->Rot.x = RandomFloat2() * .3f;
 	ring2->Rot.z = RandomFloat2() * .3f;
 	ring1->ChainNode = ring2;
-	
-	
+
+
 			/* MAKE SPARKLE */
 
 	i = ring1->Sparkles[0] = GetFreeSparkle(ring1);				// get free sparkle slot
@@ -1619,12 +1619,12 @@ int		i;
 
 		gSparkles[i].scale = 250.0f;
 		gSparkles[i].separation = 100.0f;
-		
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_BlueSpark;
-	}	
-	
-	
-	PlayEffect(EFFECT_BONUSTELEPORT);		
+	}
+
+
+	PlayEffect(EFFECT_BONUSTELEPORT);
 }
 
 
@@ -1637,13 +1637,13 @@ ObjNode *ring1,*ring2;
 int		i;
 
 			/* GET RINGS */
-			
+
 	ring1 = human->ChainNode;
 	ring2 = ring1->ChainNode;
 
 
 			/* MOVE RINGS */
-				
+
 	ring1->RingOffset += fps * 100.0f;
 	ring1->Coord.x = human->Coord.x;
 	ring1->Coord.y = human->Coord.y + ring1->RingOffset;
@@ -1660,7 +1660,7 @@ int		i;
 
 	UpdateObjectTransforms(ring1);
 	UpdateObjectTransforms(ring2);
-	
+
 			/* FADE IN HUMAN */
 
 	human->ColorFilter.a += fps * .7f;
@@ -1676,14 +1676,14 @@ int		i;
 
 	ring1->ColorFilter.a = 1.0f - human->ColorFilter.a;
 	ring2->ColorFilter.a = 1.0f - human->ColorFilter.a;
-		
+
 	if (human->ShadowNode)
-		human->ShadowNode->ColorFilter.a = human->ColorFilter.a;	
-	
-		
+		human->ShadowNode->ColorFilter.a = human->ColorFilter.a;
+
+
 		/* UPDATE SPARKLE */
-	
-	i = ring1->Sparkles[0];	
+
+	i = ring1->Sparkles[0];
 	if (i != -1)
 	{
 		gSparkles[i].color.a -= fps * 1.0f;
@@ -1705,7 +1705,7 @@ float	fps = gFramesPerSecondFrac;
 	theNode->Coord.y += theNode->Delta.y * fps;
 	if (theNode->Coord.y > 850.0f)
 		theNode->Coord.y = -850.0f;
-		
+
 	UpdateObjectTransforms(theNode);
 }
 
@@ -1719,13 +1719,13 @@ float	a;
 ObjNode	*flame;
 u_long	vol;
 
-	GetObjectInfo(rocket);	
+	GetObjectInfo(rocket);
 
 	gCoord.y -= 100.0f * fps;
 	gCoord.z += 260.0f * fps;
 
 	rocket->Rot.y += fps * .5f;
-	
+
 	if (gCoord.z > 400.0f)													// fade when close
 	{
 		a = rocket->ColorFilter.a -= fps * 1.3f;							// fade out the ship
@@ -1739,32 +1739,32 @@ u_long	vol;
 		else
 			gInteriorObj->ColorFilter.a = 1.0f - rocket->ColorFilter.a;		// fade in the interior as ship fades out
 	}
-	
-	
+
+
 			/**********/
 			/* UPDATE */
 			/**********/
-			
+
 	UpdateObject(rocket);
-	
+
 		/* UPDATE FLAME */
-		
-	flame = rocket->ChainNode;			
+
+	flame = rocket->ChainNode;
 	if (flame)
 	{
 		flame->ColorFilter.a = rocket->ColorFilter.a;
 		flame->Coord = gCoord;
 		UpdateObjectTransforms(flame);
 	}
-	
+
 	if (rocket->Sparkles[0] != -1)											// fade sparkle
 	{
 		gSparkles[rocket->Sparkles[0]].color.a = rocket->ColorFilter.a * .6f;
 	}
-	
+
 			/* UPDATE AUDIO */
-			
-	vol = gGammaFadePercent / 100.0f * (FULL_CHANNEL_VOLUME/2);	
+
+	vol = gGammaFadePercent / 100.0f * (FULL_CHANNEL_VOLUME/2);
 	if (rocket->EffectChannel == -1)
 		rocket->EffectChannel = PlayEffect_Parms(EFFECT_BONUSROCKET, vol, vol, NORMAL_CHANNEL_RATE);
 	else

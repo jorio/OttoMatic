@@ -71,7 +71,7 @@ static Boolean CornGotPunched(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *fistC
 
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -128,30 +128,30 @@ ObjNode	*newObj;
 				/*******************************/
 				/* MAKE DEFAULT SKELETON ENEMY */
 				/*******************************/
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_CORN,x,z, CORN_SCALE, 0, MoveCorn);
 
 	SetSkeletonAnim(newObj->Skeleton, CORN_ANIM_STAND);
-	
+
 
 				/*******************/
 				/* SET BETTER INFO */
 				/*******************/
-			
+
 	newObj->Health 		= 1.0;
 	newObj->Damage 		= .1;
 	newObj->Kind 		= ENEMY_KIND_CORN;
-	
-		
-	
+
+
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,CORN_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] = CornEnemyHitByStunPulse;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] = CornHitBySuperNova;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FIST] = CornGotPunched;
@@ -159,17 +159,17 @@ ObjNode	*newObj;
 
 	newObj->HurtCallback = HurtCorn;							// set hurt callback function
 
-	
+
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8,false);
-	
+
 	CreateCornSparkles(newObj);
-		
+
 	gNumEnemies++;
 	gNumEnemyOfKind[ENEMY_KIND_CORN]++;
-	
+
 	return(newObj);
 }
 
@@ -189,7 +189,7 @@ ObjNode	*newObj;
 		newObj->Rot.y = CalcYAngleFromPointToPoint(0, x, z, gPlayerInfo.coord.x, gPlayerInfo.coord.z);		// aim at player
 
 		SetSkeletonAnim(newObj->Skeleton, CORN_ANIM_GROW);
-		UpdateObjectTransforms(newObj);				
+		UpdateObjectTransforms(newObj);
 	}
 }
 
@@ -213,7 +213,7 @@ static	void(*myMoveTable[])(ObjNode *) =
 	}
 
 	GetObjectInfo(theNode);
-	myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -228,33 +228,33 @@ float	angleToTarget,dist;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
-				
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, CORN_TURN_SPEED, true);			
 
-		
+	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, CORN_TURN_SPEED, true);
+
+
 
 				/* SEE IF CHASE */
 
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
 	if (dist < CORN_CHASE_DIST)
-	{					
+	{
 		MorphToSkeletonAnim(theNode->Skeleton, CORN_ANIM_WALK, 8);
 	}
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
 
 
-	UpdateCorn(theNode);		
+	UpdateCorn(theNode);
 }
 
 
@@ -269,30 +269,30 @@ float		r,fps;
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
-			
-	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, CORN_TURN_SPEED, true);			
+
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, CORN_TURN_SPEED, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * CORN_WALK_SPEED;
 	gDelta.z = -cos(r) * CORN_WALK_SPEED;
 	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
 	MoveEnemy(theNode);
-		
-		
+
+
 				/* UPDATE ANIM SPEED */
 
 	if (theNode->Skeleton->AnimNum == CORN_ANIM_WALK)
 		theNode->Skeleton->AnimSpeed = CORN_WALK_SPEED * .007f;
-	
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
-		
+
 	DoCornShoot(theNode);
-		
-	UpdateCorn(theNode);		
+
+	UpdateCorn(theNode);
 }
 
 
@@ -302,14 +302,14 @@ static void  MoveCorn_GetHit(ObjNode *theNode)
 {
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if on ground, add friction
 		ApplyFrictionToDeltas(400.0,&gDelta);
-		
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;			// add gravity
 
 	MoveEnemy(theNode);
 
 
 				/* SEE IF DONE */
-			
+
 	theNode->ButtTimer -= gFramesPerSecondFrac;
 	if (theNode->ButtTimer <= 0.0)
 	{
@@ -318,7 +318,7 @@ static void  MoveCorn_GetHit(ObjNode *theNode)
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
@@ -336,25 +336,25 @@ float	scale;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 		/* MAKE GROW */
-		
+
 	scale = theNode->Scale.x += gFramesPerSecondFrac;
-	
+
 	if (scale >= CORN_SCALE)
 	{
 		scale = CORN_SCALE;
 		CreateCollisionBoxFromBoundingBox(theNode, 1,1);
-		MorphToSkeletonAnim(theNode->Skeleton, CORN_ANIM_STAND, 2);	
+		MorphToSkeletonAnim(theNode->Skeleton, CORN_ANIM_STAND, 2);
 		gDelta.y = 700.0f;
 	}
 
-	theNode->Scale.x = 
-	theNode->Scale.y = 
+	theNode->Scale.x =
+	theNode->Scale.y =
 	theNode->Scale.z = scale;
 
 	if (DoEnemyCollisionDetect(theNode,0, true))			// just do ground
 		return;
 
-	UpdateCorn(theNode);		
+	UpdateCorn(theNode);
 }
 
 
@@ -375,40 +375,40 @@ float			x,z,placement;
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
-	
+	placement = itemPtr->placement;
+
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 
 				/* MAKE DEFAULT SKELETON ENEMY */
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_CORN,x,z, CORN_SCALE, 0, nil);
-		
-		
+
+
 	newObj->SplineItemPtr = itemPtr;
 	newObj->SplineNum = splineNum;
-	
+
 	SetSkeletonAnim(newObj->Skeleton, CORN_ANIM_WALK);
-		
+
 
 				/* SET BETTER INFO */
-			
+
 	newObj->StatusBits		|= STATUS_BIT_ONSPLINE;
 	newObj->SplinePlacement = placement;
-	newObj->Coord.y 		-= newObj->BottomOff;			
+	newObj->Coord.y 		-= newObj->BottomOff;
 	newObj->SplineMoveCall 	= MoveCornOnSpline;				// set move call
 	newObj->Health 			= 1.0;
 	newObj->Damage 			= 0;
 	newObj->Kind 			= ENEMY_KIND_CORN;
-	
-	
+
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,CORN_TARGET_OFFSET);
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] = CornEnemyHitByStunPulse;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] = CornHitBySuperNova;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FIST] 	= CornGotPunched;
@@ -420,14 +420,14 @@ float			x,z,placement;
 	newObj->InitCoord = newObj->Coord;							// remember where started
 
 				/* MAKE SHADOW */
-				
+
 	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8, false);
 
 	CreateCornSparkles(newObj);
 
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	DetachObject(newObj, true);									// detach this object from the linked list
 	AddToSplineObjectList(newObj, true);
 
@@ -439,7 +439,7 @@ float			x,z,placement;
 
 static void MoveCornOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
 
@@ -450,33 +450,33 @@ Boolean isVisible;
 
 
 			/* UPDATE STUFF IF VISIBLE */
-			
+
 	if (isVisible)
 	{
 		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,			// calc y rot aim
-												theNode->Coord.x, theNode->Coord.z);		
+												theNode->Coord.x, theNode->Coord.z);
 
 		theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - theNode->BottomOff;	// calc y coord
 		UpdateObjectTransforms(theNode);																// update transforms
-		UpdateShadow(theNode);	
+		UpdateShadow(theNode);
 		UpdateCornSparkles(theNode);
-		
+
 				/* DO SOME COLLISION CHECKING */
-				
+
 		GetObjectInfo(theNode);
 		if (DoEnemyCollisionDetect(theNode,CTYPE_HURTENEMY, false))					// just do this to see if explosions hurt
 			return;
 
 					/* TRY SHOOTING */
-					
+
 		DoCornShoot(theNode);
 
 					/* SEE IF LEAVE SPLINE TO CHASE PLAYER */
-					
-		if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < CORN_DETACH_DIST)
-			DetachEnemyFromSpline(theNode, MoveCorn);			
 
-	}	
+		if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < CORN_DETACH_DIST)
+			DetachEnemyFromSpline(theNode, MoveCorn);
+
+	}
 }
 
 
@@ -510,7 +510,7 @@ short	i,j;
 	{
 
 				/* CREATE EYE LIGHTS */
-				
+
 		i = theNode->Sparkles[j] = GetFreeSparkle(theNode);				// get free sparkle slot
 		if (i == -1)
 			return;
@@ -531,7 +531,7 @@ short	i,j;
 
 		gSparkles[i].scale = 170.0f;
 		gSparkles[i].separation = 10.0f;
-		
+
 		gSparkles[i].textureNum = PARTICLE_SObjType_WhiteSpark3;
 	}
 }
@@ -558,7 +558,7 @@ const static OGLPoint3D	rightEye = {27,10,-60};
 		FindCoordOnJoint(theNode, 0, &rightEye, &gSparkles[i].where);		// calc coord of right eye
 		gSparkles[i].aim.x = aimX;											// update aim vector
 		gSparkles[i].aim.z = aimZ;
-	}	
+	}
 
 
 		/* UPDATE LEFT EYE */
@@ -569,7 +569,7 @@ const static OGLPoint3D	rightEye = {27,10,-60};
 		FindCoordOnJoint(theNode, 0, &leftEye, &gSparkles[i].where);		// calc coord of left eye
 		gSparkles[i].aim.x = aimX;											// update aim vector
 		gSparkles[i].aim.z = aimZ;
-	}	
+	}
 
 }
 
@@ -584,21 +584,21 @@ const static OGLPoint3D	rightEye = {27,10,-60};
 static Boolean CornEnemyHitByStunPulse(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord, weaponDelta)
-	
+
 			/* HURT IT */
-			
+
 	if (HurtCorn(enemy, .5))
 		return(true);
 
-	
-	
+
+
 
 			/* GIVE MOMENTUM */
 
 	enemy->Delta.x += weaponDelta->x * .6f;
 	enemy->Delta.y += weaponDelta->y * .6f;
 	enemy->Delta.z += weaponDelta->z * .6f;
-	
+
 	return(true);
 }
 
@@ -614,7 +614,7 @@ float	r;
 #pragma unused (weapon, fistCoord, weaponDelta)
 
 			/* HURT IT */
-			
+
 	if (HurtCorn(enemy, .2))
 		return(true);
 
@@ -626,7 +626,7 @@ float	r;
 	enemy->Delta.z = -cos(r) * 500.0f;
 	enemy->Delta.y = 300.0f;
 
-	return(true);	
+	return(true);
 }
 
 /************** CORN GOT HIT BY SUPERNOVA  *****************/
@@ -634,9 +634,9 @@ float	r;
 static Boolean CornHitBySuperNova(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord, weaponDelta)
-	
+
 	KillCorn(enemy);
-	
+
 	return(false);
 }
 
@@ -656,13 +656,13 @@ static Boolean HurtCorn(ObjNode *enemy, float damage)
 {
 
 			/* SEE IF REMOVE FROM SPLINE */
-	
+
 	if (enemy->StatusBits & STATUS_BIT_ONSPLINE)
 		DetachEnemyFromSpline(enemy, MoveCorn);
 
 
 				/* HURT ENEMY & SEE IF KILL */
-				
+
 	enemy->Health -= damage;
 	if (enemy->Health <= 0.0f)
 	{
@@ -671,13 +671,13 @@ static Boolean HurtCorn(ObjNode *enemy, float damage)
 	else
 	{
 					/* GO INTO HIT ANIM */
-				
+
 		if (enemy->Skeleton->AnimNum != CORN_ANIM_GETHIT)
 			MorphToSkeletonAnim(enemy->Skeleton, CORN_ANIM_GETHIT, 5);
 
 		enemy->ButtTimer = 3.0f;
-	}	
-	
+	}
+
 	return(false);
 }
 
@@ -692,38 +692,38 @@ static Boolean KillCorn(ObjNode *enemy)
 ObjNode	*newObj;
 int		i;
 float	y;
-			
+
 	SpewAtoms(&enemy->Coord, 0,1, 3, false);
 	PlayEffect3D(EFFECT_CORNCRUNCH, &enemy->Coord);
-			
+
 			/* EXPLODE POPCORN */
-								
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_PopCorn;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
-	gNewObjectDefinition.moveCall 	= MovePopcorn;	
-	gNewObjectDefinition.rot 		= 0;	
+	gNewObjectDefinition.moveCall 	= MovePopcorn;
+	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= 1.0;
 
 	y = GetTerrainY(enemy->Coord.x, enemy->Coord.z);
-	
+
 	for (i = 0; i < 20; i++)
 	{
 		gNewObjectDefinition.coord.x 	= enemy->Coord.x + RandomFloat2() * 70.0f;
-		gNewObjectDefinition.coord.z 	= enemy->Coord.z + RandomFloat2() * 70.0f;	
+		gNewObjectDefinition.coord.z 	= enemy->Coord.z + RandomFloat2() * 70.0f;
 		gNewObjectDefinition.coord.y 	= y + RandomFloat() * 250.0f;
 
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 		newObj->Delta.x = RandomFloat2() * 700.0f;
 		newObj->Delta.z = RandomFloat2() * 700.0f;
 		newObj->Delta.y = 600.0f + RandomFloat2() * 1000.0f;
 
 		newObj->DeltaRot.x = RandomFloat2() * PI2;
 		newObj->DeltaRot.y = RandomFloat2() * PI2;
-		newObj->DeltaRot.z = RandomFloat2() * PI2;	
-	
+		newObj->DeltaRot.z = RandomFloat2() * PI2;
+
 		newObj->Health = 3.0f + RandomFloat() * 2.0f;
 
 		CreateCollisionBoxFromBoundingBox(newObj, 1,1);
@@ -731,11 +731,11 @@ float	y;
 
 
 			/* EXPLODE GEOMETRY */
-				
+
 	ExplodeGeometry(enemy, 300, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 2, 1.0);
-	
-	
-	DeleteEnemy(enemy);	
+
+
+	DeleteEnemy(enemy);
 	return(true);
 }
 
@@ -753,27 +753,27 @@ float	fps = gFramesPerSecondFrac;
 			/*********************************/
 			/* UPDATE CURRENT SHOOTING SPREE */
 			/*********************************/
-			
+
 	if (enemy->IsShooting)
 	{
 			/* SEE IF TIME TO FIRE OFF A KERNEL */
-			
+
 		enemy->ShotSpacing -= fps;
 		if (enemy->ShotSpacing <= 0.0f)
 		{
 			enemy->ShotSpacing += .4f;								// reset spacing timer
-			
+
 			ShootCornKernel(enemy);
-		
-		
+
+
 				/* SEE IF ALL DONE */
-				
+
 			enemy->ShotCounter++;
 			if (enemy->ShotCounter >= 3)
 				enemy->IsShooting = false;
-		}	
+		}
 	}
-	
+
 			/********************************/
 			/* SEE IF SHOULD START SHOOTING */
 			/********************************/
@@ -783,19 +783,19 @@ float	fps = gFramesPerSecondFrac;
 		if (enemy->DelayToShoot <= 0.0f)
 		{
 				/* SEE IF AIMED AT PLAYER */
-				
+
 			if (TurnObjectTowardTarget(enemy, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, 0, true) < (PI/3.0f))
 			{
 				/* SEE IF IN RANGE */
-				
+
 				if (CalcDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < CORN_ATTACK_DIST)
 				{
 						/* START SHOOTING */
-						
+
 					enemy->IsShooting = true;
 					enemy->DelayToShoot = 4.0f;
 					enemy->ShotCounter = 0;
-					enemy->ShotSpacing = 0;	
+					enemy->ShotSpacing = 0;
 				}
 			}
 		}
@@ -808,17 +808,17 @@ float	fps = gFramesPerSecondFrac;
 static void ShootCornKernel(ObjNode *enemy)
 {
 ObjNode	*newObj;
-float	f;				
-								
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+float	f;
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_CornKernel;
 	gNewObjectDefinition.coord.x 	= gCoord.x;
 	gNewObjectDefinition.coord.y 	= gCoord.y + 230.0f;
-	gNewObjectDefinition.coord.z 	= gCoord.z;	
+	gNewObjectDefinition.coord.z 	= gCoord.z;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;
-	gNewObjectDefinition.moveCall 	= MoveCornKernel;	
-	gNewObjectDefinition.rot 		= 0;	
+	gNewObjectDefinition.moveCall 	= MoveCornKernel;
+	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= 1.0;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
@@ -830,14 +830,14 @@ float	f;
 	newObj->Kind		 	= TRIGTYPE_CORNKERNEL;
 
 	CreateCollisionBoxFromBoundingBox(newObj, 1, 1);
-	
+
 			/* SET BULLET INFO */
-			
+
 	newObj->Damage = KERNEL_DAMAGE;
-			
+
 	f = CalcDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z);
 	f *= .8f;
-	
+
 	newObj->Delta.x = -sin(enemy->Rot.y) * f + (RandomFloat2() * 200.0f);
 	newObj->Delta.z = -cos(enemy->Rot.y) * f + (RandomFloat2() * 200.0f);
 	newObj->Delta.y = 100.0f;
@@ -847,10 +847,10 @@ float	f;
 	newObj->DeltaRot.z = RandomFloat2() * PI2;
 
 	AttachShadowToObject(newObj, GLOBAL_SObjType_Shadow_Circular, 3,3, true);
-	
-	
+
+
 	newObj->Health = 4.0f + RandomFloat() * 3.0f;
-	
+
 	PlayEffect3D(EFFECT_SHOOTCORN, &newObj->Coord);
 }
 
@@ -863,7 +863,7 @@ float	fps = gFramesPerSecondFrac;
 
 
 		/* SEE IF OUT OF RANGE */
-		
+
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
 		DeleteObject(theNode);
@@ -871,38 +871,38 @@ float	fps = gFramesPerSecondFrac;
 	}
 
 			/* SEE IF AUTO-POP */
-			
+
 	theNode->Health -= fps;
 	if (theNode->Health <= 0.0f)
 		PopKernel(theNode, false);
 
 
 	GetObjectInfo(theNode);
-	
+
 
 			/* MOVE IT */
-	
+
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// do friction if landed
 	{
-		ApplyFrictionToDeltasXZ(2000.0,&gDelta);		
+		ApplyFrictionToDeltasXZ(2000.0,&gDelta);
 		ApplyFrictionToRotation(10.0,&theNode->DeltaRot);
 	}
-			
+
 	gDelta.y -= 1000.0f * fps;								// gravity
 
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
 	gCoord.z += gDelta.z * fps;
-	
+
 	theNode->Rot.x += theNode->DeltaRot.x * fps;
 	theNode->Rot.y += theNode->DeltaRot.y * fps;
 	theNode->Rot.z += theNode->DeltaRot.z * fps;
-	
-	
+
+
 		/* HANDLE COLLISIONS */
-			
+
 	HandleCollisions(theNode, CTYPE_MISC|CTYPE_TERRAIN|CTYPE_FENCE, -.3);
-				
+
 	UpdateObject(theNode);
 
 
@@ -917,7 +917,7 @@ float	fps = gFramesPerSecondFrac;
 Boolean DoTrig_CornKernel(ObjNode *theNode, ObjNode *whoNode, Byte sideBits)
 {
 #pragma unused (whoNode, sideBits)
-	
+
 	PopKernel(theNode, true);
 	return(true);
 }
@@ -934,29 +934,29 @@ NewParticleDefType		newParticleDef;
 
 	theNode->Type = FARM_ObjType_PopCorn;
 	ResetDisplayGroupObject(theNode);
-	
+
 	theNode->CType = 0;
-	
+
 	theNode->Delta.x = RandomFloat2() * 600.0f;
 	theNode->Delta.y = 700.0f + RandomFloat() * 600.0f;
 	theNode->Delta.z = RandomFloat2() * 600.0f;
-	
+
 	theNode->DeltaRot.x = RandomFloat2() * 10.0f;
 	theNode->DeltaRot.y = RandomFloat2() * 10.0f;
 	theNode->DeltaRot.z = RandomFloat2() * 10.0f;
-	
+
 	theNode->MoveCall = MovePopcorn;
-	
+
 	CreateCollisionBoxFromBoundingBox(theNode, 1, 1);
-		
+
 	theNode->Health = 5;
-	
-	
+
+
 	PlayEffect3D(EFFECT_POPCORN, &theNode->Coord);
-	
-	
+
+
 			/* ALSO PUT DOWN PARTICLES */
-			
+
 	gNewParticleGroupDef.magicNum				= 0;
 	gNewParticleGroupDef.type					= PARTICLE_TYPE_FALLINGSPARKS;
 	gNewParticleGroupDef.flags					= PARTICLE_FLAGS_BOUNCE;
@@ -971,11 +971,11 @@ NewParticleDefType		newParticleDef;
 
 	pg = NewParticleGroup(&gNewParticleGroupDef);
 	if (pg != -1)
-	{	
+	{
 		float	x = theNode->Coord.x;
 		float	y = theNode->Coord.y;
 		float	z = theNode->Coord.z;
-		
+
 		for (i = 0; i < 15; i++)
 		{
 			pt.x = x + RandomFloat2() * 30.0f;
@@ -985,23 +985,23 @@ NewParticleDefType		newParticleDef;
 			delta.x = RandomFloat2() * 300.0f;
 			delta.y = RandomFloat() * 400.0f;
 			delta.z = RandomFloat2() * 300.0f;
-						
+
 			newParticleDef.groupNum		= pg;
 			newParticleDef.where		= &pt;
 			newParticleDef.delta		= &delta;
 			newParticleDef.scale		= RandomFloat() + 1.0f;
 			newParticleDef.rotZ			= 0;
 			newParticleDef.rotDZ		= 0;
-			newParticleDef.alpha		= FULL_ALPHA;		
+			newParticleDef.alpha		= FULL_ALPHA;
 			AddParticleToGroup(&newParticleDef);
 		}
 	}
-	
-	
+
+
 			/*********************/
 			/* SEE IF HIT PLAYER */
 			/*********************/
-			
+
 	if (gPlayerInfo.invincibilityTimer <= 0.0f)
 	{
 		if (CalcDistance3D(theNode->Coord.x, theNode->Coord.y, theNode->Coord.z,
@@ -1009,14 +1009,14 @@ NewParticleDefType		newParticleDef;
 		{
 			ObjNode *player = gPlayerInfo.objNode;
 			OGLVector3D	v;
-			
-			PlayerGotHit(theNode, 0);	
-		
+
+			PlayerGotHit(theNode, 0);
+
 			v.x = gPlayerInfo.coord.x - theNode->Coord.x;
 			v.y = gPlayerInfo.coord.y - theNode->Coord.y;
 			v.z = gPlayerInfo.coord.z - theNode->Coord.z;
 			FastNormalizeVector(v.x, v.y, v.z, &v);
-			
+
 			if (fromTrigger)
 			{
 				gDelta.x = v.x * 2000.0f;
@@ -1029,9 +1029,9 @@ NewParticleDefType		newParticleDef;
 				player->Delta.y = v.y * 2000.0f;
 				player->Delta.z = v.z * 2000.0f;
 			}
-		}	
+		}
 	}
-	
+
 }
 
 
@@ -1043,7 +1043,7 @@ float	fps = gFramesPerSecondFrac;
 
 
 		/* SEE IF OUT OF RANGE */
-		
+
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
 nuke:
@@ -1052,16 +1052,16 @@ nuke:
 	}
 
 	GetObjectInfo(theNode);
-	
+
 
 			/* MOVE IT */
-	
+
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// do friction if landed
 	{
-		ApplyFrictionToDeltasXZ(400.0,&gDelta);		
+		ApplyFrictionToDeltasXZ(400.0,&gDelta);
 		ApplyFrictionToRotation(10.0,&theNode->DeltaRot);
 	}
-			
+
 	gDelta.y -= 800.0f * fps;								// gravity
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
@@ -1070,15 +1070,15 @@ nuke:
 	theNode->Rot.x += theNode->DeltaRot.x * fps;
 	theNode->Rot.y += theNode->DeltaRot.y * fps;
 	theNode->Rot.z += theNode->DeltaRot.z * fps;
-	
-	
+
+
 		/* HANDLE COLLISIONS */
-			
+
 	HandleCollisions(theNode, CTYPE_MISC|CTYPE_TERRAIN|CTYPE_FENCE|CTYPE_PLAYER, -.3);
-		
-		
+
+
 			/* DECAY */
-			
+
 	theNode->Health -= fps;
 	if (theNode->Health < 0.0f)
 	{
@@ -1088,7 +1088,7 @@ nuke:
 		if (theNode->ShadowNode)									// also fade shadow
 			theNode->ShadowNode->ColorFilter.a = theNode->ColorFilter.a;
 	}
-		
+
 	UpdateObject(theNode);
 }
 

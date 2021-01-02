@@ -78,7 +78,7 @@ static Boolean DoTrig_SpinningPlatform(ObjNode *theNode, ObjNode *whoNode, Byte 
 												// TRIGGER HANDLER TABLE
 												//========================
 
-Boolean	(*gTriggerTable[])(ObjNode *, ObjNode *, Byte) = 
+Boolean	(*gTriggerTable[])(ObjNode *, ObjNode *, Byte) =
 {
 	DoTrig_WoodenGate,
 	DoTrig_MetalGate,
@@ -143,7 +143,7 @@ Boolean HandleTrigger(ObjNode *triggerNode, ObjNode *whoNode, Byte side)
 	}
 
 			/* CHECK SIDES */
-	else		
+	else
 	if (side & SIDE_BITS_BACK)
 	{
 		if (triggerNode->TriggerSides & SIDE_BITS_FRONT)		// if my back hit, then must be front-triggerable
@@ -207,21 +207,21 @@ Boolean AddWoodenGate(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 int		i;
-									
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_WoodGate;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits | STATUS_BIT_NOLIGHTING;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;
 	gNewObjectDefinition.moveCall 	= MoveWoodenGate;
-	
+
 	if (itemPtr->parm[0] == 1)
 		gNewObjectDefinition.rot 		= PI/2;
 	else
 		gNewObjectDefinition.rot 		= 0;
-	
+
 	gNewObjectDefinition.scale 		= WOODFENCE_SCALE;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	if (newObj == nil)
@@ -239,8 +239,8 @@ int		i;
 	CreateCollisionBoxFromBoundingBox_Rotated(newObj, 1.5, 1);
 
 			/* COLLISION CALLBACKS */
-			
-	
+
+
 	for (i = 0; i < NUM_WEAPON_TYPES; i++)								// all weapons call this
 		newObj->HitByWeaponHandler[i] = WoodenGate_HitByWeaponHandler;
 
@@ -255,7 +255,7 @@ static void MoveWoodenGate(ObjNode *theNode)
 float	off,r;
 
 		/* SEE IF OUT OF RANGE */
-		
+
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
 		DeleteObject(theNode);
@@ -267,13 +267,13 @@ float	off,r;
 	if (theNode->ShimmeyTimer > 0.0f)
 	{
 		off = cos(theNode->ShimmeyTimer	* 20.0f) * (theNode->ShimmeyTimer * 10.0f);
-		
+
 		r = theNode->Rot.y;
-		
+
 		theNode->Coord.x = theNode->InitCoord.x + sin(r) * off;
 		theNode->Coord.z = theNode->InitCoord.z + cos(r) * off;
 		UpdateObjectTransforms(theNode);
-		
+
 		theNode->ShimmeyTimer -= gFramesPerSecondFrac;
 		if (theNode->ShimmeyTimer < 0.0f)
 			theNode->ShimmeyTimer = 0;
@@ -288,12 +288,12 @@ float	off,r;
 static Boolean	WoodenGate_HitByWeaponHandler(ObjNode *weaponObj, ObjNode *gate, OGLPoint3D *where, OGLVector3D *delta)
 {
 #pragma unused (weaponObj, where, delta)
-	
+
 	if (gate->ShimmeyTimer == 0.0f)
 		gate->ShimmeyTimer = 1.1f;
-		
+
 	PlayEffect3D(EFFECT_WOODDOORHIT, &gate->Coord);
-		
+
 	return(true);			// stop weapon
 }
 
@@ -307,7 +307,7 @@ static Boolean DoTrig_WoodenGate(ObjNode *theNode, ObjNode *whoNode, Byte sideBi
 {
 ObjNode	*newObj;
 int		i;
-const static short type[] = 
+const static short type[] =
 {
 	FARM_ObjType_WoodGateChunk_Post,
 	FARM_ObjType_WoodGateChunk_Post,
@@ -320,7 +320,7 @@ const static short type[] =
 	FARM_ObjType_WoodGateChunk_Slat,
 };
 
-const static OGLPoint3D coord[] = 
+const static OGLPoint3D coord[] =
 {
 	-393, 60, 0,
 	-45, 60, 0,
@@ -341,8 +341,8 @@ const static OGLPoint3D coord[] =
 		{
 			theNode->ShimmeyTimer = .5f;						// make shimmy instead
 			PlayEffect3D(EFFECT_WOODDOORHIT, &theNode->Coord);
-		}		
-			
+		}
+
 		return(true);
 	}
 
@@ -358,7 +358,7 @@ const static OGLPoint3D coord[] =
 	for (i = 0; i < 8; i++)
 	{
 		OGLPoint3D_Transform(&coord[i], &theNode->BaseTransformMatrix, &gNewObjectDefinition.coord);
-		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 		gNewObjectDefinition.type 		= type[i];
 		gNewObjectDefinition.flags 		= STATUS_BIT_NOLIGHTING;
 		gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
@@ -366,11 +366,11 @@ const static OGLPoint3D coord[] =
 		gNewObjectDefinition.moveCall 	= MoveWoodenGateChunk;
 		gNewObjectDefinition.scale 		= theNode->Scale.x;
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-		
+
 		newObj->DeltaRot.x = RandomFloat2() * PI2;
 		newObj->DeltaRot.y = RandomFloat2() * PI2;
 		newObj->DeltaRot.z = RandomFloat2() * PI2;
-		
+
 		newObj->Delta.x = whoNode->Delta.x * .2f;
 		newObj->Delta.y = whoNode->Delta.y + 1200.0f;
 		newObj->Delta.z = whoNode->Delta.z * .2f;
@@ -380,7 +380,7 @@ const static OGLPoint3D coord[] =
 
 
 			/* DELETE THE GATE */
-			
+
 	theNode->TerrainItemPtr = nil;								// never come back
 	DeleteObject(theNode);
 
@@ -399,13 +399,13 @@ float	fps = gFramesPerSecondFrac;
 	GetObjectInfo(theNode);
 
 	gDelta.y -= 2500.0f * fps;
-	
+
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
 	gCoord.z += gDelta.z * fps;
 
 			/* SEE IF BOUNCE */
-			
+
 	if (theNode->Special[0] < 1)							// see if bounce
 	{
 		if ((gCoord.y + theNode->BottomOff) < GetTerrainY(gCoord.x, gCoord.z))
@@ -418,16 +418,16 @@ float	fps = gFramesPerSecondFrac;
 		}
 	}
 	else
-	{			
+	{
 		if ((gCoord.y + theNode->BBox.max.y) < GetTerrainY(gCoord.x, gCoord.z))
 		{
 			DeleteObject(theNode);
 			return;
 		}
 	}
-	
+
 			/* SPIN */
-			
+
 	theNode->Rot.x += theNode->DeltaRot.x * fps;
 	theNode->Rot.y += theNode->DeltaRot.y * fps;
 	theNode->Rot.z += theNode->DeltaRot.z * fps;
@@ -445,21 +445,21 @@ Boolean AddMetalGate(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
 int		i;
-									
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= FARM_ObjType_MetalGate;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;
 	gNewObjectDefinition.moveCall 	= MoveMetalGate;
-	
+
 	if (itemPtr->parm[0] == 1)
 		gNewObjectDefinition.rot 		= PI/2;
 	else
 		gNewObjectDefinition.rot 		= 0;
-	
+
 	gNewObjectDefinition.scale 		= METALFENCE_SCALE;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	if (newObj == nil)
@@ -477,7 +477,7 @@ int		i;
 	CreateCollisionBoxFromBoundingBox_Rotated(newObj, 1.1, 1.5);
 
 			/* COLLISION CALLBACKS */
-				
+
 	for (i = 0; i < NUM_WEAPON_TYPES; i++)								// all weapons call this
 		newObj->HitByWeaponHandler[i] = MetalGate_HitByWeaponHandler;
 
@@ -492,7 +492,7 @@ static void MoveMetalGate(ObjNode *theNode)
 float	off,r;
 
 		/* SEE IF OUT OF RANGE */
-		
+
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
 		DeleteObject(theNode);
@@ -504,13 +504,13 @@ float	off,r;
 	if (theNode->ShimmeyTimer > 0.0f)
 	{
 		off = cos(theNode->ShimmeyTimer	* 20.0f) * (theNode->ShimmeyTimer * 10.0f);
-		
+
 		r = theNode->Rot.y;
-		
+
 		theNode->Coord.x = theNode->InitCoord.x + sin(r) * off;
 		theNode->Coord.z = theNode->InitCoord.z + cos(r) * off;
 		UpdateObjectTransforms(theNode);
-		
+
 		theNode->ShimmeyTimer -= gFramesPerSecondFrac;
 		if (theNode->ShimmeyTimer < 0.0f)
 			theNode->ShimmeyTimer = 0;
@@ -525,11 +525,11 @@ float	off,r;
 static Boolean	MetalGate_HitByWeaponHandler(ObjNode *weaponObj, ObjNode *gate, OGLPoint3D *where, OGLVector3D *delta)
 {
 #pragma unused (weaponObj, delta, where)
-	
+
 	if (gate->ShimmeyTimer == 0.0f)
 	{
 		gate->ShimmeyTimer = 1.1f;
-		
+
 		PlayEffect3D(EFFECT_METALGATEHIT, &gate->Coord);
 	}
 
@@ -546,7 +546,7 @@ static Boolean DoTrig_MetalGate(ObjNode *theNode, ObjNode *whoNode, Byte sideBit
 {
 ObjNode	*newObj;
 int		i;
-const static short type[] = 
+const static short type[] =
 {
 	FARM_ObjType_MetalGateChunk_V,
 	FARM_ObjType_MetalGateChunk_V,
@@ -559,7 +559,7 @@ const static short type[] =
 	FARM_ObjType_MetalGateChunk_H,
 };
 
-const static OGLPoint3D coord[] = 
+const static OGLPoint3D coord[] =
 {
 	-393, 60, 0,
 	-45, 60, 0,
@@ -576,7 +576,7 @@ const static OGLPoint3D coord[] =
 
 	if (whoNode->CType & CTYPE_PLAYER)						// player's cannot trigger this
 	{
-shim:	
+shim:
 		if (theNode->ShimmeyTimer == 0.0f)
 		{
 			theNode->ShimmeyTimer = .5f;					// make shimmy instead
@@ -595,7 +595,7 @@ shim:
 	for (i = 0; i < 8; i++)
 	{
 		OGLPoint3D_Transform(&coord[i], &theNode->BaseTransformMatrix, &gNewObjectDefinition.coord);
-		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 		gNewObjectDefinition.type 		= type[i];
 		gNewObjectDefinition.flags 		= STATUS_BIT_NOLIGHTING;
 		gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
@@ -603,11 +603,11 @@ shim:
 		gNewObjectDefinition.moveCall 	= MoveMetalGateChunk;
 		gNewObjectDefinition.scale 		= theNode->Scale.x;
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-		
+
 		newObj->DeltaRot.x = RandomFloat2() * PI2;
 		newObj->DeltaRot.y = RandomFloat2() * PI2;
 		newObj->DeltaRot.z = RandomFloat2() * PI2;
-		
+
 		newObj->Delta.x = whoNode->Delta.x * .2f;
 		newObj->Delta.y = whoNode->Delta.y + 1200.0f;
 		newObj->Delta.z = whoNode->Delta.z * .2f;
@@ -617,14 +617,14 @@ shim:
 
 
 			/* DELETE THE GATE */
-			
+
 	theNode->TerrainItemPtr = nil;								// never come back
 	DeleteObject(theNode);
 
 
 			/* STOP THE TRACTOR */
-			
-	whoNode->Mode = TRACTOR_MODE_WAIT; 
+
+	whoNode->Mode = TRACTOR_MODE_WAIT;
 	whoNode->TractorIsDone = true;
 	whoNode->Damage = 0;
 	whoNode->CType = CTYPE_MISC;
@@ -646,13 +646,13 @@ float	fps = gFramesPerSecondFrac;
 	GetObjectInfo(theNode);
 
 	gDelta.y -= 2000.0f * fps;
-	
+
 	gCoord.x += gDelta.x * fps;
 	gCoord.y += gDelta.y * fps;
 	gCoord.z += gDelta.z * fps;
 
 			/* SEE IF BOUNCE */
-			
+
 	if (theNode->Special[0] < 2)							// see if bounce
 	{
 		if ((gCoord.y + theNode->BottomOff) < GetTerrainY(gCoord.x, gCoord.z))
@@ -665,17 +665,17 @@ float	fps = gFramesPerSecondFrac;
 		}
 	}
 	else
-	{			
+	{
 		if ((gCoord.y + theNode->BBox.max.y) < GetTerrainY(gCoord.x, gCoord.z))
 		{
-del:		
+del:
 			DeleteObject(theNode);
 			return;
 		}
 	}
-	
+
 			/* SPIN */
-			
+
 	theNode->Rot.x += theNode->DeltaRot.x * fps;
 	theNode->Rot.y += theNode->DeltaRot.y * fps;
 	theNode->Rot.z += theNode->DeltaRot.z * fps;
@@ -698,18 +698,18 @@ Boolean AddCheckpoint(TerrainItemEntryType *itemPtr, long  x, long z)
 ObjNode	*base, *dish;
 float	y;
 					/* MAKE BASE */
-			
-	y = FindHighestCollisionAtXZ(x,z, CTYPE_MISC|CTYPE_TERRAIN|CTYPE_MPLATFORM);	
-									
-	gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;	
+
+	y = FindHighestCollisionAtXZ(x,z, CTYPE_MISC|CTYPE_TERRAIN|CTYPE_MPLATFORM);
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;
 	gNewObjectDefinition.type 		= GLOBAL_ObjType_TeleportBase;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= y + 3.0f;	
+	gNewObjectDefinition.coord.y 	= y + 3.0f;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;
-	gNewObjectDefinition.moveCall 	= MoveCheckpoint;	
-	gNewObjectDefinition.rot 		= 0;	
+	gNewObjectDefinition.moveCall 	= MoveCheckpoint;
+	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= 5.0;
 	base = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
@@ -729,7 +729,7 @@ float	y;
 	if (base->CheckpointNum <= gBestCheckpointNum)				// see if this one has already been activated
 	{
 		base->CheckpointSpinning = true;
-		MakeCheckPointSparkles(base);		
+		MakeCheckPointSparkles(base);
 		base->CType &= ~CTYPE_TRIGGER;					// dont allow trigger since alreay spinning
 	}
 	else
@@ -739,13 +739,13 @@ float	y;
 
 
 				/* MAKE DISH */
-				
+
 	gNewObjectDefinition.type 		= GLOBAL_ObjType_TeleportDish;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
-	gNewObjectDefinition.moveCall 	= nil;	
+	gNewObjectDefinition.moveCall 	= nil;
 	dish = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-		
-	base->ChainNode = dish;	
+
+	base->ChainNode = dish;
 
 	AttachShadowToObject(base, GLOBAL_SObjType_Shadow_Circular, 5,5, false);
 
@@ -763,7 +763,7 @@ float	dx,dy,dz;
 float	fps = gFramesPerSecondFrac;
 
 		/* SEE IF OUT OF RANGE */
-		
+
 	if (TrackTerrainItem(base))							// just check to see if it's gone
 	{
 		DeleteObject(base);
@@ -771,12 +771,12 @@ float	fps = gFramesPerSecondFrac;
 	}
 
 			/* SPIN DISH */
-			
+
 	if (base->CheckpointSpinning)
 	{
 		dish->Rot.y -= gFramesPerSecondFrac * 4.0f;
-		
-		if (base->EffectChannel == -1)	
+
+		if (base->EffectChannel == -1)
 			base->EffectChannel = PlayEffect3D(EFFECT_CHECKPOINTLOOP, &base->Coord);
 		else
 			Update3DSoundChannel(EFFECT_CHECKPOINTLOOP, &base->EffectChannel, &base->Coord);
@@ -789,42 +789,42 @@ float	fps = gFramesPerSecondFrac;
 			/* MOVE */
 
 	gDelta.y -= gGravity * fps;					// gravity
-	
+
 	dx = gDelta.x;
 	dy = gDelta.y;
 	dz = gDelta.z;
-			
+
 	if (base->MPlatform)						// see if factor in moving platform
 	{
 		ObjNode *plat = base->MPlatform;
 		dx += plat->Delta.x;
 		dy += plat->Delta.y;
-		dz += plat->Delta.z;	
+		dz += plat->Delta.z;
 	}
-	
+
 	gCoord.x += dx*fps;
-	gCoord.y += dy*fps;	
+	gCoord.y += dy*fps;
 	gCoord.z += dz*fps;
 
 
 			/* DO COLLISION */
-			
+
 	HandleCollisions(base, CTYPE_TERRAIN|CTYPE_MISC|CTYPE_MPLATFORM|CTYPE_TRIGGER2, 0);
 
 			/* UPDATE */
-			
+
 	UpdateObject(base);
 	dish->Coord = gCoord;
 	UpdateObjectTransforms(dish);
 
 
 		/* SEE IF DISPLAY HELP */
-	
+
 	if (!gHelpMessageDisabled[HELP_MESSAGE_CHECKPOINT])
 	{
 		if (CalcQuickDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < HELP_BEACON_RANGE)
 		{
-			DisplayHelpMessage(HELP_MESSAGE_CHECKPOINT, .5f, true);	
+			DisplayHelpMessage(HELP_MESSAGE_CHECKPOINT, .5f, true);
 		}
 	}
 
@@ -840,8 +840,8 @@ static Boolean DoTrig_Checkpoint(ObjNode *theNode, ObjNode *whoNode, Byte sideBi
 {
 
 #pragma unused (whoNode, sideBits)
-	
-	
+
+
 			/* DO THE USUAL CHECKPOINT STUFF */
 
 	theNode->CheckpointSpinning = true;
@@ -853,7 +853,7 @@ static Boolean DoTrig_Checkpoint(ObjNode *theNode, ObjNode *whoNode, Byte sideBi
 		gBestCheckpointNum = theNode->CheckpointNum;
 		gBestCheckpointCoord.x = gPlayerInfo.coord.x;		// set to coord on previous frame of animation
 		gBestCheckpointCoord.y = gPlayerInfo.coord.z;
-		
+
 		gBestCheckpointAim = theNode->ReincarnationAim;
 	}
 
@@ -878,7 +878,7 @@ static void MakeCheckPointSparkles(ObjNode *theNode)
 int		i;
 
 			/* #1 */
-			
+
 	i = theNode->Sparkles[0] = GetFreeSparkle(theNode);				// get free sparkle slot
 	if (i != -1)
 	{
@@ -893,14 +893,14 @@ int		i;
 		gSparkles[i].color.b = 1;
 		gSparkles[i].color.a = 1;
 
-		gSparkles[i].scale = 30.0f;		
-		gSparkles[i].separation = 20.0f;					
+		gSparkles[i].scale = 30.0f;
+		gSparkles[i].separation = 20.0f;
 		gSparkles[i].textureNum = PARTICLE_SObjType_BlueSpark;
 	}
 
 
 			/* #2 */
-			
+
 	i = theNode->Sparkles[1] = GetFreeSparkle(theNode);				// get free sparkle slot
 	if (i != -1)
 	{
@@ -915,13 +915,13 @@ int		i;
 		gSparkles[i].color.b = 1;
 		gSparkles[i].color.a = 1;
 
-		gSparkles[i].scale = 30.0f;		
-		gSparkles[i].separation = 20.0f;					
+		gSparkles[i].scale = 30.0f;
+		gSparkles[i].separation = 20.0f;
 		gSparkles[i].textureNum = PARTICLE_SObjType_BlueSpark;
 	}
 
 			/* #3 */
-			
+
 	i = theNode->Sparkles[2] = GetFreeSparkle(theNode);				// get free sparkle slot
 	if (i != -1)
 	{
@@ -936,11 +936,11 @@ int		i;
 		gSparkles[i].color.b = 1;
 		gSparkles[i].color.a = 1;
 
-		gSparkles[i].scale = 30.0f;		
-		gSparkles[i].separation = 20.0f;					
+		gSparkles[i].scale = 30.0f;
+		gSparkles[i].separation = 20.0f;
 		gSparkles[i].textureNum = PARTICLE_SObjType_BlueSpark;
 	}
-			
+
 
 
 
@@ -958,10 +958,10 @@ Boolean AddBumperBubble(TerrainItemEntryType *itemPtr, long  x, long z)
 ObjNode	*newObj;
 
 
-		
+
 					/* MAKE BASE */
-									
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= SLIME_ObjType_BumperBubble;
 	gNewObjectDefinition.scale 		= BUMPERBUBBLE_SCALE;
 	gNewObjectDefinition.coord.x 	= x;
@@ -969,8 +969,8 @@ ObjNode	*newObj;
 	gNewObjectDefinition.coord.y 	= GetMinTerrainY(x, z, gNewObjectDefinition.group, gNewObjectDefinition.type, gNewObjectDefinition.scale);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;
-	gNewObjectDefinition.moveCall 	= MoveBumperBubble;	
-	gNewObjectDefinition.rot 		= 0;	
+	gNewObjectDefinition.moveCall 	= MoveBumperBubble;
+	gNewObjectDefinition.rot 		= 0;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->TerrainItemPtr = itemPtr;								// keep ptr to item list
@@ -984,9 +984,9 @@ ObjNode	*newObj;
 	CreateCollisionBoxFromBoundingBox(newObj, .9, .95);
 
 				/* SET SPIN */
-				
+
 	newObj->BumperBubbleSpin = RandomFloat() * PI2;
-	
+
 	newObj->Coord.x = newObj->InitCoord.x + sin(newObj->BumperBubbleSpin) * BUMPER_BUBBLE_SPIN_RADIUS;
 	newObj->Coord.z = newObj->InitCoord.z + cos(newObj->BumperBubbleSpin) * BUMPER_BUBBLE_SPIN_RADIUS;
 
@@ -1002,7 +1002,7 @@ float	fps = gFramesPerSecondFrac;
 float	s,r;
 
 		/* SEE IF OUT OF RANGE */
-		
+
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
 		DeleteObject(theNode);
@@ -1010,15 +1010,15 @@ float	s,r;
 	}
 
 			/* SPIN */
-			
+
 	r = theNode->BumperBubbleSpin += fps;
-	
+
 	theNode->Coord.x = theNode->InitCoord.x + sin(r) * BUMPER_BUBBLE_SPIN_RADIUS;
 	theNode->Coord.z = theNode->InitCoord.z + cos(r) * BUMPER_BUBBLE_SPIN_RADIUS;
 
 
 			/* WOBBLE */
-			
+
 	s = theNode->BumperWobble3;					// get wobble scaler
 
 	theNode->BumperWobble0 += fps * 10.0f;
@@ -1029,12 +1029,12 @@ float	s,r;
 
 	theNode->BumperWobble2 += fps * 18.0f;
 	theNode->Scale.z = BUMPERBUBBLE_SCALE + sin(theNode->BumperWobble2 + .3f) * s;
-	
+
 	theNode->BumperWobble3 -= fps * .1f;
 	if (theNode->BumperWobble3 < 0.0f)
 		theNode->BumperWobble3 = 0.0;
-				
-	
+
+
 		/* UPDATE */
 
 	RotateOnTerrain(theNode, 0, nil);							// set transform matrix
@@ -1054,33 +1054,33 @@ static Boolean DoTrig_BumperBubble(ObjNode *theNode, ObjNode *whoNode, Byte side
 			//
 			// For landing on top we special case it so that we don't get bounced backward - better player control this way.
 			//
-			
+
 	if (sideBits & SIDE_BITS_BOTTOM)
 	{
-		gDelta.y = 2200.0f;	
+		gDelta.y = 2200.0f;
 	}
-	
+
 			/* HIT SIDE OF BUMPER */
 	else
-	{			
+	{
 		float footY = gCoord.y + whoNode->BottomOff;
 		OGLVector3D	vec;
-				
+
 		vec.x = gCoord.x - theNode->Coord.x;						// calc vector to player's foot
 		vec.y = fabs(footY - theNode->Coord.y);
-		vec.z = gCoord.z - theNode->Coord.z;	
+		vec.z = gCoord.z - theNode->Coord.z;
 		FastNormalizeVector(vec.x, vec.y, vec.z, &vec);
-		
+
 		gDelta.x = vec.x * 2500.0f;									// set player delta bounce
 		gDelta.y = vec.y * 2500.0f;
-		gDelta.z = vec.z * 2500.0f;	
-		VectorLength2D(gCurrentMaxSpeed, gDelta.x, gDelta.z);		// also let player's max speed to this fast			
+		gDelta.z = vec.z * 2500.0f;
+		VectorLength2D(gCurrentMaxSpeed, gDelta.x, gDelta.z);		// also let player's max speed to this fast
 	}
 
 	theNode->SpecialF[3] = .3f;
-	
+
 	PlayEffect3D(EFFECT_BUMPERBUBBLE, &theNode->Coord);				// play effect
-	
+
 	return(false);
 }
 
@@ -1100,27 +1100,27 @@ short	type = itemPtr->parm[0];
 int		i;
 
 
-									
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
-	if (gLevelNum == LEVEL_NUM_BLOBBOSS)	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
+	if (gLevelNum == LEVEL_NUM_BLOBBOSS)
 	{
 		type = 0;
 		gNewObjectDefinition.type 	= BLOBBOSS_ObjType_FallingSlimePlatform_Small;
-		gNewObjectDefinition.coord.y = GetTerrainY_Undeformed(x,z) + 400.0f;			
+		gNewObjectDefinition.coord.y = GetTerrainY_Undeformed(x,z) + 400.0f;
 	}
 	else
 	{
 		gNewObjectDefinition.type 	= SLIME_ObjType_FallingSlimePlatform_Small + type;
-		GetWaterY(x,z, &gNewObjectDefinition.coord.y);			
+		GetWaterY(x,z, &gNewObjectDefinition.coord.y);
 	}
-	
+
 	gNewObjectDefinition.coord.x 	= x;
 	y = gNewObjectDefinition.coord.y += 200.0f;
 	gNewObjectDefinition.coord.z 	= z;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;
-	gNewObjectDefinition.moveCall 	= MoveFallingSlimePlatform;	
-	gNewObjectDefinition.rot 		= 0;	
+	gNewObjectDefinition.moveCall 	= MoveFallingSlimePlatform;
+	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= s = 2.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
@@ -1143,7 +1143,7 @@ int		i;
 
 	switch(type)
 	{
-		case	0:	
+		case	0:
 				i = newObj->Sparkles[0] = GetFreeSparkle(newObj);				// get free sparkle slot
 				if (i != -1)
 				{
@@ -1158,12 +1158,12 @@ int		i;
 					gSparkles[i].color.b = 1;
 					gSparkles[i].color.a = 1;
 
-					gSparkles[i].scale = 30.0f;		
-					gSparkles[i].separation = 20.0f;					
+					gSparkles[i].scale = 30.0f;
+					gSparkles[i].separation = 20.0f;
 					gSparkles[i].textureNum = PARTICLE_SObjType_RedSpark;
 				}
 
-				i = newObj->Sparkles[1] = GetFreeSparkle(newObj);				
+				i = newObj->Sparkles[1] = GetFreeSparkle(newObj);
 				if (i != -1)
 				{
 					gSparkles[i].flags = SPARKLE_FLAG_OMNIDIRECTIONAL|SPARKLE_FLAG_TRANSFORMWITHOWNER;
@@ -1177,14 +1177,14 @@ int		i;
 					gSparkles[i].color.b = 1;
 					gSparkles[i].color.a = 1;
 
-					gSparkles[i].scale = 30.0f;		
-					gSparkles[i].separation = 20.0f;					
+					gSparkles[i].scale = 30.0f;
+					gSparkles[i].separation = 20.0f;
 					gSparkles[i].textureNum = PARTICLE_SObjType_RedSpark;
 				}
 				break;
-				
-		case	1:			
-				i = newObj->Sparkles[0] = GetFreeSparkle(newObj);				
+
+		case	1:
+				i = newObj->Sparkles[0] = GetFreeSparkle(newObj);
 				if (i != -1)
 				{
 					gSparkles[i].flags = SPARKLE_FLAG_OMNIDIRECTIONAL|SPARKLE_FLAG_TRANSFORMWITHOWNER;
@@ -1198,12 +1198,12 @@ int		i;
 					gSparkles[i].color.b = 1;
 					gSparkles[i].color.a = 1;
 
-					gSparkles[i].scale = 30.0f;		
-					gSparkles[i].separation = 20.0f;					
+					gSparkles[i].scale = 30.0f;
+					gSparkles[i].separation = 20.0f;
 					gSparkles[i].textureNum = PARTICLE_SObjType_RedSpark;
 				}
 
-				i = newObj->Sparkles[1] = GetFreeSparkle(newObj);				
+				i = newObj->Sparkles[1] = GetFreeSparkle(newObj);
 				if (i != -1)
 				{
 					gSparkles[i].flags = SPARKLE_FLAG_OMNIDIRECTIONAL|SPARKLE_FLAG_TRANSFORMWITHOWNER;
@@ -1217,12 +1217,12 @@ int		i;
 					gSparkles[i].color.b = 0;
 					gSparkles[i].color.a = 1;
 
-					gSparkles[i].scale = 30.0f;		
-					gSparkles[i].separation = 20.0f;					
+					gSparkles[i].scale = 30.0f;
+					gSparkles[i].separation = 20.0f;
 					gSparkles[i].textureNum = PARTICLE_SObjType_RedSpark;
 				}
 
-				i = newObj->Sparkles[2] = GetFreeSparkle(newObj);				
+				i = newObj->Sparkles[2] = GetFreeSparkle(newObj);
 				if (i != -1)
 				{
 					gSparkles[i].flags = SPARKLE_FLAG_OMNIDIRECTIONAL|SPARKLE_FLAG_TRANSFORMWITHOWNER;
@@ -1236,12 +1236,12 @@ int		i;
 					gSparkles[i].color.b = 1;
 					gSparkles[i].color.a = 1;
 
-					gSparkles[i].scale = 30.0f;		
-					gSparkles[i].separation = 20.0f;					
+					gSparkles[i].scale = 30.0f;
+					gSparkles[i].separation = 20.0f;
 					gSparkles[i].textureNum = PARTICLE_SObjType_RedSpark;
 				}
 
-				i = newObj->Sparkles[3] = GetFreeSparkle(newObj);				
+				i = newObj->Sparkles[3] = GetFreeSparkle(newObj);
 				if (i != -1)
 				{
 					gSparkles[i].flags = SPARKLE_FLAG_OMNIDIRECTIONAL|SPARKLE_FLAG_TRANSFORMWITHOWNER;
@@ -1255,8 +1255,8 @@ int		i;
 					gSparkles[i].color.b = 1;
 					gSparkles[i].color.a = 1;
 
-					gSparkles[i].scale = 30.0f;		
-					gSparkles[i].separation = 20.0f;					
+					gSparkles[i].scale = 30.0f;
+					gSparkles[i].separation = 20.0f;
 					gSparkles[i].textureNum = PARTICLE_SObjType_RedSpark;
 				}
 				break;
@@ -1274,7 +1274,7 @@ static void MoveFallingSlimePlatform(ObjNode *theNode)
 float	fps = gFramesPerSecondFrac;
 
 		/* SEE IF OUT OF RANGE */
-		
+
 	if (TrackTerrainItem(theNode))							// just check to see if it's gone
 	{
 		DeleteObject(theNode);
@@ -1286,17 +1286,17 @@ float	fps = gFramesPerSecondFrac;
 	switch(theNode->Mode)
 	{
 		case	FALLING_PLATFORM_MODE_FALL:
-				
+
 				theNode->FallDelay -= fps;								// see if still delayed
 				if (theNode->FallDelay <= 0.0f)
-				{				
+				{
 					gDelta.y -= 100.0f * fps;
 					gCoord.y += gDelta.y * fps;
-					
+
 					if (gCoord.y < (theNode->InitCoord.y - 600.0f))		// see if reset
 						theNode->Mode = FALLING_PLATFORM_MODE_RISE;
-					
-				}				
+
+				}
 				break;
 
 
@@ -1366,24 +1366,24 @@ static const OGLPoint3D xLights[8] =
 };
 
 
-	
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= BLOBBOSS_ObjType_BarPlatform_Blue + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.y 	= y = GetTerrainY_Undeformed(x,z) + 550.0f + ((float)itemPtr->parm[2] * 10.0f);
 	gNewObjectDefinition.coord.z 	= z;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;
-	gNewObjectDefinition.moveCall 	= MoveSpinningPlatform;	
-	gNewObjectDefinition.rot 		= gSpinningPlatformRot;	
+	gNewObjectDefinition.moveCall 	= MoveSpinningPlatform;
+	gNewObjectDefinition.rot 		= gSpinningPlatformRot;
 	gNewObjectDefinition.scale 	= s = 2.0f;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	
+
 	newObj->TerrainItemPtr = itemPtr;								// keep ptr to item list
 
 
 				/* CALC COLLISION INFO */
-				
+
 	newObj->CType 			= CTYPE_TRIGGER|CTYPE_TRIGGER2|CTYPE_MISC|CTYPE_BLOCKCAMERA|CTYPE_BLOCKSHADOW;
 	newObj->CBits			= CBITS_TOP;
 	newObj->TriggerSides 	= SIDE_BITS_TOP;						// side(s) to activate it
@@ -1392,11 +1392,11 @@ static const OGLPoint3D xLights[8] =
 	CreateCollisionBoxFromBoundingBox_Maximized(newObj);			// calc collision box
 	newObj->TopOff 	= 0;											// reset the top to eliminate those light poles
 	CalcObjectBoxFromNode(newObj);
-	KeepOldCollisionBoxes(newObj);	
-	
+	KeepOldCollisionBoxes(newObj);
+
 
 				/* SET SPIN */
-				
+
 	if (itemPtr->parm[3] & 1)							// see if CW or CCW
 	{
 		newObj->SpinDirectionCCW = true;
@@ -1414,11 +1414,11 @@ static const OGLPoint3D xLights[8] =
 			/*********************/
 			/* SET PLATFORM INFO */
 			/*********************/
-			
+
 	switch(type)
 	{
 				/* BARS */
-				
+
 		case	0:
 		case	1:
 		case	2:
@@ -1435,15 +1435,15 @@ static const OGLPoint3D xLights[8] =
 						gSparkles[i].color.g = 1;
 						gSparkles[i].color.b = 1;
 						gSparkles[i].color.a = 1;
-						gSparkles[i].scale = 30.0f;		
-						gSparkles[i].separation = 20.0f;					
+						gSparkles[i].scale = 30.0f;
+						gSparkles[i].separation = 20.0f;
 						gSparkles[i].textureNum = PARTICLE_SObjType_RedSpark;
 					}
 				}
 				break;
-				
+
 				/* CIRCULAR */
-				
+
 		case	4:
 		case	5:
 		case	6:
@@ -1462,8 +1462,8 @@ static const OGLPoint3D xLights[8] =
 						gSparkles[i].color.g = 1;
 						gSparkles[i].color.b = 1;
 						gSparkles[i].color.a = 1;
-						gSparkles[i].scale = 20.0f;		
-						gSparkles[i].separation = 20.0f;		
+						gSparkles[i].scale = 20.0f;
+						gSparkles[i].separation = 20.0f;
 						if (c&1)
 							gSparkles[i].textureNum = PARTICLE_SObjType_RedSpark;
 						else
@@ -1471,19 +1471,19 @@ static const OGLPoint3D xLights[8] =
 					}
 				}
 				break;
-		
+
 				/* COG POLE DOWN */
-				
+
 		case	8:
 		case	9:
 		case	10:
 		case	11:
 				newObj->SpinningPlatformType = SPINNING_PLATFORM_TYPE_COG;
 				break;
-		
-		
+
+
 				/* COG POLE UP */
-				
+
 		case	12:
 		case	13:
 		case	14:
@@ -1501,9 +1501,9 @@ static const OGLPoint3D xLights[8] =
 				KeepOldCollisionBoxes(newObj);
 				newObj->CBits = CBITS_ALLSOLID;
 				break;
-			
+
 				/* X */
-				
+
 		case	16:
 		case	17:
 		case	18:
@@ -1520,17 +1520,17 @@ static const OGLPoint3D xLights[8] =
 						gSparkles[i].color.g = 1;
 						gSparkles[i].color.b = 1;
 						gSparkles[i].color.a = 1;
-						gSparkles[i].scale = 30.0f;		
-						gSparkles[i].separation = 20.0f;					
+						gSparkles[i].scale = 30.0f;
+						gSparkles[i].separation = 20.0f;
 						gSparkles[i].textureNum = PARTICLE_SObjType_RedSpark;
 					}
 				}
 				break;
-				
+
 		default:
 				DoFatalAlert("\pAddSpinningPlatform: unknown type");
 	}
-	
+
 
 	return(true);													// item was added
 }
@@ -1551,7 +1551,7 @@ static void MoveSpinningPlatform(ObjNode *theNode)
 	else
 		theNode->Rot.y = -gSpinningPlatformRot - theNode->SpinOffset;
 
-	UpdateObjectTransforms(theNode);	
+	UpdateObjectTransforms(theNode);
 }
 
 
@@ -1561,7 +1561,7 @@ static void MoveSpinningPlatform(ObjNode *theNode)
 //
 
 static Boolean DoTrig_SpinningPlatform(ObjNode *theNode, ObjNode *whoNode, Byte sideBits)
-{ 
+{
 double			dist,deltaRot;
 double			platX, platZ, fps = gFramesPerSecondFrac;
 float			s;
@@ -1570,18 +1570,18 @@ OGLPoint2D		origin,pt,p[12];
 
 
 #pragma unused (sideBits, whoNode)
-	
+
 	platX = theNode->Coord.x;
 	platZ = theNode->Coord.z;
 
 	s = theNode->Scale.x;												// get scale
-	
+
 	switch(theNode->SpinningPlatformType)
 	{
 						/*************************************/
 						/* SEE IF OFF THE EDGE OF THE CIRCLE */
 						/*************************************/
-						
+
 		case	SPINNING_PLATFORM_TYPE_CIRCULAR:
 				dist = CalcDistance(gCoord.x, gCoord.z, platX, platZ);
 				if (dist > ((theNode->BBox.max.x * s) + 30.0f))
@@ -1592,97 +1592,97 @@ OGLPoint2D		origin,pt,p[12];
 						/**********************************/
 						/* SEE IF OFF THE EDGE OF THE COG */
 						/**********************************/
-						
+
 		case	SPINNING_PLATFORM_TYPE_COG:
-						
+
 						/* QUCK CHECK TO SEE IF OUT OF OUTER RADIUS */
-						
+
 				dist = CalcDistance(gCoord.x, gCoord.z, platX, platZ);
 				if (dist > ((theNode->BBox.max.x * s) + 30.0f))
 					return(false);												// fall off
 
 						/* QUCK CHECK TO SEE IF IN INNER RADIUS */
-						
+
 				if (dist > ((180.0f * s) + 30.0f))								// nope, on the cogs
-				{			
+				{
 								/* DO POLY COLLISION FOR COGS */
-								
+
 								/* PLANK A */
-							
+
 					p[0].x = -144.8f * s;
 					p[0].y = -244.8f * s;
-					
+
 					p[1].x = 0;
 					p[1].y = -271.6f * s;
-					
+
 					p[2].x = 144.8f * s;
 					p[2].y = 244.8f * s;
-					
+
 					p[3].x = p[1].x;
-					p[3].y = 267.6f * s;	
-					
-				
+					p[3].y = 267.6f * s;
+
+
 							/* PLANK B */
-				
+
 					p[4].x = -271.6f * s;
 					p[4].y = 0;
-					
+
 					p[5].x = -244.8f * s;
 					p[5].y = -144.8f * s;
-					
+
 					p[6].x = 271.0f * s;
 					p[6].y = 0;
-					
+
 					p[7].x = 244.8f * s;
-					p[7].y = 144.8f * s;				
+					p[7].y = 144.8f * s;
 
 							/* PLANK C */
-				
+
 					p[8].x = -144.6f * s;
 					p[8].y = 244.8f * s;
-					
+
 					p[9].x = -239.8f * s;
 					p[9].y = 144.8f * s;
-					
+
 					p[10].x = 144.8f * s;
 					p[10].y = -244.8f * s;
-					
+
 					p[11].x = 244.8f * s;
-					p[11].y = -144.8f * s;				
-				
+					p[11].y = -144.8f * s;
+
 					OGLMatrix3x3_SetRotate(&m, -theNode->Rot.y);
 					OGLPoint2D_TransformArray(p, &m, p, 12);										// transform points
-					
+
 					if (!IsPointInPoly2D(gCoord.x - platX, gCoord.z - platZ, 4, &p[0]))			// see if player is in plank A
 						if (!IsPointInPoly2D(gCoord.x - platX, gCoord.z - platZ, 4, &p[4]))		// see if player is in plank B
 							if (!IsPointInPoly2D(gCoord.x - platX, gCoord.z - platZ, 4, &p[8]))	// see if player is in plank C
 								return(false);
-				}				
+				}
 				break;
-				
-				
+
+
 						/**********************************/
 						/* SEE IF OFF THE EDGE OF THE BAR */
 						/**********************************/
-						
+
 		case	SPINNING_PLATFORM_TYPE_BAR:
 
 							/* CALC 4 CORNERS OF BAR */
-						
+
 				p[0].x = theNode->BBox.min.x * s - 30.0f;
 				p[0].y = theNode->BBox.min.z * s - 30.0f;
-				
+
 				p[1].x = theNode->BBox.max.x * s + 30.0f;
 				p[1].y = p[0].y;
-				
+
 				p[2].x = p[1].x;
 				p[2].y = theNode->BBox.max.z * s + 30.0f;
-				
+
 				p[3].x = p[0].x;
-				p[3].y = p[2].y;				
+				p[3].y = p[2].y;
 				OGLMatrix3x3_SetRotate(&m, -theNode->Rot.y);
 				OGLPoint2D_TransformArray(p, &m, p, 4);				// transform points
-				
+
 				if (!IsPointInPoly2D(gCoord.x - platX, gCoord.z - platZ, 4, p))		// see if player is in there
 					return(false);
 
@@ -1692,49 +1692,49 @@ OGLPoint2D		origin,pt,p[12];
 						/************************************/
 						/* SEE IF OFF THE EDGE OF THE X-BAR */
 						/************************************/
-						
+
 		case	SPINNING_PLATFORM_TYPE_X:
 							/* PLANK A */
-						
+
 				p[0].x = -230.0f * s;
 				p[0].y = -670.0f * s;
-				
+
 				p[1].x = 230.0f * s;
 				p[1].y = p[0].y;
-				
+
 				p[2].x = p[1].x;
 				p[2].y = 670.0f * s;
-				
+
 				p[3].x = p[0].x;
-				p[3].y = p[2].y;	
-				
-			
+				p[3].y = p[2].y;
+
+
 						/* PLANK B */
-			
+
 				p[4].x = -670.0f * s;
 				p[4].y = -230.0f * s;
-				
+
 				p[5].x = 670.0f * s;
 				p[5].y = p[4].y;
-				
+
 				p[6].x = p[5].x;
 				p[6].y = 230.0f * s;
-				
+
 				p[7].x = p[4].x;
-				p[7].y = p[6].y;				
-			
+				p[7].y = p[6].y;
+
 				OGLMatrix3x3_SetRotate(&m, -theNode->Rot.y);
 				OGLPoint2D_TransformArray(p, &m, p, 8);										// transform points
-				
+
 				if (!IsPointInPoly2D(gCoord.x - platX, gCoord.z - platZ, 4, &p[0]))			// see if player is in plank A
 					if (!IsPointInPoly2D(gCoord.x - platX, gCoord.z - platZ, 4, &p[4]))		// see if player is in plank B
 						return(false);
 				break;
-				
+
 		default:
 				DoFatalAlert("\pDoTrig_SpinningPlatform: unknown type");
 	}
-	
+
 				/*******************/
 				/* MOVE THE PLAYER */
 				/*******************/
@@ -1746,13 +1746,13 @@ OGLPoint2D		origin,pt,p[12];
    	origin.x = platX;
 	origin.y = platZ;
 	OGLMatrix3x3_SetRotateAboutPoint(&m, &origin, -deltaRot);		// do (-) cuz 2D y rot is reversed from 3D y rot
-	
+
 	pt.x = gCoord.x;
 	pt.y = gCoord.z;
 	OGLPoint2D_Transform(&pt, &m, &pt);								// transform player's coord
 	gCoord.x = pt.x;
 	gCoord.z = pt.y;
-	
+
 	whoNode->Rot.y += deltaRot;										// spin player
 
 	return(true);

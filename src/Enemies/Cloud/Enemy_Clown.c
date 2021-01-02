@@ -78,7 +78,7 @@ static Boolean BubbleHitByDart(ObjNode *weapon, ObjNode *bubble, OGLPoint3D *wea
 
 
 		/* ANIMS */
-	
+
 
 enum
 {
@@ -90,7 +90,7 @@ enum
 
 
 		/* JOINTS */
-		
+
 enum
 {
 	CLOWN_JOINT_WAND	= 	16
@@ -139,7 +139,7 @@ ObjNode	*newObj;
 	newObj = MakeEnemy_Clown(x,z);
 	newObj->TerrainItemPtr = itemPtr;
 	newObj->EnemyRegenerate = itemPtr->parm[3] & (1<<1);
-	
+
 	return(true);
 }
 
@@ -152,11 +152,11 @@ ObjNode	*newObj;
 				/*******************************/
 				/* MAKE DEFAULT SKELETON ENEMY */
 				/*******************************/
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_CLOWN,x,z, CLOWN_SCALE, 0, MoveClown);
 
 	SetSkeletonAnim(newObj->Skeleton, CLOWN_ANIM_STAND);
-	
+
 
 
 				/*******************/
@@ -166,18 +166,18 @@ ObjNode	*newObj;
 	newObj->Health 		= CLOWN_HEALTH;
 	newObj->Damage 		= CLOWN_DAMAGE;
 	newObj->Kind 		= ENEMY_KIND_CLOWN;
-	
+
 	newObj->AttackDelay = RandomFloat() * 4.0f;
-	
-	
+
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,CLOWN_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= ClownHitByWeapon;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] 	= ClownHitBySuperNova;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FIST] 		= ClownGotPunched;
@@ -185,19 +185,19 @@ ObjNode	*newObj;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_DART] 		= ClownHitByWeapon;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FLARE] 		= ClownHitByWeapon;
 	newObj->HitByJumpJetHandler 						= ClownHitByJumpJet;
-			
+
 	newObj->HurtCallback = HurtClown;							// set hurt callback function
 
 
 
 				/* MAKE SHADOW */
-				
+
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8,false);
-		
-		
+
+
 	gNumEnemies++;
 	gNumEnemyOfKind[ENEMY_KIND_CLOWN]++;
-	
+
 	return(newObj);
 }
 
@@ -222,8 +222,8 @@ static	void(*myMoveTable[])(ObjNode *) =
 	}
 
 	GetObjectInfo(theNode);
-	
-	myMoveTable[theNode->Skeleton->AnimNum](theNode);	
+
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
 }
 
 
@@ -241,19 +241,19 @@ float	fps = gFramesPerSecondFrac;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
-				
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, CLOWN_TURN_SPEED, true);			
+
+	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, CLOWN_TURN_SPEED, true);
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
-		
+
 
 				/* SEE IF CHASE */
 
 
-	theNode->StandDelay -= fps;								// see if in stand delay 
+	theNode->StandDelay -= fps;								// see if in stand delay
 	if (theNode->StandDelay <= 0.0f)
 	{
 		if (!IsBottomlessPitInFrontOfEnemy(theNode->Rot.y))
-		{	
+		{
 			if ((dist < CLOWN_CHASE_DIST_MAX) && (dist > CLOWN_CHASE_DIST_MIN))
 			{
 				MorphToSkeletonAnim(theNode->Skeleton, CLOWN_ANIM_WALK, 4);
@@ -263,23 +263,23 @@ float	fps = gFramesPerSecondFrac;
 
 
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
 		return;
 
 
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfClownAttack(theNode, angleToTarget, dist);
 
 
-	UpdateClown(theNode);		
+	UpdateClown(theNode);
 }
 
 
@@ -294,8 +294,8 @@ float		r,fps,angle,dist;
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
-			
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, CLOWN_TURN_SPEED, true);			
+
+	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, CLOWN_TURN_SPEED, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * CLOWN_WALK_SPEED;
@@ -310,33 +310,33 @@ float		r,fps,angle,dist;
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
 
 		/* STOP WALKING IF BOTTOMLESS PIT IN FRONT OF US */
-		
+
 	if (IsBottomlessPitInFrontOfEnemy(r))
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, CLOWN_ANIM_STAND, 4);
 	}
 	else
-	{					
+	{
 		if ((dist >= CLOWN_CHASE_DIST_MAX) || (dist <= CLOWN_CHASE_DIST_MIN))
 			MorphToSkeletonAnim(theNode->Skeleton, CLOWN_ANIM_STAND, 4);
-	}		
-		
+	}
+
 				/* UPDATE ANIM SPEED */
 
 	if (theNode->Skeleton->AnimNum == CLOWN_ANIM_WALK)
 		theNode->Skeleton->AnimSpeed = CLOWN_WALK_SPEED * .01f;
-	
-	
+
+
 				/* SEE IF DO ATTACK */
-	
+
 	SeeIfClownAttack(theNode, angle, dist);
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
-		
-	UpdateClown(theNode);		
+
+	UpdateClown(theNode);
 }
 
 
@@ -350,26 +350,26 @@ float	angleToTarget;
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
-				
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, CLOWN_TURN_SPEED, true);			
 
-		
+	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, CLOWN_TURN_SPEED, true);
+
+
 			/* MOVE */
-				
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;				// add gravity
 	MoveEnemy(theNode);
-				
+
 
 				/* DO ENEMY COLLISION */
-				
-	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
-		return;			
 
-	UpdateClown(theNode);		
+	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, false))
+		return;
+
+	UpdateClown(theNode);
 
 
 			/* SEE IF BLOW BUBBLE */
-			
+
 	if (theNode->BlowBubble)
 	{
 		ClownBlowBubble(theNode);
@@ -386,14 +386,14 @@ static void  MoveClown_GotHit(ObjNode *theNode)
 
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if on ground, add friction
 		ApplyFrictionToDeltas(1200.0,&gDelta);
-		
+
 	gDelta.y -= ENEMY_GRAVITY*gFramesPerSecondFrac;			// add gravity
 
 	MoveEnemy(theNode);
 
 
 				/* SEE IF DONE */
-			
+
 	theNode->ButtTimer -= gFramesPerSecondFrac;
 	if (theNode->ButtTimer <= 0.0)
 	{
@@ -402,7 +402,7 @@ static void  MoveClown_GotHit(ObjNode *theNode)
 
 
 				/* DO ENEMY COLLISION */
-				
+
 	if (DoEnemyCollisionDetect(theNode,DEFAULT_ENEMY_COLLISION_CTYPES, true))
 		return;
 
@@ -430,42 +430,42 @@ float			x,z,placement;
 
 			/* GET SPLINE INFO */
 
-	placement = itemPtr->placement;	
-	
+	placement = itemPtr->placement;
+
 	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 
 				/* MAKE DEFAULT SKELETON ENEMY */
-				
+
 	newObj = MakeEnemySkeleton(SKELETON_TYPE_CLOWN,x,z, CLOWN_SCALE, 0, nil);
-		
-		
+
+
 	newObj->SplineItemPtr = itemPtr;
 	newObj->SplineNum = splineNum;
-	
+
 	SetSkeletonAnim(newObj->Skeleton, CLOWN_ANIM_WALK);
 	newObj->Skeleton->AnimSpeed = 2.0f;
 
 				/* SET BETTER INFO */
-			
+
 	newObj->InitCoord 		= newObj->Coord;							// remember where started
 	newObj->StatusBits		|= STATUS_BIT_ONSPLINE;
 	newObj->SplinePlacement = placement;
-	newObj->Coord.y 		-= newObj->BottomOff;			
+	newObj->Coord.y 		-= newObj->BottomOff;
 	newObj->SplineMoveCall 	= MoveClownOnSpline;					// set move call
 	newObj->Health 			= CLOWN_HEALTH;
 	newObj->Damage 			= CLOWN_DAMAGE;
 	newObj->Kind 			= ENEMY_KIND_CLOWN;
-	
-	
+
+
 				/* SET COLLISION INFO */
-				
+
 	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
 	CalcNewTargetOffsets(newObj,CLOWN_TARGET_OFFSET);
 
 
 				/* SET WEAPON HANDLERS */
-				
+
 	newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= ClownHitByWeapon;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] 	= ClownHitBySuperNova;
 	newObj->HitByWeaponHandler[WEAPON_TYPE_FIST] 		= ClownGotPunched;
@@ -478,12 +478,12 @@ float			x,z,placement;
 
 
 				/* MAKE SHADOW & GLOW */
-				
+
 	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8, false);
 
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
-			
+
 	DetachObject(newObj, true);										// detach this object from the linked list
 	AddToSplineObjectList(newObj, true);
 
@@ -495,7 +495,7 @@ float			x,z,placement;
 
 static void MoveClownOnSpline(ObjNode *theNode)
 {
-Boolean isVisible; 
+Boolean isVisible;
 
 	isVisible = IsSplineItemVisible(theNode);					// update its visibility
 
@@ -506,30 +506,30 @@ Boolean isVisible;
 
 
 			/* UPDATE STUFF IF VISIBLE */
-			
+
 	if (isVisible)
 	{
-		
+
 		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,			// calc y rot aim
-												theNode->Coord.x, theNode->Coord.z);		
+												theNode->Coord.x, theNode->Coord.z);
 
 		theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - theNode->BBox.min.y;	// calc y coord
 		UpdateObjectTransforms(theNode);											// update transforms
-		UpdateShadow(theNode);	
-		
+		UpdateShadow(theNode);
+
 				/* DO SOME COLLISION CHECKING */
-				
+
 		GetObjectInfo(theNode);
 		if (DoEnemyCollisionDetect(theNode,CTYPE_HURTENEMY, false))					// just do this to see if explosions hurt
 			return;
-			
-			
+
+
 					/* SEE IF LEAVE SPLINE TO CHASE PLAYER */
-					
+
 		if (CalcQuickDistance(theNode->Coord.x, theNode->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < CLOWN_DETACH_DIST)
-			DetachEnemyFromSpline(theNode, MoveClown);			
-			
-	}	
+			DetachEnemyFromSpline(theNode, MoveClown);
+
+	}
 }
 
 
@@ -553,10 +553,10 @@ static void UpdateClown(ObjNode *theNode)
 static Boolean ClownHitByWeapon(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord)
-	
+
 
 			/* HURT IT */
-			
+
 	HurtClown(enemy, weapon->Damage);
 
 
@@ -584,7 +584,7 @@ float	r;
 #pragma unused (weapon, fistCoord, weaponDelta)
 
 			/* HURT IT */
-			
+
 	HurtClown(enemy, .25);
 
 
@@ -594,8 +594,8 @@ float	r;
 
 	enemy->Delta.x = -sin(r) * 1000.0f;
 	enemy->Delta.z = -cos(r) * 1000.0f;
-	enemy->Delta.y = 500.0f;	
-		
+	enemy->Delta.y = 500.0f;
+
 	return(true);
 }
 
@@ -607,16 +607,16 @@ static void ClownHitByJumpJet(ObjNode *enemy)
 float	r;
 
 		/* HURT IT */
-			
+
 	HurtClown(enemy, 1.0);
 
 
 			/* GIVE MOMENTUM */
-			
+
 	r = gPlayerInfo.objNode->Rot.y;
 	enemy->Delta.x = -sin(r) * 1000.0f;
 	enemy->Delta.z = -cos(r) * 1000.0f;
-	enemy->Delta.y = 500.0f;	
+	enemy->Delta.y = 500.0f;
 }
 
 /************** CLOWN GOT HIT BY SUPERNOVA *****************/
@@ -624,9 +624,9 @@ float	r;
 static Boolean ClownHitBySuperNova(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weapon, weaponCoord, weaponDelta)
-	
+
 	KillClown(enemy);
-	
+
 	return(false);
 }
 
@@ -639,28 +639,28 @@ static Boolean HurtClown(ObjNode *enemy, float damage)
 {
 
 			/* SEE IF REMOVE FROM SPLINE */
-	
+
 	if (enemy->StatusBits & STATUS_BIT_ONSPLINE)
 		DetachEnemyFromSpline(enemy, MoveClown);
 
 
 			/* SEE IF POP BUBBLE BEING BLOWN */
-			
+
 	if (enemy->BlowBubble)
 	{
 		ObjNode	*bubble = enemy->ChainNode;
-		
+
 		if (bubble)
 		{
 			enemy->ChainNode = nil;
 			PopClownBubble(bubble);
 		}
-	
+
 		enemy->BlowBubble = false;
 	}
 
 				/* HURT ENEMY & SEE IF KILL */
-				
+
 	enemy->Health -= damage;
 	if (enemy->Health <= 0.0f)
 	{
@@ -670,12 +670,12 @@ static Boolean HurtClown(ObjNode *enemy, float damage)
 	else
 	{
 					/* GO INTO HIT ANIM */
-				
+
 		if (enemy->Skeleton->AnimNum != CLOWN_ANIM_GETHIT)
 			MorphToSkeletonAnim(enemy->Skeleton, CLOWN_ANIM_GETHIT, 8);
 
 		enemy->ButtTimer = 1.0f;
-	}	
+	}
 	return(false);
 }
 
@@ -700,7 +700,7 @@ static void KillClown(ObjNode *enemy)
 	if (!enemy->EnemyRegenerate)
 		enemy->TerrainItemPtr = nil;							// dont ever come back
 
-	DeleteEnemy(enemy);	
+	DeleteEnemy(enemy);
 }
 
 
@@ -709,31 +709,31 @@ static void KillClown(ObjNode *enemy)
 /************ SEE IF CLOWN ATTACK *********************/
 
 static void SeeIfClownAttack(ObjNode *theNode, float angleToPlayer, float distToPlayer)
-{	
+{
 	if (!gPlayerHasLanded)
 		return;
-	
+
 	if (gPlayerInfo.invincibilityTimer > 0.0f)
 		return;
-	
+
 	theNode->AttackDelay -= gFramesPerSecondFrac;
 	if (theNode->AttackDelay > 0.0f)
 		return;
-	
+
 	if (distToPlayer > CLOWN_ATTACK_DIST)
 		return;
-	
+
 	if (angleToPlayer > (PI/2))
 		return;
-	
+
 			/* DON'T ATTACK THRU THINGS */
-				
+
 	if (SeeIfLineSegmentHitsAnything(&gCoord, &gPlayerInfo.coord, nil, CTYPE_FENCE|CTYPE_BLOCKRAYS))
 		return;
-	
-	
+
+
 	MorphToSkeletonAnim(theNode->Skeleton, CLOWN_ANIM_ATTACK, 5.0);
-	
+
 }
 
 
@@ -754,10 +754,10 @@ Boolean			detach;
 			/************************************/
 			/* SEE IF NEED TO CREATE THE BUBBLE */
 			/************************************/
-			
+
 	if (bubble == nil)
-	{	
-		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+	{
+		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 		gNewObjectDefinition.type 		= CLOUD_ObjType_ClownBubble;
 		gNewObjectDefinition.coord		= clown->Coord;
 		gNewObjectDefinition.flags 		= gAutoFadeStatusBits  | STATUS_BIT_GLOW;
@@ -766,20 +766,20 @@ Boolean			detach;
 		gNewObjectDefinition.rot 		= 0;
 		gNewObjectDefinition.scale 		= 1;
 		bubble = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-		
+
 		clown->ChainNode = bubble;
-		
+
 		bubble->ColorFilter.a = .5f;
 		bubble->InflatePitch = NORMAL_CHANNEL_RATE;
 		bubble->Damage = .15;
 		bubble->Health = 4.0;
-		
-		
+
+
 	}
 
 				/* SEE IF ABORT BUBBLE */
-				
-	if (clown->Skeleton->AnimNum != CLOWN_ANIM_ATTACK)	
+
+	if (clown->Skeleton->AnimNum != CLOWN_ANIM_ATTACK)
 	{
 		PopClownBubble(bubble);
 		return;
@@ -788,11 +788,11 @@ Boolean			detach;
 
 
 			/* INFLATE BUBBLE */
-			
+
 	s = bubble->Scale.x =
 	bubble->Scale.y =
 	bubble->Scale.z += 50.0f * gFramesPerSecondFrac;
-	
+
 	if (s > MAX_BUBBLE_SCALE)												// see if full size
 	{
 		bubble->Scale.x =
@@ -802,12 +802,12 @@ Boolean			detach;
 	}
 	else
 		detach = false;
-		
-		
-		
+
+
+
 			/* INCREASE PITCH */
-			
-	if (bubble->EffectChannel == -1)	
+
+	if (bubble->EffectChannel == -1)
 		bubble->EffectChannel = PlayEffect3D(EFFECT_INFLATE, &bubble->Coord);
 	else
 	{
@@ -815,51 +815,51 @@ Boolean			detach;
 		ChangeChannelRate(bubble->EffectChannel, bubble->InflatePitch);
 		Update3DSoundChannel(EFFECT_INFLATE, &bubble->EffectChannel, &bubble->Coord);
 	}
-			
-	
+
+
 
 				/* CALC PT WHERE BUBBLE SHOULD BE */
-				
+
 	FindJointFullMatrix(clown,CLOWN_JOINT_WAND,&m);				// calc matrix
-	OGLPoint3D_Transform(&wandOff, &m, &wandPt);				// calc point of wand center	
+	OGLPoint3D_Transform(&wandOff, &m, &wandPt);				// calc point of wand center
 	OGLVector3D_Transform(&wandAim, &m, &v);					// calc vector away from wand
 
 
 	bubble->Coord.x = wandPt.x + v.x * s;						// move bubble so tangent with wand
 	bubble->Coord.y = wandPt.y + v.y * s;
 	bubble->Coord.z = wandPt.z + v.z * s;
-	
+
 	UpdateObjectTransforms(bubble);
-	
-	
+
+
 			/*****************/
 			/* SEE IF DETACH */
 			/*****************/
-			
+
 	if (detach)
 	{
 		StopAChannel(&bubble->EffectChannel);					// stop inflate effect
-			
-	
+
+
 		clown->ChainNode = nil;									// detach bubble from clown
 		MorphToSkeletonAnim(clown->Skeleton, CLOWN_ANIM_STAND, 2.0);
 		bubble->MoveCall = MoveClownBubble;
 		clown->AttackDelay = RandomFloat() * 4.0f;
-		
+
 		bubble->BubbleWobbleX = RandomFloat() * PI2;
 		bubble->BubbleWobbleY = RandomFloat() * PI2;
-		
+
 		bubble->Delta.y = 100.0f;
 
 		CreateCollisionBoxFromBoundingBox(bubble, 1,1);
 
 		clown->StandDelay = 3.0f;								// clown won't move for 3 secs to give bubble time to clear out
-		
+
 		clown->BlowBubble = false;
-		
-		
+
+
 					/* ACTIVATE COLLISION */
-					
+
 		bubble->HitByWeaponHandler[WEAPON_TYPE_DART] = BubbleHitByDart;		// bubble can now be popped by weapon
 		bubble->CType = CTYPE_MISC;
 		bubble->CBits = CBITS_TOUCHABLE;
@@ -876,21 +876,21 @@ float	fps = gFramesPerSecondFrac;
 OGLVector2D	v;
 
 				/* SEE IF EXHAUSTED */
-				
+
 	theNode->Health -= fps;
 	if (theNode->Health <= 0.0f)
 	{
 		PopClownBubble(theNode);
-		return;	
+		return;
 	}
-	
-	
+
+
 
 	GetObjectInfo(theNode);
-	
-	
+
+
 				/* UPDATE WOBBLE */
-				
+
 	theNode->BubbleWobbleX += fps * 6.0f;
 	theNode->BubbleWobbleY += fps * 5.0f;
 
@@ -916,7 +916,7 @@ OGLVector2D	v;
 	{
 		float	tweak = theNode->Speed2D / MAX_BUBBLE_SPEED;
 		gDelta.x /= tweak;
-		gDelta.z /= tweak;	
+		gDelta.z /= tweak;
 		theNode->Speed2D = MAX_BUBBLE_SPEED;
 	}
 
@@ -930,22 +930,22 @@ OGLVector2D	v;
 			/***********************/
 			/* SEE IF HIT ANYTHING */
 			/***********************/
-										
+
 	if (HandleCollisions(theNode, CTYPE_FENCE | CTYPE_TERRAIN | CTYPE_MISC | CTYPE_PLAYER, 0))
 	{
 		int		i;
-		
+
 				/* SEE IF HIT PLAYER */
-				
-		for (i = 0; i < gNumCollisions; i++)				
+
+		for (i = 0; i < gNumCollisions; i++)
 		{
 			if (gCollisionList[i].objectPtr ==  gPlayerInfo.objNode)
 			{
 				PlayerGotHit(theNode, 0);
-			}		
+			}
 		}
-		
-		PopClownBubble(theNode);									// pop bubble		
+
+		PopClownBubble(theNode);									// pop bubble
 	}
 }
 
@@ -956,7 +956,7 @@ OGLVector2D	v;
 static void PopClownBubble(ObjNode *theNode)
 {
 	PlayEffect3D(EFFECT_CLOWNBUBBLEPOP, &theNode->Coord);	// play pop
-	ExplodeGeometry(theNode, 200, SHARD_MODE_FROMORIGIN, 1, 3.0);				
+	ExplodeGeometry(theNode, 200, SHARD_MODE_FROMORIGIN, 1, 3.0);
 	DeleteObject(theNode);
 }
 
@@ -966,7 +966,7 @@ static void PopClownBubble(ObjNode *theNode)
 static Boolean BubbleHitByDart(ObjNode *weapon, ObjNode *bubble, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
 #pragma unused (weaponDelta, weapon, weaponCoord)
-	
+
 	PopClownBubble(bubble);
 
 	return(true);			// stop weapon

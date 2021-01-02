@@ -146,19 +146,19 @@ ObjNode					*newObj;
 		{
 			short	id,area;
 			float	x,z;
-		
+
 			id = itemPtr[i].parm[0];								// get generator ID
 			if (id >= MAX_GENERATORS)
 				DoFatalAlert("\pInitBumperCars: ID# >= MAX_GENERATORS");
-				
+
 			area = itemPtr[i].parm[1];								// get area #
 			if (area > MAX_AREAS)
 				DoFatalAlert("\pInitBumperCars: Area# >= MAX_AREAS");
-			
+
 			x = gGeneratorCoords[area][id].x = itemPtr[i].x;		// get coords
 			z = gGeneratorCoords[area][id].z = itemPtr[i].y;
 			gGeneratorCoords[area][id].y = GetTerrainY_Undeformed(x,z) + 700.0f;
-			
+
 			gNumGenerators[area]++;
 		}
 	}
@@ -166,14 +166,14 @@ ObjNode					*newObj;
 		/*******************************************/
 		/* CREATE DUMMY DRAW OBJECT FOR GENERATORS */
 		/*******************************************/
-	
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;				
+
+	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+2;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.scale 		= 1;
 	gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOLIGHTING|STATUS_BIT_GLOW|STATUS_BIT_NOZWRITES;
-	
-	newObj = MakeNewObject(&gNewObjectDefinition);		
+
+	newObj = MakeNewObject(&gNewObjectDefinition);
 	newObj->CustomDrawFunction = DrawGeneratorBeams;
 }
 
@@ -188,24 +188,24 @@ short	id,area;
 int		playerCar = itemPtr->parm[3] & 1;
 
 	id = itemPtr->parm[0];											// get car ID #
-	
+
 	if (!gG4)														// on slow machines, add fewer cars
 	{
 		if (id > 3)
 			return(true);
-	
+
 	}
-	
+
 	area = itemPtr->parm[1];										// get area #
-										
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	if (playerCar)
 		gNewObjectDefinition.type 	= CLOUD_ObjType_BumperCar;
 	else
 		gNewObjectDefinition.type 	= CLOUD_ObjType_ClownBumperCar;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= PLAYER_SLOT-2;								// move car before player
 	gNewObjectDefinition.moveCall 	= MoveEnemyBumperCar;
@@ -218,18 +218,18 @@ int		playerCar = itemPtr->parm[3] & 1;
 	newObj->BoundingSphereRadius =  newObj->BBox.max.x * BUMPERCAR_SCALE;	// set correct bounding sphere for fence collision
 
 				/* ADD TO CAR LIST */
-				
+
 	newObj->AreaNum = area;										// save area #
-				
+
 	newObj->CarID = id;											// set car ID
 	if (id >= MAX_CARS)
 		DoFatalAlert("\pAddBumperCar: illegal car ID");
-		
+
 	if (gCarList[area][id] != nil)
 		DoFatalAlert("\pAddBumperCar: duplicate car ID#!");
 	gCarList[area][newObj->CarID] = newObj;
-		
-		
+
+
 
 			/* PLAYER'S CAR IS A TRIGGER */
 
@@ -240,10 +240,10 @@ int		playerCar = itemPtr->parm[3] & 1;
 		newObj->TriggerSides 	= SIDE_BITS_TOP;				// side(s) to activate it
 		newObj->Kind		 	= TRIGTYPE_BUMPERCAR;
 		CreateCollisionBoxFromBoundingBox(newObj,.9,.8);
-		
+
 		newObj->MoveCall 		= PlayerMoveBumperCar;					// change move call
 	}
-	
+
 			/* CLOWN CAR */
 	else
 	{
@@ -285,12 +285,12 @@ static void StopBumperCars(void)
 int	a,i;
 
 			/* STOP ALL THE SOUNDS */
-		
-	for (a = 0; a < MAX_AREAS; a++)	
+
+	for (a = 0; a < MAX_AREAS; a++)
 		for (i = 0; i < MAX_CARS; i++)
 		{
 			if (gCarList[a][i])
-			{			
+			{
 				StopAChannel(&gCarList[a][i]->EffectChannel);
 			}
 		}
@@ -312,14 +312,14 @@ ObjNode	*targetCar;
 
 	if (!gPlayerCar || gBumperCarGateBlown[theNode->AreaNum])	// dont do anything if player isnt riding or if gate is blown
 	{
-not_active:	
+not_active:
 		if (TrackTerrainItem(theNode))							// just check to see if it's gone
 		{
 			gCarList[theNode->AreaNum][theNode->CarID] = nil;	// remove from car list
 			DeleteObject(theNode);
 			return;
 		}
-				
+
 		if (theNode->EffectChannel != -1)						// kill sound if not moving
 			StopAChannel(&theNode->EffectChannel);
 		return;
@@ -331,18 +331,18 @@ not_active:
 
 	GetObjectInfo(theNode);
 
-		
+
 	/**************************/
 	/* SEE IF SEEK NEW TARGET */
-	/**************************/	
-	
+	/**************************/
+
 	theNode->SeekTimer -= fps;
 	if ((theNode->SeekTimer <= 0.0f) || (gCarList[theNode->AreaNum][theNode->SeekCarID] == nil))
 	{
 		theNode->SeekTimer = 5.0f + RandomFloat() * 5.0f;			// set new random seek time
-	
+
 				/* SEEK PLAYER */
-				
+
 		if (gPlayerCar && ((MyRandomLong() & 0xf) < 0x9))			// only if player is driving and our odds are good
 		{
 			theNode->SeekCarID = gPlayerCarID;
@@ -356,36 +356,36 @@ not_active:
 		}
 	}
 
-		/**********************/	
+		/**********************/
 		/* MOVE TOWARD TARGET */
 		/**********************/
-	
+
 	targetCar = gCarList[theNode->AreaNum][theNode->SeekCarID];
 	if (targetCar)
 	{
 		float	angle;
-		
+
 			/* DO TURNING AI */
-	
+
 		angle =  TurnObjectTowardTarget(theNode, &gCoord, targetCar->Coord.x, targetCar->Coord.z, PI, false);
-	
+
 
 			/* APPLY FRICTION TO DELTAS */
-			
+
 		ApplyFrictionToDeltas(BUMPERCAR_FRICTION, &gDelta);
 
-		
+
 		if (SeeIfLineSegmentHitsFence(&gCoord, &targetCar->Coord, nil, nil, nil))		// dont accel if there's a fence between us
 		{
 			theNode->SeekTimer = 0;														// clear this so will choose new target next time
 		}
 		else
-		{		
-				
+		{
+
 				/* ACCELERATE IF AIMED AT TARGET */
-				
+
 			if (angle < (PI/3))
-			{	
+			{
 				float r = theNode->Rot.y;
 				theNode->AccelVector.x = -sin(r);
 				theNode->AccelVector.y = -cos(r);
@@ -395,23 +395,23 @@ not_active:
 
 
 							/* CALC SPEED */
-							
+
 				VectorLength2D(theNode->Speed2D, gDelta.x, gDelta.z);					// calc 2D speed value
 
 				if (theNode->Speed2D > MAX_ENEMY_BUMPERCAR_SPEED)						// see if limit top speed
 				{
 					float	tweak;
-					
+
 					tweak = 1.0f / (theNode->Speed2D / MAX_ENEMY_BUMPERCAR_SPEED);
-					
+
 					gDelta.x *= tweak;
-					gDelta.z *= tweak;	
-					
+					gDelta.z *= tweak;
+
 					theNode->Speed2D = MAX_ENEMY_BUMPERCAR_SPEED;
 				}
 			}
 		}
-		
+
 			/* MOVE IT */
 
 		gCoord.x += gDelta.x * fps;
@@ -419,7 +419,7 @@ not_active:
 
 
 			/* DO COLLISION DETECT */
-		
+
 		DoBumperCarCollision(theNode);
 
 
@@ -427,8 +427,8 @@ not_active:
 	}
 
 		/* UPDATE */
-		
-	UpdateBumperCar(theNode);	
+
+	UpdateBumperCar(theNode);
 }
 
 
@@ -443,14 +443,14 @@ float	fps = gFramesPerSecondFrac;
 			/*****************************************/
 			/* JUST TRACK IT IF NOT BEING DRIVEN YET */
 			/*****************************************/
-	
+
 	if (gPlayerInfo.objNode->Skeleton->AnimNum != PLAYER_ANIM_BUMPERCAR)		// double-check that player is in there
 		car->CarBeingDriven = false;
-			
+
 	if (!car->CarBeingDriven)
 	{
 		gPlayerCar = nil;															// make sure this is nil if not driving
-		
+
 		if (gBumperCarGateBlown[car->CarID])									// only make car go away if gate blown
 		{
 			if (TrackTerrainItem(car))
@@ -460,9 +460,9 @@ float	fps = gFramesPerSecondFrac;
 				return;
 			}
 		}
-		
+
 			/* RESET TO ORIGINAL POSITION IF INVISIBLE */
-			
+
 		if (car->StatusBits & STATUS_BIT_ISCULLED)
 		{
 			car->Delta.x = car->Delta.z = 0;
@@ -470,22 +470,22 @@ float	fps = gFramesPerSecondFrac;
 			UpdateObjectTransforms(car);
 			CalcObjectBoxFromNode(car);
 		}
-		
+
 		return;
 	}
 
 				/***********************/
 				/* CAR IS BEING DRIVEN */
 				/***********************/
-				
+
 	GetObjectInfo(car);
-	
+
 	if (gBumperCarGateBlown[car->AreaNum])				// if power blown, then no control
 	{
-		gPlayerInfo.analogControlX = gPlayerInfo.analogControlZ = 0;	
+		gPlayerInfo.analogControlX = gPlayerInfo.analogControlZ = 0;
 	}
 	else
-	{	
+	{
 		if (gPlayerInfo.analogControlX || gPlayerInfo.analogControlZ)	// if player is attempting some control then reset this timer
 		{
 			gTimeSinceLastThrust = 0;
@@ -496,7 +496,7 @@ float	fps = gFramesPerSecondFrac;
 
 
 			/* CHECK USER CONTROLS FOR ROTATION */
-			
+
 	if (gPlayerInfo.analogControlX != 0.0f)																// see if spin
 	{
 		car->DeltaRot.y -= gPlayerInfo.analogControlX * fps * CONTROL_SENSITIVITY_BUMPERCAR_TURN;			// use x to rotate
@@ -504,9 +504,9 @@ float	fps = gFramesPerSecondFrac;
 			car->DeltaRot.y = PI2;
 		else
 		if (car->DeltaRot.y < -PI2)
-			car->DeltaRot.y = -PI2;				
+			car->DeltaRot.y = -PI2;
 	}
-	
+
 			/* APPLY FRICTION TO SPIN */
 	else
 	{
@@ -527,17 +527,17 @@ float	fps = gFramesPerSecondFrac;
 
 
 			/* APPLY FRICTION TO DELTAS */
-			
+
 	ApplyFrictionToDeltas(BUMPERCAR_FRICTION, &gDelta);
-	
+
 
 				/* DO ROTATION */
-				
+
 	r = car->Rot.y += car->DeltaRot.y * fps;
 
 
 				/* DO ACCELERATION */
-				
+
 	car->AccelVector.x = sin(r);
 	car->AccelVector.y = cos(r);
 
@@ -546,18 +546,18 @@ float	fps = gFramesPerSecondFrac;
 
 
 				/* CALC SPEED */
-				
+
 	VectorLength2D(car->Speed2D, gDelta.x, gDelta.z);					// calc 2D speed value
 
 	if (car->Speed2D > MAX_BUMPERCAR_SPEED)						// see if limit top speed
 	{
 		float	tweak;
-		
+
 		tweak = 1.0f / (car->Speed2D / MAX_BUMPERCAR_SPEED);
-		
+
 		gDelta.x *= tweak;
-		gDelta.z *= tweak;	
-		
+		gDelta.z *= tweak;
+
 		car->Speed2D = MAX_BUMPERCAR_SPEED;
 	}
 
@@ -568,14 +568,14 @@ float	fps = gFramesPerSecondFrac;
 
 
 		/* DO COLLISION DETECT */
-		
+
 	DoBumperCarCollision(car);
 
 
 		/***************************/
 		/* SEE IF PLAYER WANTS OUT */
 		/***************************/
-		
+
 	if (gControlNeeds[kNeed_Jump].newButtonPress)
 	{
 		UpdateInput();				// NOTE:  we do this to clear out the jump key since the player's jump move call will be called on same frame and we don't want to jump-jet accidentally
@@ -593,7 +593,7 @@ float	fps = gFramesPerSecondFrac;
 		//
 		// note: the player is then updated during the player's move call
 		//
-		
+
 	UpdateBumperCar(car);
 
 }
@@ -604,30 +604,30 @@ float	fps = gFramesPerSecondFrac;
 static void UpdateBumperCar(ObjNode *theNode)
 {
 			/* NO AUDIO IF NO POWER */
-			
+
 	if (gBumperCarGateBlown[theNode->AreaNum])
 	{
-		StopAChannel(&theNode->EffectChannel);					// make sure no audio if no power	
+		StopAChannel(&theNode->EffectChannel);					// make sure no audio if no power
 	}
 	else
 	{
 
 				/* UPDATE AUDIO ONLY IF PLAYER IS DRIVING */
-				
-		if (gPlayerCar)				
+
+		if (gPlayerCar)
 		{
-			if (theNode->EffectChannel == -1)	
+			if (theNode->EffectChannel == -1)
 				theNode->EffectChannel = PlayEffect3D(EFFECT_BUMPERHUM, &gCoord);
 			else
 			{
 				float q = theNode->Speed2D / MAX_BUMPERCAR_SPEED;
-			
+
 				ChangeChannelRate(theNode->EffectChannel, 0x10000 + (float)0x8000 * q);
 				Update3DSoundChannel(EFFECT_BUMPERHUM, &theNode->EffectChannel, &gCoord);
 			}
-		}		
+		}
 	}
-		
+
 	UpdateObject(theNode);
 }
 
@@ -655,46 +655,46 @@ short	area = theNode->AreaNum;
 
 		if ((otherCar == theNode) || (otherCar == nil))							// don't check against self or if blank
 			continue;
-		
+
 		otherX = otherCar->Coord.x;
 		otherZ = otherCar->Coord.z;
-	
+
 		dist = CalcDistance(gCoord.x, gCoord.z, otherX, otherZ);				// calc dist to the car
-	
+
 					/*****************************/
 					/* SEE IF THEY HAVE COLLIDED */
 					/*****************************/
-					
+
 		if (dist < BUMPER_CAR_RADIUSX2)
-		{			
+		{
 						/* CALC OUR VECTORS */
-						
+
 			vec2to1.x = gCoord.x - otherX;										// calc vector from other to us
 			vec2to1.y = gCoord.z - otherZ;
 			FastNormalizeVector2D(vec2to1.x, vec2to1.y, &vec2to1, false);
-		
+
 			FastNormalizeVector2D(gDelta.x, gDelta.z, &move1, true);			// calc this and other motion vectors
 			FastNormalizeVector2D(otherCar->Delta.x, otherCar->Delta.z, &move2, true);
-		
-		
+
+
 					/* FIRST JUST MOVE SO IT'S NOT OVERLAPPING */
-					
+
 			gCoord.x = otherX + vec2to1.x * (BUMPER_CAR_RADIUSX2 * 1.01f);	// move me back so I'm not overlapping the other car (plus a little extra)
-			gCoord.z = otherZ + vec2to1.y * (BUMPER_CAR_RADIUSX2 * 1.01f);	
+			gCoord.z = otherZ + vec2to1.y * (BUMPER_CAR_RADIUSX2 * 1.01f);
 
 
 						/* CALC REFLECTION VECTORS */
-						
-			ReflectVector2D(&move1, &vec2to1, &bounce);							// reflect the motion vector of #1						
+
+			ReflectVector2D(&move1, &vec2to1, &bounce);							// reflect the motion vector of #1
 			vec2to1.x = -vec2to1.x;												// flip reflection axis vector
-			vec2to1.y = -vec2to1.y;			
+			vec2to1.y = -vec2to1.y;
 			ReflectVector2D(&move2, &vec2to1, &bounce2);						// reflect the motion vector of #2
-						
+
 			speed = (theNode->Speed2D * .5f) + (otherCar->Speed2D * .5f);			// swap some energy
 
-	
+
 					/* BOUNCE 1ST OBJECT (OUR CAR) */
-										
+
 			move1.x += bounce.x;												// average in bounce vector
 			move1.y += bounce.y;
 			move1.x -= bounce2.x;												// also average in the reverse boucne vector of #2
@@ -704,23 +704,23 @@ short	area = theNode->AreaNum;
 
 			gDelta.x = move1.x * speed;											// calc new deltas from the deflected vector
 			gDelta.z = move1.y * speed;
-			
-			
+
+
 					/* BOUNCE HIT OBJECT OFF OF OUR CAR */
-					
+
 			move2.x += bounce2.x;												// average the bounce and the original move
 			move2.y += bounce2.y;
 			move2.x -= bounce.x;												// also average in the reverse boucne vector of #1
 			move2.y -= bounce.y;
 			FastNormalizeVector2D(move2.x, move2.y, &move1, true);
-					
+
 			otherCar->Delta.x = move2.x * speed;								// calc new deltas from the deflected vector
 			otherCar->Delta.z = move2.y * speed;
-			
-			
+
+
 			VectorLength2D(theNode->Speed2D, gDelta.x, gDelta.z);						// calc 2D speed value
 			VectorLength2D(otherCar->Speed2D, otherCar->Delta.x, otherCar->Delta.z);
-			
+
 			if (hitCount == 0)
 			{
 				if (theNode->Speed2D > 100.0f)
@@ -729,9 +729,9 @@ short	area = theNode->AreaNum;
 					PlayEffect_Parms3D(EFFECT_BUMPERHIT, &gCoord, NORMAL_CHANNEL_RATE + (q * (float)0x3000), q);
 				}
 			}
-			
+
 					/* GOTTA RE-CHECK THEM ALL AGAIN */
-					
+
 			if (++hitCount < 3)
 				i = -1;															// reset loop counter (-1 will go to 0 @ end of loop)
 		}
@@ -739,15 +739,15 @@ short	area = theNode->AreaNum;
 
 
 			/* HANDLE GENERAL COLLISION */
-			
+
 	if (theNode == gPlayerCar)
 		ctype = CTYPE_FENCE|CTYPE_MISC|CTYPE_TRIGGER2;
 	else
 		ctype = CTYPE_FENCE|CTYPE_MISC;
-			
+
 	if (HandleCollisions(theNode, ctype, -.9f))
 	{
-		theNode->DeltaRot.y *= .7f;	
+		theNode->DeltaRot.y *= .7f;
 	}
 }
 
@@ -781,7 +781,7 @@ void PlayerTouchedElectricFloor(ObjNode *theNode)
 	}
 
 			/* SPARKS */
-			
+
 	MakeSparkExplosion(gCoord.x, gCoord.y, gCoord.z, 200.0f, 1.0, PARTICLE_SObjType_WhiteSpark,0);
 
 	if (theNode->Skeleton->AnimNum != PLAYER_ANIM_ZAPPED)
@@ -790,20 +790,20 @@ void PlayerTouchedElectricFloor(ObjNode *theNode)
 		theNode->ZappedTimer = 1.7f;
 		gExplodePlayerAfterElectrocute = true;
 	}
-	
+
 	PlayEffect3D(EFFECT_ZAP, &gCoord);
 
 
 			/* DISCHARGE A SUPERNOVA */
-		
+
 	if (gDischargeTimer <= 0.0f)
 	{
 		ObjNode	*novaObj;
-		
-		gNewObjectDefinition.genre		= CUSTOM_GENRE;				
+
+		gNewObjectDefinition.genre		= CUSTOM_GENRE;
 		gNewObjectDefinition.coord 		= gCoord;
 		gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOTEXTUREWRAP|
-											STATUS_BIT_GLOW|STATUS_BIT_KEEPBACKFACES;									
+											STATUS_BIT_GLOW|STATUS_BIT_KEEPBACKFACES;
 		gNewObjectDefinition.slot 		= SPRITE_SLOT-1;
 		gNewObjectDefinition.moveCall 	= nil;
 		novaObj = MakeNewObject(&gNewObjectDefinition);
@@ -832,25 +832,25 @@ short	i;
 	tx = x;
 	tz = z;
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= CLOUD_ObjType_TireBumper;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 200;
 	gNewObjectDefinition.rot 		= 0;
 	s =gNewObjectDefinition.scale 		= 2.0;
 
 	for (i = 0; i < numTires; i++)
-	{			
+	{
 		gNewObjectDefinition.coord.x 	= tx;
 		gNewObjectDefinition.coord.z 	= tz;
 		gNewObjectDefinition.slot++;
-		
+
 		if (i == 0)
 			gNewObjectDefinition.moveCall = MoveStaticObject;
 		else
 			gNewObjectDefinition.moveCall = nil;
-		
+
 		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 		if (i == 0)														// first one is special
@@ -859,10 +859,10 @@ short	i;
 
 			newObj->CType 			= CTYPE_MISC | CTYPE_BLOCKSHADOW;
 			newObj->CBits			= CBITS_ALLSOLID;
-			
+
 			radius = newObj->BBox.max.x * s;
 			diameter = radius * 2.0f;									// calc diameter of each tire
-			
+
 			switch(itemPtr->parm[1])
 			{
 				case	0:
@@ -895,12 +895,12 @@ short	i;
 			prev->ChainNode = newObj;
 
 
-		
+
 				/* NEXT COORD */
-				
+
 		tx -= sin(aim) * 230.0f;
 		tz -= cos(aim) * 230.0f;
-		
+
 		prev = newObj;
 	}
 
@@ -920,21 +920,21 @@ ObjNode	*newObj,*bumper;
 int		i;
 short	area = itemPtr->parm[1];
 short	id = itemPtr->parm[0];
-		
+
 				/***********************/
 				/* MAKE GENERATOR POST */
 				/***********************/
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= CLOUD_ObjType_Generator;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;
-	gNewObjectDefinition.moveCall 	= MoveBumperCarPowerPost;	
+	gNewObjectDefinition.moveCall 	= MoveBumperCarPowerPost;
 	gNewObjectDefinition.rot 		= 0;
-	
+
 	gNewObjectDefinition.scale 		= 1.1;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
@@ -957,7 +957,7 @@ short	id = itemPtr->parm[0];
 			/*********************************************/
 			/* IF NOT BLOWN, MAKE SPARKLE & LOWER BUMPER */
 			/*********************************************/
-			
+
 	if (gGeneratorBlownMode[area][id] != GENERATOR_MODE_BLOWN)
 	{
 		i = newObj->Sparkles[0] = GetFreeSparkle(newObj);				// get free sparkle slot
@@ -975,7 +975,7 @@ short	id = itemPtr->parm[0];
 
 			gSparkles[i].scale = 300.0f;
 			gSparkles[i].separation = 40.0f;
-			
+
 			gSparkles[i].textureNum = PARTICLE_SObjType_BlueGlint;
 		}
 	}
@@ -983,13 +983,13 @@ short	id = itemPtr->parm[0];
 	else
 	{
 		newObj->ColorFilter.r = 								// make dim
-		newObj->ColorFilter.g = 
+		newObj->ColorFilter.g =
 		newObj->ColorFilter.b = .7f;
 	}
-	
+
 	if (gGeneratorBlownMode[area][id] == GENERATOR_MODE_ON)
 	{
-	
+
 			/*********************/
 			/* MAKE LOWER BUMPER */
 			/*********************/
@@ -1036,29 +1036,29 @@ ObjNode	*bumper = theNode->ChainNode;
 	}
 
 			/* UPDATE HUM */
-			
+
 	if (gGeneratorBlownMode[theNode->AreaNum][theNode->GeneratorID] == GENERATOR_MODE_BLOWN)	// dont hum if blown
-		StopAChannel(&theNode->EffectChannel);	
+		StopAChannel(&theNode->EffectChannel);
 	else
-	{	
-		if (theNode->EffectChannel == -1)	
+	{
+		if (theNode->EffectChannel == -1)
 			theNode->EffectChannel = PlayEffect3D(EFFECT_BUMPERPOLEHUM, &theNode->Coord);
 		else
 		{
 			Update3DSoundChannel(EFFECT_BUMPERPOLEHUM, &theNode->EffectChannel, &theNode->Coord);
 		}
 	}
-	
+
 		/* UPDATE LOWER BUMPER WOBBLE */
-		
+
 	if (bumper)
 	{
 		bumper->BumperWobble += gFramesPerSecondFrac * 10.0f;
-	
+
 		bumper->Scale.x =
 		bumper->Scale.y =
 		bumper->Scale.z = theNode->Scale.x + (sin(bumper->BumperWobble) * .1f);
-	
+
 		UpdateObjectTransforms(bumper);
 	}
 }
@@ -1088,7 +1088,7 @@ short	area = theNode->AreaNum;
 			/************************/
 
 	MakeSparkExplosion(theNode->Coord.x, theNode->Coord.y + 70.0f, theNode->Coord.z, 300.0f, 1, PARTICLE_SObjType_RedSpark,0);
-			
+
 	if (theNode->Type == CLOUD_ObjType_GeneratorBumper)
 	{
 		ObjNode	*post = theNode->ChainHead;
@@ -1104,33 +1104,33 @@ short	area = theNode->AreaNum;
 
 		gGeneratorBlownMode[area][theNode->GeneratorID] = GENERATOR_MODE_HIT;
 	}
-	
+
 			/*******************/
 			/* RAMMED THE POST */
 			/*******************/
 	else
 	{
 		int i = theNode->Sparkles[0];
-		
+
 		if (i != -1)
 		{
 			DeleteSparkle(i);
 			theNode->Sparkles[0] = -1;
 			theNode->CType &= ~CTYPE_TRIGGER2;					// don't trigger again
 		}
-		
+
 		gGeneratorBlownMode[area][theNode->GeneratorID] = GENERATOR_MODE_BLOWN;
-		
+
 		StopAChannel(&theNode->EffectChannel);					// stop the hum
-		
+
 		PlayEffect3D(EFFECT_BUMPERPOLEOFF, &theNode->Coord);	// player power down effect
-		
+
 		theNode->ColorFilter.r = 								// make dim
-		theNode->ColorFilter.g = 
+		theNode->ColorFilter.g =
 		theNode->ColorFilter.b = .7f;
-		
+
 				/* SEE IF ALL BLOWN */
-				
+
 		gNumBlownGenerators[area]++;
 		if (gNumBlownGenerators[area] >= gNumGenerators[area])
 			gBumperCarGateBlown[area] = true;
@@ -1160,10 +1160,10 @@ short	a;
 		y = gGeneratorCoords[a][0].y;
 		z = gGeneratorCoords[a][0].z;
 
-		for (i = 0; i < gNumGenerators[a]; i++)								
+		for (i = 0; i < gNumGenerators[a]; i++)
 		{
 					/* GET COORDS OF NEXT GENERATOR */
-					
+
 			if (i == (gNumGenerators[a]-1))							// see if loop back
 				i2 = 0;
 			else
@@ -1172,25 +1172,25 @@ short	a;
 			x2 = gGeneratorCoords[a][i2].x;							// get next coords
 			y2 = gGeneratorCoords[a][i2].y;
 			z2 = gGeneratorCoords[a][i2].z;
-			
+
 
 			if ((gGeneratorBlownMode[a][i] != GENERATOR_MODE_BLOWN) && (gGeneratorBlownMode[a][i2] != GENERATOR_MODE_BLOWN))	// if either post is blown then skip
 			{
 					/* DRAW A QUAD */
-				
+
 				yo = 20.0f + RandomFloat() * 10.0f;
-					
+
 				u = RandomFloat() * 5.0f;
 				u2 = u + 5.0f;
-					
-				MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][CLOUD_SObjType_BlueBeam].materialObject, setupInfo);			
-					
-				glBegin(GL_QUADS);		
+
+				MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][CLOUD_SObjType_BlueBeam].materialObject, setupInfo);
+
+				glBegin(GL_QUADS);
 				glTexCoord2f(u,0);			glVertex3f(x,y+yo,z);
 				glTexCoord2f(u,1);			glVertex3f(x,y-yo,z);
 				glTexCoord2f(u2,1);			glVertex3f(x2,y2-yo, z2);
 				glTexCoord2f(u2,0);			glVertex3f(x2,y2+yo,z2);
-				glEnd();				
+				glEnd();
 			}
 
 					/* NEXT ENDPOINT */
@@ -1216,7 +1216,7 @@ ObjNode	*post,*beam;
 int		i,j;
 short	area = itemPtr->parm[1];
 
-static const OGLPoint3D	sparkles[10] = 
+static const OGLPoint3D	sparkles[10] =
 {
 	-165.0,	217.5, 0,
 	-165.0,	177.5, 0,
@@ -1234,15 +1234,15 @@ static const OGLPoint3D	sparkles[10] =
 				/**************/
 				/* MAKE POSTS */
 				/**************/
-				
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= CLOUD_ObjType_BumperGatePosts;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
-	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);	
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB-20;
-	gNewObjectDefinition.moveCall 	= MoveBumperCarGate;	
+	gNewObjectDefinition.moveCall 	= MoveBumperCarGate;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= 3.5;
 	post = MakeNewDisplayGroupObject(&gNewObjectDefinition);
@@ -1271,7 +1271,7 @@ static const OGLPoint3D	sparkles[10] =
 				/*****************/
 
 		for (j = 0; j < 10; j++)
-		{			
+		{
 			i = post->Sparkles[j] = GetFreeSparkle(post);				// get free sparkle slot
 			if (i != -1)
 			{
@@ -1285,7 +1285,7 @@ static const OGLPoint3D	sparkles[10] =
 
 				gSparkles[i].scale = 200.0f;
 				gSparkles[i].separation = 40.0f;
-				
+
 				gSparkles[i].textureNum = PARTICLE_SObjType_BlueGlint;
 			}
 		}
@@ -1304,7 +1304,7 @@ static const OGLPoint3D	sparkles[10] =
 		post->ChainNode = beam;
 
 
-		beam->ColorFilter.a = .99; 
+		beam->ColorFilter.a = .99;
 	}
 
 
@@ -1331,13 +1331,13 @@ int		j,i;
 	if (beams)
 	{
 		beams->TextureTransformU += gFramesPerSecondFrac * 1.1;
-		
+
 		beams->ColorFilter.a =.2f +  RandomFloat() * .79f;
-		
+
 		if (gBumperCarGateBlown[posts->AreaNum])							// see if deactivate
 		{
 				/* TURN OFF SPARKELS */
-				
+
 			for (j = 0; j < 10; j++)
 			{
 				i = posts->Sparkles[j];
@@ -1345,17 +1345,17 @@ int		j,i;
 				{
 					DeleteSparkle(i);
 					posts->Sparkles[j] = -1;
-				}		
+				}
 			}
-			
+
 				/* NUKE BEAMS */
-				
+
 			DeleteObject(beams);
 			posts->ChainNode = nil;
-			
-			
+
+
 				/* CHANGE COLLISION */
-				
+
 			posts->TopOff = 40.0f;								// lower so just a small bump
 			CalcObjectBoxFromNode(posts);
 		}

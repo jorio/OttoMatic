@@ -186,8 +186,8 @@ int						itemX, itemZ;
 int						total;
 
 			/* ALLOC MEMORY FOR SUPERTILE ITEM INDEX GRID */
-			
-			
+
+
 	Alloc_2d_array(SuperTileItemIndexType, gSuperTileItemIndexGrid, gNumSuperTilesDeep, gNumSuperTilesWide);
 
 	if (gNumTerrainItems == 0)
@@ -202,45 +202,45 @@ int						total;
 
 	HLock((Handle)gMasterItemList);
 	HLock((Handle)tempItemList);
-	
+
 	srcList = *gMasterItemList;
 	newList = *tempItemList;
 
 
-			/************************/	
+			/************************/
 			/* SCAN ALL SUPERTILES  */
-			/************************/	
+			/************************/
 
 	total = 0;
-			
+
 	for (row = 0; row < gNumSuperTilesDeep; row++)
 	{
 		for (col = 0; col < gNumSuperTilesWide; col++)
 		{
 			gSuperTileItemIndexGrid[row][col].numItems = 0;			// no items on this supertile yet
-			
-			
+
+
 			/* FIND ALL ITEMS ON THIS SUPERTILE */
-		
+
 			for (i = 0; i < gNumTerrainItems; i++)
 			{
 				itemX = srcList[i].x;								// get pixel coords of item
 				itemZ = srcList[i].y;
-		
+
 				itemX /= TERRAIN_SUPERTILE_UNIT_SIZE;				// convert to supertile row
 				itemZ /= TERRAIN_SUPERTILE_UNIT_SIZE;				// convert to supertile column
-				
+
 				if ((itemX == col) && (itemZ == row))				// see if its on this supertile
 				{
 					if (gSuperTileItemIndexGrid[row][col].numItems == 0)		// see if this is the 1st item
 						gSuperTileItemIndexGrid[row][col].itemIndex = total;	// set starting index
-				
+
 					newList[total] = srcList[i];					// copy into new list
 					total++;										// inc counter
 					gSuperTileItemIndexGrid[row][col].numItems++;	// inc # items on this supertile
-					
+
 				}
-				else				
+				else
 				if (itemX > col)									// since original list is sorted, we can know when we are past the usable edge
 					break;
 			}
@@ -249,15 +249,15 @@ int						total;
 
 
 		/* NUKE THE ORIGINAL ITEM LIST AND REASSIGN TO THE NEW SORTED LIST */
-		
+
 	DisposeHandle((Handle)gMasterItemList);						// nuke old list
 	gMasterItemList = tempItemList;								// reassign
 
 
 
 			/* FIGURE OUT WHERE THE STARTING POINT IS */
-			
-	FindPlayerStartCoordItems();										// look thru items for my start coords	
+
+	FindPlayerStartCoordItems();										// look thru items for my start coords
 }
 
 
@@ -282,18 +282,18 @@ Boolean                 flags = false;
 	{
 		if (itemPtr[i].type == MAP_ITEM_MYSTARTCOORD)						// see if it's a MyStartCoord item
 		{
-			
+
 					/* CHECK FOR BIT INFO */
-					
-		
+
+
 			gPlayerInfo.coord.x = gPlayerInfo.startX = itemPtr[i].x;
-			gPlayerInfo.coord.z = gPlayerInfo.startZ = itemPtr[i].y;			
+			gPlayerInfo.coord.z = gPlayerInfo.startZ = itemPtr[i].y;
 			gPlayerInfo.startRotY = (float)itemPtr[i].parm[0] * (PI2/8.0f);	// calc starting rotation aim
-			
+
 			break;
-			
+
 //			if (flags)                      								// if we already got a coord for this player then err
-  //              DoFatalAlert("\pFindPlayerStartCoordItems:  duplicate start item for player #n");		
+  //              DoFatalAlert("\pFindPlayerStartCoordItems:  duplicate start item for player #n");
 	        flags = true;
 		}
 	}
@@ -324,20 +324,20 @@ Boolean			flag;
 			/*****************************/
 			/* SCAN ALL ITEMS UNDER HERE */
 			/*****************************/
-			
+
 	for (i = 0; i < numItems; i++)
 	{
 		float	x,z;
-		
+
 		if (itemPtr[i].flags & ITEM_FLAGS_INUSE)				// see if item available
 			continue;
-		
+
 		x = itemPtr[i].x;										// get item coords
 		z = itemPtr[i].y;
-			
+
 		if (SeeIfCoordsOutOfRange(x,z))						// only add if this supertile is active by player
 			continue;
-			
+
 		type = itemPtr[i].type;									// get item #
 		if (type > MAX_ITEM_NUM)								// error check!
 		{
@@ -398,15 +398,15 @@ Boolean SeeIfCoordsOutOfRange(float x, float z)
 int			row,col;
 
 			/* SEE IF OUT OF RANGE */
-			
-	if ((x < 0) || (z < 0))	
+
+	if ((x < 0) || (z < 0))
 		return(true);
 	if ((x >= gTerrainUnitWidth) || (z >= gTerrainUnitDepth))
 		return(true);
 
 
 		/* SEE IF A PLAYER USES THIS SUPERTILE */
-			
+
 	col = x * TERRAIN_SUPERTILE_UNIT_SIZE_Frac;						// calc supertile relative row/col that the coord lies on
 	row = z * TERRAIN_SUPERTILE_UNIT_SIZE_Frac;
 
@@ -432,42 +432,42 @@ OGLPoint3D		to;
 OGLMatrix4x4	*m,m2;
 
 			/* GET CENTER Y COORD & TERRAIN NORMAL */
-			
+
 	x = theNode->Coord.x;
 	z = theNode->Coord.z;
-	y = theNode->Coord.y = GetTerrainY(x, z) + yOffset;	
-	
+	y = theNode->Coord.y = GetTerrainY(x, z) + yOffset;
+
 	if (surfaceNormal)
 		up = *surfaceNormal;
 	else
 		up = gRecentTerrainNormal;
-	
-	
+
+
 			/* CALC "TO" COORD */
-			
+
 	r = theNode->Rot.y;
 	to.x = x + sin(r) * -30.0f;
 	to.z = z + cos(r) * -30.0f;
-	to.y = GetTerrainY(to.x, to.z) + yOffset;	
-	
-	
+	to.y = GetTerrainY(to.x, to.z) + yOffset;
+
+
 			/* CREATE THE MATRIX */
-	
+
 	m = &theNode->BaseTransformMatrix;
 	SetLookAtMatrix(m, &up, &theNode->Coord, &to);
-	
-	
+
+
 		/* POP IN THE TRANSLATE INTO THE MATRIX */
-			
+
 	m->value[M03] = x;
 	m->value[M13] = y;
 	m->value[M23] = z;
 
 
 			/* SET SCALE */
-					
+
 	OGLMatrix4x4_SetScale(&m2, theNode->Scale.x,				// make scale matrix
-							 	theNode->Scale.y,			
+							 	theNode->Scale.y,
 							 	theNode->Scale.z);
 	OGLMatrix4x4_Multiply(&m2, m, m);
 }
@@ -494,7 +494,7 @@ static OGLPoint3D	p4 = {TERRAIN_POLYGON_SIZE, 0, 0};
 
 
 		/* MAKE SURE ROW/COL IS IN RANGE */
-			
+
 	if ((row >= gTerrainTileDepth) || (row < 0) ||
 		(col >= gTerrainTileWidth) || (col < 0))
 	{
@@ -504,12 +504,12 @@ static OGLPoint3D	p4 = {TERRAIN_POLYGON_SIZE, 0, 0};
 		return;
 	}
 
-	p1.y = gMapYCoords[row][col];		// far left	
+	p1.y = gMapYCoords[row][col];		// far left
 	p2.y = gMapYCoords[row+1][col];		// near left
-	p3.y = gMapYCoords[row+1][col+1];	// near right	
-	p4.y = gMapYCoords[row][col+1];		// far right	
-	
-	
+	p3.y = gMapYCoords[row+1][col+1];	// near right
+	p4.y = gMapYCoords[row][col+1];		// far right
+
+
 		/* CALC NORMALS BASED ON SPLIT */
 
 	if (gMapSplitMode[row][col] == SPLIT_BACKWARD)
@@ -539,7 +539,7 @@ static OGLPoint3D	p4 = {TERRAIN_POLYGON_SIZE, 0, 0};
 
 
 		/* MAKE SURE ROW/COL IS IN RANGE */
-			
+
 	if ((row >= gTerrainTileDepth) || (row < 0) ||
 		(col >= gTerrainTileWidth) || (col < 0))
 	{
@@ -549,12 +549,12 @@ static OGLPoint3D	p4 = {TERRAIN_POLYGON_SIZE, 0, 0};
 		return;
 	}
 
-	p1.y = gMapYCoords[row][col];		// far left	
+	p1.y = gMapYCoords[row][col];		// far left
 	p2.y = gMapYCoords[row+1][col];		// near left
-	p3.y = gMapYCoords[row+1][col+1];	// near right	
-	p4.y = gMapYCoords[row][col+1];		// far right	
-	
-	
+	p3.y = gMapYCoords[row+1][col+1];	// near right
+	p4.y = gMapYCoords[row][col+1];		// far right
+
+
 		/* CALC NORMALS BASED ON SPLIT */
 
 	if (gMapSplitMode[row][col] == SPLIT_BACKWARD)

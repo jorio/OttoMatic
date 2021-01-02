@@ -63,7 +63,7 @@ u_long			gVRAMAfterBuffers = 0;
 
 
 WindowRef 		gDialogWindow = nil;
-EventHandlerUPP gWinEvtHandler;		
+EventHandlerUPP gWinEvtHandler;
 
 
 WindowPtr		gGameWindow;
@@ -111,37 +111,37 @@ Rect				r;
 float				w,h;
 CFDictionaryRef 	refDisplayMode = 0;
 CGTableCount 		sampleCount;
-	
-	
+
+
 	gPlayFullScreen = true;				//!gGamePrefs.playInWindow;
 
 	if (gPlayFullScreen)
 	{
-	
+
 		CGDisplayCapture(gCGDisplayID);
-	
+
 				/* FIND BEST MATCH */
-				
+
 		refDisplayMode = CGDisplayBestModeForParametersAndRefreshRate(gCGDisplayID, gGamePrefs.depth,
 																	gGamePrefs.screenWidth, gGamePrefs.screenHeight,
 																	gGamePrefs.hz,
 																	NULL);
 		if (refDisplayMode == nil)
-			DoFatalAlert("\pInitWindowStuff: CGDisplayBestModeForParameters failed!");		
-			
-			
+			DoFatalAlert("\pInitWindowStuff: CGDisplayBestModeForParameters failed!");
+
+
 				/* SWITCH TO IT */
-				
+
 		CGDisplaySwitchToMode (gCGDisplayID, refDisplayMode);
 
 
 					/* GET GDEVICE & INFO */
-					
+
 		DMGetGDeviceByDisplayID ((DisplayIDType)gCGDisplayID, &gGDevice, false);
 
 		w = gGamePrefs.screenWidth;
 		h = gGamePrefs.screenHeight;
-		
+
 		r.top  		= (short) ((**gGDevice).gdRect.top + ((**gGDevice).gdRect.bottom - (**gGDevice).gdRect.top) / 2);	  	// h center
 		r.top  		-= (short) (h / 2);
 		r.left  	= (short) ((**gGDevice).gdRect.left + ((**gGDevice).gdRect.right - (**gGDevice).gdRect.left) / 2);		// v center
@@ -153,9 +153,9 @@ CGTableCount 		sampleCount;
 
 
 					/* GET ORIGINAL GAMMA TABLE */
-					
+
 		CGGetDisplayTransferByTable(gCGDisplayID, 256, gOriginalRedTable, gOriginalGreenTable, gOriginalBlueTable, &sampleCount);
-		
+
 	}
 
 
@@ -168,37 +168,37 @@ CGTableCount 		sampleCount;
 		gGDevice = GetMainDevice();
 
 				/* SIZE WINDOW TO HALF SCREEN SIZE */
-				
+
 		w = (**gGDevice).gdRect.right;				// get width/height of display
 		h = (**gGDevice).gdRect.bottom;
-		
-		r.left = r.top = 0;		
+
+		r.left = r.top = 0;
 		r.right = w / 2;
-		r.bottom = h / 2;	
-		
+		r.bottom = h / 2;
+
 		if (r.right < 640)			// keep minimum at 640 wide
 		{
 			r.right = 640;
-			r.bottom = 480;		
+			r.bottom = 480;
 		}
-			
+
 		gGameWindow = NewCWindow(nil, &r, "\p", false, plainDBox, (WindowPtr)-1L, false, 0);
-		
+
 
 		gGameWindowGrafPtr = GetWindowPort(gGameWindow);
 
 				/* MOVE WINDOW TO CENTER OF SCREEN */
-				
+
 		MoveWindow(gGameWindow, r.right/2, r.bottom/2, true);
-		ShowWindow(gGameWindow);		
+		ShowWindow(gGameWindow);
 	}
 
-	
-	
+
+
 	gGameWindowWidth = r.right - r.left;
 	gGameWindowHeight = r.bottom - r.top;
-	
-	
+
+
 }
 
 
@@ -236,8 +236,8 @@ short		itype;
 Handle		ihandle;
 Rect		irect;
 
-	GetDialogItem (dlogPtr, item, &itype, (Handle *)&ihandle, &irect);	// get the user item's rect 
-	FrameRect (&irect);						// frame the button now 
+	GetDialogItem (dlogPtr, item, &itype, (Handle *)&ihandle, &irect);	// get the user item's rect
+	FrameRect (&irect);						// frame the button now
 	PenNormal();
 }
 
@@ -261,19 +261,19 @@ int			i;
 		gGammaFadePercent += .07f;
 		if (gGammaFadePercent > 1.0f)
 			gGammaFadePercent = 1.0f;
-	
+
 	    for (i = 0; i < 256 ; i++)
 	    {
 	        gGammaRedTable[i] 	= gOriginalRedTable[i] * gGammaFadePercent * gGammaTweak;
 	        gGammaGreenTable[i] = gOriginalGreenTable[i] * gGammaFadePercent * gGammaTweak;
 	        gGammaBlueTable[i] 	= gOriginalBlueTable[i] * gGammaFadePercent * gGammaTweak;
 	    }
-		
+
 		Wait(1);
 
 		CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
 	}
-#endif	
+#endif
 }
 
 
@@ -306,7 +306,7 @@ int			i;
 		CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
 
 	}
-#endif	
+#endif
 }
 
 /********************** GAMMA ON *********************/
@@ -321,10 +321,10 @@ void GammaOn(void)
 	if (gGammaFadePercent != 1.0f)
 	{
 		gGammaFadePercent = 1.0f;
-		
-	 	CGSetDisplayTransferByTable(0, 256, gOriginalRedTable, gOriginalGreenTable, gOriginalBlueTable);		
+
+	 	CGSetDisplayTransferByTable(0, 256, gOriginalRedTable, gOriginalGreenTable, gOriginalBlueTable);
 	}
-#endif	
+#endif
 }
 
 
@@ -337,23 +337,23 @@ void GammaOff(void)
 
 	if (!gPlayFullScreen)
 		return;
-		
+
 	if (gGammaFadePercent != 0.0f)
 	{
 		int			i;
-	
+
 		gGammaFadePercent = 0.0f;
-		
+
 	    for (i = 0; i < 256 ; i++)
 	    {
 	        gGammaRedTable[i] 	= gOriginalRedTable[i] * gGammaFadePercent * gGammaTweak;
 	        gGammaGreenTable[i] = gOriginalGreenTable[i] * gGammaFadePercent * gGammaTweak;
 	        gGammaBlueTable[i] 	= gOriginalBlueTable[i] * gGammaFadePercent * gGammaTweak;
 	    }
-	    
+
 		CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
 	}
-#endif	
+#endif
 }
 
 
@@ -364,7 +364,7 @@ void GammaOff(void)
 void CleanupDisplay(void)
 {
 	CGReleaseAllDisplays();
-	
+
 	gDisplayContextGrafPtr = nil;
 }
 
@@ -382,7 +382,7 @@ ObjNode		*thisNodePtr;
 		/* SCAN FOR OLD FADE EVENTS STILL IN LIST */
 
 	thisNodePtr = gFirstNodePtr;
-	
+
 	while (thisNodePtr)
 	{
 		if (thisNodePtr->MoveCall == MoveFadeEvent)
@@ -395,7 +395,7 @@ ObjNode		*thisNodePtr;
 
 
 		/* MAKE NEW FADE EVENT */
-			
+
 	gNewObjectDefinition.genre = EVENT_GENRE;
 	gNewObjectDefinition.flags = 0;
 	gNewObjectDefinition.slot = SLOT_OF_DUMB + 1000;
@@ -403,7 +403,7 @@ ObjNode		*thisNodePtr;
 	newObj = MakeNewObject(&gNewObjectDefinition);
 
 	newObj->Flag[0] = fadeIn;
-	
+
 	newObj->Speed = fadeSpeed;
 }
 
@@ -414,9 +414,9 @@ static void MoveFadeEvent(ObjNode *theNode)
 {
 float	fps = gFramesPerSecondFrac;
 float	speed = theNode->Speed * fps;
-				
+
 			/* SEE IF FADE IN */
-			
+
 	if (theNode->Flag[0])
 	{
 		gGammaFadePercent += speed;
@@ -426,7 +426,7 @@ float	speed = theNode->Speed * fps;
 			DeleteObject(theNode);
 		}
 	}
-	
+
 			/* FADE OUT */
 	else
 	{
@@ -442,7 +442,7 @@ float	speed = theNode->Speed * fps;
 	if (gPlayFullScreen)
 	{
 		int			i;
-	
+
 	    for (i = 0; i < 256 ; i++)
 	    {
 	        gGammaRedTable[i] 	= gOriginalRedTable[i] * gGammaFadePercent * gGammaTweak;
@@ -462,13 +462,13 @@ float	speed = theNode->Speed * fps;
 void GameScreenToBlack(void)
 {
 Rect	r;
-	
+
 	if (!gDisplayContextGrafPtr)
-		return;	
-	
+		return;
+
 	SetPort(gDisplayContextGrafPtr);
 	BackColor(blackColor);
-	
+
 	GetPortBounds(gDisplayContextGrafPtr, &r);
 	EraseRect(&r);
 }
@@ -482,7 +482,7 @@ Rect	r;
 void Enter2D(void)
 {
 	InitCursor();
-	MyFlushEvents();	
+	MyFlushEvents();
 
 	g2DStackDepth++;
 	if (g2DStackDepth > 1)						// see if already in 2D
@@ -494,24 +494,24 @@ void Enter2D(void)
 	if (gPlayFullScreen)
 	{
 		GammaOff();
-	
+
 		if (gAGLContext)
 		{
 			glFlush();
 			glFinish();
-		
+
 			aglSetDrawable(gAGLContext, nil);		// diable GL so our dialogs will show up
 			glFlush();
 			glFinish();
 		}
 
 			/* NEED TO UN-CAPTURE THE CG DISPLAY */
-			
+
 		CGDisplayRelease(gCGDisplayID);
 	}
 
 	GammaOn();
-	
+
 }
 
 
@@ -527,8 +527,8 @@ void Exit2D(void)
 		return;
 
 	HideCursor();
-	
-	
+
+
 	if (gPlayFullScreen)
 	{
 //		if (gAGLContext)
@@ -537,8 +537,8 @@ void Exit2D(void)
 			if (gAGLContext)
 				aglSetFullScreen(gAGLContext, 0, 0, 0, 0);		//re-enable GL
 		}
-	}		
-	
+	}
+
 }
 
 
@@ -559,7 +559,7 @@ Rect			r;
 	DoLockPixels(thisWorld);
 
 	GetGWorld (&oldGW,&oldGD);
-	pm = GetGWorldPixMap(thisWorld);	
+	pm = GetGWorldPixMap(thisWorld);
 	if ((pm == nil) | (*pm == nil) )
 		DoAlert("\pPixMap Handle or Ptr = Null?!");
 
@@ -569,7 +569,7 @@ Rect			r;
 	BackColor(whiteColor);
 
 	GetPortBounds(thisWorld, &r);
-				
+
 	CopyBits((BitMap *)*pm, GetPortBitMapForCopyBits(GetWindowPort(thisWindow)),
 			 &r,
 			 destRect,
@@ -584,7 +584,7 @@ Rect			r;
 void DoLockPixels(GWorldPtr world)
 {
 PixMapHandle pm;
-	
+
 	pm = GetGWorldPixMap(world);
 	if (LockPixels(pm) == false)
 		DoFatalAlert("\pPixMap Went Bye,Bye?!");
@@ -596,11 +596,11 @@ PixMapHandle pm;
 void Wait(u_long ticks)
 {
 u_long	start;
-	
+
 	start = TickCount();
 
 	while (TickCount()-start < ticks)
-		MyFlushEvents(); 
+		MyFlushEvents();
 
 }
 
@@ -632,21 +632,21 @@ const char		*rezNames[MAX_LANGUAGES] =
 
 
 				/* GET LIST OF VIDEO MODES FOR USER TO CHOOSE FROM */
-				
+
 	CreateDisplayModeList();
 
 
 				/**********************************************/
 				/* DETERMINE IF NEED TO DO THIS DIALOG OR NOT */
 				/**********************************************/
-				
+
 	UpdateInput();
 	UpdateInput();
 	if (GetKeyState(KEY_OPTION) || gGamePrefs.showScreenModeDialog)			// see if force it
 		goto do_it;
-		
+
 					/* VERIFY THAT CURRENT MODE IS ALLOWED */
-					
+
 	for (i=0; i < gNumVideoModes; i++)
 	{
 		if ((gVideoModeList[i].rezH == gGamePrefs.screenWidth) &&					// if its a match then bail
@@ -654,12 +654,12 @@ const char		*rezNames[MAX_LANGUAGES] =
 			(gVideoModeList[i].hz == gGamePrefs.hz))
 			{
 				CalcVRAMAfterBuffers();
-				return;		
+				return;
 			}
 	}
 
 			/* BAD MODE, SO RESET TO SOMETHING LEGAL AS DEFAULT */
-				
+
 	gGamePrefs.screenWidth = gVideoModeList[0].rezH;
 	gGamePrefs.screenHeight = gVideoModeList[0].rezV;
 	gGamePrefs.hz = gVideoModeList[0].hz;
@@ -669,12 +669,12 @@ const char		*rezNames[MAX_LANGUAGES] =
     		/***************/
     		/* INIT DIALOG */
     		/***************/
-do_it:    
+do_it:
 
 	InitCursor();
 
 				/* CREATE WINDOW FROM THE NIB */
-				
+
     err = CreateWindowFromNib(gNibs, CFStringCreateWithCString(nil, rezNames[gGamePrefs.language],
     						kCFStringEncodingMacRoman), &gDialogWindow);
 	if (err)
@@ -682,7 +682,7 @@ do_it:
 
 
 			/* CREATE NEW WINDOW EVENT HANDLER */
-				
+
     gWinEvtHandler = NewEventHandlerUPP(DoScreenModeDialog_EventHandler);
     InstallWindowEventHandler(gDialogWindow, gWinEvtHandler, GetEventTypeCount(list), list, 0, &ref);
 
@@ -690,7 +690,7 @@ do_it:
 			/* SET "DON'T SHOW" CHECKBOX */
 
     idControl.signature = 'nosh';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(gDialogWindow, &idControl, &control);
 	SetControlValue(control, !gGamePrefs.showScreenModeDialog);
 
@@ -698,13 +698,13 @@ do_it:
 			/* SET "16/32" BUTTONS */
 
     idControl.signature = 'bitd';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(gDialogWindow, &idControl, &control);
 	SetControlValue(control, (gGamePrefs.depth == 32) + 1);
 
 //	if (gDisplayVRAM <= 0x2000000)				// if <= 32MB VRAM...
 //	{
-//		DisableControl(control);               
+//		DisableControl(control);
 //	}
 
 
@@ -712,7 +712,7 @@ do_it:
 			/* SET STEREO BUTTONS*/
 
     idControl.signature = '3dmo';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(gDialogWindow, &idControl, &control);
 	SetControlValue(control, gGamePrefs.anaglyph + 1);
 
@@ -720,7 +720,7 @@ do_it:
 			/* SET ANAGLYPH COLOR/BW BUTTONS */
 
     idControl.signature = '3dco';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(gDialogWindow, &idControl, &control);
 	SetControlValue(control, gGamePrefs.anaglyphColor + 1);
 
@@ -732,7 +732,7 @@ do_it:
 			/**********************/
 			/* PROCESS THE DIALOG */
 			/**********************/
-			
+
     ShowWindow(gDialogWindow);
 	RunAppModalLoopForWindow(gDialogWindow);
 
@@ -740,11 +740,11 @@ do_it:
 			/*********************/
 			/* GET RESULT VALUES */
 			/*********************/
-			
+
 			/* GET "DON'T SHOW" CHECKBOX */
 
     idControl.signature = 'nosh';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(gDialogWindow, &idControl, &control);
 	gGamePrefs.showScreenModeDialog = !GetControlValue(control);
 
@@ -752,7 +752,7 @@ do_it:
 			/* GET "16/32" BUTTONS */
 
     idControl.signature = 'bitd';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(gDialogWindow, &idControl, &control);
 	if (GetControlValue(control) == 1)
 		gGamePrefs.depth = 16;
@@ -761,9 +761,9 @@ do_it:
 
 
 			/* GET RESOLUTION MENU */
-			
+
     idControl.signature = 'rezm';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(gDialogWindow, &idControl, &control);
 	i = GetControlValue(control);
 	gGamePrefs.screenWidth = gVideoModeList[i-1].rezH;
@@ -774,7 +774,7 @@ do_it:
 			/* GET STEREO BUTTONS*/
 
     idControl.signature = '3dmo';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(gDialogWindow, &idControl, &control);
 	gGamePrefs.anaglyph = GetControlValue(control) - 1;
 
@@ -782,23 +782,23 @@ do_it:
 			/* GET ANAGLYPH COLOR/BW BUTTONS */
 
     idControl.signature = '3dco';
-    idControl.id 		= 0; 
+    idControl.id 		= 0;
     GetControlByID(gDialogWindow, &idControl, &control);
 	if (GetControlValue(control) == 2)
 		gGamePrefs.anaglyphColor = true;
 	else
 		gGamePrefs.anaglyphColor = false;
-	
+
 
 				/***********/
 				/* CLEANUP */
 				/***********/
-				
+
 	DisposeEventHandlerUPP (gWinEvtHandler);
 	DisposeWindow (gDialogWindow);
-	
-	
-	
+
+
+
 	CalcVRAMAfterBuffers();
 	SavePrefs();
 }
@@ -817,28 +817,28 @@ HICommand 		command;
 
 	switch(GetEventKind(event))
 	{
-				
+
 				/*******************/
 				/* PROCESS COMMAND */
 				/*******************/
-				
+
 		case	kEventProcessCommand:
 				GetEventParameter (event, kEventParamDirectObject, kEventParamHICommand, NULL, sizeof(command), NULL, &command);
 				switch(command.commandID)
 				{
 							/* "OK" BUTTON */
-							
+
 					case	'ok  ':
 		                    QuitAppModalLoopForWindow(gDialogWindow);
 							break;
 
 							/* "QUIT" BUTTON */
-							
+
 					case	'quit':
 		                    ExitToShell();
 							break;
-							
-							
+
+
 				}
 				break;
     }
@@ -855,34 +855,34 @@ static void BuildResolutionMenu(void)
 Str255 		menuStrings[MAX_VIDEO_MODES];
 short		i, defaultItem = 1;
 Str32		s,t;
-	
+
 	for (i=0; i < gNumVideoModes; i++)
 	{
 				/* BUILD MENU ITEM STRING */
-				
+
 		NumToString(gVideoModeList[i].rezH, s);			// horiz rez
 		s[s[0]+1] = 'x';								// "x"
 		s[0]++;
 
 		NumToString(gVideoModeList[i].rezV, t);			// vert rez
 		BlockMove(&t[1], &s[s[0]+1], t[0]);
-		s[0] += t[0];	
+		s[0] += t[0];
 
 		s[s[0]+1] = ' ';								// " "
 		s[0]++;
 
 		NumToString(gVideoModeList[i].hz, t);			// refresh hz
 		BlockMove(&t[1], &s[s[0]+1], t[0]);
-		s[0] += t[0];	
+		s[0] += t[0];
 
 		s[s[0]+1] = 'h';								// "hz"
-		s[s[0]+2] = 'z';						
+		s[s[0]+2] = 'z';
 		s[0] += 2;
 
 		BlockMove(&s[0], &menuStrings[i][0], s[0]+1);
-		
+
 			/* IS THIS THE CURRENT SETTING? */
-			
+
 		if ((gVideoModeList[i].rezH == gGamePrefs.screenWidth) &&
 			(gVideoModeList[i].rezV == gGamePrefs.screenHeight) &&
 			(gVideoModeList[i].hz == gGamePrefs.hz))
@@ -890,11 +890,11 @@ Str32		s,t;
 			defaultItem = i;
 		}
 	}
-	
-	
+
+
 			/* BUILD THE MENU FROM THE STRING LIST */
-			
-	BuildControlMenu (gDialogWindow, 'rezm', 0, &menuStrings[0], gNumVideoModes, defaultItem);	
+
+	BuildControlMenu (gDialogWindow, 'rezm', 0, &menuStrings[0], gNumVideoModes, defaultItem);
 }
 
 
@@ -911,33 +911,33 @@ ControlID 	idControl;
 ControlRef 	control;
 short 		i;
 OSStatus 	err = noErr;
-    
+
     		/* GET MENU DATA */
-    		
+
     idControl.signature = controlSig;
-    idControl.id 		= id; 
+    idControl.id 		= id;
     GetControlByID(window, &idControl, &control);
     GetControlData(control, kControlMenuPart, kControlPopupButtonMenuHandleTag, sizeof (MenuHandle), &hMenu, &tempSize);
-    
+
     	/* REMOVE ALL ITEMS FROM EXISTING MENU */
-    		
+
     err = DeleteMenuItems(hMenu, 1, CountMenuItems (hMenu));
 
 
 			/* ADD NEW ITEMS TO THE MENU */
-			
+
     for (i = 0; i < numItems; i++)
         AppendMenu(hMenu, textList[i]);
 
 
 			/* FORCE UPDATE OF MENU EXTENTS */
-			
+
     SetControlMaximum(control, numItems);
 
 	if (defaultSelection >= numItems)					// make sure default isn't over
 		defaultSelection = 0;
-		
-	SetControlValue(control, defaultSelection+1);               
+
+	SetControlValue(control, defaultSelection+1);
 
 }
 
@@ -950,53 +950,53 @@ OSStatus 	err = noErr;
 static void CreateDisplayModeList(void)
 {
 int					i, j, numDeviceModes;
-CFArrayRef 			modeList; 
-CFDictionaryRef 	mode; 
+CFArrayRef 			modeList;
+CFDictionaryRef 	mode;
 long				width, height, dep;
 double				hz;
 
 			/* MAKE SURE IT SHOWS 640X480 */
-			
+
 	gVideoModeList[0].rezH = 640;
 	gVideoModeList[0].rezV = 480;
 	gVideoModeList[0].hz = 60;
 	gNumVideoModes = 1;
 
 				/* GET MAIN MONITOR ID & VRAM FOR IT */
-				
+
 	gCGDisplayID = CGMainDisplayID();
 	GetDisplayVRAM();										// calc the amount of vram on this device
 
 				/* GET LIST OF MODES FOR THIS MONITOR */
-				
-	modeList = CGDisplayAvailableModes(gCGDisplayID); 
+
+	modeList = CGDisplayAvailableModes(gCGDisplayID);
 	if (modeList == nil)
 		DoFatalAlert("\pCreateDisplayModeList: CGDisplayAvailableModes failed!");
 
-	numDeviceModes = CFArrayGetCount(modeList); 
+	numDeviceModes = CFArrayGetCount(modeList);
 
 
 				/*********************/
 				/* EXTRACT MODE INFO */
 				/*********************/
-				
+
 	for (i = 0; i < numDeviceModes; i++)
-    {      
+    {
     	CFNumberRef	number;
     	Boolean		skip;
-    	
+
         mode = CFArrayGetValueAtIndex( modeList, i );				  	// Pull the mode dictionary out of the CFArray
 		if (mode == nil)
 			DoFatalAlert("\pCreateDisplayModeList: CFArrayGetValueAtIndex failed!");
 
 		number = CFDictionaryGetValue(mode, kCGDisplayWidth);			// get width
-		CFNumberGetValue(number, kCFNumberLongType, &width) ; 
+		CFNumberGetValue(number, kCFNumberLongType, &width) ;
 
 		number = CFDictionaryGetValue(mode, kCGDisplayHeight);	 		// get height
-		CFNumberGetValue(number, kCFNumberLongType, &height); 	
+		CFNumberGetValue(number, kCFNumberLongType, &height);
 
 		number = CFDictionaryGetValue(mode, kCGDisplayBitsPerPixel);	// get depth
-		CFNumberGetValue(number, kCFNumberLongType, &dep); 	
+		CFNumberGetValue(number, kCFNumberLongType, &dep);
 		if (dep != 32)
 			continue;
 
@@ -1005,26 +1005,26 @@ double				hz;
 			hz = 85;
 		else
 		{
-			CFNumberGetValue(number, kCFNumberDoubleType, &hz); 
+			CFNumberGetValue(number, kCFNumberDoubleType, &hz);
 			if (hz == 0)												// LCD's tend to return 0 since there's no real refresh rate
 				hz = 60;
 		}
-		
+
 				/* IN LOW-VRAM SITUATIONS, DON'T ALLOW LARGE MODES */
 
-#if 0				
+#if 0
 		if (gDisplayVRAM <= 0x4000000)				// if <= 64MB VRAM...
 		{
 			if (width > 1280)
-				continue;		
+				continue;
 		}
 
 		if (gDisplayVRAM <= 0x2000000)				// if <= 32MB VRAM...
 		{
 			if (width > 1024)
-				continue;	
+				continue;
 		}
-#endif		
+#endif
 
 					/***************************/
 					/* SEE IF ADD TO MODE LIST */
@@ -1033,12 +1033,12 @@ double				hz;
 					/* SEE IF IT'S A VALID MODE FOR US */
 
 		if (CFDictionaryGetValue(mode, kCGDisplayModeUsableForDesktopGUI) != kCFBooleanTrue)	// is it a displayable rez?
-			continue;	
-							
-								
+			continue;
+
+
 						/* SEE IF ALREADY IN LIST */
-						
-		skip = false;	
+
+		skip = false;
 		for (j = 0; j < gNumVideoModes; j++)
 		{
 			if ((gVideoModeList[j].rezH == width) &&
@@ -1049,11 +1049,11 @@ double				hz;
 				break;
 			}
 		}
-		
+
 		if (!skip)
-		{	
+		{
 				/* THIS REZ NOT IN LIST YET, SO ADD */
-			
+
 			if (gNumVideoModes < MAX_VIDEO_MODES)
 			{
 				gVideoModeList[gNumVideoModes].rezH = width;
@@ -1063,7 +1063,7 @@ double				hz;
 			}
 		}
 	}
-} 
+}
 
 /******************** GET DISPLAY VRAM ***********************/
 
@@ -1073,20 +1073,20 @@ io_service_t	port;
 CFTypeRef		classCode;
 
 			/* SEE HOW MUCH VRAM WE HAVE */
-			
+
 	port = CGDisplayIOServicePort(gCGDisplayID);
 	classCode = IORegistryEntryCreateCFProperty(port, CFSTR(kIOFBMemorySizeKey), kCFAllocatorDefault, kNilOptions);
-	
+
 	if (CFGetTypeID(classCode) == CFNumberGetTypeID())
 	{
 		CFNumberGetValue(classCode, kCFNumberSInt32Type, &gDisplayVRAM);
 	}
 	else
 		gDisplayVRAM = 0x8000000;				// if failed, then just assume 128MB VRAM to be safe
-	
-	
+
+
 			/* SET SOME PREFS IF THINGS ARE LOOKING LOW */
-			
+
 	if (gDisplayVRAM <= 0x1000000)				// if <= 16MB VRAM...
 	{
 		gGamePrefs.depth = 16;
@@ -1096,9 +1096,9 @@ CFTypeRef		classCode;
 //	{
 //		DoFatalAlert("\pThis game requires at least 32MB of VRAM, and you appear to have much less than that.  You will need to install a newer video card with more VRAM to play this game.");
 //	}
-	
-		
-	SavePrefs();	
+
+
+	SavePrefs();
 }
 
 
@@ -1110,12 +1110,12 @@ CFTypeRef		classCode;
 static void CalcVRAMAfterBuffers(void)
 {
 int	bufferSpace;
-			
+
 	bufferSpace = gGamePrefs.screenWidth * gGamePrefs.screenHeight * 2 * 2;		// calc main pixel/z buffers @ 16-bit
 	if (gGamePrefs.depth == 32)
 		bufferSpace *= 2;
-	
-	gVRAMAfterBuffers = gDisplayVRAM - bufferSpace;	
+
+	gVRAMAfterBuffers = gDisplayVRAM - bufferSpace;
 }
 
 

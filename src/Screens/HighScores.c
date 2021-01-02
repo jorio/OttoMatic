@@ -65,7 +65,7 @@ enum
 
 static Str32	gHighScoresFileName = "\p:OttoMatic:HighScores";
 
-HighScoreType	gHighScores[NUM_SCORES];	
+HighScoreType	gHighScores[NUM_SCORES];
 
 static	float	gFinalScoreTimer,gFinalScoreAlpha, gCursorFlux = 0;
 
@@ -79,51 +79,51 @@ static	Boolean	gDrawScoreVerbage,gExitHighScores;
 void NewScore(void)
 {
 	if (gScore == 0)
-		return;	
-		
+		return;
+
 	gAllowAudioKeys = false;					// dont interfere with name editing
-	
+
 			/* INIT */
-			
-	
+
+
 	LoadHighScores();										// make sure current scores are loaded
 	SetupScoreScreen();										// setup OGL
 	MakeFadeEvent(true, 1.0);
 
 
 			/* LOOP */
-			
+
 	CalcFramesPerSecond();
-	UpdateInput();		
-		
+	UpdateInput();
+
 	while(!gExitHighScores)
 	{
-		
+
 		CalcFramesPerSecond();
-		UpdateInput();		
-		MoveObjects();				
-		OGL_DrawScene(gGameViewInfoPtr, DrawHighScoresCallback);	
-		
+		UpdateInput();
+		MoveObjects();
+		OGL_DrawScene(gGameViewInfoPtr, DrawHighScoresCallback);
+
 				/*****************************/
 				/* SEE IF USER ENTERING NAME */
 				/*****************************/
-				
+
 		if (!gDrawScoreVerbage)
 		{
 			EventRecord 	theEvent;
-			
+
 			GetNextEvent(keyDownMask|autoKeyMask, &theEvent);							// poll event queue
 			if ((theEvent.what == keyDown) || (theEvent.what == autoKeyMask))			// see if key pressed
 			{
 				char	theChar = theEvent.message & charCodeMask;						// extract key
 				int		i;
-		
+
 				switch(theChar)
 				{
 					case	CHAR_RETURN:
 							gExitHighScores = true;
 							break;
-							
+
 					case	CHAR_LEFT:
 							if (gCursorIndex > 0)
 								gCursorIndex--;
@@ -145,7 +145,7 @@ void NewScore(void)
 								gHighScores[gNewScoreSlot].name[MAX_NAME_LENGTH] = ' ';
 							}
 							break;
-							
+
 					default:
 							if (gCursorIndex < MAX_NAME_LENGTH)								// dont add anything more if maxxed out now
 							{
@@ -155,22 +155,22 @@ void NewScore(void)
 								gCursorIndex++;
 							}
 				}
-							
+
 			}
 		}
-	}	
+	}
 
 
 		/* CLEANUP */
-		
-	if (gNewScoreSlot != -1)						// if a new score was added then update the high scores file			
+
+	if (gNewScoreSlot != -1)						// if a new score was added then update the high scores file
 		SaveHighScores();
-		
+
 	FreeScoreScreen();
-	
-	GammaFadeOut();			
-	
-	
+
+	GammaFadeOut();
+
+
 	gAllowAudioKeys = true;
 }
 
@@ -191,13 +191,13 @@ ObjNode				*newObj;
 
 
 		/* IF THIS WAS A SAVED GAME AND SCORE HASN'T CHANGED AND IS ALREADY IN LIST THEN DON'T ADD TO HIGH SCORES */
-			
+
 	if (gPlayingFromSavedGame && (gScore == gLoadedScore) && IsThisScoreInList(gScore))
 	{
 		gFinalScoreTimer = 4.0f;
 		gNewScoreSlot = -1;
 	}
-	
+
 			/* NOT SAVED GAME OR A BETTER SCORE THAN WAS LOADED OR ISN'T IN LIST YET */
 	else
 	{
@@ -213,8 +213,8 @@ ObjNode				*newObj;
 			/**************/
 			/* SETUP VIEW */
 			/**************/
-			
-	OGL_NewViewDef(&viewDef);	
+
+	OGL_NewViewDef(&viewDef);
 
 	viewDef.camera.fov 			= 1.9;
 	viewDef.camera.hither 		= 20;
@@ -223,12 +223,12 @@ ObjNode				*newObj;
 	viewDef.camera.from.x		= 0;
 	viewDef.camera.from.z		= 800;
 	viewDef.camera.from.y		= 0;
-	
-	
+
+
 			/*********************/
 			/* SET ANAGLYPH INFO */
-			/*********************/			
-			
+			/*********************/
+
 	if (gGamePrefs.anaglyph)
 	{
 		if (!gGamePrefs.anaglyphColor)
@@ -237,11 +237,11 @@ ObjNode				*newObj;
 			viewDef.lights.ambientColor.g 		+= .1f;
 			viewDef.lights.ambientColor.b 		+= .1f;
 		}
-				
+
 		gAnaglyphFocallength	= 180.0f;
 		gAnaglyphEyeSeparation 	= 10.0f;
 	}
-	
+
 	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
 
 
@@ -258,12 +258,12 @@ ObjNode				*newObj;
 
 
 			/* LOAD SKELETONS */
-			
+
 	LoadASkeleton(SKELETON_TYPE_OTTO, gGameViewInfoPtr);
-	
+
 
 			/* LOAD SPRITES */
-			
+
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:particle.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
@@ -283,12 +283,12 @@ ObjNode				*newObj;
 //	LoadSoundBank(&spec, SOUND_BANK_BONUS);
 
 
-		
+
 			/************/
 			/* MAKE CYC */
 			/************/
-			
-	gNewObjectDefinition.group 		= MODEL_GROUP_HIGHSCORES;	
+
+	gNewObjectDefinition.group 		= MODEL_GROUP_HIGHSCORES;
 	gNewObjectDefinition.type 		= HIGHSCORES_SObjType_Cyc;
 	gNewObjectDefinition.coord		= viewDef.camera.from;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG;
@@ -308,11 +308,11 @@ ObjNode				*newObj;
 /********************** FREE SCORE SCREEN **********************/
 
 static void FreeScoreScreen(void)
-{				
+{
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
-	DisposeAllSpriteGroups();	
+	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUND_BANK_BONUS);
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
@@ -323,13 +323,13 @@ static void FreeScoreScreen(void)
 /***************** DRAW HIGHSCORES CALLBACK *******************/
 
 static void DrawHighScoresCallback(OGLSetupOutputType *info)
-{			
+{
 	DrawObjects(info);
 	DrawSparkles(info);											// draw light sparkles
 
 
 			/* DRAW SPRITES */
-			
+
 	OGL_PushState();
 
 	SetHighScoresSpriteState();
@@ -353,19 +353,19 @@ static void SetHighScoresSpriteState(void)
 AGLContext agl_ctx = gAGLContext;
 
 	OGL_DisableLighting();
-	glDisable(GL_CULL_FACE);							
+	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);								// no z-buffer
 
 	gGlobalMaterialFlags = BG3D_MATERIALFLAG_CLAMP_V|BG3D_MATERIALFLAG_CLAMP_U;	// clamp all textures
-	
+
 
 			/* INIT MATRICES */
-					
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0, 640, 480, 0, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();					
+	glLoadIdentity();
 }
 
 /********************* DRAW SCORE VERBAGE ****************************/
@@ -378,7 +378,7 @@ float	x;
 AGLContext agl_ctx = gAGLContext;
 
 				/* SEE IF DONE */
-				
+
 	gFinalScoreTimer -= gFramesPerSecondFrac;
 	if (gFinalScoreTimer <= 0.0f)
 	{
@@ -397,16 +397,16 @@ AGLContext agl_ctx = gAGLContext;
 			/****************************/
 			/* DRAW BONUS TOTAL VERBAGE */
 			/****************************/
-	
+
 			/* DRAW GLOW */
-			
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gFinalScoreAlpha;
 	DrawInfobarSprite2(320-150, 170, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreTextGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 			/* DRAW TEXT */
-			
+
 	gGlobalTransparency = gFinalScoreAlpha;
 	DrawInfobarSprite2(320-150, 170, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreText, info);
 
@@ -419,8 +419,8 @@ AGLContext agl_ctx = gAGLContext;
 	n = s[0];										// get str len
 
 	x = 320.0f - ((float)n / 2.0f) * MYSCORE_DIGIT_SPACING - (MYSCORE_DIGIT_SPACING/2);	// calc starting x
-	
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (i = 1; i <= n; i++)
 	{
 		texNum = CharToSprite(s[i]);				// get texture #
@@ -430,8 +430,8 @@ AGLContext agl_ctx = gAGLContext;
 		x += MYSCORE_DIGIT_SPACING;
 	}
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-	
+
+
 	gGlobalTransparency = 1.0f;
 }
 
@@ -449,36 +449,36 @@ Str32	s;
 	if (gFinalScoreAlpha > .99f)
 		gFinalScoreAlpha = .99f;
 
-	
+
  	gCursorFlux += gFramesPerSecondFrac * 10.0f;
- 	
- 	
+
+
 			/****************************/
 			/* DRAW ENTER NAME VERBAGE */
 			/****************************/
-	
+
 			/* DRAW GLOW */
-			
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);		
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gFinalScoreAlpha;
 	DrawInfobarSprite2(320-250, 10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 			/* DRAW TEXT */
-			
+
 	gGlobalTransparency = gFinalScoreAlpha;
 	DrawInfobarSprite2(320-250, 10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameText, info);
- 	
- 	
+
+
 	gGlobalTransparency = gFinalScoreAlpha;
 
- 	
+
 			/*****************/
 			/* DRAW THE TEXT */
 			/*****************/
-		
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
-		
+
 	y = 120;
 	for (i = 0; i < NUM_SCORES; i++)
 	{
@@ -487,41 +487,41 @@ Str32	s;
 			cursorY = y;
 			cursorX = 150.0f + (SCORE_TEXT_SPACING * gCursorIndex);
 		}
-		
+
 				/* DRAW NAME */
-				
+
 		DrawScoreText(gHighScores[i].name, 150,y,info);
-	
+
 				/* DRAW SCORE */
-				
+
 		NumToString(gHighScores[i].score, s);	// convert score to a text string
 		if (s[0] < SCORE_DIGITS)				// pad 0's
 		{
 			n = SCORE_DIGITS-s[0];
 			BlockMove(&s[1],&s[1+n], 20);		// shift existing data over
-			
+
 			for (j = 0; j < n; j++)				// pad with 0's
 				s[1+j] = '0';
-				
+
 			s[0] = SCORE_DIGITS;
 		}
 		DrawScoreText(s, 350,y,info);
-		
+
 		y += SCORE_TEXT_SPACING * 1.3f;
-	}	
-	
-		/*******************/	
+	}
+
+		/*******************/
 		/* DRAW THE CURSOR */
 		/*******************/
-			
+
 	if (gCursorIndex < MAX_NAME_LENGTH)						// dont draw if off the right side
 	{
 		gGlobalTransparency = (.3f + ((sin(gCursorFlux) + 1.0f) * .5f) * .699f) * gFinalScoreAlpha;
 		DrawInfobarSprite2(cursorX, cursorY, SCORE_TEXT_SPACING * 1.9f, SPRITE_GROUP_FONT, HELPTEXT_SObjType_Cursor, info);
-	}	
-			
-			
-		
+	}
+
+
+
 			/***********/
 			/* CLEANUP */
 			/***********/
@@ -567,9 +567,9 @@ FSSpec				file;
 long				count;
 
 				/* OPEN FILE */
-					
+
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, gHighScoresFileName, &file);
-	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);	
+	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);
 	if (iErr == fnfErr)
 		ClearHighScores();
 	else
@@ -581,12 +581,12 @@ long				count;
 		iErr = FSRead(refNum, &count,  &gHighScores[0]);								// read data from file
 		if (iErr)
 		{
-			FSClose(refNum);			
+			FSClose(refNum);
 			FSpDelete(&file);												// file is corrupt, so delete
 			return;
 		}
-		FSClose(refNum);			
-	}	
+		FSClose(refNum);
+	}
 }
 
 
@@ -600,7 +600,7 @@ short				refNum;
 long				count;
 
 				/* CREATE BLANK FILE */
-				
+
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, gHighScoresFileName, &file);
 	FSpDelete(&file);															// delete any existing file
 	iErr = FSpCreate(&file, 'Otto', 'Skor', smSystemScript);					// create blank file
@@ -609,21 +609,21 @@ long				count;
 
 
 				/* OPEN FILE */
-					
+
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, gHighScoresFileName, &file);
 	iErr = FSpOpenDF(&file, fsRdWrPerm, &refNum);
 	if (iErr)
 	{
-err:	
+err:
 		DoAlert("\pUnable to Save High Scores file!");
 		return;
 	}
 
 				/* WRITE DATA */
-				
+
 	count = sizeof(HighScoreType) * NUM_SCORES;
-	FSWrite(refNum, &count, &gHighScores[0]);	
-	FSClose(refNum);			
+	FSWrite(refNum, &count, &gHighScores[0]);
+	FSClose(refNum);
 
 }
 
@@ -637,7 +637,7 @@ char				blank[MAX_NAME_LENGTH] = "EMPTY----------";
 
 
 			/* INIT SCORES */
-			
+
 	for (i=0; i < NUM_SCORES; i++)
 	{
 		gHighScores[i].name[0] = MAX_NAME_LENGTH;
@@ -646,7 +646,7 @@ char				blank[MAX_NAME_LENGTH] = "EMPTY----------";
 		gHighScores[i].score = 0;
 	}
 
-	SaveHighScores();		
+	SaveHighScores();
 }
 
 
@@ -660,16 +660,16 @@ static short AddNewScore(u_long newScore)
 short	slot,i;
 
 			/* FIND INSERT SLOT */
-	
+
 	for (slot=0; slot < NUM_SCORES; slot++)
 	{
 		if (newScore > gHighScores[slot].score)
 			goto	got_slot;
 	}
 	return(-1);
-	
-	
-got_slot:	
+
+
+got_slot:
 			/* INSERT INTO LIST */
 
 	for (i = NUM_SCORES-1; i > slot; i--)						// make hole
