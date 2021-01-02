@@ -1,0 +1,70 @@
+ 
+		/* MY BUILD OPTIONS */
+		
+#define	TARGET_API_MAC_CARBON				1
+
+#define	DEMO	0
+#define	OEM		0
+
+
+		/* HEADERS */
+		
+#include <Carbon/Carbon.h>
+
+#include <IOKit/IOKitLib.h>
+#include <IOKit/IOCFPlugIn.h>
+#include <IOKit/hid/IOHIDLib.h>
+#include <IOKit/hid/IOHIDKeys.h>
+#include <Kernel/IOKit/hidsystem/IOHIDUsageTables.h>
+
+
+#include <Quicktime/Movies.h>
+#include <AGL/agl.h> 
+#include <AGL/glu.h>
+#include <OpenGL/glext.h>
+
+#include "globals.h"
+#include "structs.h"
+
+
+#include "metaobjects.h"
+#include "ogl_support.h"
+#include "main.h"
+#include "mobjtypes.h"
+#include "misc.h"
+#include "sound2.h"
+#include "sobjtypes.h"
+#include "sprites.h"
+#include "sparkle.h"
+#include "bg3d.h"
+#include "camera.h"
+#include "collision.h"
+#include 	"input.h"
+#include "file.h"
+#include "windows.h"
+#include "internet.h"
+#include "player.h"
+#include "terrain.h"
+#include "humans.h"
+#include "skeletonobj.h"
+#include "skeletonanim.h"
+#include "skeletonjoints.h"
+#include	"infobar.h"
+#include "triggers.h"
+#include "effects.h"
+#include "shards.h"
+#include "bones.h"
+#include "vaportrails.h"
+#include "splineitems.h"
+#include "mytraps.h"
+#include "enemy.h"
+#include "items.h"
+#include "sky.h"
+#include "water.h"
+#include "fences.h"
+#include "miscscreens.h"
+#include "objects.h"
+#include "mainmenu.h"
+#include "lzss.h"
+
+

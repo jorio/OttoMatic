@@ -1,0 +1,51 @@
+//
+// miscscreens.h
+//
+
+#define	NUM_SCORES		15
+#define	MAX_NAME_LENGTH	15
+
+typedef struct
+{
+	unsigned char	name[MAX_NAME_LENGTH+1];
+	unsigned long	score;
+}HighScoreType;
+
+#define	DARKEN_PANE_Z	450.0f
+
+enum
+{
+	LOSE_SObjType_GameOver,
+	WIN_SObjType_TheEnd_Text,
+	WIN_SObjType_TheEnd_Glow,
+	WIN_SObjType_BlackOut,
+	WIN_SObjType_QText,
+	WIN_SObjType_QGlow
+};
+
+
+
+void DisplayPicture(FSSpec *spec);
+void DoPaused(void);
+
+Boolean DoFailedMenu(const Str31	headerString);
+void DoLegalScreen(void);
+Boolean DoLevelCheatDialog(void);
+void DoLevelIntro(void);
+void DoBonusScreen(void);
+void DoGameSettingsDialog(void);
+
+void NewScore(void);
+void LoadHighScores(void);
+void ClearHighScores(void);
+
+void DoLoseScreen(void);
+void DoWinScreen(void);
+
+void DoDemoExpiredScreen(void);
+void ShowDemoQuitScreen(void);
+
+void DrawDarkenPane(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+void MoveCredits(ObjNode *text);
+
+void DoHTTPMultipleFailureWarning(void);
