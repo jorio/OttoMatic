@@ -1203,7 +1203,7 @@ float	mag,oneOverM;
 /*********************** REFLECT VECTOR 3D *************************/
 //
 // compute reflection vector 
-// which is N(2(N¥V)) - V 
+// which is N(2(N.V)) - V
 // N - Surface Normal 
 // vec = vector aiming at the normal.
 //
