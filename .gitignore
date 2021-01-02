@@ -1,0 +1,24 @@
+# External libraries
+extern/SDL*
+
+# External library cache
+/cache
+
+# Automatically-generated headers
+src/Headers/version.h
+
+# Build directories
+/build*/
+/cmake-build*/
+
+# IDEs
+.vs/
+/.vscode
+/.idea
+
+# macOS metadata
+.DS_Store
+
+# Shader debugging
+quesa-*.frag
+quesa-*.vert
