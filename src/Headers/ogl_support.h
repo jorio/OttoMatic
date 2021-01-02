@@ -231,7 +231,7 @@ typedef struct
 typedef struct
 {
 	Boolean					isActive;
-	AGLContext				drawContext;
+	SDL_GLContext			drawContext;
 	Rect					clip;				// not pane size, but clip:  left = amount to clip off left
 	OGLLightDefType			lightList;
 	OGLCameraPlacement		cameraPlacement;	

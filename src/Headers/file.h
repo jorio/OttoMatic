@@ -78,11 +78,13 @@ typedef struct
 	Byte	language;
 	Boolean	playerRelControls;
 
+#if 0 // srcport rm
 	DateTimeRec	lastVersCheckDate;
 	Byte	didThisNote[MAX_HTTP_NOTES];
 	Boolean customerHasRegistered;		// not the serial number, but the customer info registration
 
 	int		numHTTPReadFails;			// counter which determines how many times an HTTP read has failed - possible pirate hacking
+#endif
 
 	Boolean	anaglyph;
 	Boolean	anaglyphColor;
@@ -129,7 +131,9 @@ Boolean SaveGame(void);
 Boolean LoadSavedGame(void);
 
 
+#if 0 // srcport rm
 void GetLibVersion(ConstStrFileNameParam libName, NumVersion *version);
+#endif
 
 void VerifyApplicationFileID(void);
 

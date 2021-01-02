@@ -19,8 +19,10 @@ extern	float			gGammaFadePercent;
 extern void	InitWindowStuff(void);
 extern void	DumpGWorld2(GWorldPtr, WindowPtr, Rect *);
 extern void	DoLockPixels(GWorldPtr);
+#if 0 // srcport rm
 pascal void DoBold (DialogPtr dlogPtr, short item);
 pascal void DoOutline (DialogPtr dlogPtr, short item);
+#endif
 void MakeFadeEvent(Boolean fadeIn, float fadeSpeed);
 void DumpGWorld2(GWorldPtr thisWorld, WindowPtr thisWindow,Rect *destRect);
 
@@ -42,4 +44,6 @@ void Wait(u_long ticks);
 void Enter2D(void);
 void Exit2D(void);
 
+#if 0 // srcport rm
 void BuildControlMenu(WindowRef window, SInt32 controlSig, SInt32 id, Str255 textList[], short numItems, short defaultSelection);
+#endif

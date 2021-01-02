@@ -51,9 +51,10 @@ enum
   
 //=================================================
 
+#if 0 // srcport rm
 extern	IBNibRef 			gNibs;
 extern	CFBundleRef 		gBundle;
-
+#endif
 
 extern	int main(void);
 extern	void ToolBoxInit(void);
