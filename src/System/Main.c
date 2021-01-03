@@ -104,8 +104,10 @@ float	gDemoVersionTimer = 0;
 u_long	gScore,gLoadedScore;
 
 
+#if 0	// srcport rm
 CFBundleRef 		gBundle = nil;
 IBNibRef 			gNibs = nil;
+#endif
 
 
 //======================================================================================
@@ -232,6 +234,7 @@ NumVersion	vers;
 
 void InitDefaultPrefs(void)
 {
+#if 0	// srcport rm. TODO: There's std::locale in C++.
 long 		keyboardScript, languageCode, i;
 
 		/* DETERMINE WHAT LANGUAGE IS ON THIS MACHINE */
@@ -260,6 +263,10 @@ long 		keyboardScript, languageCode, i;
 		default:
 				gGamePrefs.language 			= LANGUAGE_ENGLISH;
 	}
+#else
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+	gGamePrefs.language				= LANGUAGE_ENGLISH;
+#endif
 
 	gGamePrefs.difficulty			= 0;
 	gGamePrefs.showScreenModeDialog = true;
@@ -270,9 +277,11 @@ long 		keyboardScript, languageCode, i;
 	gGamePrefs.monitorNum			= 0;			// main monitor by default
 	gGamePrefs.playerRelControls	= false;
 
+#if 0	// srcport rm
 	gGamePrefs.lastVersCheckDate.year = 0;
 	gGamePrefs.customerHasRegistered = false;
 	gGamePrefs.numHTTPReadFails		= 0;
+#endif
 
 	gGamePrefs.anaglyph				= false;
 	gGamePrefs.anaglyphColor		= true;
@@ -292,8 +301,10 @@ long 		keyboardScript, languageCode, i;
 	gGamePrefs.reserved[6] 			= 0;
 	gGamePrefs.reserved[7] 			= 0;
 
+#if 0	// srcport rm
 	for (i = 0; i < MAX_HTTP_NOTES; i++)
-		gGamePrefs.didThisNote[i] = false;
+		gGamePrefs.diMAdThisNote[i] = false;
+#endif
 }
 
 
@@ -307,17 +318,6 @@ long 		keyboardScript, languageCode, i;
 
 static void PlayGame(void)
 {
-	if (!gSerialWasVerified)							// check if hackers bypassed the reg verify - if so, de-register us
-	{
-		FSSpec	spec;
-
-		gGameIsRegistered = false;
-
-		if (FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, gSerialFileName, &spec) == noErr)	// delete the serial # file
-			FSpDelete(&spec);
-		ExitToShell();
-	}
-
 			/***********************/
 			/* GAME INITIALIZATION */
 			/***********************/
