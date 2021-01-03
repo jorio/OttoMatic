@@ -23,7 +23,7 @@ extern	SDL_GLContext		gAGLContext;
 extern	Byte			gDebugMode;
 extern	PrefsType			gGamePrefs;
 extern	Boolean			gSongPlayingFlag;
-extern	Movie				gSongMovie;
+//extern	Movie				gSongMovie;
 extern	OGLMatrix4x4	gWorldToFrustumMatrix,gWorldToViewMatrix,gViewToFrustumMatrix;
 extern	OGLMatrix4x4	*gCurrentObjMatrix;
 extern	CGrafPtr				gDisplayContextGrafPtr;
@@ -455,6 +455,8 @@ Rect		r;
 	width = r.right - r.left;		// get width/height
 	height = r.bottom - r.top;
 
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+#if 0
 	hPixMap = GetGWorldPixMap(gworld);							// get gworld's pixmap
 	pictMapAddr = GetPixBaseAddr(hPixMap);
 	pictRowBytes = (u_long)(**hPixMap).rowBytes & 0x3fff;
@@ -656,7 +658,7 @@ Rect		r;
 				/* KEEP MUSIC PLAYING */
 
 			if (gSongPlayingFlag && (!gMuteMusicFlag))
-				MoviesTask(gSongMovie, 0);
+				SOURCE_PORT_MINOR_PLACEHOLDER(); //MoviesTask(gSongMovie, 0);
 		}
 	}
 
@@ -665,7 +667,7 @@ Rect		r;
 
 	DisposeGWorld (gworld);
 	SafeDisposePtr(buffer);
-
+#endif
 }
 
 
@@ -2155,6 +2157,8 @@ Rect			r;
 	if (buffer == nil)
 		DoFatalAlert("MO_GetTextureFromResource: AllocPtr failed!");
 
+	SOURCE_PORT_PLACEHOLDER();
+#if 0
 	pictMapAddr = GetPixBaseAddr(hPixMap);
 	pictRowBytes = (u_long)(**hPixMap).rowBytes & 0x3fff;
 	pictMapAddr += pictRowBytes * (height-1);						// start @ bottom to flip texture
@@ -2238,6 +2242,7 @@ Rect			r;
 	SafeDisposePtr(buffer);									// dispose of our copy of the buffer
 
 	return(obj);
+#endif
 }
 
 /*************** MO: GEOMETRY OFFSET UVS *********************/
