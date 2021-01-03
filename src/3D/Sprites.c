@@ -17,7 +17,7 @@
 extern	float	gCurrentAspectRatio,gGlobalTransparency;
 extern	int		gPolysThisFrame;
 extern	Boolean			gSongPlayingFlag,gLowMemMode,gMuteMusicFlag;
-extern	Movie				gSongMovie;
+//extern	Movie				gSongMovie;
 extern	u_long			gGlobalMaterialFlags;
 
 /****************************/
@@ -322,7 +322,7 @@ MOMaterialData	matData;
 			/* KEEP MUSIC PLAYING */
 
 		if (gSongPlayingFlag && (!gMuteMusicFlag))
-			MoviesTask(gSongMovie, 0);
+			SOURCE_PORT_MINOR_PLACEHOLDER(); //MoviesTask(gSongMovie, 0);
 	}
 
 

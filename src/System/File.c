@@ -35,7 +35,7 @@ extern	PrefsType			gGamePrefs;
 extern	SDL_GLContext		gAGLContext;
 extern	AGLDrawable		gAGLWin;
 extern	Boolean			gSongPlayingFlag,gLowMemMode,gMuteMusicFlag,gMuteMusicFlag,gLoadedDrawSprocket,gOSX;
-extern	Movie				gSongMovie;
+//extern	Movie				gSongMovie;
 extern	WaterDefType	**gWaterListHandle, *gWaterList;
 extern	PlayerInfoType	gPlayerInfo;
 extern	Boolean			gPlayingFromSavedGame,gG4;
@@ -675,7 +675,7 @@ FInfo						fndrInfo;
 			/* KEEP MUSIC PLAYING */
 
 	if (gSongPlayingFlag && (!gMuteMusicFlag))
-		MoviesTask(gSongMovie, 0);
+		SOURCE_PORT_MINOR_PLACEHOLDER(); //MoviesTask(gSongMovie, 0);
 
 
 			/* MAKE GWORLD */
@@ -1749,7 +1749,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 				/* KEEP MUSIC PLAYING */
 
 		if (gSongPlayingFlag && (!gMuteMusicFlag))
-			MoviesTask(gSongMovie, 0);
+			SOURCE_PORT_PLACEHOLDER(); //MoviesTask(gSongMovie, 0);
 	}
 
 			/* CLOSE THE FILE */

@@ -88,7 +88,7 @@ static short				gMusicFileRefNum = 0x0ded;
 Boolean				gMuteMusicFlag = false;
 short				gCurrentSong = -1;
 
-Movie				gSongMovie = nil;
+//Movie				gSongMovie = nil;
 
 static CGrafPtr		gQTDummyPort = nil;
 
@@ -1258,6 +1258,8 @@ void DoSoundMaintenance(void)
 
 	if (gSongPlayingFlag && (!gMuteMusicFlag))
 	{
+		SOURCE_PORT_MINOR_PLACEHOLDER();
+#if 0
 		if (IsMovieDone(gSongMovie))				// see if the song has completed
 		{
 			if (gLoopSongFlag)						// see if repeat it
@@ -1279,6 +1281,7 @@ void DoSoundMaintenance(void)
 				gMoviesTaskTimer += .4f;
 			}
 		}
+#endif
 	}
 
 

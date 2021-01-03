@@ -11,7 +11,7 @@
 
 
 extern	Boolean			gSongPlayingFlag,gLowMemMode,gMuteMusicFlag;
-extern	Movie				gSongMovie;
+//extern	Movie				gSongMovie;
 
 
 /****************************/
@@ -927,7 +927,7 @@ void				*pixels;
 				/* KEEP MUSIC PLAYING */
 
 		if (gSongPlayingFlag && (!gMuteMusicFlag))
-			MoviesTask(gSongMovie, 0);
+			SOURCE_PORT_MINOR_PLACEHOLDER();//MoviesTask(gSongMovie, 0);
 
 	}
 }
