@@ -153,6 +153,12 @@ if(NOT MSVC)
 		-Wno-multichar
 		-Wno-unknown-pragmas
 		-Wno-unused-parameter
+		-Werror=implicit-function-declaration
+		-Werror=return-type
+		-Wno-missing-braces			# TEMP for first phase of porting
+		-Wno-unused-variable		# TEMP for first phase of porting
+		-Wno-old-style-declaration	# TEMP for first phase of porting
+
 		"$<$<CXX_COMPILER_ID:GNU>:-Wno-unused-but-set-variable>"
 	)
 else()
