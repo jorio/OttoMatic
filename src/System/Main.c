@@ -112,7 +112,6 @@ IBNibRef 			gNibs = nil;
 //======================================================================================
 //======================================================================================
 
-#include "serialVerify.h"
 
 
 /****************** TOOLBOX INIT  *****************/
@@ -122,7 +121,6 @@ void ToolBoxInit(void)
 long		response;
 OSErr		iErr;
 NumVersion	vers;
-Boolean		noRTL,RTL;
 
 
 
@@ -131,6 +129,7 @@ Boolean		noRTL,RTL;
 	gMainAppRezFile = CurResFile();
 
 
+#if 0	// srcport rm
 			/*****************/
 			/* INIT NIB INFO */
 			/*****************/
@@ -140,6 +139,7 @@ Boolean		noRTL,RTL;
 		DoFatalAlert("ToolBoxInit: CFBundleGetMainBundle() failed!");
 	if (CreateNibReferenceWithCFBundle(gBundle, CFSTR(kDefaultNibFileName), &gNibs) != noErr)
 		DoFatalAlert("ToolBoxInit: CreateNibReferenceWithCFBundle() failed!");
+#endif
 
 
 
@@ -155,6 +155,7 @@ Boolean		noRTL,RTL;
 	OGL_Boot();
 
 
+#if 0	// srcport rm
 			/******************/
 			/* INIT QUICKTIME */
 			/******************/
@@ -192,24 +193,6 @@ Boolean		noRTL,RTL;
 					break;
 		}
 	}
-
-			/* DETERMINE IF SHAREWARE OR BOXED VERSION */
-
-#if DEMO || OEM
-	gShareware = false;
-	noRTL = RTL = false;
-#else
-	{
-		FSSpec	spc;
-
-		noRTL = (FSMakeFSSpec(0, 0, ":Data:Images:NORTL", &spc) == noErr);		// the presence of this file will tell us if it's shareware or boxed
-		RTL = (FSMakeFSSpec(0, 0, ":Data:Images:RTL", &spc) == noErr);
-
-		if (noRTL)
-			gShareware = true;
-		else
-			gShareware = false;
-	}
 #endif
 
 
@@ -228,76 +211,9 @@ Boolean		noRTL,RTL;
             /* SEE IF GAME IS REGISTERED OR NOT */
 			/************************************/
 
-	if (((!noRTL) && (!RTL)) || DEMO)								// if no RTL or NORTL found then it's the old Aspyr version, thus no serial#
-	{
-		gGameIsRegistered = true;
-		gSerialWasVerified = true;
-	}
-	else
-	    CheckGameSerialNumber(false);
-
-
-		/*************************************/
-		/* SEE IF SHOULD DO WEB UPDATE CHECK */
-		/*************************************/
-
-#if !DEMO
-	if (gGameIsRegistered)											// only do HTTP if running full version in registered mode
-	{
-		DateTimeRec	dateTime;
-		u_long		seconds, seconds2;
-
-		GetTime(&dateTime);											// get date time
-		DateToSeconds(&dateTime, &seconds);
-
-		DateToSeconds(&gGamePrefs.lastVersCheckDate, &seconds2);
-
-		if ((seconds - seconds2) > 86400)							// see if 1 days have passed since last check
-		{
-			MyFlushEvents();
-			gGamePrefs.lastVersCheckDate = dateTime;				// update time
-
-
-					/* READ THE UPDATEDATA FILE & PARSE */
-
-			gSuccessfulHTTPRead = false;							// assume the HTTP read will fail
-			ReadHTTPData_VersionInfo();								// do version check (also checks serial #'s)
-
-
-				/* FOR UNKNOWN REASONS THE HTTP READ FAILED - POSSIBLE PIRATE ACTIVITY */
-				//
-				// If trying to read our UpdateData file from all of the URL's in the list fails then that's very suspicious.
-				// This is probably caused by pirates trying to firefall those sites out, however, it could simply be that the
-				// internet connection is down.  So, to verify that the internet is working, just try to read apple.com.
-				// If apple.com fails, then the internet connection is really down, but if it loads, then someone is probably
-				// blocking our URL's.  We'll let this happen a few times before we warn the user.
-				//
-
-			if (!gSuccessfulHTTPRead)
-			{
-				if (gHTTPDataHandle)								// only bother if we've got a handle to read into
-				{
-					if (DownloadURL("http://www.apple.com") == noErr) // let's be safe and verify we have an internet connection by reading apple.com
-					{
-						gGamePrefs.numHTTPReadFails++;
-						if (gGamePrefs.numHTTPReadFails > 5)		// if we've failed too many times then tell the user
-						{
-							gGamePrefs.lastVersCheckDate.year = 0;	// make sure it checks the next time we run the game
-							SavePrefs();
-
-							DoHTTPMultipleFailureWarning();
-						}
-					}
-				}
-			}
-			else
-				gGamePrefs.numHTTPReadFails = 0;					// we read the UpdateData fine, so reset our failure counter
-
-			SavePrefs();
-		}
-	}
-#endif
-
+	gShareware = false;
+	gGameIsRegistered = true;
+	gSerialWasVerified = true;
 
 
 
