@@ -26,7 +26,7 @@ extern	Boolean				gOSX;
 static short FindSilentChannel(void);
 static void Calc3DEffectVolume(short effectNum, OGLPoint3D *where, float volAdjust, u_long *leftVolOut, u_long *rightVolOut);
 static void UpdateGlobalVolume(void);
-static pascal void CallBackFn (SndChannelPtr chan, SndCommand *cmd);
+//static pascal void CallBackFn (SndChannelPtr chan, SndCommand *cmd);		// srcport rm
 
 
 /****************************/
@@ -265,6 +265,10 @@ static EffectType	gEffectsTable[] =
 
 void InitSoundTools(void)
 {
+#if 1
+FSSpec spec;
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
 OSErr			iErr;
 short			i;
 ExtSoundHeader	sndHdr;
@@ -341,6 +345,7 @@ FSSpec			spec;
 
 #endif
 	}
+#endif
 
 
 		/* LOAD DEFAULT SOUNDS */
@@ -636,6 +641,9 @@ float	volumeTweaks[]=
 	KillSong();
 	DoSoundMaintenance();
 
+#if 1
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
 			/******************************/
 			/* OPEN APPROPRIATE AIFF FILE */
 			/******************************/
@@ -695,6 +703,7 @@ float	volumeTweaks[]=
 			StopMovie(gSongMovie);
 
 	}
+#endif
 }
 
 
@@ -711,12 +720,16 @@ void KillSong(void)
 
 	gSongPlayingFlag = false;											// tell callback to do nothing
 
+#if 1
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
 	if (gSongMovie)
 	{
 		StopMovie(gSongMovie);
 		DisposeMovie(gSongMovie);
 		gSongMovie = nil;
 	}
+#endif
 
 	gMusicFileRefNum = 0x0ded;
 }
@@ -727,6 +740,9 @@ void ToggleMusic(void)
 {
 	gMuteMusicFlag = !gMuteMusicFlag;
 
+#if 1
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
 	if (gSongMovie)
 	{
 		if (gMuteMusicFlag)
@@ -738,6 +754,7 @@ void ToggleMusic(void)
 			StartMovie(gSongMovie);
 		}
 	}
+#endif
 }
 
 
@@ -1017,6 +1034,7 @@ short PlayEffect(short effectNum)
 // the sound is done playing.
 //
 
+#if 0	// srcport rm
 static pascal void CallBackFn (SndChannelPtr chan, SndCommand *cmd) {
 SndCommand      theCmd;
 
@@ -1030,6 +1048,7 @@ SndCommand      theCmd;
     // Just reuse the callBackCmd that got us here in the first place
     (void)SndDoCommand (chan, cmd, true);
 }
+#endif
 
 /***************************** PLAY EFFECT PARMS ***************************/
 //
@@ -1047,7 +1066,7 @@ Byte			bankNum,soundNum;
 OSErr			myErr;
 u_long			lv2,rv2;
 static UInt32          loopStart, loopEnd;
-SoundHeaderPtr   sndPtr;
+//SoundHeaderPtr   sndPtr;		// srcport rm
 
 
 			/* GET BANK & SOUND #'S FROM TABLE */
@@ -1109,6 +1128,9 @@ SoundHeaderPtr   sndPtr;
 	mySndCmd.param2 	= rateMultiplier;
 	SndDoImmediate(chanPtr, &mySndCmd);
 
+#if 1
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
     // If the loop start point is before the loop end, then there is a loop
     sndPtr = (SoundHeaderPtr)(((long)*gSndHandles[bankNum][soundNum])+gSndOffsets[bankNum][soundNum]);
     loopStart = sndPtr->loopStart;
@@ -1120,6 +1142,7 @@ SoundHeaderPtr   sndPtr;
     	mySndCmd.param2 = ((long)*gSndHandles[bankNum][soundNum])+gSndOffsets[bankNum][soundNum];	// pointer to SoundHeader
     	SndDoCommand(chanPtr, &mySndCmd, true);
 	}
+#endif
 
 
 			/* SET MY INFO */
@@ -1155,7 +1178,7 @@ int		c;
 			/* UPDATE SONG VOLUME */
 
 	if (gSongPlayingFlag)
-		SetMovieVolume(gSongMovie, FloatToFixed16(gGlobalVolume) * SONG_VOLUME);
+		SOURCE_PORT_MINOR_PLACEHOLDER(); //SetMovieVolume(gSongMovie, FloatToFixed16(gGlobalVolume) * SONG_VOLUME);
 
 }
 
