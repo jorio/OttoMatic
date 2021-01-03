@@ -150,7 +150,7 @@ Boolean		gMouseButtonState = false, gMouseNewButtonState = false;
 
 KeyMapByteArray gKeyMap,gNewKeys,gOldKeys;
 
-
+#endif
 
 			/**************/
 			/* NEEDS LIST */
@@ -160,22 +160,22 @@ InputNeedType	gControlNeeds[NUM_CONTROL_NEEDS] =
 {
 	{										// kNeed_TurnLeft_Key
 		"Turn Left (Key)",
-		kHIDUsage_KeyboardLeftArrow,
+		SDL_SCANCODE_LEFT,
 	},
 
 	{										// kNeed_TurnRight_Key
 		"Turn Right (Key)",
-		kHIDUsage_KeyboardRightArrow,
+		SDL_SCANCODE_RIGHT,
 	},
 
 	{										// kNeed_Forward
 		"Move Forward (Key)",
-		kHIDUsage_KeyboardUpArrow,
+		SDL_SCANCODE_UP,
 	},
 
 	{										// kNeed_Backward
 		"Move Backwards (Key)",
-		kHIDUsage_KeyboardDownArrow,
+		SDL_SCANCODE_DOWN,
 	},
 
 	{										// kNeed_XAxis
@@ -190,39 +190,39 @@ InputNeedType	gControlNeeds[NUM_CONTROL_NEEDS] =
 
 	{										// kNeed_NextWeapon
 		"Next Weapon",
-		kHIDUsage_KeyboardLeftShift,
+		SDL_SCANCODE_LSHIFT,
 	},
 
 
 	{										// kNeed_Shoot
 		"Shoot",
-		kHIDUsage_KeyboardLeftGUI,
+		SDL_SCANCODE_LGUI,
 	},
 
 	{										// kNeed_PunchPickup
 		"Punch/Pickup/Drop",
-		kHIDUsage_KeyboardLeftAlt,
+		SDL_SCANCODE_LALT,
 	},
 
 	{										// kNeed_Jump
 		"Jump",
-		kHIDUsage_KeyboardSpacebar,
+		SDL_SCANCODE_SPACE,
 	},
 
 
 	{										// kNeed_CameraMode
 		"Camera Mode",
-		kHIDUsage_KeyboardTab,
+		SDL_SCANCODE_TAB,
 	},
 
 	{										// kNeed_CameraLeft
 		"Camera Swing Left",
-		kHIDUsage_KeyboardComma,
+		SDL_SCANCODE_COMMA,
 	},
 
 	{										// kNeed_CameraRight
 		"Camera Swing Right",
-		kHIDUsage_KeyboardPeriod,
+		SDL_SCANCODE_PERIOD,
 	},
 
 
@@ -231,7 +231,7 @@ InputNeedType	gControlNeeds[NUM_CONTROL_NEEDS] =
 };
 
 
-
+#if 0 // srcport rm
 		/* HID */
 
 static mach_port_t 	gHID_MasterPort 			= nil;
