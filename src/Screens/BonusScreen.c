@@ -321,7 +321,7 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 
 			/* LOAD MODELS */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:bonus.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:bonus.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_BONUS, gGameViewInfoPtr);
 
 
@@ -335,24 +335,24 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:particle.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:helpfont.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:helpfont.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_FONT, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_FONT);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:bonus.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:bonus.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_BONUS, gGameViewInfoPtr);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:spheremap.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
 
 
 				/* LOAD AUDIO */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Audio:Bonus.sounds", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Bonus.sounds", &spec);
 	LoadSoundBank(&spec, SOUND_BANK_BONUS);
 
 

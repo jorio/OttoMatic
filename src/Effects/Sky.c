@@ -324,7 +324,7 @@ AGLContext agl_ctx = setupInfo->drawContext;
 
 	glDrawElements(GL_TRIANGLES,NUM_SKY_TRIANGLES*3,GL_UNSIGNED_INT,&gSkyTriangles[0]);
 	if (OGL_CheckError())
-		DoFatalAlert("\pDrawSky: glDrawElements");
+		DoFatalAlert("DrawSky: glDrawElements");
 
 
 	gGlobalMaterialFlags &= ~BG3D_MATERIALFLAG_ALWAYSBLEND;			// make sure this is off

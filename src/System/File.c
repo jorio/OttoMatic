@@ -189,39 +189,39 @@ FSSpec		fsSpec;
 SkeletonDefType	*skeleton;
 const Str63	fileNames[MAX_SKELETON_TYPES] =
 {
-	"\p:Skeletons:Otto.skeleton",
-	"\p:Skeletons:Farmer.skeleton",
-	"\p:Skeletons:BrainAlien.skeleton",
-	"\p:Skeletons:Onion.skeleton",
-	"\p:Skeletons:Corn.skeleton",
-	"\p:Skeletons:Tomato.skeleton",
-	"\p:Skeletons:Blob.skeleton",
-	"\p:Skeletons:SlimeTree.skeleton",
-	"\p:Skeletons:BeeWoman.skeleton",
-	"\p:Skeletons:Squooshy.skeleton",
-	"\p:Skeletons:Flamester.skeleton",
-	"\p:Skeletons:GiantLizard.skeleton",
-	"\p:Skeletons:VenusFlytrap.skeleton",
-	"\p:Skeletons:Mantis.skeleton",
-	"\p:Skeletons:Turtle.skeleton",
-	"\p:Skeletons:PodWorm.skeleton",
-	"\p:Skeletons:Mutant.skeleton",
-	"\p:Skeletons:MutantRobot.skeleton",
-	"\p:Skeletons:Scientist.skeleton",
-	"\p:Skeletons:PitcherPlant.skeleton",
-	"\p:Skeletons:Clown.skeleton",
-	"\p:Skeletons:ClownFish.skeleton",
-	"\p:Skeletons:StrongMan.skeleton",
-	"\p:Skeletons:SkirtLady.skeleton",
-	"\p:Skeletons:IceCube.skeleton",
-	"\p:Skeletons:EliteBrainAlien.skeleton",
+	":Skeletons:Otto.skeleton",
+	":Skeletons:Farmer.skeleton",
+	":Skeletons:BrainAlien.skeleton",
+	":Skeletons:Onion.skeleton",
+	":Skeletons:Corn.skeleton",
+	":Skeletons:Tomato.skeleton",
+	":Skeletons:Blob.skeleton",
+	":Skeletons:SlimeTree.skeleton",
+	":Skeletons:BeeWoman.skeleton",
+	":Skeletons:Squooshy.skeleton",
+	":Skeletons:Flamester.skeleton",
+	":Skeletons:GiantLizard.skeleton",
+	":Skeletons:VenusFlytrap.skeleton",
+	":Skeletons:Mantis.skeleton",
+	":Skeletons:Turtle.skeleton",
+	":Skeletons:PodWorm.skeleton",
+	":Skeletons:Mutant.skeleton",
+	":Skeletons:MutantRobot.skeleton",
+	":Skeletons:Scientist.skeleton",
+	":Skeletons:PitcherPlant.skeleton",
+	":Skeletons:Clown.skeleton",
+	":Skeletons:ClownFish.skeleton",
+	":Skeletons:StrongMan.skeleton",
+	":Skeletons:SkirtLady.skeleton",
+	":Skeletons:IceCube.skeleton",
+	":Skeletons:EliteBrainAlien.skeleton",
 };
 
 
 	if (skeletonType < MAX_SKELETON_TYPES)
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, fileNames[skeletonType], &fsSpec);
 	else
-		DoFatalAlert("\pLoadSkeleton: Unknown skeletonType!");
+		DoFatalAlert("LoadSkeleton: Unknown skeletonType!");
 
 
 			/* OPEN THE FILE'S REZ FORK */
@@ -230,20 +230,20 @@ const Str63	fileNames[MAX_SKELETON_TYPES] =
 	if (fRefNum == -1)
 	{
 		iErr = ResError();
-		DoAlert("\pError opening Skel Rez file");
+		DoAlert("Error opening Skel Rez file");
 		ShowSystemErr(iErr);
 	}
 
 	UseResFile(fRefNum);
 	if (ResError())
-		DoFatalAlert("\pError using Rez file!");
+		DoFatalAlert("Error using Rez file!");
 
 
 			/* ALLOC MEMORY FOR SKELETON INFO STRUCTURE */
 
 	skeleton = (SkeletonDefType *)AllocPtr(sizeof(SkeletonDefType));
 	if (skeleton == nil)
-		DoFatalAlert("\pCannot alloc SkeletonInfoType");
+		DoFatalAlert("Cannot alloc SkeletonInfoType");
 
 
 			/* READ SKELETON RESOURCES */
@@ -288,18 +288,18 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 
 	hand = GetResource('Hedr',1000);
 	if (hand == nil)
-		DoFatalAlert("\pReadDataFromSkeletonFile: Error reading header resource!");
+		DoFatalAlert("ReadDataFromSkeletonFile: Error reading header resource!");
 	headerPtr = (SkeletonFile_Header_Type *)*hand;
 	version = SwizzleShort(&headerPtr->version);
 	if (version != SKELETON_FILE_VERS_NUM)
-		DoFatalAlert("\pSkeleton file has wrong version #");
+		DoFatalAlert("Skeleton file has wrong version #");
 
 	numAnims = skeleton->NumAnims = SwizzleShort(&headerPtr->numAnims);			// get # anims in skeleton
 	numJoints = skeleton->NumBones = SwizzleShort(&headerPtr->numJoints);		// get # joints in skeleton
 	ReleaseResource(hand);
 
 	if (numJoints > MAX_JOINTS)										// check for overload
-		DoFatalAlert("\pReadDataFromSkeletonFile: numJoints > MAX_JOINTS");
+		DoFatalAlert("ReadDataFromSkeletonFile: numJoints > MAX_JOINTS");
 
 
 				/*************************************/
@@ -321,11 +321,11 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		if (!iErr)
 			LoadBonesReferenceModel(&target,skeleton, skeletonType, setupInfo);
 		else
-			DoFatalAlert("\pReadDataFromSkeletonFile: Cannot find Skeleton's 3DMF file!");
+			DoFatalAlert("ReadDataFromSkeletonFile: Cannot find Skeleton's 3DMF file!");
 		ReleaseResource((Handle)alias);
 	}
 	else
-		DoFatalAlert("\pReadDataFromSkeletonFile: file is missing the Alias resource");
+		DoFatalAlert("ReadDataFromSkeletonFile: file is missing the Alias resource");
 
 
 
@@ -342,7 +342,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 
 		hand = GetResource('Bone',1000+i);
 		if (hand == nil)
-			DoFatalAlert("\pError reading Bone resource!");
+			DoFatalAlert("Error reading Bone resource!");
 		HLock(hand);
 		bonePtr = (File_BoneDefinitionType *)*hand;
 
@@ -360,17 +360,17 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 
 		skeleton->Bones[i].pointList = (u_short *)AllocPtr(sizeof(u_short) * (int)skeleton->Bones[i].numPointsAttachedToBone);
 		if (skeleton->Bones[i].pointList == nil)
-			DoFatalAlert("\pReadDataFromSkeletonFile: AllocPtr/pointList failed!");
+			DoFatalAlert("ReadDataFromSkeletonFile: AllocPtr/pointList failed!");
 
 		skeleton->Bones[i].normalList = (u_short *)AllocPtr(sizeof(u_short) * (int)skeleton->Bones[i].numNormalsAttachedToBone);
 		if (skeleton->Bones[i].normalList == nil)
-			DoFatalAlert("\pReadDataFromSkeletonFile: AllocPtr/normalList failed!");
+			DoFatalAlert("ReadDataFromSkeletonFile: AllocPtr/normalList failed!");
 
 			/* READ POINT INDEX ARRAY */
 
 		hand = GetResource('BonP',1000+i);
 		if (hand == nil)
-			DoFatalAlert("\pError reading BonP resource!");
+			DoFatalAlert("Error reading BonP resource!");
 		HLock(hand);
 		indexPtr = (u_short *)(*hand);
 
@@ -385,7 +385,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 
 		hand = GetResource('BonN',1000+i);
 		if (hand == nil)
-			DoFatalAlert("\pError reading BonN resource!");
+			DoFatalAlert("Error reading BonN resource!");
 		HLock(hand);
 		indexPtr = (u_short *)(*hand);
 
@@ -408,13 +408,13 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 
 	hand = GetResource('RelP', 1000);
 	if (hand == nil)
-		DoFatalAlert("\pError reading RelP resource!");
+		DoFatalAlert("Error reading RelP resource!");
 	HLock(hand);
 	pointPtr = (OGLPoint3D *)*hand;
 
 	i = GetHandleSize(hand) / sizeof(OGLPoint3D);
 	if (i != skeleton->numDecomposedPoints)
-		DoFatalAlert("\p# of points in Reference Model has changed!");
+		DoFatalAlert("# of points in Reference Model has changed!");
 	else
 		for (i = 0; i < skeleton->numDecomposedPoints; i++)
 		{
@@ -436,7 +436,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 
 		hand = GetResource('AnHd',1000+i);
 		if (hand == nil)
-			DoFatalAlert("\pError getting anim header resource");
+			DoFatalAlert("Error getting anim header resource");
 		HLock(hand);
 		animHeaderPtr = (SkeletonFile_AnimHeader_Type *)*hand;
 
@@ -447,7 +447,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 
 		hand = GetResource('Evnt',1000+i);
 		if (hand == nil)
-			DoFatalAlert("\pError reading anim-event data resource!");
+			DoFatalAlert("Error reading anim-event data resource!");
 		animEventPtr = (AnimEventType *)*hand;
 		for (j=0;  j < skeleton->NumAnimEvents[i]; j++)
 		{
@@ -461,7 +461,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 
 		hand = GetResource('NumK',1000+i);									// read array of #'s for this anim
 		if (hand == nil)
-			DoFatalAlert("\pError reading # keyframes/joint resource!");
+			DoFatalAlert("Error reading # keyframes/joint resource!");
 		for (j=0; j < numJoints; j++)
 			skeleton->JointKeyframes[j].numKeyFrames[i] = (*hand)[j];
 		ReleaseResource(hand);
@@ -475,7 +475,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		Alloc_2d_array(JointKeyframeType,skeleton->JointKeyframes[j].keyFrames,	numAnims,MAX_KEYFRAMES);
 
 		if ((skeleton->JointKeyframes[j].keyFrames == nil) || (skeleton->JointKeyframes[j].keyFrames[0] == nil))
-			DoFatalAlert("\pReadDataFromSkeletonFile: Error allocating Keyframe Array.");
+			DoFatalAlert("ReadDataFromSkeletonFile: Error allocating Keyframe Array.");
 
 					/* READ THIS JOINT'S KF'S FOR EACH ANIM */
 
@@ -483,13 +483,13 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		{
 			numKeyframes = skeleton->JointKeyframes[j].numKeyFrames[i];					// get actual # of keyframes for this joint
 			if (numKeyframes > MAX_KEYFRAMES)
-				DoFatalAlert("\pError: numKeyframes > MAX_KEYFRAMES");
+				DoFatalAlert("Error: numKeyframes > MAX_KEYFRAMES");
 
 					/* READ A JOINT KEYFRAME */
 
 			hand = GetResource('KeyF',1000+(i*100)+j);
 			if (hand == nil)
-				DoFatalAlert("\pError reading joint keyframes resource!");
+				DoFatalAlert("Error reading joint keyframes resource!");
 			keyFramePtr = (JointKeyframeType *)*hand;
 			for (k = 0; k < numKeyframes; k++)												// copy this joint's keyframes for this anim
 			{
@@ -534,9 +534,9 @@ long		count;
 				/*************/
 
 #if DEMO
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "\p:OttoMatic:DemoPreferences5", &file);
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":OttoMatic:DemoPreferences5", &file);
 #else
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "\p:OttoMatic:Preferences5", &file);
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":OttoMatic:Preferences5", &file);
 #endif
 	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);
 	if (iErr)
@@ -593,9 +593,9 @@ long				count;
 				/* CREATE BLANK FILE */
 
 #if DEMO
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "\p:OttoMatic:DemoPreferences5", &file);
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":OttoMatic:DemoPreferences5", &file);
 #else
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "\p:OttoMatic:Preferences5", &file);
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":OttoMatic:Preferences5", &file);
 #endif
 	FSpDelete(&file);															// delete any existing file
 	iErr = FSpCreate(&file, 'Otto', 'Pref', smSystemScript);					// create blank file
@@ -651,11 +651,11 @@ FInfo						fndrInfo;
 		switch(iErr)
 		{
 			case	fnfErr:
-					DoFatalAlert("\pDrawPictureIntoGWorld:  file is missing");
+					DoFatalAlert("DrawPictureIntoGWorld:  file is missing");
 					break;
 
 			default:
-					DoFatalAlert("\pDrawPictureIntoGWorld:  file is invalid");
+					DoFatalAlert("DrawPictureIntoGWorld:  file is invalid");
 		}
 	}
 
@@ -665,11 +665,11 @@ FInfo						fndrInfo;
 	result = GetGraphicsImporterForFile(myFSSpec, &gi);		// load importer for this image file
 	if (result != noErr)
 	{
-		DoAlert("\pDrawPictureIntoGWorld: GetGraphicsImporterForFile failed!  You do not have Quicktime properly installed, reinstall Quicktime and do a FULL install.");
+		DoAlert("DrawPictureIntoGWorld: GetGraphicsImporterForFile failed!  You do not have Quicktime properly installed, reinstall Quicktime and do a FULL install.");
 		return(result);
 	}
 	if (GraphicsImportGetBoundsRect(gi, &r) != noErr)		// get dimensions of image
-		DoFatalAlert("\pDrawPictureIntoGWorld: GraphicsImportGetBoundsRect failed!");
+		DoFatalAlert("DrawPictureIntoGWorld: GraphicsImportGetBoundsRect failed!");
 
 
 			/* KEEP MUSIC PLAYING */
@@ -683,11 +683,11 @@ FInfo						fndrInfo;
 	iErr = NewGWorld(theGWorld, depth, &r, nil, nil, 0);					// try app mem
 	if (iErr)
 	{
-		DoAlert("\pDrawPictureIntoGWorld: using temp mem");
+		DoAlert("DrawPictureIntoGWorld: using temp mem");
 		iErr = NewGWorld(theGWorld, depth, &r, nil, nil, useTempMem);		// try sys mem
 		if (iErr)
 		{
-			DoAlert("\pDrawPictureIntoGWorld: MakeMyGWorld failed");
+			DoAlert("DrawPictureIntoGWorld: MakeMyGWorld failed");
 			return(1);
 		}
 	}
@@ -709,7 +709,7 @@ FInfo						fndrInfo;
 	CloseComponent(gi);										// cleanup
 	if (result != noErr)
 	{
-		DoAlert("\pDrawPictureIntoGWorld: GraphicsImportDraw failed!");
+		DoAlert("DrawPictureIntoGWorld: GraphicsImportDraw failed!");
 		ShowSystemErr(result);
 		DisposeGWorld (*theGWorld);
 		*theGWorld= nil;
@@ -729,59 +729,59 @@ FSSpec	spec;
 
 const Str255	terrainFiles[NUM_LEVELS] =
 {
-	"\p:Terrain:EarthFarm.ter",
-	"\p:Terrain:BlobWorld.ter",
-	"\p:Terrain:BlobBoss.ter",
-	"\p:Terrain:Apocalypse.ter",
-	"\p:Terrain:Cloud.ter",
-	"\p:Terrain:Jungle.ter",
-	"\p:Terrain:JungleBoss.ter",
-	"\p:Terrain:FireIce.ter",
-	"\p:Terrain:Saucer.ter",
-	"\p:Terrain:BrainBoss.ter",
+	":Terrain:EarthFarm.ter",
+	":Terrain:BlobWorld.ter",
+	":Terrain:BlobBoss.ter",
+	":Terrain:Apocalypse.ter",
+	":Terrain:Cloud.ter",
+	":Terrain:Jungle.ter",
+	":Terrain:JungleBoss.ter",
+	":Terrain:FireIce.ter",
+	":Terrain:Saucer.ter",
+	":Terrain:BrainBoss.ter",
 };
 
 const Str255	levelModelFiles[NUM_LEVELS] =
 {
-	"\p:Models:level1_farm.bg3d",
-	"\p:Models:level2_slime.bg3d",
-	"\p:Models:level3_blobboss.bg3d",
-	"\p:Models:level4_apocalypse.bg3d",
-	"\p:Models:level5_cloud.bg3d",
-	"\p:Models:level6_jungle.bg3d",
-	"\p:Models:level6_jungle.bg3d",
-	"\p:Models:level8_fireice.bg3d",
-	"\p:Models:level9_saucer.bg3d",
-	"\p:Models:level10_brainboss.bg3d",
+	":Models:level1_farm.bg3d",
+	":Models:level2_slime.bg3d",
+	":Models:level3_blobboss.bg3d",
+	":Models:level4_apocalypse.bg3d",
+	":Models:level5_cloud.bg3d",
+	":Models:level6_jungle.bg3d",
+	":Models:level6_jungle.bg3d",
+	":Models:level8_fireice.bg3d",
+	":Models:level9_saucer.bg3d",
+	":Models:level10_brainboss.bg3d",
 };
 
 const Str255	levelSpriteFiles[NUM_LEVELS] =
 {
-	"\p:Sprites:level1_farm.sprites",
-	"\p:Sprites:level2_slime.sprites",
-	"\p",
-	"\p:Sprites:level4_apocalypse.sprites",
-	"\p:Sprites:level5_cloud.sprites",
-	"\p:Sprites:level6_jungle.sprites",
-	"\p:Sprites:level6_jungle.sprites",
-	"\p:Sprites:level8_fireice.sprites",
-	"\p",
-	"\p:Sprites:level10_brainboss.sprites",
+	":Sprites:level1_farm.sprites",
+	":Sprites:level2_slime.sprites",
+	"",
+	":Sprites:level4_apocalypse.sprites",
+	":Sprites:level5_cloud.sprites",
+	":Sprites:level6_jungle.sprites",
+	":Sprites:level6_jungle.sprites",
+	":Sprites:level8_fireice.sprites",
+	"",
+	":Sprites:level10_brainboss.sprites",
 };
 
 
 const Str255	levelSoundFiles[NUM_LEVELS] =
 {
-	"\p:Audio:Farm.sounds",
-	"\p:Audio:Slime.sounds",
-	"\p:Audio:Slime.sounds",
-	"\p:Audio:Apocalypse.sounds",
-	"\p:Audio:Cloud.sounds",
-	"\p:Audio:Jungle.sounds",
-	"\p:Audio:Jungle.sounds",
-	"\p:Audio:FireIce.sounds",
-	"\p:Audio:Saucer.sounds",
-	"\p:Audio:BrainBoss.sounds",
+	":Audio:Farm.sounds",
+	":Audio:Slime.sounds",
+	":Audio:Slime.sounds",
+	":Audio:Apocalypse.sounds",
+	":Audio:Cloud.sounds",
+	":Audio:Jungle.sounds",
+	":Audio:Jungle.sounds",
+	":Audio:FireIce.sounds",
+	":Audio:Saucer.sounds",
+	":Audio:BrainBoss.sounds",
 };
 
 
@@ -798,7 +798,7 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 
 			/* LOAD BG3D GEOMETRY */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:global.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:global.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_GLOBAL, setupInfo);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, levelModelFiles[gLevelNum], &spec);
@@ -1095,19 +1095,19 @@ const Str255	levelSoundFiles[NUM_LEVELS] =
 		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC, setupInfo);
 	}
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:infobar.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:infobar.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_INFOBAR, setupInfo);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:fence.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:fence.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_FENCES, setupInfo);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:global.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, setupInfo);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:spheremap.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, setupInfo);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:helpfont.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:helpfont.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_FONT, setupInfo);
 
 
@@ -1134,7 +1134,7 @@ void GetDemoTimer(void)
 
 				/* READ TIMER FROM FILE */
 
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "\pSysCheck22", &file);
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "SysCheck22", &file);
 	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);
 	if (iErr)
 		gDemoVersionTimer = 0;
@@ -1176,7 +1176,7 @@ long				count;
 
 				/* CREATE BLANK FILE */
 
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "\pSysCheck22", &file);
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, "SysCheck22", &file);
 	FSpDelete(&file);															// delete any existing file
 	iErr = FSpCreate(&file, '????', 'xxxx', smSystemScript);					// create blank file
 	if (iErr)
@@ -1242,7 +1242,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 	fRefNum = FSpOpenResFile(specPtr,fsCurPerm);
 	if (fRefNum == -1)
-		DoFatalAlert("\pLoadPlayfield: FSpOpenResFile failed");
+		DoFatalAlert("LoadPlayfield: FSpOpenResFile failed");
 	UseResFile(fRefNum);
 
 
@@ -1253,7 +1253,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	hand = GetResource('Hedr',1000);
 	if (hand == nil)
 	{
-		DoAlert("\pReadDataFromPlayfieldFile: Error reading header resource!");
+		DoAlert("ReadDataFromPlayfieldFile: Error reading header resource!");
 		return;
 	}
 
@@ -1271,9 +1271,9 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	ReleaseResource(hand);
 
 	if ((gTerrainTileWidth % SUPERTILE_SIZE) != 0)		// terrain must be non-fractional number of supertiles in w/h
-		DoFatalAlert("\pReadDataFromPlayfieldFile: terrain width not a supertile multiple");
+		DoFatalAlert("ReadDataFromPlayfieldFile: terrain width not a supertile multiple");
 	if ((gTerrainTileDepth % SUPERTILE_SIZE) != 0)
-		DoFatalAlert("\pReadDataFromPlayfieldFile: terrain depth not a supertile multiple");
+		DoFatalAlert("ReadDataFromPlayfieldFile: terrain depth not a supertile multiple");
 
 
 				/* CALC SOME GLOBALS HERE */
@@ -1295,7 +1295,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 	hand = GetResource('Atrb',1000);
 	if (hand == nil)
-		DoAlert("\pReadDataFromPlayfieldFile: Error reading tile attrib resource!");
+		DoAlert("ReadDataFromPlayfieldFile: Error reading tile attrib resource!");
 	else
 	{
 		DetachResource(hand);
@@ -1316,7 +1316,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 	hand = GetResource('STgd',1000);												// load grid from rez
 	if (hand == nil)
-		DoFatalAlert("\pReadDataFromPlayfieldFile: Error reading supertile rez resource!");
+		DoFatalAlert("ReadDataFromPlayfieldFile: Error reading supertile rez resource!");
 	else																			// copy rez into 2D array
 	{
 		SuperTileGridType *src = (SuperTileGridType *)*hand;
@@ -1348,7 +1348,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 		hand = GetResource('Layr',1000);
 		if (hand == nil)
-			DoAlert("\pReadDataFromPlayfieldFile: Error reading map layer rez");
+			DoAlert("ReadDataFromPlayfieldFile: Error reading map layer rez");
 		else
 		{
 			if (gTileGrid)														// free old array
@@ -1378,7 +1378,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 	hand = GetResource('YCrd',1000);
 	if (hand == nil)
-		DoAlert("\pReadDataFromPlayfieldFile: Error reading height data resource!");
+		DoAlert("ReadDataFromPlayfieldFile: Error reading height data resource!");
 	else
 	{
 		src = (float *)*hand;
@@ -1396,7 +1396,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 	hand = GetResource('Itms',1000);
 	if (hand == nil)
-		DoAlert("\pReadDataFromPlayfieldFile: Error reading itemlist resource!");
+		DoAlert("ReadDataFromPlayfieldFile: Error reading itemlist resource!");
 	else
 	{
 		TerrainItemEntryType   *rezItems;
@@ -1481,7 +1481,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 		}
 		else
-			DoFatalAlert("\pReadDataFromPlayfieldFile: cant get spline points rez");
+			DoFatalAlert("ReadDataFromPlayfieldFile: cant get spline points rez");
 	}
 
 
@@ -1509,7 +1509,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 		}
 		else
-			DoFatalAlert("\pReadDataFromPlayfieldFile: cant get spline items rez");
+			DoFatalAlert("ReadDataFromPlayfieldFile: cant get spline items rez");
 	}
 
 			/****************************/
@@ -1525,7 +1525,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 		gFenceList = (FenceDefType *)AllocPtr(sizeof(FenceDefType) * gNumFences);	// alloc new ptr for fence data
 		if (gFenceList == nil)
-			DoFatalAlert("\pReadDataFromPlayfieldFile: AllocPtr failed");
+			DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed");
 
 		inData = (FileFenceDefType *)*hand;								// get ptr to input fence list
 
@@ -1555,7 +1555,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 			gFenceList[i].nubList = (OGLPoint3D *)AllocPtr(sizeof(FenceDefType) * gFenceList[i].numNubs);	// alloc new ptr for nub array
 			if (gFenceList[i].nubList == nil)
-				DoFatalAlert("\pReadDataFromPlayfieldFile: AllocPtr failed");
+				DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed");
 
 
 			for (j = 0; j < gFenceList[i].numNubs; j++)		// convert x,z to x,y,z
@@ -1567,7 +1567,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			ReleaseResource(hand);
 		}
 		else
-			DoFatalAlert("\pReadDataFromPlayfieldFile: cant get fence nub rez");
+			DoFatalAlert("ReadDataFromPlayfieldFile: cant get fence nub rez");
 	}
 
 
@@ -1631,15 +1631,15 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	size = SUPERTILE_TEXMAP_SIZE * SUPERTILE_TEXMAP_SIZE * 2;						// calc size of supertile 16-bit texture
 	tempBuffer16 = AllocPtr(size);
 	if (tempBuffer16 == nil)
-		DoFatalAlert("\pReadDataFromPlayfieldFile: AllocPtr failed!");
+		DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed!");
 
 	tempBuffer24 = AllocPtr(SUPERTILE_TEXMAP_SIZE * SUPERTILE_TEXMAP_SIZE * 3);		// alloc for 24bit pixels
 	if (tempBuffer24 == nil)
-		DoFatalAlert("\pReadDataFromPlayfieldFile: AllocPtr failed!");
+		DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed!");
 
 	tempBuffer32 = AllocPtr(SUPERTILE_TEXMAP_SIZE * SUPERTILE_TEXMAP_SIZE * 4);		// alloc for 32bit pixels
 	if (tempBuffer32 == nil)
-		DoFatalAlert("\pReadDataFromPlayfieldFile: AllocPtr failed!");
+		DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed!");
 
 
 
@@ -1647,7 +1647,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 	iErr = FSpOpenDF(specPtr, fsCurPerm, &fRefNum);
 	if (iErr)
-		DoFatalAlert("\pReadDataFromPlayfieldFile: FSpOpenDF failed!");
+		DoFatalAlert("ReadDataFromPlayfieldFile: FSpOpenDF failed!");
 
 
 
@@ -1665,7 +1665,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 		iErr = FSRead(fRefNum, &sizeoflong, &compressedSize);
 		if (iErr)
-			DoFatalAlert("\pReadDataFromPlayfieldFile: FSRead failed!");
+			DoFatalAlert("ReadDataFromPlayfieldFile: FSRead failed!");
 
 		compressedSize = SwizzleLong(&compressedSize);
 
@@ -1674,7 +1674,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 		decompressedSize = LZSS_Decode(fRefNum, tempBuffer16, compressedSize);
 		if (decompressedSize != size)
-      			DoFatalAlert("\pReadDataFromPlayfieldFile: LZSS_Decode size is wrong!");
+      			DoFatalAlert("ReadDataFromPlayfieldFile: LZSS_Decode size is wrong!");
 
 				/* IF LOW MEM MODE THEN SHRINK THE TERRAIN TEXTURES IN HALF */
 
@@ -1966,7 +1966,7 @@ NavDialogOptions 	dialogOptions;
 OSType 				fileTypeToSave 	='PSav';
 OSType 				creatorType 	='Otto';
 NavEventUPP 		eventProc = nil; //NewNavEventUPP(myEventProc);
-Str255				name = "\pOtto Saved Game";
+Str255				name = "Otto Saved Game";
 
 	anErr = NavGetDefaultDialogOptions(&dialogOptions);
 	if (anErr == noErr)
@@ -2023,7 +2023,7 @@ void GetLibVersion(ConstStrFileNameParam libName, NumVersion *version)
 	}
 	else
 	{
-		DoAlert("\pGetLibVersion: lib not found");
+		DoAlert("GetLibVersion: lib not found");
 	}
 
 	version->majorRev 		= (versCode & 0xff000000) >> 24;
@@ -2226,14 +2226,14 @@ Boolean			success = false;
 
 	if (FSpCreate(specPtr,'Otto','OSav',nil) != noErr)
 	{
-		DoAlert("\pError creating Save file");
+		DoAlert("Error creating Save file");
 		goto bail;
 	}
 
 	FSpOpenDF(specPtr,fsRdWrPerm, &fRefNum);
 	if (fRefNum == -1)
 	{
-		DoAlert("\pError opening Save file");
+		DoAlert("Error opening Save file");
 		goto bail;
 	}
 
@@ -2243,7 +2243,7 @@ Boolean			success = false;
 	count = sizeof(SaveGameType);
 	if (FSWrite(fRefNum, &count, (Ptr)&saveData) != noErr)
 	{
-		DoAlert("\pError writing Save file");
+		DoAlert("Error writing Save file");
 		FSClose(fRefNum);
 		goto bail;
 	}
@@ -2298,7 +2298,7 @@ Boolean			success = false;
 	FSpOpenDF(&gSavedGameSpec,fsRdPerm, &fRefNum);
 	if (fRefNum == -1)
 	{
-		DoAlert("\pError opening Save file");
+		DoAlert("Error opening Save file");
 		goto bail;
 	}
 
@@ -2307,7 +2307,7 @@ Boolean			success = false;
 	count = sizeof(SaveGameType);
 	if (FSRead(fRefNum, &count, &saveData) != noErr)
 	{
-		DoAlert("\pError reading Save file");
+		DoAlert("Error reading Save file");
 		FSClose(fRefNum);
 		goto bail;
 	}

@@ -149,11 +149,11 @@ ObjNode					*newObj;
 
 			id = itemPtr[i].parm[0];								// get generator ID
 			if (id >= MAX_GENERATORS)
-				DoFatalAlert("\pInitBumperCars: ID# >= MAX_GENERATORS");
+				DoFatalAlert("InitBumperCars: ID# >= MAX_GENERATORS");
 
 			area = itemPtr[i].parm[1];								// get area #
 			if (area > MAX_AREAS)
-				DoFatalAlert("\pInitBumperCars: Area# >= MAX_AREAS");
+				DoFatalAlert("InitBumperCars: Area# >= MAX_AREAS");
 
 			x = gGeneratorCoords[area][id].x = itemPtr[i].x;		// get coords
 			z = gGeneratorCoords[area][id].z = itemPtr[i].y;
@@ -223,10 +223,10 @@ int		playerCar = itemPtr->parm[3] & 1;
 
 	newObj->CarID = id;											// set car ID
 	if (id >= MAX_CARS)
-		DoFatalAlert("\pAddBumperCar: illegal car ID");
+		DoFatalAlert("AddBumperCar: illegal car ID");
 
 	if (gCarList[area][id] != nil)
-		DoFatalAlert("\pAddBumperCar: duplicate car ID#!");
+		DoFatalAlert("AddBumperCar: duplicate car ID#!");
 	gCarList[area][newObj->CarID] = newObj;
 
 

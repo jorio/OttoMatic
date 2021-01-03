@@ -115,7 +115,7 @@ int	i;
 #pragma unused (sideBits)
 
 	if (gPlayerRocketSled)
-		DoFatalAlert("\pDoTrig_RocketSled: already in a rocket sled, why double trigger?");
+		DoFatalAlert("DoTrig_RocketSled: already in a rocket sled, why double trigger?");
 
 	theNode->CType = CTYPE_MISC;									// no longer a trigger
 
@@ -551,7 +551,7 @@ float		scale;
 const static OGLPoint3D zero = {0,0,0};
 
 	if (gPlayerRocketSled == nil)
-		DoFatalAlert("\pAlignPlayerInRocketSled: nil");
+		DoFatalAlert("AlignPlayerInRocketSled: nil");
 
 
 			/* CALC SCALE MATRIX */

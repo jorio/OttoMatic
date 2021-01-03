@@ -217,26 +217,26 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 
 				/* LOAD AUDIO */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Audio:lose.sounds", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:lose.sounds", &spec);
 	LoadSoundBank(&spec, SOUND_BANK_LOSE);
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:particle.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:spheremap.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:lose.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:lose.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_LOSE, gGameViewInfoPtr);
 
 
 
 			/* LOAD MODELS */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:losescreen.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:losescreen.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_LOSESCREEN, gGameViewInfoPtr);
 
 
@@ -479,7 +479,7 @@ ObjNode	*newObj;
 			/* ADD TO LIST */
 
 	if (gHumansOnBelt[gBeltIndex] != nil)							// make sure this slot free
-		DoFatalAlert("\pPutNewHumanOnBelt: slot overflow!");
+		DoFatalAlert("PutNewHumanOnBelt: slot overflow!");
 	gHumansOnBelt[gBeltIndex++] = newObj;
 	if (gBeltIndex >= MAX_HUMANS_ON_BELT)
 		gBeltIndex = 0;

@@ -73,7 +73,7 @@ long		decompSize = (long)destPtr;
 
 	srcOriginalPtr = (Ptr)AllocPtr(sourceSize+1);
 	if (srcOriginalPtr == nil)
-		DoFatalAlert("\pCouldnt allocate memory for ZS pack buffer!");
+		DoFatalAlert("Couldnt allocate memory for ZS pack buffer!");
 	sourcePtr = (unsigned char *)srcOriginalPtr;
 
 				/* READ LZSS DATA */
@@ -154,21 +154,21 @@ static void InitLZSSMemory(void)
 	{
 		lson = (short *)AllocPtr(sizeof(short)*(RING_BUFF_SIZE + 1));
 		if (lson == nil)
-			DoFatalAlert("\pCouldnt alloc memory for lson!");
+			DoFatalAlert("Couldnt alloc memory for lson!");
 	}
 
 	if (rson == nil)
 	{
 		rson = (short *)AllocPtr(sizeof(short)*(RING_BUFF_SIZE + 257));
 		if (rson == nil)
-			DoFatalAlert("\pCouldnt alloc memory for rson!");
+			DoFatalAlert("Couldnt alloc memory for rson!");
 	}
 
 	if (dad == nil)
 	{
 		dad = (short *)AllocPtr(sizeof(short)*(RING_BUFF_SIZE + 1));
 		if (dad == nil)
-			DoFatalAlert("\pCouldnt alloc memory for dad!");
+			DoFatalAlert("Couldnt alloc memory for dad!");
 	}
 }
 

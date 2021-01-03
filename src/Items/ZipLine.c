@@ -124,7 +124,7 @@ ObjNode					*newObj;
 		{
 			id = itemPtr[i].parm[0];								// get zip ID
 			if (id >= MAX_ZIP_LINES)
-				DoFatalAlert("\pInitZipLines: zip line ID# >= MAX_ZIP_LINES");
+				DoFatalAlert("InitZipLines: zip line ID# >= MAX_ZIP_LINES");
 
 			gZipLines[id].isUsed = true;							// this ID is used
 
@@ -270,7 +270,7 @@ const short numNubs = 4;
 
 	pointsPerSpan = OGLPoint3D_Distance(&nubPoints[0], &nubPoints[1]) * .2f;		// # points per span is a function of the length of the spline, so measure from start to end
 	if (pointsPerSpan > MAX_POINTS_PER_SPAN)
-		DoFatalAlert("\pGenerateZipSpline: pointsPerSpan > MAX_POINTS_PER_SPAN");
+		DoFatalAlert("GenerateZipSpline: pointsPerSpan > MAX_POINTS_PER_SPAN");
 
 
 		/* GET SPLINE INFO */
@@ -382,7 +382,7 @@ const short numNubs = 4;
 		for (t = 0; t < (1.0f - EPS); t += dt)
 		{
 			if (numPoints >= MAX_ZIP_SPLINE_POINTS)				// see if overflow
-				DoFatalAlert("\pGenerateZipSpline: numPoints >= MAX_ZIP_SPLINE_POINTS");
+				DoFatalAlert("GenerateZipSpline: numPoints >= MAX_ZIP_SPLINE_POINTS");
 
  			splinePoints[numPoints].x = ((a->x * t + b->x) * t + c->x) * t + d->x;		// save point
  			splinePoints[numPoints].y = ((a->y * t + b->y) * t + c->y) * t + d->y;
@@ -474,7 +474,7 @@ const static OGLVector3D	up = {0,1,0};
 	for (i = 0; i < gZipLines[zipNum].numPoints; i += ZIP_GEOMETRY_DENSITY)
 	{
 		if (p >= MAX_ZIP_GEOMETRY_POINTS)
-			DoFatalAlert("\pBuildZipGeometry: p >= MAX_ZIP_GEOMETRY_POINTS");
+			DoFatalAlert("BuildZipGeometry: p >= MAX_ZIP_GEOMETRY_POINTS");
 
 		meshPoints[p] 	= 									// start 4 verts
 		meshPoints[p+1] =
@@ -534,7 +534,7 @@ const static OGLVector3D	up = {0,1,0};
 
 	p += 4;
 	if (p > MAX_ZIP_GEOMETRY_POINTS)
-		DoFatalAlert("\pBuildZipGeometry: p > MAX_ZIP_GEOMETRY_POINTS");
+		DoFatalAlert("BuildZipGeometry: p > MAX_ZIP_GEOMETRY_POINTS");
 
 	mesh->numPoints 	= p;
 	mesh->numTriangles 	= p-4;
@@ -547,7 +547,7 @@ const static OGLVector3D	up = {0,1,0};
 	for (i = 0; i < mesh->numTriangles; i+=2)
 	{
 		if (t >= MAX_ZIP_GEOMETRY_POINTS)
-			DoFatalAlert("\pBuildZipGeometry: t >= MAX_ZIP_GEOMETRY_POINTS");
+			DoFatalAlert("BuildZipGeometry: t >= MAX_ZIP_GEOMETRY_POINTS");
 
 		triangles[t].vertexIndices[0] = p;
 		triangles[t].vertexIndices[1] = p+1;

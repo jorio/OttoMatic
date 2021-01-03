@@ -109,7 +109,7 @@ void DeleteSparkle(short i)
 		gNumSparkles--;
 	}
 //	else
-//		DoAlert("\pDeleteSparkle: double delete sparkle");
+//		DoAlert("DeleteSparkle: double delete sparkle");
 }
 
 
@@ -477,7 +477,7 @@ static const short textureTable[] =
 
 	numSparkles = itemPtr->parm[1];
 	if (numSparkles > MAX_NODE_SPARKLES)
-		DoFatalAlert("\pAddRunwayLights: # lights > MAX_NODE_SPARKLES");
+		DoFatalAlert("AddRunwayLights: # lights > MAX_NODE_SPARKLES");
 	if (numSparkles == 0)
 		numSparkles = 1;
 

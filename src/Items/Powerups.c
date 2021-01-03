@@ -1085,7 +1085,7 @@ float	r;
 		case	POW_TYPE_GROWTH:
 
 				if (gLevelNum != LEVEL_NUM_JUNGLE)
-					DoFatalAlert("\pPowerupPodGotPunched: growth POW only on jungle!");
+					DoFatalAlert("PowerupPodGotPunched: growth POW only on jungle!");
 
 					/* PUT DOWN THE POWERUP */
 
@@ -1149,7 +1149,7 @@ float	r;
 
 
 		default:
-				DoFatalAlert("\pPowerupPodGotPunched: unknown powerup ID");
+				DoFatalAlert("PowerupPodGotPunched: unknown powerup ID");
 
 	}
 
@@ -1653,7 +1653,7 @@ ObjNode	*string, *balloon;
 int		i;
 
 	if (gLevelNum != LEVEL_NUM_CLOUD)
-		DoFatalAlert("\pMakePowerupBalloon: not cloud level");
+		DoFatalAlert("MakePowerupBalloon: not cloud level");
 
 
 					/****************************/

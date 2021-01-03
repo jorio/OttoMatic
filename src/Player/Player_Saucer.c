@@ -288,7 +288,7 @@ OGLVector2D	v;
 	GetObjectInfo(theNode);
 
 	if (!CalcRocketDropZone(&dropZonePt))						// calc coord of zone
-		DoFatalAlert("\pMovePlayer_Saucer_ToDropZone: no drop zone");
+		DoFatalAlert("MovePlayer_Saucer_ToDropZone: no drop zone");
 
 	if ((CalcDistance(dropZonePt.x, dropZonePt.y, gCoord.x, gCoord.z)) < 10.0f)		// see if close enough
 	{
@@ -378,7 +378,7 @@ ObjNode	*human;
 						break;
 
 				default:
-						DoFatalAlert("\pMovePlayer_Saucer_BeamDownHumans: who?");
+						DoFatalAlert("MovePlayer_Saucer_BeamDownHumans: who?");
 			}
 
 				/* SET HUMAN INFO */

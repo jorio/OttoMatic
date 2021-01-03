@@ -342,27 +342,27 @@ static OGLPoint3D	humanPt[] =
 
 			/* LOAD MODELS */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:winscreen.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:winscreen.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_WINSCREEN, gGameViewInfoPtr);
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_WINSCREEN, WIN_ObjType_Rocket,
 								 -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
 
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:global.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:global.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_GLOBAL, gGameViewInfoPtr);
 
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:particle.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:spheremap.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:lose.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:lose.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_LOSE, gGameViewInfoPtr);
 
 

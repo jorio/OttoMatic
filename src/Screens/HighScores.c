@@ -63,7 +63,7 @@ enum
 /*    VARIABLES            */
 /***************************/
 
-static Str32	gHighScoresFileName = "\p:OttoMatic:HighScores";
+static Str32	gHighScoresFileName = ":OttoMatic:HighScores";
 
 HighScoreType	gHighScores[NUM_SCORES];
 
@@ -253,7 +253,7 @@ ObjNode				*newObj;
 
 			/* LOAD MODELS */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:highscores.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:highscores.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_HIGHSCORES, gGameViewInfoPtr);
 
 
@@ -264,22 +264,22 @@ ObjNode				*newObj;
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:particle.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:helpfont.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:helpfont.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_FONT, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_FONT);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:highscores.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:highscores.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_HIGHSCORES, gGameViewInfoPtr);
 
 
 
 				/* LOAD AUDIO */
 
-//	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Audio:bonus.sounds", &spec);
+//	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:bonus.sounds", &spec);
 //	LoadSoundBank(&spec, SOUND_BANK_BONUS);
 
 
@@ -574,7 +574,7 @@ long				count;
 		ClearHighScores();
 	else
 	if (iErr)
-		DoFatalAlert("\pLoadHighScores: Error opening High Scores file!");
+		DoFatalAlert("LoadHighScores: Error opening High Scores file!");
 	else
 	{
 		count = sizeof(HighScoreType) * NUM_SCORES;
@@ -615,7 +615,7 @@ long				count;
 	if (iErr)
 	{
 err:
-		DoAlert("\pUnable to Save High Scores file!");
+		DoAlert("Unable to Save High Scores file!");
 		return;
 	}
 

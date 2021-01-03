@@ -162,7 +162,7 @@ got_it:
 				break;
 
 		default:
-				DoFatalAlert("\pCreatetNewVaporTrail: unsupported type");
+				DoFatalAlert("CreatetNewVaporTrail: unsupported type");
 	}
 
 	return(i);
@@ -226,7 +226,7 @@ float	dist;
 					break;
 
 			default:
-					DoFatalAlert("\pAddToVaporTrail: unsupported type");
+					DoFatalAlert("AddToVaporTrail: unsupported type");
 		}
 
 
@@ -395,7 +395,7 @@ AGLContext agl_ctx = setupInfo->drawContext;
 					break;
 
 			default:
-					DoFatalAlert("\pDrawVaporTrails: unsupported type");
+					DoFatalAlert("DrawVaporTrails: unsupported type");
 		}
 
 
@@ -420,7 +420,7 @@ AGLContext agl_ctx = setupInfo->drawContext;
 
 	n = gVaporTrails[i].numSegments;						// get # segments
 	if (n > MAX_TRAIL_SEGMENTS)
-		DoFatalAlert("\pDrawVaporTrail_ColorStreak: n > MAX_TRAIL_SEGMENTS");
+		DoFatalAlert("DrawVaporTrail_ColorStreak: n > MAX_TRAIL_SEGMENTS");
 
 			/* SET LINE SIZE */
 

@@ -228,7 +228,7 @@ ObjNode	*player = gPlayerInfo.objNode;
 		return;
 
 	if (player->Skeleton == nil)									// make sure there's a skeleton
-		DoFatalAlert("\pPlayerGotHit: no skeleton on player");
+		DoFatalAlert("PlayerGotHit: no skeleton on player");
 
 
 			/* SPECIAL CASE IF WAS RIDING A BUBBLE */

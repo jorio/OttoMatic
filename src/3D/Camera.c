@@ -382,7 +382,7 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 
 	skeleton = playerObj->Skeleton;
 	if (!skeleton)
-		DoFatalAlert("\pMoveCamera: player has no skeleton!");
+		DoFatalAlert("MoveCamera: player has no skeleton!");
 
 				/******************/
 				/* GET COORD DATA */

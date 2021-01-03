@@ -566,7 +566,7 @@ u_long	flags = gAutoFadeStatusBits ;
 				break;
 
 		default:
-				DoFatalAlert("\pAddBasicPlant: bad type");
+				DoFatalAlert("AddBasicPlant: bad type");
 	}
 
 	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
@@ -1455,7 +1455,7 @@ int		type = itemPtr->parm[0];
 
 
 	if (type > 3)
-		DoFatalAlert("\pAddBasicCrystal: illegal crystal type (parm 0)");
+		DoFatalAlert("AddBasicCrystal: illegal crystal type (parm 0)");
 
 	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= SLIME_ObjType_CrystalCluster_Blue + type;
@@ -1947,7 +1947,7 @@ int		type = itemPtr->parm[0];
 
 
 	if (type > 2)
-		DoFatalAlert("\pAddLampPost: illegal type (parm 0)");
+		DoFatalAlert("AddLampPost: illegal type (parm 0)");
 
 	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_LampPost + type;
@@ -1987,7 +1987,7 @@ int		type = itemPtr->parm[0];
 
 
 	if (type > 1)
-		DoFatalAlert("\pAddCrashedShip: illegal type (parm 0)");
+		DoFatalAlert("AddCrashedShip: illegal type (parm 0)");
 
 	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_CrashedRocket + type;
@@ -2033,7 +2033,7 @@ int		type = itemPtr->parm[0];
 
 
 	if (type > 6)
-		DoFatalAlert("\pAddRubble: illegal type (parm 0)");
+		DoFatalAlert("AddRubble: illegal type (parm 0)");
 
 	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_Rubble0 + type;
@@ -2069,7 +2069,7 @@ int		type = itemPtr->parm[0];
 
 
 	if (type > 4)
-		DoFatalAlert("\pAddTeleporterMap: illegal type (parm 0)");
+		DoFatalAlert("AddTeleporterMap: illegal type (parm 0)");
 
 	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_TeleporterMap0; // + type;
@@ -2224,7 +2224,7 @@ int		type = itemPtr->parm[0];
 				/*******************/
 
 	if (type > 4)
-		DoFatalAlert("\pAddGraveStone: illegal type (parm 0)");
+		DoFatalAlert("AddGraveStone: illegal type (parm 0)");
 
 	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
 	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_GraveStone + type;

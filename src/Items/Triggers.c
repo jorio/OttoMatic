@@ -1528,7 +1528,7 @@ static const OGLPoint3D xLights[8] =
 				break;
 
 		default:
-				DoFatalAlert("\pAddSpinningPlatform: unknown type");
+				DoFatalAlert("AddSpinningPlatform: unknown type");
 	}
 
 
@@ -1732,7 +1732,7 @@ OGLPoint2D		origin,pt,p[12];
 				break;
 
 		default:
-				DoFatalAlert("\pDoTrig_SpinningPlatform: unknown type");
+				DoFatalAlert("DoTrig_SpinningPlatform: unknown type");
 	}
 
 				/*******************/

@@ -63,7 +63,7 @@ void LoadASkeleton(Byte num, OGLSetupOutputType *setupInfo)
 short	i,numDecomp;
 
 	if (num >= MAX_SKELETON_TYPES)
-		DoFatalAlert("\pLoadASkeleton: MAX_SKELETON_TYPES exceeded!");
+		DoFatalAlert("LoadASkeleton: MAX_SKELETON_TYPES exceeded!");
 
 	if (gLoadedSkeletonsList[num] == nil)					// check if already loaded
 		gLoadedSkeletonsList[num] = LoadSkeletonFile(num, setupInfo);
@@ -154,7 +154,7 @@ float	scale;
 
 	newNode->Skeleton = MakeNewSkeletonBaseData(type); 			// alloc & set skeleton data
 	if (newNode->Skeleton == nil)
-		DoFatalAlert("\pMakeNewSkeletonObject: MakeNewSkeletonBaseData == nil");
+		DoFatalAlert("MakeNewSkeletonObject: MakeNewSkeletonBaseData == nil");
 
 	UpdateObjectTransforms(newNode);
 
@@ -194,7 +194,7 @@ long	numAnims,numJoints;
 
 	skeleton->NumAnimEvents = (Byte *)AllocPtr(sizeof(Byte)*numAnims);		// array which holds # events for each anim
 	if (skeleton->NumAnimEvents == nil)
-		DoFatalAlert("\pNot enough memory to alloc NumAnimEvents");
+		DoFatalAlert("Not enough memory to alloc NumAnimEvents");
 
 	Alloc_2d_array(AnimEventType, skeleton->AnimEventsList, numAnims, MAX_ANIM_EVENTS);
 
@@ -202,22 +202,22 @@ long	numAnims,numJoints;
 
 	skeleton->Bones = (BoneDefinitionType *)AllocPtr(sizeof(BoneDefinitionType)*numJoints);
 	if (skeleton->Bones == nil)
-		DoFatalAlert("\pNot enough memory to alloc Bones");
+		DoFatalAlert("Not enough memory to alloc Bones");
 
 
 		/* ALLOC DECOMPOSED DATA */
 
 	skeleton->decomposedTriMeshes = (MOVertexArrayData *)AllocPtr(sizeof(MOVertexArrayData)*MAX_DECOMPOSED_TRIMESHES);
 	if (skeleton->decomposedTriMeshes == nil)
-		DoFatalAlert("\pNot enough memory to alloc decomposedTriMeshes");
+		DoFatalAlert("Not enough memory to alloc decomposedTriMeshes");
 
 	skeleton->decomposedPointList = (DecomposedPointType *)AllocPtr(sizeof(DecomposedPointType)*MAX_DECOMPOSED_POINTS);
 	if (skeleton->decomposedPointList == nil)
-		DoFatalAlert("\pNot enough memory to alloc decomposedPointList");
+		DoFatalAlert("Not enough memory to alloc decomposedPointList");
 
 	skeleton->decomposedNormalsList = (OGLVector3D *)AllocPtr(sizeof(OGLVector3D)*MAX_DECOMPOSED_NORMALS);
 	if (skeleton->decomposedNormalsList == nil)
-		DoFatalAlert("\pNot enough memory to alloc decomposedNormalsList");
+		DoFatalAlert("Not enough memory to alloc decomposedNormalsList");
 
 
 }
@@ -313,7 +313,7 @@ SkeletonObjDataType	*skeletonData;
 	skeletonDefPtr = gLoadedSkeletonsList[sourceSkeletonNum];				// get ptr to source skeleton definition info
 	if (skeletonDefPtr == nil)
 	{
-		DoAlert("\pMakeNewSkeletonBaseData: Skeleton data isnt loaded!");
+		DoAlert("MakeNewSkeletonBaseData: Skeleton data isnt loaded!");
 		ShowSystemErr(sourceSkeletonNum);
 	}
 
@@ -322,7 +322,7 @@ SkeletonObjDataType	*skeletonData;
 
 	skeletonData = (SkeletonObjDataType *)AllocPtrClear(sizeof(SkeletonObjDataType));
 	if (skeletonData == nil)
-		DoFatalAlert("\pMakeNewSkeletonBaseData: Cannot alloc new SkeletonObjDataType");
+		DoFatalAlert("MakeNewSkeletonBaseData: Cannot alloc new SkeletonObjDataType");
 
 
 			/* INIT NEW SKELETON */

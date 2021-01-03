@@ -107,7 +107,7 @@ MOGroupData			*data;
 		/************************/
 
 	if (FSpOpenDF(spec, fsRdPerm, &refNum) != noErr)
-		DoFatalAlert("\pImportBG3D: FSpOpenDF failed");
+		DoFatalAlert("ImportBG3D: FSpOpenDF failed");
 
 	ReadBG3DHeader(refNum);
 	ParseBG3DFile(refNum);
@@ -135,10 +135,10 @@ MOGroupData			*data;
 
 	header = gBG3D_CurrentContainer->root;							// point to root object in container
 	if (header == nil)
-		DoFatalAlert("\pImportBG3D: header == nil");
+		DoFatalAlert("ImportBG3D: header == nil");
 
 	if (header->type != MO_TYPE_GROUP)								// root should be a group
-		DoFatalAlert("\pImportBG3D: root isnt a group!");
+		DoFatalAlert("ImportBG3D: root isnt a group!");
 
 
 			/* PARSE GROUP */
@@ -172,7 +172,7 @@ long			count;
 	count = sizeof(BG3DHeaderType);
 
 	if (FSRead(refNum, &count, &headerData) != noErr)
-		DoFatalAlert("\pReadBG3DHeader: FSRead failed");
+		DoFatalAlert("ReadBG3DHeader: FSRead failed");
 
 			/* VERIFY FILE */
 
@@ -181,7 +181,7 @@ long			count;
 		(headerData.headerString[2] != '3') ||
 		(headerData.headerString[3] != 'D'))
 	{
-		DoFatalAlert("\pReadBG3DHeader: BG3D file has invalid header.");
+		DoFatalAlert("ReadBG3DHeader: BG3D file has invalid header.");
 	}
 }
 
@@ -201,7 +201,7 @@ MetaObjectPtr 	newObj;
 
 		count = sizeof(tag);
 		if (FSRead(refNum, &count, &tag) != noErr)
-			DoFatalAlert("\pParseBG3DFile: FSRead failed");
+			DoFatalAlert("ParseBG3DFile: FSRead failed");
 
 		tag = SwizzleULong(&tag);
 
@@ -264,7 +264,7 @@ MetaObjectPtr 	newObj;
 					break;
 
 			default:
-					DoFatalAlert("\pParseBG3DFile: unrecognized tag");
+					DoFatalAlert("ParseBG3DFile: unrecognized tag");
 		}
 	}while(!done);
 }
@@ -285,7 +285,7 @@ u_long				flags;
 
 	count = sizeof(flags);
 	if (FSRead(refNum, &count, &flags) != noErr)
-		DoFatalAlert("\pReadMaterialFlags: FSRead failed");
+		DoFatalAlert("ReadMaterialFlags: FSRead failed");
 
 	flags = SwizzleULong(&flags);
 
@@ -326,14 +326,14 @@ GLfloat			color[4];
 MOMaterialData	*data;
 
 	if (gBG3D_CurrentMaterialObj == nil)
-		DoFatalAlert("\pReadMaterialDiffuseColor: gBG3D_CurrentMaterialObj == nil");
+		DoFatalAlert("ReadMaterialDiffuseColor: gBG3D_CurrentMaterialObj == nil");
 
 
 			/* READ COLOR VALUE */
 
 	count = sizeof(GLfloat) * 4;
 	if (FSRead(refNum, &count, color) != noErr)
-		DoFatalAlert("\pReadMaterialDiffuseColor: FSRead failed");
+		DoFatalAlert("ReadMaterialDiffuseColor: FSRead failed");
 
 
 	color[0] = SwizzleFloat(&color[0]);
@@ -369,7 +369,7 @@ MOMaterialData	*data;
 			/* GET PTR TO CURRENT MATERIAL */
 
 	if (gBG3D_CurrentMaterialObj == nil)
-		DoFatalAlert("\pReadMaterialTextureMap: gBG3D_CurrentMaterialObj == nil");
+		DoFatalAlert("ReadMaterialTextureMap: gBG3D_CurrentMaterialObj == nil");
 
 	data = &gBG3D_CurrentMaterialObj->objectData; 	// get ptr to material data
 
@@ -399,7 +399,7 @@ MOMaterialData	*data;
 	}
 	else
 	if (data->numMipmaps >= MO_MAX_MIPMAPS)		// see if overflow
-		DoFatalAlert("\pReadMaterialTextureMap: mipmap overflow!");
+		DoFatalAlert("ReadMaterialTextureMap: mipmap overflow!");
 
 
 		/***************************/
@@ -410,7 +410,7 @@ MOMaterialData	*data;
 
 	texturePixels = AllocPtr(count);			// alloc memory for buffer
 	if (texturePixels == nil)
-		DoFatalAlert("\pReadMaterialTextureMap: AllocPtr failed");
+		DoFatalAlert("ReadMaterialTextureMap: AllocPtr failed");
 
 	FSRead(refNum, &count, texturePixels);		// read pixel data
 
@@ -448,7 +448,7 @@ MOGroupObject	*newGroup;
 
 	newGroup = MO_CreateNewObjectOfType(MO_TYPE_GROUP, 0, nil);
 	if (newGroup == nil)
-		DoFatalAlert("\pReadGroup: MO_CreateNewObjectOfType failed");
+		DoFatalAlert("ReadGroup: MO_CreateNewObjectOfType failed");
 
 
 		/*************************/
@@ -456,7 +456,7 @@ MOGroupObject	*newGroup;
 		/*************************/
 
 	if (gBG3D_GroupStackIndex >= (BG3D_GROUP_STACK_SIZE-1))
-		DoFatalAlert("\pReadGroup: gBG3D_GroupStackIndex overflow!");
+		DoFatalAlert("ReadGroup: gBG3D_GroupStackIndex overflow!");
 
 		/* SEE IF THIS IS FIRST GROUP */
 
@@ -488,7 +488,7 @@ static void EndGroup(void)
 	gBG3D_GroupStackIndex--;
 
 	if (gBG3D_GroupStackIndex < 0)									// must be something on group stack
-		DoFatalAlert("\pEndGroup: stack is empty!");
+		DoFatalAlert("EndGroup: stack is empty!");
 
 	gBG3D_CurrentGroup = gBG3D_GroupStack[gBG3D_GroupStackIndex++]; // get previous group off of stack
 }
@@ -530,7 +530,7 @@ MetaObjectPtr		newObj;
 				break;
 
 		default:
-				DoFatalAlert("\pReadNewGeometry: unknown geo type");
+				DoFatalAlert("ReadNewGeometry: unknown geo type");
 	}
 
 	return(newObj);
@@ -594,14 +594,14 @@ OGLPoint3D			*pointList;
 
 	data = &gBG3D_CurrentGeometryObj->objectData;					// point to geometry data
 	if (data->points)												// see if points already assigned
-		DoFatalAlert("\pReadVertexArray: points already assigned!");
+		DoFatalAlert("ReadVertexArray: points already assigned!");
 
 	numPoints = data->numPoints;									// get # points to expect to read
 
 	count = sizeof(OGLPoint3D) * numPoints;							// calc size of data to read
 	pointList = AllocPtr(count);									// alloc buffer to hold points
 	if (pointList == nil)
-		DoFatalAlert("\pReadVertexArray: AllocPtr failed!");
+		DoFatalAlert("ReadVertexArray: AllocPtr failed!");
 
 	FSRead(refNum, &count, pointList);								// read the data
 
@@ -633,7 +633,7 @@ OGLVector3D			*normalList;
 	count = sizeof(OGLVector3D) * numPoints;						// calc size of data to read
 	normalList = AllocPtr(count);									// alloc buffer to hold normals
 	if (normalList == nil)
-		DoFatalAlert("\pReadNormalArray: AllocPtr failed!");
+		DoFatalAlert("ReadNormalArray: AllocPtr failed!");
 
 	FSRead(refNum, &count, normalList);								// read the data
 
@@ -664,7 +664,7 @@ OGLTextureCoord		*uvList;
 	count = sizeof(OGLTextureCoord) * numPoints;					// calc size of data to read
 	uvList = AllocPtr(count);										// alloc buffer to hold uv's
 	if (uvList == nil)
-		DoFatalAlert("\pReadUVArray: AllocPtr failed!");
+		DoFatalAlert("ReadUVArray: AllocPtr failed!");
 
 	FSRead(refNum, &count, uvList);									// read the data
 
@@ -695,7 +695,7 @@ OGLColorRGBA		*colorsF;
 	count = sizeof(OGLColorRGBA_Byte) * numPoints;					// calc size of data to read
 	colorList = AllocPtr(count);									// alloc buffer to hold data
 	if (colorList == nil)
-		DoFatalAlert("\pReadVertexColorArray: AllocPtr failed!");
+		DoFatalAlert("ReadVertexColorArray: AllocPtr failed!");
 
 	FSRead(refNum, &count, colorList);								// read the data
 
@@ -709,7 +709,7 @@ OGLColorRGBA		*colorsF;
 
 	colorsF = AllocPtr(sizeof(OGLColorRGBA) * numPoints);
 	if (colorsF == nil)
-		DoFatalAlert("\pReadVertexColorArray: AllocPtr failed!");
+		DoFatalAlert("ReadVertexColorArray: AllocPtr failed!");
 
 	data->colorsFloat = colorsF;									// assign color array to geometry header
 
@@ -739,7 +739,7 @@ MOTriangleIndecies	*triList;
 	count = sizeof(MOTriangleIndecies) * numTriangles;				// calc size of data to read
 	triList = AllocPtr(count);										// alloc buffer to hold data
 	if (triList == nil)
-		DoFatalAlert("\pReadTriangleArray: AllocPtr failed!");
+		DoFatalAlert("ReadTriangleArray: AllocPtr failed!");
 
 	FSRead(refNum, &count, triList);								// read the data
 
@@ -773,7 +773,7 @@ MOGroupObject	*rootGroup;
 
 	gBG3D_CurrentContainer = AllocPtr(sizeof(BG3DFileContainer));
 	if (gBG3D_CurrentContainer == nil)
-		DoFatalAlert("\pInitBG3DContainer: AllocPtr failed!");
+		DoFatalAlert("InitBG3DContainer: AllocPtr failed!");
 
 	gBG3D_CurrentContainer->numMaterials =	0;			// no materials yet
 
@@ -782,7 +782,7 @@ MOGroupObject	*rootGroup;
 
 	rootGroup = MO_CreateNewObjectOfType(MO_TYPE_GROUP, 0, nil);
 	if (rootGroup == nil)
-		DoFatalAlert("\pInitBG3DContainer: MO_CreateNewObjectOfType failed");
+		DoFatalAlert("InitBG3DContainer: MO_CreateNewObjectOfType failed");
 
 	gBG3D_CurrentContainer->root 	= rootGroup;		// root is an empty group
 	gBG3D_CurrentGroup 				= rootGroup;
@@ -986,7 +986,7 @@ BG3DFileContainer	*file = gBG3DContainerList[groupNum];			// point to this file'
 int					i;
 
 	if (file == nil)
-		DoFatalAlert("\pDisposeBG3DContainer: this BG3D container is already gone.");
+		DoFatalAlert("DisposeBG3DContainer: this BG3D container is already gone.");
 
 			/* DISPOSE OF ALL MATERIALS */
 
@@ -1037,7 +1037,7 @@ int					n,i;
 		MOGroupObject	*groupObj = (MOGroupObject *)mo;
 
 		if (geometryNum >= groupObj->objectData.numObjectsInGroup)							// make sure # is valid
-			DoFatalAlert("\pBG3D_SetContainerMaterialFlags: geometryNum out of range");
+			DoFatalAlert("BG3D_SetContainerMaterialFlags: geometryNum out of range");
 
 				/* POINT TO 1ST GEOMETRY IN THE GROUP */
 
@@ -1048,12 +1048,12 @@ int					n,i;
 				mo = (MOVertexArrayObject *)groupObj->objectData.groupContents[i];
 
 				if ((mo->objectHeader.type != MO_TYPE_GEOMETRY) || (mo->objectHeader.subType != MO_GEOMETRY_SUBTYPE_VERTEXARRAY))
-					DoFatalAlert("\pBG3D_SetContainerMaterialFlags:  object isnt a vertex array");
+					DoFatalAlert("BG3D_SetContainerMaterialFlags:  object isnt a vertex array");
 
 				va = &mo->objectData;								// point to vertex array data
 				n = va->numMaterials;
 				if (n <= 0)											// make sure there are materials
-					DoFatalAlert("\pBG3D_SetContainerMaterialFlags:  no materials!");
+					DoFatalAlert("BG3D_SetContainerMaterialFlags:  no materials!");
 
 				mat = va->materials[0];						// get pointer to material
 				mat->objectData.flags |= flags;						// set flags
@@ -1073,7 +1073,7 @@ setit:
 		va = &mo->objectData;								// point to vertex array data
 		n = va->numMaterials;
 		if (n <= 0)											// make sure there are materials
-			DoFatalAlert("\pBG3D_SetContainerMaterialFlags:  no materials!");
+			DoFatalAlert("BG3D_SetContainerMaterialFlags:  no materials!");
 
 		mat = va->materials[0];								// get pointer to material
 		mat->objectData.flags |= flags;						// set flags
@@ -1102,7 +1102,7 @@ MOVertexArrayObject	*mo;
 		MOGroupObject	*groupObj = (MOGroupObject *)mo;
 
 		if (geometryNum >= groupObj->objectData.numObjectsInGroup)					// make sure # is valid
-			DoFatalAlert("\pBG3D_SphereMapGeomteryMaterial: geometryNum out of range");
+			DoFatalAlert("BG3D_SphereMapGeomteryMaterial: geometryNum out of range");
 
 				/* POINT TO 1ST GEOMETRY IN THE GROUP */
 
@@ -1138,7 +1138,7 @@ MOVertexArrayData	*va;
 MOMaterialObject	*mat;
 
 	if ((mo->objectHeader.type != MO_TYPE_GEOMETRY) || (mo->objectHeader.subType != MO_GEOMETRY_SUBTYPE_VERTEXARRAY))
-		DoFatalAlert("\pSetSphereMapInfo:  object isnt a vertex array");
+		DoFatalAlert("SetSphereMapInfo:  object isnt a vertex array");
 
 	va = &mo->objectData;														// point to vertex array data
 

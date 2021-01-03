@@ -104,7 +104,7 @@ unsigned long flags = newObjDef->flags;
 
 	newNodePtr = (ObjNode *)AllocPtrClear(sizeof(ObjNode));
 	if (newNodePtr == nil)
-		DoFatalAlert("\pMakeNewObject: Alloc Ptr failed!");
+		DoFatalAlert("MakeNewObject: Alloc Ptr failed!");
 
 
 
@@ -206,7 +206,7 @@ Byte	group,type;
 
 	newObj = MakeNewObject(newObjDef);
 	if (newObj == nil)
-		DoFatalAlert("\pMakeNewDisplayGroupObject: MakeNewObject failed!");
+		DoFatalAlert("MakeNewDisplayGroupObject: MakeNewObject failed!");
 
 			/* MAKE BASE GROUP & ADD GEOMETRY TO IT */
 
@@ -218,7 +218,7 @@ Byte	group,type;
 	{
 		Str255	s;
 
-		DoAlert("\pMakeNewDisplayGroupObject: type > gNumObjectsInGroupList[]!");
+		DoAlert("MakeNewDisplayGroupObject: type > gNumObjectsInGroupList[]!");
 
 		NumToString(group, s);
 		DoAlert(s);
@@ -252,7 +252,7 @@ void ResetDisplayGroupObject(ObjNode *theNode)
 	CreateBaseGroup(theNode);											// create new group object
 
 	if (theNode->Type >= gNumObjectsInBG3DGroupList[theNode->Group])							// see if illegal
-		DoFatalAlert("\pResetDisplayGroupObject: type > gNumObjectsInGroupList[]!");
+		DoFatalAlert("ResetDisplayGroupObject: type > gNumObjectsInGroupList[]!");
 
 	AttachGeometryToDisplayGroupObject(theNode,gBG3DGroupList[theNode->Group][theNode->Type]);	// attach geometry to group
 
@@ -294,13 +294,13 @@ MOMatrixObject			*transObject;
 
 	theNode->BaseGroup = MO_CreateNewObjectOfType(MO_TYPE_GROUP, 0, nil);
 	if (theNode->BaseGroup == nil)
-		DoFatalAlert("\pCreateBaseGroup: MO_CreateNewObjectOfType failed!");
+		DoFatalAlert("CreateBaseGroup: MO_CreateNewObjectOfType failed!");
 
 
 					/* SETUP BASE MATRIX */
 
 	if ((theNode->Scale.x == 0) || (theNode->Scale.y == 0) || (theNode->Scale.z == 0))
-		DoFatalAlert("\pCreateBaseGroup: A scale component == 0");
+		DoFatalAlert("CreateBaseGroup: A scale component == 0");
 
 
 	OGLMatrix4x4_SetScale(&scaleMatrix, theNode->Scale.x, theNode->Scale.y,		// make scale matrix
@@ -325,7 +325,7 @@ MOMatrixObject			*transObject;
 
 	transObject = MO_CreateNewObjectOfType(MO_TYPE_MATRIX, 0, &theNode->BaseTransformMatrix);	// make matrix xform object
 	if (transObject == nil)
-		DoFatalAlert("\pCreateBaseGroup: MO_CreateNewObjectOfType/Matrix Failed!");
+		DoFatalAlert("CreateBaseGroup: MO_CreateNewObjectOfType/Matrix Failed!");
 
 	MO_AttachToGroupStart(theNode->BaseGroup, transObject);						// add to base group
 	theNode->BaseTransformObject = transObject;									// keep extra LEGAL ref (remember to dispose later)
@@ -361,7 +361,7 @@ ObjNode		*thisNodePtr;
 				/* VERIFY NODE */
 
 		if (thisNodePtr->CType == INVALID_NODE_FLAG)
-			DoFatalAlert("\pMoveObjects: CType == INVALID_NODE_FLAG");
+			DoFatalAlert("MoveObjects: CType == INVALID_NODE_FLAG");
 
 		gCurrentNode = thisNodePtr;							// set current object node
 		gNextNode	 = thisNodePtr->NextNode;				// get next node now (cuz current node might get deleted)
@@ -1182,7 +1182,7 @@ int		i;
 	if (theNode->CType == INVALID_NODE_FLAG)		// see if already deleted
 	{
 		Str255	errString;		//-----------
-		DoAlert("\pAttempted to Double Delete an Object.  Object was already deleted!");
+		DoAlert("Attempted to Double Delete an Object.  Object was already deleted!");
 		NumToString(theNode->Genre,errString);		//------------
 		DoAlert(errString);					//---------
 		NumToString(theNode->Group,errString);		//------------

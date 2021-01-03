@@ -120,7 +120,7 @@ float					y,centerX,centerZ;
 
 
 	if (gNumWaterPatches > MAX_WATER)
-		DoFatalAlert("\pPrimeWater: gNumWaterPatches > MAX_WATER");
+		DoFatalAlert("PrimeWater: gNumWaterPatches > MAX_WATER");
 
 
 			/******************************/
@@ -133,10 +133,10 @@ float					y,centerX,centerZ;
 		numNubs 			= gWaterList[f].numNubs;					// get # nubs in water
 
 		if (numNubs == 1)
-			DoFatalAlert("\pPrimeWater: numNubs == 1");
+			DoFatalAlert("PrimeWater: numNubs == 1");
 
 		if (numNubs > MAX_NUBS_IN_WATER)
-			DoFatalAlert("\pPrimeWater: numNubs > MAX_NUBS_IN_WATER");
+			DoFatalAlert("PrimeWater: numNubs > MAX_NUBS_IN_WATER");
 
 
 				/* IF FIRST AND LAST NUBS ARE SAME, THEN ELIMINATE LAST */
@@ -227,7 +227,7 @@ double					x,y,z;
 		water = &gWaterList[f];								// point to this water
 		numNubs = water->numNubs;							// get # nubs in water (note:  this is the # from the file, not including the extra center point we added earlier!)
 		if (numNubs < 3)
-			DoFatalAlert("\pMakeWaterGeometry: numNubs < 3");
+			DoFatalAlert("MakeWaterGeometry: numNubs < 3");
 		type = water->type;									// get water type
 
 

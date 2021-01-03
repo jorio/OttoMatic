@@ -49,7 +49,7 @@ Boolean	gSerialWasVerified = false;
 
 Boolean	gLowMemMode = false;
 
-Str255  gSerialFileName = "\p:OttoMatic:Info";
+Str255  gSerialFileName = ":OttoMatic:Info";
 
 Boolean	gLittleSnitch = false;
 
@@ -431,11 +431,11 @@ OSErr	err;
 	hand = NewHandle(size);							// alloc in APPL
 	if (hand == nil)
 	{
-		DoAlert("\pAllocHandle: using temp mem");
+		DoAlert("AllocHandle: using temp mem");
 		hand = TempNewHandle(size,&err);			// try TEMP mem
 		if (hand == nil)
 		{
-			DoAlert("\pAllocHandle: failed!");
+			DoAlert("AllocHandle: failed!");
 			return(nil);
 		}
 		else
@@ -462,7 +462,7 @@ u_long	*cookiePtr;
 	pr = NewPtr(size);
 #endif
 	if (pr == nil)
-		DoFatalAlert("\pAllocPtr: NewPtr failed");
+		DoFatalAlert("AllocPtr: NewPtr failed");
 
 	cookiePtr = (u_long *)pr;
 
@@ -495,7 +495,7 @@ u_long	*cookiePtr;
 #endif
 
 	if (pr == nil)
-		DoFatalAlert("\pAllocPtr: NewPtr failed");
+		DoFatalAlert("AllocPtr: NewPtr failed");
 
 	cookiePtr = (u_long *)pr;
 
@@ -523,7 +523,7 @@ u_long	*cookiePtr;
 	cookiePtr = (u_long *)ptr;
 
 	if (*cookiePtr != 'FACE')
-		DoFatalAlert("\pSafeSafeDisposePtr: invalid cookie!");
+		DoFatalAlert("SafeSafeDisposePtr: invalid cookie!");
 
 	*cookiePtr = 0;
 
@@ -592,9 +592,9 @@ NumVersion	vers;
 			/* VERIFY & MAKE FSSPEC FOR DATA FOLDER */
 
 #if DEMO
-	iErr = FSMakeFSSpec(0, 0, "\p:DemoData:Images", &gDataSpec);
+	iErr = FSMakeFSSpec(0, 0, ":DemoData:Images", &gDataSpec);
 #else
-	iErr = FSMakeFSSpec(0, 0, "\p:Data:Images", &gDataSpec);
+	iErr = FSMakeFSSpec(0, 0, ":Data:Images", &gDataSpec);
 #endif
 	if (iErr)
 	{
@@ -608,7 +608,7 @@ NumVersion	vers;
 	{
 		iErr = Gestalt(gestaltProcClkSpeed,&cpuSpeed);
 		if (iErr != noErr)
-			DoFatalAlert("\pVerifySystem: gestaltProcClkSpeed failed!");
+			DoFatalAlert("VerifySystem: gestaltProcClkSpeed failed!");
 
 		if ((cpuSpeed/1000000) >= 600)										// must be at least 600mhz G3 for us to treat it like a G4
 			gG4 = true;
@@ -619,20 +619,20 @@ NumVersion	vers;
 
 	iErr = Gestalt(gestaltSystemVersion,(long *)&vers);
 	if (iErr != noErr)
-		DoFatalAlert("\pVerifySystem: gestaltSystemVersion failed!");
+		DoFatalAlert("VerifySystem: gestaltSystemVersion failed!");
 
 	if (vers.stage >= 0x10)													// see if at least OS 10
 	{
 		gOSX = true;
 		if ((vers.stage == 0x10) && (vers.nonRelRev < 0x10))				// must be at least OS 10.1 !!!
-			DoFatalAlert("\pThis game requires OS 10.1 or later to run on OS X.  Either upgrade to 10.1 or run the game on OS 9.");
+			DoFatalAlert("This game requires OS 10.1 or later to run on OS X.  Either upgrade to 10.1 or run the game on OS 9.");
 	}
 	else
 	{
 		gOSX = false;
 		if (vers.stage == 8)						// check for 8.6 also
 			if (vers.nonRelRev < 0x60)
-				DoFatalAlert("\pThis game requires at least OS 8.6 with all the updates.");
+				DoFatalAlert("This game requires at least OS 8.6 with all the updates.");
 	}
 
 		/* REQUIRE CARBONLIB 1.2 */
@@ -648,7 +648,7 @@ NumVersion	vers;
 		if (vers.nonRelRev < 0x20)
 		{
 carbonerr:
-			DoFatalAlert("\pThis application requires CarbonLib 1.2 or newer.  Run Software Update, or install it from the Otto Matic CD.");
+			DoFatalAlert("This application requires CarbonLib 1.2 or newer.  Run Software Update, or install it from the Otto Matic CD.");
 		}
 	}
 
@@ -665,7 +665,7 @@ carbonerr:
 //		if ((d.year > 2001) ||
 //			((d.year == 2001) && (d.month > 11)))
 //		{
-//			DoFatalAlert("\pSorry, but this beta has expired");
+//			DoFatalAlert("Sorry, but this beta has expired");
 //		}
 	}
 #endif
@@ -676,9 +676,9 @@ carbonerr:
 	iErr = FindFolder(kOnSystemDisk,kPreferencesFolderType,kDontCreateFolder,			// locate the folder
 					&gPrefsFolderVRefNum,&gPrefsFolderDirID);
 	if (iErr != noErr)
-		DoAlert("\pWarning: Cannot locate the Preferences folder.");
+		DoAlert("Warning: Cannot locate the Preferences folder.");
 
-	iErr = DirCreate(gPrefsFolderVRefNum,gPrefsFolderDirID,"\pOttoMatic",&createdDirID);		// make folder in there
+	iErr = DirCreate(gPrefsFolderVRefNum,gPrefsFolderDirID,"OttoMatic",&createdDirID);		// make folder in there
 
 
 
@@ -701,7 +701,7 @@ carbonerr:
 				Gestalt(gestaltVMAttr,(long *)&vmAttr);	// get VM attribs to see if its ON
 				if (!(vmAttr & (1 << gestaltVMPresent)))
 				{
-					DoFatalAlert("\pThis game needs at least 96MB of real RAM to run, however, turn on Virtual Memory, reboot your computer, and it might work.");
+					DoFatalAlert("This game needs at least 96MB of real RAM to run, however, turn on Virtual Memory, reboot your computer, and it might work.");
 				}
 				gLowMemMode = true;
 			}
@@ -761,7 +761,7 @@ carbonerr:
 		ProcessInfoRec	info;
 		short			i;
 		Str255		s;
-		const char snitch[] = "\pQuicken Scheduler";
+		const char snitch[] = "Quicken Scheduler";
 
 		info.processName = s;
 		info.processInfoLength = sizeof(ProcessInfoRec);
@@ -782,7 +782,7 @@ carbonerr:
 					goto next_process2;
 			}
 
-			DoAlert("\pIMPORTANT:  Quicken Scheduler is known to cause certain keyboard access functions in OS X to malfunction.  If the keyboard does not appear to be working in this game, quit Quicken Scheduler to fix it.");
+			DoAlert("IMPORTANT:  Quicken Scheduler is known to cause certain keyboard access functions in OS X to malfunction.  If the keyboard does not appear to be working in this game, quit Quicken Scheduler to fix it.");
 
 next_process2:;
 		}

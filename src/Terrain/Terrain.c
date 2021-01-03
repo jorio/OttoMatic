@@ -354,35 +354,35 @@ int	u,v,i,j;
 
 	gSuperTileMeshData = AllocPtr(sizeof(MOVertexArrayData) * MAX_SUPERTILES);
 	if (gSuperTileMeshData == nil)
-		DoFatalAlert("\pCreateSuperTileMemoryList: AllocPtr failed - gSuperTileMeshData");
+		DoFatalAlert("CreateSuperTileMemoryList: AllocPtr failed - gSuperTileMeshData");
 
 
 			/* ALLOC POINTS FOR ALL SUPERTILES */
 
 	gSuperTileCoords = AllocPtr(sizeof(OGLPoint3D) * (NUM_VERTICES_IN_SUPERTILE * MAX_SUPERTILES));
 	if (gSuperTileCoords == nil)
-		DoFatalAlert("\pCreateSuperTileMemoryList: AllocPtr failed - gSuperTileCoords");
+		DoFatalAlert("CreateSuperTileMemoryList: AllocPtr failed - gSuperTileCoords");
 
 
 			/* ALLOC VERTEX NORMALS FOR ALL SUPERTILES */
 
 	gSuperTileNormals = AllocPtr(sizeof(OGLVector3D) * (NUM_VERTICES_IN_SUPERTILE * MAX_SUPERTILES));
 	if (gSuperTileNormals == nil)
-		DoFatalAlert("\pCreateSuperTileMemoryList: AllocPtr failed - gSuperTileNormals");
+		DoFatalAlert("CreateSuperTileMemoryList: AllocPtr failed - gSuperTileNormals");
 
 
 			/* ALLOC UVS FOR ALL SUPERTILES */
 
 	gSuperTileUVs = AllocPtr(sizeof(OGLTextureCoord) * NUM_VERTICES_IN_SUPERTILE * MAX_SUPERTILES);
 	if (gSuperTileUVs == nil)
-		DoFatalAlert("\pCreateSuperTileMemoryList: AllocPtr failed - gSuperTileUVs");
+		DoFatalAlert("CreateSuperTileMemoryList: AllocPtr failed - gSuperTileUVs");
 
 
 			/* ALLOC TRIANGLE ARRAYS ALL SUPERTILES */
 
 	gSuperTileTriangles = AllocPtr(sizeof(MOTriangleIndecies) * NUM_TRIS_IN_SUPERTILE * MAX_SUPERTILES);
 	if (gSuperTileTriangles == nil)
-		DoFatalAlert("\pCreateSuperTileMemoryList: AllocPtr failed - gSuperTileTriangles");
+		DoFatalAlert("CreateSuperTileMemoryList: AllocPtr failed - gSuperTileTriangles");
 
 
 			/****************************************/
@@ -499,7 +499,7 @@ int	i;
 		}
 	}
 
-	DoFatalAlert("\pNo Free Supertiles!");
+	DoFatalAlert("No Free Supertiles!");
 	return(-1);											// ERROR, NO FREE BLOCKS!!!! SHOULD NEVER GET HERE!
 }
 

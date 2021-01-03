@@ -182,7 +182,7 @@ OGLSetupOutputType	*outputPtr;
 
 	outputPtr = (OGLSetupOutputType *)AllocPtr(sizeof(OGLSetupOutputType));
 	if (outputPtr == nil)
-		DoFatalAlert("\pOGL_SetupWindow: AllocPtr failed");
+		DoFatalAlert("OGL_SetupWindow: AllocPtr failed");
 
 
 				/* SETUP */
@@ -223,7 +223,7 @@ OGLSetupOutputType	*data;
 
 	data = *dataHandle;
 	if (data == nil)												// see if this setup exists
-		DoFatalAlert("\pOGL_DisposeWindowSetup: data == nil");
+		DoFatalAlert("OGL_DisposeWindowSetup: data == nil");
 
 			/* KILL DEBUG FONT */
 
@@ -323,7 +323,7 @@ static char			*s;
 		fmt = aglChoosePixelFormat(&gGDevice, 1, attrib2);							// try being less stringent
 		if ((fmt == NULL) || (aglGetError() != AGL_NO_ERROR))
 		{
-			DoFatalAlert("\paglChoosePixelFormat failed!  OpenGL could not initialize your video card for 3D.  Check that your video card meets the game's minimum system requirements.");
+			DoFatalAlert("aglChoosePixelFormat failed!  OpenGL could not initialize your video card for 3D.  Check that your video card meets the game's minimum system requirements.");
 		}
 	}
 
@@ -332,7 +332,7 @@ static char			*s;
 
 	gAGLContext = aglCreateContext(fmt, nil);
 	if ((gAGLContext == nil) || (aglGetError() != AGL_NO_ERROR))
-		DoFatalAlert("\pOGL_CreateDrawContext: aglCreateContext failed!");
+		DoFatalAlert("OGL_CreateDrawContext: aglCreateContext failed!");
 
 	agl_ctx = gAGLContext;
 
@@ -352,10 +352,10 @@ static char			*s;
 			{
 				gGamePrefs.showScreenModeDialog	= true;
 				SavePrefs();
-				DoFatalAlert("\pNot enough VRAM for the selected video mode.  Please try again and select a different mode.");
+				DoFatalAlert("Not enough VRAM for the selected video mode.  Please try again and select a different mode.");
 			}
 			else
-				DoFatalAlert("\pOGL_CreateDrawContext: aglSetDrawable failed!");
+				DoFatalAlert("OGL_CreateDrawContext: aglSetDrawable failed!");
 		}
 	}
 
@@ -407,7 +407,7 @@ static char			*s;
 
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
 	if (maxTexSize < 1024)
-		DoFatalAlert("\pYour video card cannot do 1024x1024 textures, so it is below the game's minimum system requirements.");
+		DoFatalAlert("Your video card cannot do 1024x1024 textures, so it is below the game's minimum system requirements.");
 
 
 				/* CLEAR BACK BUFFER ENTIRELY */
@@ -543,9 +543,9 @@ int	x,y,w,h;
 AGLContext agl_ctx = setupInfo->drawContext;
 
 	if (setupInfo == nil)										// make sure it's legit
-		DoFatalAlert("\pOGL_DrawScene setupInfo == nil");
+		DoFatalAlert("OGL_DrawScene setupInfo == nil");
 	if (!setupInfo->isActive)
-		DoFatalAlert("\pOGL_DrawScene isActive == false");
+		DoFatalAlert("OGL_DrawScene isActive == false");
 
   	aglSetCurrentContext(setupInfo->drawContext);			// make context active
 
@@ -679,80 +679,80 @@ do_anaglyph:
 		if (mem < gMinRAM)		// poll for lowest RAM free
 			gMinRAM = mem;
 
-		OGL_DrawString("\pinput x:", 20,y);
+		OGL_DrawString("input x:", 20,y);
 		OGL_DrawFloat(gPlayerInfo.analogControlX, 100,y);
 		y += 15;
-		OGL_DrawString("\pinput y:", 20,y);
+		OGL_DrawString("input y:", 20,y);
 		OGL_DrawFloat(gPlayerInfo.analogControlZ, 100,y);
 		y += 15;
 
-		OGL_DrawString("\pfps:", 20,y);
+		OGL_DrawString("fps:", 20,y);
 		OGL_DrawInt(gFramesPerSecond+.5f, 100,y);
 		y += 15;
 
-		OGL_DrawString("\p#tri:", 20,y);
+		OGL_DrawString("#tri:", 20,y);
 		OGL_DrawInt(gPolysThisFrame, 100,y);
 		y += 15;
 
-		OGL_DrawString("\p#scratchI:", 20,y);
+		OGL_DrawString("#scratchI:", 20,y);
 		OGL_DrawInt(gScratch, 100,y);
 		y += 15;
 
 #if 0
-		OGL_DrawString("\penemies:", 20,y);
+		OGL_DrawString("enemies:", 20,y);
 		OGL_DrawInt(gNumEnemies, 100,y);
 		y += 15;
 
-		OGL_DrawString("\pplayer Y:", 20,y);
+		OGL_DrawString("player Y:", 20,y);
 		OGL_DrawInt(gPlayerInfo.coord.y, 100,y);
 		y += 15;
 
 
-		OGL_DrawString("\p#free RAM:", 20,y);
+		OGL_DrawString("#free RAM:", 20,y);
 		OGL_DrawInt(mem, 100,y);
 		y += 15;
 
-		OGL_DrawString("\pmin RAM:", 20,y);
+		OGL_DrawString("min RAM:", 20,y);
 		OGL_DrawInt(gMinRAM, 100,y);
 		y += 15;
 
-		OGL_DrawString("\pused VRAM:", 20,y);
+		OGL_DrawString("used VRAM:", 20,y);
 		OGL_DrawInt(gVRAMUsedThisFrame, 100,y);
 		y += 15;
 
-		OGL_DrawString("\pOGL Mem:", 20,y);
+		OGL_DrawString("OGL Mem:", 20,y);
 		OGL_DrawInt(glmGetInteger(GLM_CURRENT_MEMORY), 100,y);
 		y += 15;
 
 
-		OGL_DrawString("\p#scratchF:", 20,y);
+		OGL_DrawString("#scratchF:", 20,y);
 		OGL_DrawFloat(gScratchF, 100,y);
 		y += 15;
 
-		OGL_DrawString("\p#t-defs:", 20,y);
+		OGL_DrawString("#t-defs:", 20,y);
 		OGL_DrawInt(gNumTerrainDeformations, 100,y);
 		y += 15;
 
-		OGL_DrawString("\p#sparkles:", 20,y);
+		OGL_DrawString("#sparkles:", 20,y);
 		OGL_DrawInt(gNumSparkles, 100,y);
 		y += 15;
 
 		if (gPlayerInfo.objNode)
 		{
-			OGL_DrawString("\pground?:", 20,y);
+			OGL_DrawString("ground?:", 20,y);
 			if (gPlayerInfo.objNode->StatusBits & STATUS_BIT_ONGROUND)
-				OGL_DrawString("\pY", 100,y);
+				OGL_DrawString("Y", 100,y);
 			else
-				OGL_DrawString("\pN", 100,y);
+				OGL_DrawString("N", 100,y);
 			y += 15;
 		}
 
 
-		OGL_DrawString("\p#H2O:", 20,y);
+		OGL_DrawString("#H2O:", 20,y);
 		OGL_DrawInt(gNumWaterDrawn, 100,y);
 		y += 15;
 
-		OGL_DrawString("\p#scratchI:", 20,y);
+		OGL_DrawString("#scratchI:", 20,y);
 		OGL_DrawInt(gScratch, 100,y);
 		y += 15;
 
@@ -760,7 +760,7 @@ do_anaglyph:
 
 
 
-//		OGL_DrawString("\p# pointers:", 20,y);
+//		OGL_DrawString("# pointers:", 20,y);
 //		OGL_DrawInt(gNumPointers, 100,y);
 //		y += 15;
 
@@ -831,11 +831,11 @@ AGLContext agl_ctx = gAGLContext;
 
 	glGenTextures(1, &textureName);
 	if (OGL_CheckError())
-		DoFatalAlert("\pOGL_TextureMap_Load: glGenTextures failed!");
+		DoFatalAlert("OGL_TextureMap_Load: glGenTextures failed!");
 
 	glBindTexture(GL_TEXTURE_2D, textureName);				// this is now the currently active texture
 	if (OGL_CheckError())
-		DoFatalAlert("\pOGL_TextureMap_Load: glBindTexture failed!");
+		DoFatalAlert("OGL_TextureMap_Load: glBindTexture failed!");
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
  		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -853,7 +853,7 @@ AGLContext agl_ctx = gAGLContext;
 			/* SEE IF RAN OUT OF MEMORY WHILE COPYING TO OPENGL */
 
 	if (OGL_CheckError())
-		DoFatalAlert("\pOGL_TextureMap_Load: glTexImage2D failed!");
+		DoFatalAlert("OGL_TextureMap_Load: glTexImage2D failed!");
 
 
 				/* SET THIS TEXTURE AS CURRENTLY ACTIVE FOR DRAWING */
@@ -1159,11 +1159,11 @@ AGLContext agl_ctx = gAGLContext;
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	if (OGL_CheckError())
-		DoFatalAlert("\pOGL_Texture_SetOpenGLTexture: glPixelStorei failed!");
+		DoFatalAlert("OGL_Texture_SetOpenGLTexture: glPixelStorei failed!");
 
 	glBindTexture(GL_TEXTURE_2D, textureName);
 	if (OGL_CheckError())
-		DoFatalAlert("\pOGL_Texture_SetOpenGLTexture: glBindTexture failed!");
+		DoFatalAlert("OGL_Texture_SetOpenGLTexture: glBindTexture failed!");
 
 
 	glGetError();
@@ -1367,7 +1367,7 @@ long			pixelSize;
 	SetRect(&r,0,0,width,height);
 	iErr = NewGWorld(&gworld,pixelSize, &r, nil, nil, 0);
 	if (iErr)
-		DoFatalAlert("\pOGL_BufferToGWorld: NewGWorld failed!");
+		DoFatalAlert("OGL_BufferToGWorld: NewGWorld failed!");
 
 	DoLockPixels(gworld);
 
@@ -1412,7 +1412,7 @@ long			pixelSize;
 
 
 		default:
-				DoFatalAlert("\pOGL_BufferToGWorld: Only 32/16 bit textures supported right now.");
+				DoFatalAlert("OGL_BufferToGWorld: Only 32/16 bit textures supported right now.");
 
 	}
 
@@ -1434,32 +1434,32 @@ AGLContext agl_ctx = gAGLContext;
 		switch(err)
 		{
 			case	GL_INVALID_ENUM:
-					DoAlert("\pOGL_CheckError: GL_INVALID_ENUM");
-					DoFatalAlert("\pThis typically means that you have a very old version of OpenGL installed.  Install OpenGL 1.2.1 or later.");
+					DoAlert("OGL_CheckError: GL_INVALID_ENUM");
+					DoFatalAlert("This typically means that you have a very old version of OpenGL installed.  Install OpenGL 1.2.1 or later.");
 					break;
 
 			case	GL_INVALID_VALUE:
-					DoAlert("\pOGL_CheckError: GL_INVALID_VALUE");
+					DoAlert("OGL_CheckError: GL_INVALID_VALUE");
 					break;
 
 			case	GL_INVALID_OPERATION:
-					DoAlert("\pOGL_CheckError: GL_INVALID_OPERATION");
+					DoAlert("OGL_CheckError: GL_INVALID_OPERATION");
 					break;
 
 			case	GL_STACK_OVERFLOW:
-					DoAlert("\pOGL_CheckError: GL_STACK_OVERFLOW");
+					DoAlert("OGL_CheckError: GL_STACK_OVERFLOW");
 					break;
 
 			case	GL_STACK_UNDERFLOW:
-					DoAlert("\pOGL_CheckError: GL_STACK_UNDERFLOW");
+					DoAlert("OGL_CheckError: GL_STACK_UNDERFLOW");
 					break;
 
 			case	GL_OUT_OF_MEMORY:
-					DoAlert("\pOGL_CheckError: GL_OUT_OF_MEMORY  (increase your Virtual Memory setting!)");
+					DoAlert("OGL_CheckError: GL_OUT_OF_MEMORY  (increase your Virtual Memory setting!)");
 					break;
 
 			default:
-					DoAlert("\pOGL_CheckError: some other error");
+					DoAlert("OGL_CheckError: some other error");
 					ShowSystemErr_NonFatal(err);
 		}
 	}
@@ -1493,7 +1493,7 @@ AGLContext agl_ctx = gAGLContext;
 	i = gStateStackIndex++;											// get stack index and increment
 
 	if (i >= STATE_STACK_SIZE)
-		DoFatalAlert("\pOGL_PushState: stack overflow");
+		DoFatalAlert("OGL_PushState: stack overflow");
 
 	gStateStack_Lighting[i] = gMyState_Lighting;
 	gStateStack_CullFace[i] = glIsEnabled(GL_CULL_FACE);
@@ -1530,7 +1530,7 @@ AGLContext agl_ctx = gAGLContext;
 	i = --gStateStackIndex;												// dec stack index
 
 	if (i < 0)
-		DoFatalAlert("\pOGL_PopState: stack underflow!");
+		DoFatalAlert("OGL_PopState: stack underflow!");
 
 	if (gStateStack_Lighting[i])
 		OGL_EnableLighting();
@@ -1609,7 +1609,7 @@ AGLContext agl_ctx = gAGLContext;
 	gFontList = glGenLists(256);
 
     if (!aglUseFont(gAGLContext, kFontIDMonaco, bold, 9, 0, 256, gFontList))
-		DoFatalAlert("\pOGL_InitFont: aglUseFont failed");
+		DoFatalAlert("OGL_InitFont: aglUseFont failed");
 }
 
 
@@ -1696,8 +1696,8 @@ Boolean			gotit = false;
 	head_info = aglQueryRendererInfo(&hGD, 1);
 	if(!head_info)
 	{
-		DoAlert("\pCheckRenderer: aglQueryRendererInfo failed");
-		DoFatalAlert("\pThis problem occurs if you have run the faulty MacOS 9.2.1 updater.  To fix, simply delete all Nvidia extensions and reboot.");
+		DoAlert("CheckRenderer: aglQueryRendererInfo failed");
+		DoFatalAlert("This problem occurs if you have run the faulty MacOS 9.2.1 updater.  To fix, simply delete all Nvidia extensions and reboot.");
 	}
 
 		/*******************************************/

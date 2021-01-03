@@ -562,7 +562,7 @@ MOTriangleIndecies	*triPtr;
 		if (numRings < 2)											// gotta be at least 2 to do anything
 			continue;
 		if (numRings > MAX_TENTACLE_SEGMENTS)
-			DoFatalAlert("\pDrawTentacles: numRings > MAX_TENTACLE_SEGMENTS");
+			DoFatalAlert("DrawTentacles: numRings > MAX_TENTACLE_SEGMENTS");
 
 		gTentacleMesh.numPoints 	= numRings * NUM_RING_POINTS;								// set # points in mesh
 		gTentacleMesh.numTriangles 	= (numRings-1) * (NUM_RING_POINTS-1) * 2;	// set # triangles in mesh

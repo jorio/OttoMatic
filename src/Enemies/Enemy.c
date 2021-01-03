@@ -81,7 +81,7 @@ void DeleteEnemy(ObjNode *theEnemy)
 		gNumEnemyOfKind[theEnemy->Kind]--;					// dec kind count
 		if (gNumEnemyOfKind[theEnemy->Kind] < 0)
 		{
-			DoAlert("\pDeleteEnemy: < 0");
+			DoAlert("DeleteEnemy: < 0");
 			gNumEnemyOfKind[theEnemy->Kind] = 0;
 		}
 

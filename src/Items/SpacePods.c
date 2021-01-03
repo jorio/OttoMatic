@@ -579,7 +579,7 @@ const int	numNubs = NUM_SPLINE_NUBS;
 
 	pointsPerSpan = MAX_POINTS_PER_SPAN; //OGLPoint3D_Distance(&nubPoints[0], &nubPoints[numNubs-1]) * .1f;		// # points per span is a function of the length of the spline, so measure from start to end
 //	if (pointsPerSpan > MAX_POINTS_PER_SPAN)
-//		DoFatalAlert("\pGenerateWormSplinePoints: pointsPerSpan > MAX_POINTS_PER_SPAN");
+//		DoFatalAlert("GenerateWormSplinePoints: pointsPerSpan > MAX_POINTS_PER_SPAN");
 
 
 		/* GET SPLINE INFO */
@@ -692,7 +692,7 @@ const int	numNubs = NUM_SPLINE_NUBS;
 		for (t = 0; t < (1.0f - EPS); t += dt)
 		{
 			if (numPoints >= MAX_SPLINE_POINTS)				// see if overflow
-				DoFatalAlert("\pGenerateWormSplinePoints: numPoints >= MAX_SPLINE_POINTS");
+				DoFatalAlert("GenerateWormSplinePoints: numPoints >= MAX_SPLINE_POINTS");
 
  			splinePoints[numPoints].x = ((a->x * t + b->x) * t + c->x) * t + d->x;		// save point
  			splinePoints[numPoints].y = ((a->y * t + b->y) * t + c->y) * t + d->y;

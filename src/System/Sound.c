@@ -325,7 +325,7 @@ FSSpec			spec;
 		mySndCmd.param2 = (long)&sndHdr;
 		if ((iErr = SndDoImmediate(gSndChannel[gMaxChannels], &mySndCmd)) != noErr)
 		{
-			DoAlert("\pInitSoundTools: SndDoImmediate failed!");
+			DoAlert("InitSoundTools: SndDoImmediate failed!");
 			ShowSystemErr_NonFatal(iErr);
 		}
 
@@ -335,7 +335,7 @@ FSSpec			spec;
 		mySndCmd.param2 = initNoInterp|initStereo;
 		if ((iErr = SndDoImmediate(gSndChannel[gMaxChannels], &mySndCmd)) != noErr)
 		{
-			DoAlert("\pInitSoundTools: SndDoImmediate failed 2!");
+			DoAlert("InitSoundTools: SndDoImmediate failed 2!");
 			ShowSystemErr_NonFatal(iErr);
 		}
 
@@ -345,7 +345,7 @@ FSSpec			spec;
 
 		/* LOAD DEFAULT SOUNDS */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Audio:Main.sounds", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Main.sounds", &spec);
 	LoadSoundBank(&spec, SOUND_BANK_MAIN);
 }
 
@@ -386,7 +386,7 @@ OSErr			iErr;
 	StopAllEffectChannels();
 
 	if (bankNum >= MAX_SOUND_BANKS)
-		DoFatalAlert("\pLoadSoundBank: bankNum >= MAX_SOUND_BANKS");
+		DoFatalAlert("LoadSoundBank: bankNum >= MAX_SOUND_BANKS");
 
 			/* DISPOSE OF EXISTING BANK */
 
@@ -397,7 +397,7 @@ OSErr			iErr;
 
 	srcFile1 = FSpOpenResFile(spec, fsRdPerm);
 	if (srcFile1 == -1)
-		DoFatalAlert("\pLoadSoundBank: OpenResFile failed!");
+		DoFatalAlert("LoadSoundBank: OpenResFile failed!");
 
 			/****************************/
 			/* LOAD ALL EFFECTS IN BANK */
@@ -406,7 +406,7 @@ OSErr			iErr;
 	UseResFile( srcFile1 );												// open sound resource fork
 	numSoundsInBank = Count1Resources('snd ');							// count # snd's in this bank
 	if (numSoundsInBank > MAX_EFFECTS)
-		DoFatalAlert("\pLoadSoundBank: numSoundsInBank > MAX_EFFECTS");
+		DoFatalAlert("LoadSoundBank: numSoundsInBank > MAX_EFFECTS");
 
 	for (i=0; i < numSoundsInBank; i++)
 	{
@@ -416,9 +416,9 @@ OSErr			iErr;
 		if (gSndHandles[bankNum][i] == nil)
 		{
 			iErr = ResError();
-			DoAlert("\pLoadSoundBank: GetResource failed!");
+			DoAlert("LoadSoundBank: GetResource failed!");
 			if (iErr == memFullErr)
-				DoFatalAlert("\pLoadSoundBank: Out of Memory");
+				DoFatalAlert("LoadSoundBank: Out of Memory");
 			else
 				ShowSystemErr(iErr);
 		}
@@ -589,21 +589,21 @@ GrafPtr	oldPort;
 
 Str32	songNames[] =
 {
-	"\p:Audio:ThemeSong.aif",
-	"\p:Audio:FarmSong.aif",
-	"\p:Audio:SlimeSong.aif",
-	"\p:Audio:SlimeBossSong.aif",
-	"\p:Audio:ApocalypseSong.aif",
-	"\p:Audio:CloudSong.aif",
-	"\p:Audio:JungleSong.aif",
-	"\p:Audio:JungleBoss.aif",
-	"\p:Audio:FireIceSong.aif",
-	"\p:Audio:SaucerSong.aif",
-	"\p:Audio:BonusSong.aif",
-	"\p:Audio:HighScoreSong.aif",
-	"\p:Audio:BrainBossSong.aif",
-	"\p:Audio:LoseSong.aif",
-	"\p:Audio:WinSong.aif",
+	":Audio:ThemeSong.aif",
+	":Audio:FarmSong.aif",
+	":Audio:SlimeSong.aif",
+	":Audio:SlimeBossSong.aif",
+	":Audio:ApocalypseSong.aif",
+	":Audio:CloudSong.aif",
+	":Audio:JungleSong.aif",
+	":Audio:JungleBoss.aif",
+	":Audio:FireIceSong.aif",
+	":Audio:SaucerSong.aif",
+	":Audio:BonusSong.aif",
+	":Audio:HighScoreSong.aif",
+	":Audio:BrainBossSong.aif",
+	":Audio:LoseSong.aif",
+	":Audio:WinSong.aif",
 };
 
 float	volumeTweaks[]=
@@ -642,7 +642,7 @@ float	volumeTweaks[]=
 
 	iErr = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID,songNames[songNum], &spec);
 	if (iErr)
-		DoFatalAlert("\pPlaySong: song file not found");
+		DoFatalAlert("PlaySong: song file not found");
 
 	volumeTweak = volumeTweaks[songNum];
 
@@ -764,7 +764,7 @@ u_long					leftVol, rightVol;
 
 	if (soundNum >= gNumSndsInBank[bankNum])					// see if illegal sound #
 	{
-		DoAlert("\pIllegal sound number!");
+		DoAlert("Illegal sound number!");
 		ShowSystemErr(effectNum);
 	}
 
@@ -805,7 +805,7 @@ u_long			leftVol, rightVol;
 
 	if (soundNum >= gNumSndsInBank[bankNum])					// see if illegal sound #
 	{
-		DoAlert("\pIllegal sound number!");
+		DoAlert("Illegal sound number!");
 		ShowSystemErr(effectNum);
 	}
 
@@ -1057,7 +1057,7 @@ SoundHeaderPtr   sndPtr;
 
 	if (soundNum >= gNumSndsInBank[bankNum])					// see if illegal sound #
 	{
-		DoAlert("\pIllegal sound number!");
+		DoAlert("Illegal sound number!");
 		ShowSystemErr(effectNum);
 	}
 

@@ -214,7 +214,7 @@ float	h;
 				break;
 
 		default:
-				DoFatalAlert("\pSetBlobColor: undefined blob color type");
+				DoFatalAlert("SetBlobColor: undefined blob color type");
 	}
 
 }
@@ -469,7 +469,7 @@ float	dx,dy,dz;
 					break;
 
 			default:
-					DoFatalAlert("\pKillBlob: illegal BlobColorType");
+					DoFatalAlert("KillBlob: illegal BlobColorType");
 		}
 
 

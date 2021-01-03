@@ -319,7 +319,7 @@ static const short weaponToModel[] =
 
 	i = FindWeaponInventoryIndex(weaponType);					// get index into inventory list
 	if (i == NO_INVENTORY_HERE)
-		DoFatalAlert("\pDecWeaponQuantity: weapon not in inventory");
+		DoFatalAlert("DecWeaponQuantity: weapon not in inventory");
 
 	type = gPlayerInfo.currentWeaponType;						// get current weapon type
 
@@ -552,7 +552,7 @@ Boolean	wasHoldingGun = gPlayerInfo.holdingGun;
 			// should never get here since we always have the fist!
 			//
 
-	DoFatalAlert("\pChangeWeapons: somehow the inventory is empty?!");
+	DoFatalAlert("ChangeWeapons: somehow the inventory is empty?!");
 }
 
 

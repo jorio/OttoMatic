@@ -390,16 +390,16 @@ const Byte	cloud[] =
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:spheremap.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:levelIntro.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:levelIntro.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_LEVELINTRO, gGameViewInfoPtr);
 	BlendASprite(SPRITE_GROUP_LEVELINTRO, LEVELINTRO_SObjType_FarmText);
 
 			/* LOAD MODELS */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:LevelIntro.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:LevelIntro.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_LEVELINTRO, gGameViewInfoPtr);
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_LEVELINTRO, INTRO_ObjType_IceSaucer,

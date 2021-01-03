@@ -78,7 +78,7 @@ float	timeout = 40.0f;
 
 	gBackgoundPicture = MO_CreateNewObjectOfType(MO_TYPE_PICTURE, (u_long)gGameViewInfoPtr, spec);
 	if (!gBackgoundPicture)
-		DoFatalAlert("\pDisplayPicture: MO_CreateNewObjectOfType failed");
+		DoFatalAlert("DisplayPicture: MO_CreateNewObjectOfType failed");
 
 
 
@@ -144,7 +144,7 @@ void DoLegalScreen(void)
 {
 FSSpec	spec;
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Images:Title", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Images:Title", &spec);
 
 	DisplayPicture(&spec);
 
@@ -162,7 +162,7 @@ void DoDemoExpiredScreen(void)
 {
 FSSpec	spec;
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Images:DemoExpired", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Images:DemoExpired", &spec);
 	DisplayPicture(&spec);
 	CleanQuit();
 }
@@ -176,7 +176,7 @@ FSSpec	spec;
 
 	SaveDemoTimer();						// make sure to save this before we bail
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Images:DemoQuit", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Images:DemoQuit", &spec);
 	DisplayPicture(&spec);
 
 }
@@ -200,7 +200,7 @@ Boolean			dialogDone = false;
 	myDialog = GetNewDialog(132,nil,MOVE_TO_FRONT);
 	if (!myDialog)
 	{
-		DoAlert("\pDoLevelCheatDialog: GetNewDialog failed!");
+		DoAlert("DoLevelCheatDialog: GetNewDialog failed!");
 		ShowSystemErr(ResError());
 	}
 
@@ -285,7 +285,7 @@ do_again:
     err = CreateWindowFromNib(gNibs,CFStringCreateWithCString(nil, rezNames[gGamePrefs.language],
     						kCFStringEncodingMacRoman), &dialogWindow);
 	if (err)
-		DoFatalAlert("\pDoGameSettingsDialog: CreateWindowFromNib failed!");
+		DoFatalAlert("DoGameSettingsDialog: CreateWindowFromNib failed!");
 
 			/* CREATE NEW WINDOW EVENT HANDLER */
 
@@ -457,7 +457,7 @@ Boolean			dialogDone;
 	myDialog = GetNewDialog(1000 + gGamePrefs.language,nil,MOVE_TO_FRONT);
 	if (myDialog == nil)
 	{
-		DoAlert("\pDoGameSettingsDialog: GetNewDialog failed!");
+		DoAlert("DoGameSettingsDialog: GetNewDialog failed!");
 		ShowSystemErr(gGamePrefs.language);
 	}
 
@@ -579,9 +579,9 @@ Boolean			dialogDone;
 
 void DoHTTPMultipleFailureWarning(void)
 {
-	DoAlert("\pOtto Matic needs to connect to the internet to get some information, but several attempts over many days have failed.");
-	DoAlert("\pPlease check that you do not have any firewall software blocking www.pangeasoft.net");
-	DoFatalAlert("\pIf you continue to have trouble, please contact support@pangeasoft.net");
+	DoAlert("Otto Matic needs to connect to the internet to get some information, but several attempts over many days have failed.");
+	DoAlert("Please check that you do not have any firewall software blocking www.pangeasoft.net");
+	DoFatalAlert("If you continue to have trouble, please contact support@pangeasoft.net");
 }
 
 

@@ -94,7 +94,7 @@ float					rot;
 		{
 			id = itemPtr[i].parm[0];								// get teleporter ID
 			if (id >= MAX_TELEPORTERS)
-				DoFatalAlert("\pInitTeleporters: ID# >= MAX_TELEPORTERS");
+				DoFatalAlert("InitTeleporters: ID# >= MAX_TELEPORTERS");
 
 			rot = gTeleporterRot[id] = itemPtr[i].parm[2] * (PI2/8.0f) + PI;			// get rot
 

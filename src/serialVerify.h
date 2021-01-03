@@ -54,11 +54,11 @@ Rect			itemRect;
                     	switch(gGamePrefs.language)
                     	{
                     		case	LANGUAGE_SPANISH:
-			                        DoAlert("\pLo sentimos, el número de serie no es válido.  Por favor inténtelo nuevamente.");
+			                        DoAlert("Lo sentimos, el número de serie no es válido.  Por favor inténtelo nuevamente.");
                     				break;
                     				
                     		default:
-			                        DoAlert("\pSorry, that serial number is not valid.  Please try again.");
+			                        DoAlert("Sorry, that serial number is not valid.  Please try again.");
 			            }
 						InitCursor();                        
                     }
@@ -71,7 +71,7 @@ Rect			itemRect;
             case    4:                                  // URL
             		if (gShareware)
 					{
-						if (LaunchURL("\phttp://www.pangeasoft.net/otto/serials.html") == noErr)
+						if (LaunchURL("http://www.pangeasoft.net/otto/serials.html") == noErr)
 		                    ExitToShell();
 					}
                     break;
@@ -231,7 +231,7 @@ try_shareware_code:
 				// The serials are stored in the Level 1 terrain file
 				//
 
-		if (FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Audio:Main.sounds", &spec) == noErr)		// open rez fork
+		if (FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Main.sounds", &spec) == noErr)		// open rez fork
 		{
 			short fRefNum = FSpOpenResFile(&spec,fsRdPerm);
 			

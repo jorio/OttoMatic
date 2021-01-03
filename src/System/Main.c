@@ -137,9 +137,9 @@ Boolean		noRTL,RTL;
 
 	gBundle = CFBundleGetMainBundle();
 	if (gBundle == nil)
-		DoFatalAlert("\pToolBoxInit: CFBundleGetMainBundle() failed!");
+		DoFatalAlert("ToolBoxInit: CFBundleGetMainBundle() failed!");
 	if (CreateNibReferenceWithCFBundle(gBundle, CFSTR(kDefaultNibFileName), &gNibs) != noErr)
-		DoFatalAlert("\pToolBoxInit: CreateNibReferenceWithCFBundle() failed!");
+		DoFatalAlert("ToolBoxInit: CreateNibReferenceWithCFBundle() failed!");
 
 
 
@@ -163,7 +163,7 @@ Boolean		noRTL,RTL;
 
 	iErr = Gestalt(gestaltQuickTime,&response);
 	if(iErr != noErr)
-		DoFatalAlert("\pThis application requires Quicktime 4 or newer");
+		DoFatalAlert("This application requires Quicktime 4 or newer");
 
 
 			/* SEE IF HAVE 4 */
@@ -171,7 +171,7 @@ Boolean		noRTL,RTL;
 	iErr = Gestalt(gestaltQuickTimeVersion,(long *)&vers);
 	if ((vers.majorRev < 4) ||
 		((vers.majorRev == 4) && (vers.minorAndBugRev < 0x11)))
-			DoFatalAlert("\pThis application requires Quicktime 4.1.1 or newer which you can download from www.apple.com/quicktime");
+			DoFatalAlert("This application requires Quicktime 4.1.1 or newer which you can download from www.apple.com/quicktime");
 
 
 			/* START QUICKTIME */
@@ -188,7 +188,7 @@ Boolean		noRTL,RTL;
 		switch(response)
 		{
 			case	gestaltCPU601:				// 601 is only that doesnt support it
-					DoFatalAlert("\pSorry, but this app will not run on a PowerPC 601, only on newer Macintoshes.");
+					DoFatalAlert("Sorry, but this app will not run on a PowerPC 601, only on newer Macintoshes.");
 					break;
 		}
 	}
@@ -202,8 +202,8 @@ Boolean		noRTL,RTL;
 	{
 		FSSpec	spc;
 
-		noRTL = (FSMakeFSSpec(0, 0, "\p:Data:Images:NORTL", &spc) == noErr);		// the presence of this file will tell us if it's shareware or boxed
-		RTL = (FSMakeFSSpec(0, 0, "\p:Data:Images:RTL", &spc) == noErr);
+		noRTL = (FSMakeFSSpec(0, 0, ":Data:Images:NORTL", &spc) == noErr);		// the presence of this file will tell us if it's shareware or boxed
+		RTL = (FSMakeFSSpec(0, 0, ":Data:Images:RTL", &spc) == noErr);
 
 		if (noRTL)
 			gShareware = true;

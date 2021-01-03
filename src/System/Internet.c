@@ -126,7 +126,7 @@ const char urlString[3][256] =
 			{
 				case	kURLInvalidURLError:
 invalid_url:
-						DoFatalAlert("\pThis application's checksum does not match.  Please reinstall the game.");
+						DoFatalAlert("This application's checksum does not match.  Please reinstall the game.");
 						break;
 
 			}
@@ -281,7 +281,7 @@ Boolean			dialogDone = false;
 short			itemType,itemHit;
 ControlHandle	itemHandle;
 Rect			itemRect;
-Str255			v = "\pVersion               ";
+Str255			v = "Version               ";
 
 	BlockMove(&s[1], &v[9], s[0]);				// copy version number string into full string
 
@@ -308,7 +308,7 @@ Str255			v = "\pVersion               ";
 					break;
 
             case    4:                                  // URL
-					if (LaunchURL("\phttp://www.pangeasoft.net/otto/updates.html") == noErr)
+					if (LaunchURL("http://www.pangeasoft.net/otto/updates.html") == noErr)
 	                    ExitToShell();
                     break;
 		}
@@ -387,7 +387,7 @@ short	fRefNum;
 			/* PREPARE TO SAVE BAD SERIALS INTO A DATA FILE */
 
 
-	if (FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Audio:Main.sounds", &spec) == noErr)
+	if (FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Main.sounds", &spec) == noErr)
 	{
 		fRefNum = FSpOpenResFile(&spec,fsRdWrPerm);
 		if (fRefNum != -1)
@@ -416,7 +416,7 @@ short	fRefNum;
 		{
 			hand = AllocHandle(SERIAL_LENGTH);							// alloc handle
 			BlockMove(&s[1], *hand, SERIAL_LENGTH);						// copy code into handle
-			AddResource(hand, 'savs', 128+count, "\p");					// write rez to file
+			AddResource(hand, 'savs', 128+count, "");					// write rez to file
 		}
 		WriteResource(hand);
 		ReleaseResource(hand);
@@ -439,7 +439,7 @@ short	fRefNum;
 	    if (iErr == noErr)
 		{
 			FSpDelete(&spec);											// delete the serial file
-			DoAlert("\pThe serial number being used is invalid.  Please enter a valid serial number to continue playing.");
+			DoAlert("The serial number being used is invalid.  Please enter a valid serial number to continue playing.");
 		}
 		gGamePrefs.lastVersCheckDate.year = 0;							// reset date so will check again next launch
 		SavePrefs();
@@ -554,7 +554,7 @@ OSStatus 	err;
 
 	if (gHTTPDataHandle == nil)
 	{
-		DoFatalAlert("\pDownloadURL: gHTTPDataHandle == nil");
+		DoFatalAlert("DownloadURL: gHTTPDataHandle == nil");
 
 	}
 
@@ -638,7 +638,7 @@ long endSel;
     {
 	    startSel = 0;
 	    endSel = urlStr[0];
-	    err = ICLaunchURL(inst, "\p", (char *) &urlStr[1], urlStr[0], &startSel, &endSel);
+	    err = ICLaunchURL(inst, "", (char *) &urlStr[1], urlStr[0], &startSel, &endSel);
         ICStop(inst);
     }
     return (err);

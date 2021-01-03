@@ -408,7 +408,7 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 
 			/* LOAD MODELS */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:mainmenu.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:mainmenu.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_MAINMENU, gGameViewInfoPtr);
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_MAINMENU, MAINMENU_ObjType_HelpIcon,
@@ -421,17 +421,17 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 							 -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Models:global.bg3d", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:global.bg3d", &spec);
 	ImportBG3D(&spec, MODEL_GROUP_GLOBAL, gGameViewInfoPtr);
 
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:spheremap.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
 	InitParticleSystem(gGameViewInfoPtr);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Sprites:helpfont.sprites", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:helpfont.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_FONT, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_FONT);
 
@@ -457,7 +457,7 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 
 				/* LOAD AUDIO */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, "\p:Audio:Menu.sounds", &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Menu.sounds", &spec);
 	LoadSoundBank(&spec, SOUND_BANK_MENU);
 
 
@@ -709,13 +709,13 @@ static void MakeIconString(void)
 ObjNode	*newObj;
 static Str31 strings[] =
 {
-	"\pPLAY GAME",
-	"\pLOAD SAVED GAME",
-	"\pHELP",
-	"\pQUIT",
-	"\pCREDITS",
-	"\pHIGH SCORES",
-	"\pSETTINGS"
+	"PLAY GAME",
+	"LOAD SAVED GAME",
+	"HELP",
+	"QUIT",
+	"CREDITS",
+	"HIGH SCORES",
+	"SETTINGS"
 };
 
 
@@ -1283,7 +1283,7 @@ static Boolean DoMainMenuControl(void)
 
 				case	SELECT_LOADSAVEDGAME:
 #if DEMO
-						DoAlert("\pSaved Games are not available in the demo version.");
+						DoAlert("Saved Games are not available in the demo version.");
 #else
 						if (LoadSavedGame())
 						{
