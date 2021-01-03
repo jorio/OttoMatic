@@ -4,7 +4,9 @@
 /* By Brian Greenstone      */
 /****************************/
 
+#if 0
 #include <mach/mach_port.h>
+#endif
 
 /***************/
 /* EXTERNALS   */
@@ -19,6 +21,7 @@ extern	PrefsType			gGamePrefs;
 /*     PROTOTYPES     */
 /**********************/
 
+#if 0
 static pascal OSStatus MyMouseEventHandler(EventHandlerCallRef eventhandler, EventRef pEventRef, void *userdata);
 static void Install_MouseEventHandler(void);
 static void UpdateMouseDeltas(void);
@@ -3159,6 +3162,57 @@ HICommand 			command;
     return result;
 }
 
+#endif
 
 
 
+
+
+
+void InitInput(void)
+{
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+}
+
+void UpdateInput(void)
+{
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+}
+
+Boolean GetNewKeyState(unsigned short key)
+{
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+	return false;
+}
+
+Boolean GetKeyState(unsigned short key)
+{
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+	return false;
+}
+
+Boolean AreAnyNewKeysPressed(void)
+{
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+	return false;
+}
+
+void ShutdownHID(void)
+{
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+}
+
+void DoInputConfigDialog(void)
+{
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+}
+
+void BuildHIDControlSettings(HIDControlSettingsType *settings)
+{
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+}
+
+void RestoreHIDControlSettings(HIDControlSettingsType *settings)
+{
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+}
