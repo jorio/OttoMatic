@@ -12,6 +12,7 @@
 #include "3dmath.h"
 
 //#include <AGL/aglmacro.h> // srcport rm
+#include <GL/glu.h>		// gluPerspective
 
 
 extern int				gNumObjectNodes,gNumPointers;
@@ -60,7 +61,7 @@ Byte					gAnaglyphPass;
 u_char					gAnaglyphGreyTable[255];
 
 
-AGLDrawable		gAGLWin;
+//AGLDrawable		gAGLWin;
 SDL_GLContext	gAGLContext = nil;
 
 static GLuint 			gFontList;
@@ -229,9 +230,9 @@ OGLSetupOutputType	*data;
 
 	OGL_FreeFont();
 
-  	aglSetCurrentContext(nil);								// make context not current
-   	aglSetDrawable(data->drawContext, nil);
-	aglDestroyContext(data->drawContext);					// nuke the AGL context
+	SOURCE_PORT_PLACEHOLDER();//aglSetCurrentContext(nil);								// make context not current
+	SOURCE_PORT_PLACEHOLDER();//aglSetDrawable(data->drawContext, nil);
+	SOURCE_PORT_PLACEHOLDER();//aglDestroyContext(data->drawContext);					// nuke the AGL context
 
 
 		/* FREE MEMORY & NIL POINTER */
@@ -250,12 +251,14 @@ OGLSetupOutputType	*data;
 
 static void OGL_CreateDrawContext(OGLViewDefType *viewDefPtr)
 {
-AGLPixelFormat 	fmt;
+//AGLPixelFormat 	fmt;
 GLboolean      mkc, ok;
+#if 0
 GLint          attribWindow[]	= {AGL_RGBA, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
 GLint          attrib32bit[] 	= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
 GLint          attrib16bit[] 	= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
 GLint          attrib2[] 		= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 16, AGL_ALL_RENDERERS, AGL_NONE};
+#endif
 SDL_GLContext agl_ctx;
 GLint			maxTexSize;
 static char			*s;
@@ -302,6 +305,9 @@ static char			*s;
 
 			/* PLAY IN WINDOW */
 
+#if 1
+			SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
 	if (!gPlayFullScreen)
 	{
 		fmt = aglChoosePixelFormat(&gGDevice, 1, attribWindow);
@@ -326,16 +332,24 @@ static char			*s;
 			DoFatalAlert("aglChoosePixelFormat failed!  OpenGL could not initialize your video card for 3D.  Check that your video card meets the game's minimum system requirements.");
 		}
 	}
+#endif
 
 
 			/* CREATE AGL CONTEXT & ATTACH TO WINDOW */
 
+#if 1
+SOURCE_PORT_PLACEHOLDER();
+#else
 	gAGLContext = aglCreateContext(fmt, nil);
 	if ((gAGLContext == nil) || (aglGetError() != AGL_NO_ERROR))
 		DoFatalAlert("OGL_CreateDrawContext: aglCreateContext failed!");
+#endif
 
 	agl_ctx = gAGLContext;
 
+#if 1
+	SOURCE_PORT_MINOR_PLACEHOLDER();	// fullscreen/non-fullscreen
+#else
 	if (gPlayFullScreen)
 	{
 		gAGLWin = nil;
@@ -358,10 +372,14 @@ static char			*s;
 				DoFatalAlert("OGL_CreateDrawContext: aglSetDrawable failed!");
 		}
 	}
+#endif
 
 
 			/* ACTIVATE CONTEXT */
 
+#if 1
+SOURCE_PORT_PLACEHOLDER();
+#else
 	mkc = aglSetCurrentContext(gAGLContext);
 	if ((mkc == nil) || (aglGetError() != AGL_NO_ERROR))
 		return;
@@ -370,6 +388,7 @@ static char			*s;
 			/* NO LONGER NEED PIXEL FORMAT */
 
 	aglDestroyPixelFormat(fmt);
+#endif
 
 
 
@@ -415,7 +434,7 @@ static char			*s;
 	glClearColor(0,0,0, 1.0);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glClear(GL_COLOR_BUFFER_BIT);
-	aglSwapBuffers(gAGLContext);
+	SOURCE_PORT_PLACEHOLDER(); //aglSwapBuffers(gAGLContext);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(viewDefPtr->clearColor.r, viewDefPtr->clearColor.g, viewDefPtr->clearColor.b, 1.0);
 
@@ -547,7 +566,7 @@ SDL_GLContext agl_ctx = setupInfo->drawContext;
 	if (!setupInfo->isActive)
 		DoFatalAlert("OGL_DrawScene isActive == false");
 
-  	aglSetCurrentContext(setupInfo->drawContext);			// make context active
+  	SOURCE_PORT_PLACEHOLDER(); //aglSetCurrentContext(setupInfo->drawContext);			// make context active
 
 
 			/* INIT SOME STUFF */
@@ -674,7 +693,7 @@ do_anaglyph:
 	if (gDebugMode > 0)
 	{
 		int		y = 100;
-		int		mem = FreeMem();
+		int		mem = 1 << 30; //FreeMem();   // TODO: maybe Pomme could monitor how much memory has been allocated
 
 		if (mem < gMinRAM)		// poll for lowest RAM free
 			gMinRAM = mem;
@@ -776,7 +795,7 @@ do_anaglyph:
 
            /* SWAP THE BUFFS */
 
-	aglSwapBuffers(setupInfo->drawContext);					// end render loop
+	SOURCE_PORT_PLACEHOLDER(); //aglSwapBuffers(setupInfo->drawContext);					// end render loop
 
 
 	if (gGamePrefs.anaglyph)
@@ -1337,89 +1356,6 @@ SDL_GLContext agl_ctx = gAGLContext;
 #pragma mark -
 
 
-/**************** OGL BUFFER TO GWORLD ***********************/
-
-GWorldPtr OGL_BufferToGWorld(Ptr buffer, int width, int height, int bytesPerPixel)
-{
-Rect			r;
-GWorldPtr		gworld;
-PixMapHandle	gworldPixmap;
-long			gworldRowBytes,x,y,pixmapRowbytes;
-Ptr				gworldPixelPtr;
-unsigned long	*pix32Src,*pix32Dest;
-unsigned short	*pix16Src,*pix16Dest;
-OSErr			iErr;
-long			pixelSize;
-
-			/* CREATE GWORLD TO DRAW INTO */
-
-	switch(bytesPerPixel)
-	{
-		case	2:
-				pixelSize = 16;
-				break;
-
-		case	4:
-				pixelSize = 32;
-				break;
-	}
-
-	SetRect(&r,0,0,width,height);
-	iErr = NewGWorld(&gworld,pixelSize, &r, nil, nil, 0);
-	if (iErr)
-		DoFatalAlert("OGL_BufferToGWorld: NewGWorld failed!");
-
-	DoLockPixels(gworld);
-
-	gworldPixmap = GetGWorldPixMap(gworld);
-	LockPixels(gworldPixmap);
-
-	gworldRowBytes = (**gworldPixmap).rowBytes & 0x3fff;					// get GWorld's rowbytes
-	gworldPixelPtr = GetPixBaseAddr(gworldPixmap);							// get ptr to pixels
-
-	pixmapRowbytes = width * bytesPerPixel;
-
-
-			/* WRITE DATA INTO GWORLD */
-
-	switch(pixelSize)
-	{
-		case	32:
-				pix32Src = (unsigned long *)buffer;							// get 32bit pointers
-				pix32Dest = (unsigned long *)gworldPixelPtr;
-				for (y = 0; y <  height; y++)
-				{
-					for (x = 0; x < width; x++)
-						pix32Dest[x] = pix32Src[x];
-
-					pix32Dest += gworldRowBytes/4;							// next dest row
-					pix32Src += pixmapRowbytes/4;
-				}
-				break;
-
-		case	16:
-				pix16Src = (unsigned short *)buffer;						// get 16bit pointers
-				pix16Dest = (unsigned short *)gworldPixelPtr;
-				for (y = 0; y <  height; y++)
-				{
-					for (x = 0; x < width; x++)
-						pix16Dest[x] = pix16Src[x];
-
-					pix16Dest += gworldRowBytes/2;							// next dest row
-					pix16Src += pixmapRowbytes/2;
-				}
-				break;
-
-
-		default:
-				DoFatalAlert("OGL_BufferToGWorld: Only 32/16 bit textures supported right now.");
-
-	}
-
-	return(gworld);
-}
-
-
 /******************** OGL: CHECK ERROR ********************/
 
 GLenum OGL_CheckError(void)
@@ -1608,8 +1544,12 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 	gFontList = glGenLists(256);
 
+#if 1
+	SOURCE_PORT_PLACEHOLDER();
+#else
     if (!aglUseFont(gAGLContext, kFontIDMonaco, bold, 9, 0, 256, gFontList))
 		DoFatalAlert("OGL_InitFont: aglUseFont failed");
+#endif
 }
 
 
@@ -1674,72 +1614,3 @@ Str255	s;
 	OGL_DrawString(s,x,y);
 
 }
-
-#pragma mark -
-
-
-/********************* OGL:  CHECK RENDERER **********************/
-//
-// Returns: true if renderer for the requested device complies, false otherwise
-//
-
-Boolean OGL_CheckRenderer (GDHandle hGD, long* vram)
-{
-AGLRendererInfo info, head_info;
-GLint 			dAccel = 0;
-Boolean			gotit = false;
-
-			/**********************/
-			/* GET FIRST RENDERER */
-			/**********************/
-
-	head_info = aglQueryRendererInfo(&hGD, 1);
-	if(!head_info)
-	{
-		DoAlert("CheckRenderer: aglQueryRendererInfo failed");
-		DoFatalAlert("This problem occurs if you have run the faulty MacOS 9.2.1 updater.  To fix, simply delete all Nvidia extensions and reboot.");
-	}
-
-		/*******************************************/
-		/* SEE IF THERE IS AN ACCELERATED RENDERER */
-		/*******************************************/
-
-	info = head_info;
-
-	while (info)
-	{
-		aglDescribeRenderer(info, AGL_ACCELERATED, &dAccel);
-
-				/* GOT THE ACCELERATED RENDERER */
-
-		if (dAccel)
-		{
-			gotit = true;
-
-					/* GET VRAM */
-
-			aglDescribeRenderer (info, AGL_TEXTURE_MEMORY, vram);
-
-
-
-
-			break;
-		}
-
-
-				/* TRY NEXT ONE */
-
-		info = aglNextRendererInfo(info);
-	}
-
-
-
-			/***********/
-			/* CLEANUP */
-			/***********/
-
-	aglDestroyRendererInfo(head_info);
-
-	return(gotit);
-}
-
