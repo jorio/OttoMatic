@@ -33,7 +33,6 @@ extern	u_short			**gTileGrid;
 extern	MOMaterialObject	*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];
 extern	PrefsType			gGamePrefs;
 extern	SDL_GLContext		gAGLContext;
-extern	AGLDrawable		gAGLWin;
 extern	Boolean			gSongPlayingFlag,gLowMemMode,gMuteMusicFlag,gMuteMusicFlag,gLoadedDrawSprocket,gOSX;
 //extern	Movie				gSongMovie;
 extern	WaterDefType	**gWaterListHandle, *gWaterList;
@@ -49,6 +48,7 @@ static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, 
 static void ReadDataFromPlayfieldFile(FSSpec *specPtr, OGLSetupOutputType *setupInfo);
 static void	ConvertTexture16To16(u_short *textureBuffer, int width, int height);
 
+#if 0	// srcport rm
 static OSErr GetFileWithNavServices(const FSSpecPtr defaultLocationfssPtr, FSSpec *documentFSSpec);
 pascal void myEventProc(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms,
 						NavCallBackUserData callBackUD);
@@ -58,6 +58,7 @@ static OSErr PutFileWithNavServices(NavReplyRecord *reply, FSSpec *outSpec);
 
 static Boolean FindSharedLib(ConstStrFileNameParam libName, FSSpec *spec);
 static UInt32	GetFileVersion(FSSpec *spec);
+#endif
 
 
 /****************************/
@@ -147,6 +148,8 @@ static	FSSpec	gApplicationFSSpec;								// spec of this application
 
 void SetDefaultDirectory(void)
 {
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+#if 0
 ProcessSerialNumber serial;
 ProcessInfoRec info;
 WDPBRec wpb;
@@ -167,6 +170,7 @@ OSErr	iErr;
 	wpb.ioNamePtr = NULL;
 
 	iErr = PBHSetVolSync(&wpb);
+#endif
 }
 
 
@@ -636,6 +640,9 @@ long				count;
 
 OSErr DrawPictureIntoGWorld(FSSpec *myFSSpec, GWorldPtr *theGWorld, short depth)
 {
+	SOURCE_PORT_PLACEHOLDER();
+	return unimpErr;
+#if 0
 OSErr						iErr;
 GraphicsImportComponent		gi;
 Rect						r;
@@ -716,6 +723,7 @@ FInfo						fndrInfo;
 		return(result);
 	}
 	return(noErr);
+#endif
 }
 
 
@@ -1833,6 +1841,7 @@ Boolean	blackOpaq;
 
 /************************ NAV SERVICES:  EVENT PROC *****************************/
 
+#if 0	// srcport rm
 pascal void myEventProc(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms,
 						NavCallBackUserData callBackUD)
 {
@@ -2164,6 +2173,7 @@ static Boolean FindSharedLib(ConstStrFileNameParam libName, FSSpec *spec)
 
 	return false;
 }
+#endif
 
 
 #pragma mark -
@@ -2176,6 +2186,9 @@ static Boolean FindSharedLib(ConstStrFileNameParam libName, FSSpec *spec)
 
 Boolean SaveGame(void)
 {
+	SOURCE_PORT_PLACEHOLDER();
+	return false;
+#if 0
 SaveGameType	saveData;
 short			fRefNum;
 FSSpec			*specPtr;
@@ -2265,6 +2278,7 @@ bail:
 	Exit2D();
 
 	return(success);
+#endif
 }
 
 
@@ -2272,6 +2286,9 @@ bail:
 
 Boolean LoadSavedGame(void)
 {
+	SOURCE_PORT_PLACEHOLDER();
+	return false;
+#if 0
 SaveGameType	saveData;
 short			fRefNum;
 long			count;
@@ -2341,6 +2358,7 @@ bail:
 //		PlaySong(oldSong, true);
 
 	return(success);
+#endif
 }
 
 
