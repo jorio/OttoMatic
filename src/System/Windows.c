@@ -9,7 +9,6 @@
 /* EXTERNALS   */
 /***************/
 
-#include	"windows.h"
 
 
 extern	NewObjectDefinitionType	gNewObjectDefinition;
