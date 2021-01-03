@@ -28,7 +28,6 @@ enum
 void DisplayPicture(FSSpec *spec);
 void DoPaused(void);
 
-Boolean DoFailedMenu(const Str31	headerString);
 void DoLegalScreen(void);
 Boolean DoLevelCheatDialog(void);
 void DoLevelIntro(void);
