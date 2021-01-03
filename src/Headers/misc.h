@@ -5,8 +5,8 @@
 #define SERIAL_LENGTH      12
 
 extern	void ShowSystemErr(long err);
-extern void	DoAlert(Str255);
-extern void	DoFatalAlert(Str255);
+extern void	DoAlert(const char*);
+extern void	DoFatalAlert(const char*);
 void DoAssert(const char* msg, const char* file, int line);
 extern unsigned char	*NumToHex(unsigned short);
 extern unsigned char	*NumToHex2(unsigned long, short);

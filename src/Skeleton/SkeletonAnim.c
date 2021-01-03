@@ -11,7 +11,6 @@
 
 #include "3dmath.h"
 
-extern	EventRecord			gTheEvent;
 extern	float				gFramesPerSecondFrac;
 extern	OGLPoint3D	gCoord;
 

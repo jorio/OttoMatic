@@ -13,6 +13,18 @@
 
 #include "3dmath.h"
 
+GLAPI void GLAPIENTRY glActiveTextureARB(GLenum texture)
+{
+	// TODO get proc
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+}
+
+GLAPI void GLAPIENTRY glClientActiveTextureARB(GLenum texture)
+{
+	// TODO get proc
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+}
+
 extern	Boolean			gMuteMusicFlag;
 extern	float			gCurrentAspectRatio;
 extern	SpriteType		*gSpriteGroupList[];
@@ -2158,6 +2170,7 @@ Rect			r;
 		DoFatalAlert("MO_GetTextureFromResource: AllocPtr failed!");
 
 	SOURCE_PORT_PLACEHOLDER();
+	return nil;
 #if 0
 	pictMapAddr = GetPixBaseAddr(hPixMap);
 	pictRowBytes = (u_long)(**hPixMap).rowBytes & 0x3fff;

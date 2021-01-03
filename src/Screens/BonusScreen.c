@@ -702,7 +702,12 @@ short	i;
 	{
 		Str255	s;
 
+#if 1
+		s[0] = sprintf(s+1, "SRCPORT TODO GETINDSTRING %d %d", 3000 + gGamePrefs.language, i + 1);
+		SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
 		GetIndString(s, 3000 + gGamePrefs.language, i + 1);
+#endif
 
 		gSaveIcons[i] = MakeFontStringObject(s, &gNewObjectDefinition, gGameViewInfoPtr, true);
 		gSaveIcons[i]->ColorFilter.a = 0;

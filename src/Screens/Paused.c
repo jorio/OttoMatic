@@ -134,7 +134,12 @@ short	i;
 	{
 		Str255	s;
 
+#if 1
+		s[0] = sprintf(s+1, "SRCPORT TODO GETINDSTRING %d %d", 2000 + gGamePrefs.language, i + 1);
+		SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
 		GetIndString(s, 2000 + gGamePrefs.language, i + 1);
+#endif
 
 		gPausedIcons[i] = MakeFontStringObject(s, &gNewObjectDefinition, gGameViewInfoPtr, true);
 		gPausedIcons[i]->ColorFilter.a = 0;

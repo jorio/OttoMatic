@@ -942,7 +942,12 @@ float	size;
 
 			/* GET THE STRING TEXT TO DISPLAY */
 
+#if 1
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+	gHelpString[0] = sprintf(gHelpString+1, "SRCPORT TODO GETINDSTRING %d %d", 1000 + gGamePrefs.language, messNum+1);
+#else
 	GetIndString(gHelpString, 1000 + gGamePrefs.language, messNum+1);
+#endif
 
 
 			/* CALC STRING PARAMETERS */

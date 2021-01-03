@@ -110,6 +110,8 @@ void NewScore(void)
 
 		if (!gDrawScoreVerbage)
 		{
+			SOURCE_PORT_MINOR_PLACEHOLDER(); // TODO: reimplement for SDL input
+#if 0
 			EventRecord 	theEvent;
 
 			GetNextEvent(keyDownMask|autoKeyMask, &theEvent);							// poll event queue
@@ -157,6 +159,7 @@ void NewScore(void)
 				}
 
 			}
+#endif
 		}
 	}
 

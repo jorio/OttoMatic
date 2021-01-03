@@ -28,7 +28,7 @@ extern	short		gMainAppRezFile;
 /****************************/
 
 static void DisplayPicture_Draw(OGLSetupOutputType *info);
-static pascal OSStatus DoGameSettingsDialog_EventHandler(EventHandlerCallRef myHandler, EventRef event, void* userData);
+//static pascal OSStatus DoGameSettingsDialog_EventHandler(EventHandlerCallRef myHandler, EventRef event, void* userData);
 
 
 /****************************/
@@ -191,6 +191,8 @@ FSSpec	spec;
 
 Boolean DoLevelCheatDialog(void)
 {
+	SOURCE_PORT_PLACEHOLDER();
+#if 0	// srcport: awaiting reimplementation
 DialogPtr 		myDialog;
 short			itemHit;
 Boolean			dialogDone = false;
@@ -233,7 +235,7 @@ Boolean			dialogDone = false;
 	GammaFadeOut();
 	GameScreenToBlack();
 
-
+#endif
 	return(false);
 }
 
@@ -245,6 +247,8 @@ Boolean			dialogDone = false;
 
 void DoGameSettingsDialog(void)
 {
+	SOURCE_PORT_PLACEHOLDER();
+#if 0	// srcport: awaiting reimplementation
 OSErr			err;
 EventTypeSpec	list[] = { { kEventClassCommand,  kEventProcessCommand } };
 WindowRef 		dialogWindow = nil;
@@ -372,12 +376,13 @@ do_again:
 
 	CalcFramesPerSecond();				// reset this so things dont go crazy when we return
 	CalcFramesPerSecond();
-
+#endif
 }
 
 
 /****************** DO GAME SETTINGS DIALOG EVENT HANDLER *************************/
 
+#if 0	// srcport: awaiting reimplementation
 static pascal OSStatus DoGameSettingsDialog_EventHandler(EventHandlerCallRef myHandler, EventRef event, void* userData)
 {
 #pragma unused (myHandler, userData)
@@ -429,6 +434,7 @@ HICommand 			command;
 
     return (result);
 }
+#endif
 
 #else
 

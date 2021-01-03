@@ -9,9 +9,8 @@
 /*    EXTERNALS             */
 /****************************/
 
-
 #include "3dmath.h"
-//#include <AGL/aglmacro.h> // srcport rm
+#include <GL/glu.h>		// gluPerspective
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond,gCurrentAspectRatio,gSpinningPlatformRot;
 extern	OGLPoint3D			gCoord;
