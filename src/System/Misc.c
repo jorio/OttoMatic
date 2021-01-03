@@ -165,6 +165,17 @@ OSErr	iErr;
 }
 
 
+/*********************** DO ASSERT *******************/
+
+void DoAssert(const char* msg, const char* file, int line)
+{
+	printf("GAME ASSERTION FAILED: %s - %s:%d\n", msg, file, line);
+	static char alertbuf[1024];
+	snprintf(alertbuf, 1024, "%s\n%s:%d", msg, file, line);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic: Assertion Failed!", alertbuf, /*gSDLWindow*/ nil);
+	ExitToShell();
+}
+
 
 /************ CLEAN QUIT ***************/
 
