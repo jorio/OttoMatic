@@ -19,7 +19,6 @@ extern	long	gPrefsFolderDirID;
 extern	Boolean				gMuteMusicFlag;
 extern	PrefsType			gGamePrefs;
 extern	Boolean			gSongPlayingFlag;
-extern	AGLDrawable		gAGLWin;
 extern	SDL_GLContext		gAGLContext;
 
 /****************************/
@@ -28,6 +27,7 @@ extern	SDL_GLContext		gAGLContext;
 
 static void MoveFadeEvent(ObjNode *theNode);
 
+#if 0	// srcport rm
 static void CreateDisplayModeList(void);
 pascal void ModeListCallback(void *userData, DMListIndexType a, DMDisplayModeListEntryPtr displaymodeInfo);
 pascal void ShowVideoMenuSelection (DialogPtr dlogPtr, short item);
@@ -35,6 +35,7 @@ static void CalcVRAMAfterBuffers(void);
 static void GetDisplayVRAM(void);
 static pascal OSStatus DoScreenModeDialog_EventHandler(EventHandlerCallRef myHandler, EventRef event, void* userData);
 static void BuildResolutionMenu(void);
+#endif
 
 
 /****************************/
@@ -61,8 +62,10 @@ u_long			gDisplayVRAM = 0;
 u_long			gVRAMAfterBuffers = 0;
 
 
+#if 0	// srcport rm
 WindowRef 		gDialogWindow = nil;
 EventHandlerUPP gWinEvtHandler;
+#endif
 
 
 WindowPtr		gGameWindow;
@@ -87,6 +90,7 @@ short			g2DStackDepth = 0;
 
 
 Boolean			gPlayFullScreen;
+#if 0	// srcport - awaiting reimplementation
 static	CGDirectDisplayID	gCGDisplayID;
 
 CGGammaValue gOriginalRedTable[256];
@@ -97,6 +101,7 @@ CGGammaValue gOriginalBlueTable[256];
 static CGGammaValue gGammaRedTable[256];
 static CGGammaValue gGammaGreenTable[256];
 static CGGammaValue gGammaBlueTable[256];
+#endif
 
 
 float		gGammaTweak = 1.0f;
@@ -106,6 +111,7 @@ float		gGammaTweak = 1.0f;
 
 void InitWindowStuff(void)
 {
+#if 0		// srcport - awaiting reimplementation
 Rect				r;
 float				w,h;
 CFDictionaryRef 	refDisplayMode = 0;
@@ -197,47 +203,7 @@ CGTableCount 		sampleCount;
 	gGameWindowWidth = r.right - r.left;
 	gGameWindowHeight = r.bottom - r.top;
 
-
-}
-
-
-
-
-/*==============================================================================
-* Dobold ()
-* this is the user item procedure to make the thick outline around the default
-* button (assumed to be item 1)
-*=============================================================================*/
-
-pascal void DoBold (DialogPtr dlogPtr, short item)
-{
-short		itype;
-Handle		ihandle;
-Rect		irect;
-
-#pragma unused (item)
-
-	GetDialogItem (dlogPtr, 1, &itype, (Handle *)&ihandle, &irect);	/* get the buttons rect */
-	PenSize (3, 3);											/* make thick lines	*/
-	InsetRect (&irect, -4, -4);							/* grow rect a little   */
-	FrameRoundRect (&irect, 16, 16);						/* frame the button now */
-	PenNormal ();
-}
-
-/*==============================================================================
-* DoOutline ()
-* this is the user item procedure to make the thin outline around the given useritem
-*=============================================================================*/
-
-pascal void DoOutline (DialogPtr dlogPtr, short item)
-{
-short		itype;
-Handle		ihandle;
-Rect		irect;
-
-	GetDialogItem (dlogPtr, item, &itype, (Handle *)&ihandle, &irect);	// get the user item's rect
-	FrameRect (&irect);						// frame the button now
-	PenNormal();
+#endif
 }
 
 
@@ -261,16 +227,20 @@ int			i;
 		if (gGammaFadePercent > 1.0f)
 			gGammaFadePercent = 1.0f;
 
+#if 1
+		SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
 	    for (i = 0; i < 256 ; i++)
 	    {
 	        gGammaRedTable[i] 	= gOriginalRedTable[i] * gGammaFadePercent * gGammaTweak;
 	        gGammaGreenTable[i] = gOriginalGreenTable[i] * gGammaFadePercent * gGammaTweak;
 	        gGammaBlueTable[i] 	= gOriginalBlueTable[i] * gGammaFadePercent * gGammaTweak;
 	    }
+#endif
 
 		Wait(1);
 
-		CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
+		SOURCE_PORT_MINOR_PLACEHOLDER(); //CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
 	}
 #endif
 }
@@ -293,16 +263,20 @@ int			i;
 		if (gGammaFadePercent < 0.0f)
 			gGammaFadePercent = 0.0f;
 
+#if 1
+		SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
 	    for (i = 0; i < 256 ; i++)
 	    {
 	        gGammaRedTable[i] 	= gOriginalRedTable[i] * gGammaFadePercent * gGammaTweak;
 	        gGammaGreenTable[i] = gOriginalGreenTable[i] * gGammaFadePercent * gGammaTweak;
 	        gGammaBlueTable[i] 	= gOriginalBlueTable[i] * gGammaFadePercent * gGammaTweak;
 	    }
+#endif
 
 		Wait(1);
 
-		CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
+		SOURCE_PORT_MINOR_PLACEHOLDER(); // CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
 
 	}
 #endif
@@ -321,7 +295,7 @@ void GammaOn(void)
 	{
 		gGammaFadePercent = 1.0f;
 
-	 	CGSetDisplayTransferByTable(0, 256, gOriginalRedTable, gOriginalGreenTable, gOriginalBlueTable);
+		SOURCE_PORT_MINOR_PLACEHOLDER(); // CGSetDisplayTransferByTable(0, 256, gOriginalRedTable, gOriginalGreenTable, gOriginalBlueTable);
 	}
 #endif
 }
@@ -343,6 +317,9 @@ void GammaOff(void)
 
 		gGammaFadePercent = 0.0f;
 
+#if 1
+		SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
 	    for (i = 0; i < 256 ; i++)
 	    {
 	        gGammaRedTable[i] 	= gOriginalRedTable[i] * gGammaFadePercent * gGammaTweak;
@@ -351,6 +328,7 @@ void GammaOff(void)
 	    }
 
 		CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
+#endif
 	}
 #endif
 }
@@ -362,7 +340,7 @@ void GammaOff(void)
 
 void CleanupDisplay(void)
 {
-	CGReleaseAllDisplays();
+	SOURCE_PORT_MINOR_PLACEHOLDER(); //CGReleaseAllDisplays();
 
 	gDisplayContextGrafPtr = nil;
 }
@@ -440,6 +418,9 @@ float	speed = theNode->Speed * fps;
 
 	if (gPlayFullScreen)
 	{
+#if 1
+		SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
 		int			i;
 
 	    for (i = 0; i < 256 ; i++)
@@ -450,6 +431,7 @@ float	speed = theNode->Speed * fps;
 	    }
 
 		CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
+#endif
 	}
 
 }
@@ -494,6 +476,9 @@ void Enter2D(void)
 	{
 		GammaOff();
 
+#if 1
+		SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
 		if (gAGLContext)
 		{
 			glFlush();
@@ -507,6 +492,7 @@ void Enter2D(void)
 			/* NEED TO UN-CAPTURE THE CG DISPLAY */
 
 		CGDisplayRelease(gCGDisplayID);
+#endif
 	}
 
 	GammaOn();
@@ -527,7 +513,9 @@ void Exit2D(void)
 
 	HideCursor();
 
-
+#if 1
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+#else
 	if (gPlayFullScreen)
 	{
 //		if (gAGLContext)
@@ -537,12 +525,14 @@ void Exit2D(void)
 				aglSetFullScreen(gAGLContext, 0, 0, 0, 0);		//re-enable GL
 		}
 	}
+#endif
 
 }
 
 
 #pragma mark -
 
+#if 0		// srcport rm -- unused in Otto Matic
 /*********************** DUMP GWORLD 2 **********************/
 //
 //    copies to a destination RECT
@@ -576,6 +566,7 @@ Rect			r;
 
 	SetGWorld(oldGW,oldGD);								// restore gworld
 }
+#endif
 
 
 /******************* DO LOCK PIXELS **************/
@@ -610,6 +601,9 @@ u_long	start;
 
 void DoScreenModeDialog(void)
 {
+#if 1
+	SOURCE_PORT_PLACEHOLDER();
+#else
 OSErr			err;
 EventHandlerRef	ref;
 EventTypeSpec	list[] = { { kEventClassCommand,  kEventProcessCommand } };
@@ -800,6 +794,7 @@ do_it:
 
 	CalcVRAMAfterBuffers();
 	SavePrefs();
+#endif
 }
 
 
@@ -808,6 +803,7 @@ do_it:
 // main window event handling
 //
 
+#if 0	// srcport rm
 static pascal OSStatus DoScreenModeDialog_EventHandler(EventHandlerCallRef myHandler, EventRef event, void* userData)
 {
 #pragma unused (myHandler, userData)
@@ -1119,3 +1115,4 @@ int	bufferSpace;
 
 
 
+#endif
