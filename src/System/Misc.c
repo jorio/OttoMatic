@@ -657,6 +657,8 @@ short	dataLen = inSourceStr[0] + 1;
 
 void CalcFramesPerSecond(void)
 {
+	SOURCE_PORT_PLACEHOLDER();
+#if 0
 AbsoluteTime currTime,deltaTime;
 static AbsoluteTime time = {0,0};
 Nanoseconds	nano;
@@ -679,6 +681,7 @@ slow_down:
 
 
 	time = currTime;	// reset for next time interval
+#endif
 }
 
 
@@ -708,6 +711,8 @@ int		i;
 
 void MyFlushEvents(void)
 {
+	SOURCE_PORT_MINOR_PLACEHOLDER();
+#if 0
 EventRecord 	theEvent;
 
 	FlushEvents (everyEvent, REMOVE_ALL_EVENTS);
@@ -721,6 +726,7 @@ EventRecord 	theEvent;
 
 	FlushEvents (everyEvent, REMOVE_ALL_EVENTS);
 	FlushEventQueue(GetMainEventQueue());
+#endif
 #endif
 }
 
