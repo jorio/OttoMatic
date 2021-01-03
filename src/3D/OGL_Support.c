@@ -61,7 +61,7 @@ u_char					gAnaglyphGreyTable[255];
 
 
 AGLDrawable		gAGLWin;
-AGLContext		gAGLContext = nil;
+SDL_GLContext	gAGLContext = nil;
 
 static GLuint 			gFontList;
 
@@ -256,7 +256,7 @@ GLint          attribWindow[]	= {AGL_RGBA, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32,
 GLint          attrib32bit[] 	= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
 GLint          attrib16bit[] 	= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
 GLint          attrib2[] 		= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 16, AGL_ALL_RENDERERS, AGL_NONE};
-AGLContext agl_ctx;
+SDL_GLContext agl_ctx;
 GLint			maxTexSize;
 static char			*s;
 
@@ -428,7 +428,7 @@ static char			*s;
 static void OGL_SetStyles(OGLSetupInputType *setupDefPtr)
 {
 OGLStyleDefType *styleDefPtr = &setupDefPtr->styles;
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 
 	glEnable(GL_CULL_FACE);									// activate culling
@@ -480,7 +480,7 @@ static void OGL_CreateLights(OGLLightDefType *lightDefPtr)
 {
 int		i;
 GLfloat	ambient[4];
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 	OGL_EnableLighting();
 
@@ -540,7 +540,7 @@ AGLContext agl_ctx = gAGLContext;
 void OGL_DrawScene(OGLSetupOutputType *setupInfo, void (*drawRoutine)(OGLSetupOutputType *))
 {
 int	x,y,w,h;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 	if (setupInfo == nil)										// make sure it's legit
 		DoFatalAlert("OGL_DrawScene setupInfo == nil");
@@ -816,7 +816,7 @@ GLuint OGL_TextureMap_Load(void *imageMemory, int width, int height,
 							GLint srcFormat,  GLint destFormat, GLint dataType)
 {
 GLuint	textureName;
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 
 	if (gGamePrefs.anaglyph)
@@ -1155,7 +1155,7 @@ u_long	a;
 
 void OGL_Texture_SetOpenGLTexture(GLuint textureName)
 {
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	if (OGL_CheckError())
@@ -1249,7 +1249,7 @@ float	aspect;
 OGLCameraPlacement	*placement;
 int		temp, w, h, i;
 OGLLightDefType	*lights;
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 	OGL_GetCurrentViewport(setupInfo, &temp, &temp, &w, &h);
 	aspect = (float)w/(float)h;
@@ -1425,7 +1425,7 @@ long			pixelSize;
 GLenum OGL_CheckError(void)
 {
 GLenum	err;
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 
 	err = glGetError();
@@ -1476,7 +1476,7 @@ AGLContext agl_ctx = gAGLContext;
 void OGL_PushState(void)
 {
 int	i;
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 		/* PUSH MATRIES WITH OPENGL */
 
@@ -1516,7 +1516,7 @@ AGLContext agl_ctx = gAGLContext;
 void OGL_PopState(void)
 {
 int		i;
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 		/* RETREIVE OPENGL MATRICES */
 
@@ -1581,7 +1581,7 @@ AGLContext agl_ctx = gAGLContext;
 
 void OGL_EnableLighting(void)
 {
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 	gMyState_Lighting = true;
 	glEnable(GL_LIGHTING);
@@ -1591,7 +1591,7 @@ AGLContext agl_ctx = gAGLContext;
 
 void OGL_DisableLighting(void)
 {
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 	gMyState_Lighting = false;
 	glDisable(GL_LIGHTING);
@@ -1604,7 +1604,7 @@ AGLContext agl_ctx = gAGLContext;
 
 static void OGL_InitFont(void)
 {
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 	gFontList = glGenLists(256);
 
@@ -1618,7 +1618,7 @@ AGLContext agl_ctx = gAGLContext;
 static void OGL_FreeFont(void)
 {
 
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 	glDeleteLists(gFontList, 256);
 
 }
@@ -1628,7 +1628,7 @@ AGLContext agl_ctx = gAGLContext;
 void OGL_DrawString(Str255 s, GLint x, GLint y)
 {
 
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 	OGL_PushState();
 

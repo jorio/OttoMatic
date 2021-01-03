@@ -27,7 +27,7 @@ extern	SplineDefType	**gSplineList;
 extern	SparkleType	gSparkles[MAX_SPARKLES];
 extern	short				gNumEnemies,gNumTerrainItems;
 extern	SpriteType	*gSpriteGroupList[];
-extern	AGLContext		gAGLContext;
+extern	SDL_GLContext		gAGLContext;
 extern	TerrainItemEntryType 	**gMasterItemList;
 extern	float			gCameraUserRotY,gTimeSinceLastThrust,gDischargeTimer,gCurrentMaxSpeed,gLevelCompletedCoolDownTimer;
 extern	ObjNode			*gFirstNodePtr;

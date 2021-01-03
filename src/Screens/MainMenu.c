@@ -21,7 +21,7 @@ extern	OGLVector3D	gDelta;
 extern	Boolean				gSongPlayingFlag,gOSX,gPlayingFromSavedGame;
 extern	PlayerInfoType	gPlayerInfo;
 extern	SparkleType	gSparkles[];
-extern	AGLContext		gAGLContext;
+extern	SDL_GLContext		gAGLContext;
 extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 extern	PrefsType			gGamePrefs;
 extern	HighScoreType	gHighScores[];
@@ -221,7 +221,7 @@ static void DrawMainMenuCallback(OGLSetupOutputType *info)
 
 static void DrawOttoLogo(OGLSetupOutputType *info)
 {
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 			/* SET STATE */
 
@@ -257,7 +257,7 @@ AGLContext agl_ctx = gAGLContext;
 
 static void DrawHighScores(OGLSetupOutputType *info)
 {
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 float	y;
 int		i,j,n;
 Str32	s;
@@ -1900,7 +1900,7 @@ ObjNode *text = glow->ChainNode;
 
 void DrawDarkenPane(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 
 	glDisable(GL_TEXTURE_2D);

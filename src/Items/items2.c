@@ -27,7 +27,7 @@ extern	int					gLevelNum;
 extern	SplineDefType	**gSplineList;
 extern	short				gNumEnemies;
 extern	SpriteType	*gSpriteGroupList[];
-extern	AGLContext		gAGLContext;
+extern	SDL_GLContext		gAGLContext;
 extern	SparkleType	gSparkles[MAX_SPARKLES];
 
 
@@ -233,7 +233,7 @@ float	fps = gFramesPerSecondFrac;
 
 static void DrawCloudPlatform(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 float	x,y,z;
 OGLMatrix4x4	m;
 int			i;

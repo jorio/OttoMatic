@@ -23,7 +23,7 @@ extern	OGLPoint3D	gCoord;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	SparkleType	gSparkles[];
 extern	int			gLevelNum;
-extern	AGLContext		gAGLContext;
+extern	SDL_GLContext		gAGLContext;
 extern	u_long				gGlobalMaterialFlags;
 extern	float				gGlobalTransparency;
 
@@ -221,7 +221,7 @@ float	oldTime,maxTime = 11.0f;
 
 static void DrawIntroCallback(OGLSetupOutputType *info)
 {
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 const short textSprites[] =
 {
 	LEVELINTRO_SObjType_FarmText,

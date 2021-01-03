@@ -359,7 +359,7 @@ Byte	trailType = gVaporTrails[t].type;
 void DrawVaporTrails(OGLSetupOutputType *setupInfo)
 {
 int		i;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 
 	OGL_PushState();
@@ -415,7 +415,7 @@ static void DrawVaporTrail_ColorStreak(int	i, OGLSetupOutputType *setupInfo)
 {
 u_long	w,p,n;
 float	size,dist;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 
 	n = gVaporTrails[i].numSegments;						// get # segments

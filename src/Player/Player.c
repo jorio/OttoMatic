@@ -690,7 +690,7 @@ int		i;
 
 void DrawRocketFlame(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 float		x,y,z,r,s;
 OGLMatrix4x4	m;
 const static OGLPoint3D vOff[4] =

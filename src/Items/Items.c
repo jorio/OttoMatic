@@ -28,7 +28,7 @@ extern	SplineDefType	**gSplineList;
 extern	SparkleType	gSparkles[MAX_SPARKLES];
 extern	short				gNumEnemies;
 extern	SpriteType	*gSpriteGroupList[];
-extern	AGLContext		gAGLContext;
+extern	SDL_GLContext		gAGLContext;
 extern	ObjNode				*gPlayerRocketSled,*gSoapBubble;
 extern	CollisionBoxType *gSaucerIceBounds;
 
@@ -198,7 +198,7 @@ OGLPoint3D cameraCoord = setupInfo->cameraPlacement.cameraLocation;
 static void DrawSaturnRing(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
 OGLPoint3D cameraCoord = setupInfo->cameraPlacement.cameraLocation;
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 
 		/* UPDATE CYCLORAMA COORD INFO */
@@ -1183,7 +1183,7 @@ OGLPoint3D			p;
 
 static void DrawSlimeFlow(ObjNode *slime, const OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 float	x,y,z,r,s,y2;
 float	v;
 int		tubeType;

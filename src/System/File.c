@@ -32,7 +32,7 @@ extern	TileAttribType	**gTileAttribList;
 extern	u_short			**gTileGrid;
 extern	MOMaterialObject	*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];
 extern	PrefsType			gGamePrefs;
-extern	AGLContext		gAGLContext;
+extern	SDL_GLContext		gAGLContext;
 extern	AGLDrawable		gAGLWin;
 extern	Boolean			gSongPlayingFlag,gLowMemMode,gMuteMusicFlag,gMuteMusicFlag,gLoadedDrawSprocket,gOSX;
 extern	Movie				gSongMovie;

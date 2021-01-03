@@ -14,7 +14,7 @@ extern	short		gMainAppRezFile;
 extern	Boolean		gOSX,gG4;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	int			gPolysThisFrame;
-extern	AGLContext		gAGLContext;
+extern	SDL_GLContext		gAGLContext;
 extern	AGLDrawable		gAGLWin;
 extern	FSSpec				gDataSpec;
 

@@ -21,7 +21,7 @@ extern	Boolean				gMuteMusicFlag;
 extern	PrefsType			gGamePrefs;
 extern	Boolean			gSongPlayingFlag;
 extern	AGLDrawable		gAGLWin;
-extern	AGLContext		gAGLContext;
+extern	SDL_GLContext		gAGLContext;
 
 /****************************/
 /*    PROTOTYPES            */

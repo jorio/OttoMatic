@@ -397,7 +397,7 @@ Boolean	reGen = false;			// assume no re-gen
 static void DrawAtom(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
 int			atomType = theNode->Type;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 static const OGLVector3D 	up = {0,1,0};
 OGLMatrix4x4				m;
 OGLPoint3D					tc[4];

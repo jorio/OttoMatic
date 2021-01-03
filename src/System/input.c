@@ -10,7 +10,7 @@
 /* EXTERNALS   */
 /***************/
 
-extern	AGLContext		gAGLContext;
+extern	SDL_GLContext		gAGLContext;
 extern	float			gFramesPerSecondFrac,gFramesPerSecond,gScratchF;
 extern	PrefsType			gGamePrefs;
 

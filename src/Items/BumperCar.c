@@ -28,7 +28,7 @@ extern	SplineDefType	**gSplineList;
 extern	SparkleType	gSparkles[MAX_SPARKLES];
 extern	short				gNumEnemies,gNumTerrainItems;
 extern	SpriteType	*gSpriteGroupList[];
-extern	AGLContext		gAGLContext;
+extern	SDL_GLContext		gAGLContext;
 extern	TerrainItemEntryType 	**gMasterItemList;
 extern	float			gCameraUserRotY,gTimeSinceLastThrust,gDischargeTimer;
 extern	ObjNode			*gFirstNodePtr;
@@ -1145,7 +1145,7 @@ short	area = theNode->AreaNum;
 static void DrawGeneratorBeams(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
 short	i,i2;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 float	x,y,z,x2,y2,z2,u,u2,yo;
 short	a;
 

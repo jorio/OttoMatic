@@ -389,7 +389,7 @@ static void MoveBrainStatic(ObjNode *theNode)
 
 static void DrawBrainStatic(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 OGLMatrix4x4	m;
 OGLPoint3D		pts[4];
 
@@ -1150,7 +1150,7 @@ ObjNode	*newObj;
 static void DrawPortalBeams(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
 short	i,i2;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 float	x,y,z,x2,y2,z2,u,u2,yo;
 
 #pragma unused(theNode)

@@ -548,7 +548,7 @@ float	dist,scaleX,scaleZ;
 static void DrawShadow(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
 int	shadowType = theNode->Kind;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 
 	OGL_PushState();

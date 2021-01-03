@@ -25,7 +25,7 @@ extern	int						gLevelNum,gScratch;
 extern	PlayerInfoType			gPlayerInfo;
 extern	FenceDefType			*gFenceList;
 extern	u_long					gGameFrameNum;
-extern	AGLContext		gAGLContext;
+extern	SDL_GLContext		gAGLContext;
 extern	OGLBoundingBox			gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 extern	float					gFramesPerSecond, gFramesPerSecondFrac;
 extern	WaterDefType	**gWaterListHandle;
@@ -905,7 +905,7 @@ static void DrawTerrain(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
 int				r,c;
 u_short			i,unique;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 Boolean			superTileVisible;
 
 #pragma unused(theNode)

@@ -19,7 +19,7 @@ extern	FSSpec	gDataSpec;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	u_long			gScore,gGlobalMaterialFlags,gLoadedScore;
 extern	Boolean			gPlayingFromSavedGame,gAllowAudioKeys;
-extern	AGLContext		gAGLContext;
+extern	SDL_GLContext		gAGLContext;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -350,7 +350,7 @@ static void DrawHighScoresCallback(OGLSetupOutputType *info)
 
 static void SetHighScoresSpriteState(void)
 {
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 	OGL_DisableLighting();
 	glDisable(GL_CULL_FACE);
@@ -375,7 +375,7 @@ static void DrawScoreVerbage(OGLSetupOutputType *info)
 Str32	s;
 int		texNum,n,i;
 float	x;
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 				/* SEE IF DONE */
 
@@ -440,7 +440,7 @@ AGLContext agl_ctx = gAGLContext;
 
 static void DrawHighScoresAndCursor(OGLSetupOutputType *info)
 {
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 float	y,cursorY,cursorX;
 int		i,j,n;
 Str32	s;

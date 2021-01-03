@@ -431,7 +431,7 @@ del:
 void DrawShards(const OGLSetupOutputType *setupInfo)
 {
 long	i;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 	if (gNumShards == 0)												// quick check if any particles at all
 		return;

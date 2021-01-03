@@ -19,7 +19,7 @@ extern	SpriteType		*gSpriteGroupList[];
 extern	long			gNumSpritesInGroupList[];
 extern	int				gPolysThisFrame,gVRAMUsedThisFrame;
 extern	Boolean			gMyState_Lighting;
-extern	AGLContext		gAGLContext;
+extern	SDL_GLContext		gAGLContext;
 extern	Byte			gDebugMode;
 extern	PrefsType			gGamePrefs;
 extern	Boolean			gSongPlayingFlag;
@@ -390,7 +390,7 @@ static void SetMetaObjectToMaterial(MOMaterialObject *matObj, MOMaterialData *in
 
 #if 0
 		{
-			AGLContext agl_ctx = gGameViewInfoPtr->drawContext;
+			SDL_GLContext agl_ctx = gGameViewInfoPtr->drawContext;
 
 			MO_DrawMaterial(matObj, gGameViewInfoPtr);		// safety prime ----------
 			glBegin(GL_TRIANGLES);
@@ -919,7 +919,7 @@ int	numChildren,i;
 void MO_DrawGeometry_VertexArray(const MOVertexArrayData *data, const OGLSetupOutputType *setupInfo)
 {
 Boolean		useTexture = false, multiTexture = false;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 u_long 	materialFlags;
 short	i;
 
@@ -1277,7 +1277,7 @@ MOMaterialData		*matData;
 OGLColorRGBA		*diffuseColor,diffColor2;
 Boolean				textureHasAlpha = false;
 Boolean				alreadySet;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 u_long				matFlags;
 
 			/* SEE IF THIS MATERIAL IS ALREADY SET AS CURRENT */
@@ -1405,7 +1405,7 @@ u_long				matFlags;
 void MO_DrawMatrix(const MOMatrixObject *matObj, const OGLSetupOutputType *setupInfo)
 {
 const OGLMatrix4x4		*m;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 	m = &matObj->matrix;							// point to matrix
 
@@ -1427,7 +1427,7 @@ float			x,y,z,xadj,yadj;
 const MOPictureData	*picData = &picObj->objectData;
 int				px,py,pw,ph;
 float			screenScaleX,screenScaleY;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 			/* INIT MATRICES */
 
@@ -1509,7 +1509,7 @@ void MO_DrawSprite(const MOSpriteObject *spriteObj, const OGLSetupOutputType *se
 {
 const MOSpriteData	*spriteData = &spriteObj->objectData;
 float			scaleX,scaleY,x,y,z;
-AGLContext agl_ctx = setupInfo->drawContext;
+SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 	x = spriteData->coord.x;
 	y = spriteData->coord.y;
@@ -1846,7 +1846,7 @@ void MO_DeleteObjectInfo_Geometry_VertexArray(MOVertexArrayData *data)
 static void MO_DeleteObjectInfo_Material(MOMaterialObject *obj)
 {
 MOMaterialData		*data = &obj->objectData;
-AGLContext agl_ctx = gAGLContext;
+SDL_GLContext agl_ctx = gAGLContext;
 
 		/* DISPOSE OF TEXTURE NAMES */
 
