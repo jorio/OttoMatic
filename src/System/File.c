@@ -588,8 +588,10 @@ long				count;
 
 		/* GET THE CURRENT CONTROL SETTINGS */
 
+#if 0 // srcport rm
 	if (!gHIDInitialized)								// can't save prefs unless HID is initialized!
 		return;
+#endif
 
 	BuildHIDControlSettings(&gGamePrefs.controlSettings);
 
