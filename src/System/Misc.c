@@ -15,7 +15,7 @@ extern	Boolean		gOSX,gG4;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	int			gPolysThisFrame;
 extern	SDL_GLContext		gAGLContext;
-extern	AGLDrawable		gAGLWin;
+extern	SDL_Window			*gSDLWindow;
 extern	FSSpec				gDataSpec;
 
 
@@ -65,6 +65,7 @@ Str255		numStr;
 
 	Enter2D();
 
+#if 0
 	if (gAGLContext)
 		aglSetDrawable(gAGLContext, nil);			// diable gl for dialog
 
@@ -73,6 +74,10 @@ Str255		numStr;
 	UseResFile(gMainAppRezFile);
 	NumToStringC(err, numStr);
 	DoAlert (numStr);
+#else
+	snprintf(numStr, sizeof(numStr), "System error: %ld", err);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", numStr, gSDLWindow);
+#endif
 
 
 	Exit2D();
@@ -90,6 +95,7 @@ Str255		numStr;
 
 	Enter2D();
 
+#if 0
 	if (gAGLContext)
 		aglSetDrawable(gAGLContext, nil);			// diable gl for dialog
 
@@ -97,6 +103,10 @@ Str255		numStr;
 	MyFlushEvents();
 	NumToStringC(err, numStr);
 	DoAlert (numStr);
+#else
+	snprintf(numStr, sizeof(numStr), "System error (non-fatal): %ld", err);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", numStr, gSDLWindow);
+#endif
 
 	Exit2D();
 
@@ -111,6 +121,7 @@ void DoAlert(const char* s)
 
 	Enter2D();
 
+#if 0
 	if (gAGLContext)
 		aglSetDrawable(gAGLContext, nil);			// diable gl for dialog
 
@@ -119,6 +130,9 @@ void DoAlert(const char* s)
 	MyFlushEvents();
 	ParamText(s,NIL_STRING,NIL_STRING,NIL_STRING);
 	NoteAlert(ERROR_ALERT_ID,nil);
+#else
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", s, gSDLWindow);
+#endif
 
 	Exit2D();
 
@@ -126,25 +140,9 @@ void DoAlert(const char* s)
 }
 
 
-/*********************** DO ALERT NUM *******************/
-
-void DoAlertNum(int n)
-{
-	GammaOn();
-
-	Enter2D();
-
-	NoteAlert(n,nil);
-
-	Exit2D();
-
-}
-
-
-
 /*********************** DO FATAL ALERT *******************/
 
-void DoFatalAlert(Str255 s)
+void DoFatalAlert(const char* s)
 {
 OSErr	iErr;
 
@@ -154,8 +152,7 @@ OSErr	iErr;
 
 	UseResFile(gMainAppRezFile);
 
-	ParamText(s,NIL_STRING,NIL_STRING,NIL_STRING);
-	iErr = NoteAlert(ERROR_ALERT_ID,nil);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", s, gSDLWindow);
 
 
 	Exit2D();
