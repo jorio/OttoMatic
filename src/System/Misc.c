@@ -51,8 +51,6 @@ Boolean	gLowMemMode = false;
 
 Str255  gSerialFileName = ":OttoMatic:Info";
 
-Boolean	gLittleSnitch = false;
-
 
 /**********************/
 /*     PROTOTYPES     */
@@ -594,8 +592,7 @@ void DrawCString(char *string)
 void VerifySystem(void)
 {
 OSErr	iErr;
-long		createdDirID, cpuSpeed;
-NumVersion	vers;
+long		createdDirID;
 
 	SetDefaultDirectory();							// be sure to get the default directory
 
@@ -609,77 +606,11 @@ NumVersion	vers;
 #endif
 	if (iErr)
 	{
-		DoAlertNum(133);
-		ExitToShell();
+		DoFatalAlert("Data folder not found.");
+		return;
 	}
 
 	gG4 = true;
-
-	if (!gG4)																// if not G4, check processor speed to see if on really fast G3
-	{
-		iErr = Gestalt(gestaltProcClkSpeed,&cpuSpeed);
-		if (iErr != noErr)
-			DoFatalAlert("VerifySystem: gestaltProcClkSpeed failed!");
-
-		if ((cpuSpeed/1000000) >= 600)										// must be at least 600mhz G3 for us to treat it like a G4
-			gG4 = true;
-	}
-
-
-		/* DETERMINE IF RUNNING ON OS X */
-
-	iErr = Gestalt(gestaltSystemVersion,(long *)&vers);
-	if (iErr != noErr)
-		DoFatalAlert("VerifySystem: gestaltSystemVersion failed!");
-
-	if (vers.stage >= 0x10)													// see if at least OS 10
-	{
-		gOSX = true;
-		if ((vers.stage == 0x10) && (vers.nonRelRev < 0x10))				// must be at least OS 10.1 !!!
-			DoFatalAlert("This game requires OS 10.1 or later to run on OS X.  Either upgrade to 10.1 or run the game on OS 9.");
-	}
-	else
-	{
-		gOSX = false;
-		if (vers.stage == 8)						// check for 8.6 also
-			if (vers.nonRelRev < 0x60)
-				DoFatalAlert("This game requires at least OS 8.6 with all the updates.");
-	}
-
-		/* REQUIRE CARBONLIB 1.2 */
-
-	iErr = Gestalt(gestaltCarbonVersion,(long *)&vers);
-	if (iErr)
-	{
-		ShowSystemErr_NonFatal(iErr);
-		goto carbonerr;
-	}
-	if (vers.stage == 1)
-	{
-		if (vers.nonRelRev < 0x20)
-		{
-carbonerr:
-			DoFatalAlert("This application requires CarbonLib 1.2 or newer.  Run Software Update, or install it from the Otto Matic CD.");
-		}
-	}
-
-
-#if !DEMO
-			/* CHECK TIME-BOMB */
-	{
-//		unsigned long secs;
-//		DateTimeRec	d;
-//
-//		GetDateTime(&secs);
-//		SecondsToDate(secs, &d);
-//
-//		if ((d.year > 2001) ||
-//			((d.year == 2001) && (d.month > 11)))
-//		{
-//			DoFatalAlert("Sorry, but this beta has expired");
-//		}
-	}
-#endif
 
 
 			/* CHECK PREFERENCES FOLDER */
@@ -690,115 +621,6 @@ carbonerr:
 		DoAlert("Warning: Cannot locate the Preferences folder.");
 
 	iErr = DirCreate(gPrefsFolderVRefNum,gPrefsFolderDirID,"OttoMatic",&createdDirID);		// make folder in there
-
-
-
-		/* CHECK MEMORY */
-	{
-		u_long	mem;
-		iErr = Gestalt(gestaltPhysicalRAMSize,(long *)&mem);
-		if (iErr == noErr)
-		{
-					/* CHECK FOR LOW-MEMORY SITUATIONS */
-
-			mem /= 1024;
-			mem /= 1024;
-			if (mem <= 64)						// see if have only 64 MB of real RAM or less installed
-			{
-				u_long	vmAttr;
-
-						/* MUST HAVE VM ON */
-
-				Gestalt(gestaltVMAttr,(long *)&vmAttr);	// get VM attribs to see if its ON
-				if (!(vmAttr & (1 << gestaltVMPresent)))
-				{
-					DoFatalAlert("This game needs at least 96MB of real RAM to run, however, turn on Virtual Memory, reboot your computer, and it might work.");
-				}
-				gLowMemMode = true;
-			}
-		}
-	}
-
-
-
-
-		/***********************************/
-		/* SEE IF LITTLE-SNITCH IS RUNNING */
-		/***********************************/
-
-
-	gLittleSnitch = false;
-
-#if ((DEMO == 0) && (OEM == 0))
-
-	{
-		ProcessSerialNumber psn = {kNoProcess, kNoProcess};
-		ProcessInfoRec	info;
-		Str255		s;
-
-		info.processName = s;
-		info.processInfoLength = sizeof(ProcessInfoRec);
-		info.processAppSpec = nil;
-
-		while(GetNextProcess(&psn) == noErr)
-		{
-			char	pname[256];
-			char	*matched;
-
-			iErr = GetProcessInformation(&psn, &info);
-			if (iErr)
-				break;
-
-			p2cstrcpy(pname, &s[0]);					// convert pstring to cstring
-
-			matched = strstr (pname, "Snitc");			// does "Snitc" appear anywhere in the process name?
-			if (matched != nil)
-			{
-				gLittleSnitch = true;
-				break;
-			}
-		}
-	}
-#endif
-
-
-
-		/***************************************/
-		/* SEE IF QUICKEN SCHEDULER IS RUNNING */
-		/***************************************/
-
-	{
-		ProcessSerialNumber psn = {kNoProcess, kNoProcess};
-		ProcessInfoRec	info;
-		short			i;
-		Str255		s;
-		const char snitch[] = "Quicken Scheduler";
-
-		info.processName = s;
-		info.processInfoLength = sizeof(ProcessInfoRec);
-		info.processAppSpec = nil;
-
-		while(GetNextProcess(&psn) == noErr)
-		{
-			iErr = GetProcessInformation(&psn, &info);
-			if (iErr)
-				break;
-
-			if (s[0] != snitch[0])					// see if string matches
-				goto next_process2;
-
-			for (i = 1; i <= s[0]; i++)
-			{
-				if (s[i] != snitch[i])
-					goto next_process2;
-			}
-
-			DoAlert("IMPORTANT:  Quicken Scheduler is known to cause certain keyboard access functions in OS X to malfunction.  If the keyboard does not appear to be working in this game, quit Quicken Scheduler to fix it.");
-
-next_process2:;
-		}
-	}
-
 }
 
 
