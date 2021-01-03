@@ -9,7 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include <AGL/aglmacro.h>
+//#include <AGL/aglmacro.h> // srcport rm
 
 #include "3dmath.h"
 

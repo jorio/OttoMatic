@@ -10,7 +10,7 @@
 /****************************/
 
 #include "3dmath.h"
-#include <AGL/aglmacro.h>
+//#include <AGL/aglmacro.h> // srcport rm
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGammaFadePercent;
 extern	FSSpec		gDataSpec;

@@ -10,7 +10,7 @@
 /***************/
 
 #include "3dmath.h"
-#include <AGL/aglmacro.h>
+//#include <AGL/aglmacro.h> // srcport rm
 
 extern	OGLBoundingBox	gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 extern	float		gFramesPerSecondFrac,gGlobalTransparency;
