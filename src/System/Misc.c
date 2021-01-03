@@ -73,7 +73,7 @@ Str255		numStr;
 	GammaOn();
 	MyFlushEvents();
 	UseResFile(gMainAppRezFile);
-	NumToString(err, numStr);
+	NumToStringC(err, numStr);
 	DoAlert (numStr);
 
 
@@ -97,7 +97,7 @@ Str255		numStr;
 
 		GammaOn();
 	MyFlushEvents();
-	NumToString(err, numStr);
+	NumToStringC(err, numStr);
 	DoAlert (numStr);
 
 	Exit2D();
@@ -107,7 +107,7 @@ Str255		numStr;
 
 /*********************** DO ALERT *******************/
 
-void DoAlert(Str255 s)
+void DoAlert(const char* s)
 {
 	GammaOn();
 
