@@ -72,11 +72,11 @@ enum
 
 typedef struct
 {
-	u_long	width,height;					// dimensions of texture
-	GLint	srcPixelFormat;					// OGL format (GL_RGBA, etc.) for internal
-	GLint	dstPixelFormat;					// format for VRAM
-	u_long	bufferSize;						// size of texture data to follow
-	u_long	reserved[4];					// for future use
+	uint32_t	width,height;					// dimensions of texture
+	int32_t		srcPixelFormat;					// OGL format (GL_RGBA, etc.) for internal
+	int32_t		dstPixelFormat;					// format for VRAM
+	uint32_t	bufferSize;						// size of texture data to follow
+	uint32_t	reserved[4];					// for future use
 }BG3DTextureHeader;
 
 
@@ -93,13 +93,13 @@ enum
 		
 typedef struct
 {
-	u_long	type;								// geometry type
-	long	numMaterials;						// # material layers
-	u_long	layerMaterialNum[MAX_MULTITEXTURE_LAYERS];	// index into material list
-	u_long	flags;								// flags
-	u_long	numPoints;							// (if applicable)
-	u_long	numTriangles;						// (if applicable)
-	u_long	reserved[4];						// for future use
+	uint32_t	type;								// geometry type
+	int32_t		numMaterials;						// # material layers
+	uint32_t	layerMaterialNum[MAX_MULTITEXTURE_LAYERS];	// index into material list
+	uint32_t	flags;								// flags
+	uint32_t	numPoints;							// (if applicable)
+	uint32_t	numTriangles;						// (if applicable)
+	uint32_t	reserved[4];						// for future use
 }BG3DGeometryHeader;
 
 

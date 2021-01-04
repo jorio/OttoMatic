@@ -190,7 +190,7 @@ long			count;
 
 static void ParseBG3DFile(short refNum)
 {
-u_long			tag;
+uint32_t		tag;
 long			count;
 Boolean			done = false;
 MetaObjectPtr 	newObj;
@@ -200,7 +200,7 @@ MetaObjectPtr 	newObj;
 			/* READ A TAG */
 
 		count = sizeof(tag);
-		if (FSRead(refNum, &count, &tag) != noErr)
+		if (FSRead(refNum, &count, (Ptr) &tag) != noErr)
 			DoFatalAlert("ParseBG3DFile: FSRead failed");
 
 		tag = SwizzleULong(&tag);
@@ -279,12 +279,12 @@ static void ReadMaterialFlags(short refNum)
 {
 long				count,i;
 MOMaterialData		data;
-u_long				flags;
+uint32_t			flags;
 
 			/* READ FLAGS */
 
 	count = sizeof(flags);
-	if (FSRead(refNum, &count, &flags) != noErr)
+	if (FSRead(refNum, &count, (Ptr) &flags) != noErr)
 		DoFatalAlert("ReadMaterialFlags: FSRead failed");
 
 	flags = SwizzleULong(&flags);
@@ -332,7 +332,7 @@ MOMaterialData	*data;
 			/* READ COLOR VALUE */
 
 	count = sizeof(GLfloat) * 4;
-	if (FSRead(refNum, &count, color) != noErr)
+	if (FSRead(refNum, &count, (Ptr) color) != noErr)
 		DoFatalAlert("ReadMaterialDiffuseColor: FSRead failed");
 
 
