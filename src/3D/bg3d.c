@@ -199,11 +199,7 @@ MetaObjectPtr 	newObj;
 	{
 			/* READ A TAG */
 
-		count = sizeof(tag);
-		if (FSRead(refNum, &count, (Ptr) &tag) != noErr)
-			DoFatalAlert("ParseBG3DFile: FSRead failed");
-
-		tag = SwizzleULong(&tag);
+		tag = FSReadBEULong(refNum);
 
 
 			/* HANDLE THE TAG */
@@ -283,11 +279,7 @@ uint32_t			flags;
 
 			/* READ FLAGS */
 
-	count = sizeof(flags);
-	if (FSRead(refNum, &count, (Ptr) &flags) != noErr)
-		DoFatalAlert("ReadMaterialFlags: FSRead failed");
-
-	flags = SwizzleULong(&flags);
+	flags = FSReadBEULong(refNum);
 
 
 		/* INIT NEW MATERIAL DATA */

@@ -116,10 +116,7 @@ MOMaterialData	matData;
 
 		/* READ # SPRITES IN THIS FILE */
 
-	count = sizeof(long);
-	FSRead(refNum, &count, &gNumSpritesInGroupList[groupNum]);
-
-	gNumSpritesInGroupList[groupNum] = SwizzleLong(&gNumSpritesInGroupList[groupNum]);
+	gNumSpritesInGroupList[groupNum] = FSReadBELong(refNum);
 
 
 		/* ALLOCATE MEMORY FOR SPRITE RECORDS */
@@ -138,40 +135,18 @@ MOMaterialData	matData;
 		long		bufferSize;
 		u_char *buffer;
 
-			/* READ WIDTH/HEIGHT, ASPECT RATIO */
+			/* READ WIDTH/HEIGHT, ASPECT RATIO, SRC/DEST FORMATS */
 
-		count = sizeof(int);
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].width);
-		gSpriteGroupList[groupNum][i].width = SwizzleLong(&gSpriteGroupList[groupNum][i].width);
-
-		count = sizeof(int);
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].height);
-		gSpriteGroupList[groupNum][i].height = SwizzleLong(&gSpriteGroupList[groupNum][i].height);
-
-		count = sizeof(float);
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].aspectRatio);
-		gSpriteGroupList[groupNum][i].aspectRatio = SwizzleFloat(&gSpriteGroupList[groupNum][i].aspectRatio);
-
-
-			/* READ SRC FORMAT */
-
-		count = sizeof(GLint);
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].srcFormat);
-		gSpriteGroupList[groupNum][i].srcFormat = SwizzleLong(&gSpriteGroupList[groupNum][i].srcFormat);
-
-
-			/* READ DEST FORMAT */
-
-		count = sizeof(GLint);
-		FSRead(refNum, &count, &gSpriteGroupList[groupNum][i].destFormat);
-		gSpriteGroupList[groupNum][i].destFormat = SwizzleLong(&gSpriteGroupList[groupNum][i].destFormat);
+		gSpriteGroupList[groupNum][i].width			= FSReadBELong(refNum);
+		gSpriteGroupList[groupNum][i].height		= FSReadBELong(refNum);
+		gSpriteGroupList[groupNum][i].aspectRatio	= FSReadBEFloat(refNum);
+		gSpriteGroupList[groupNum][i].srcFormat		= FSReadBELong(refNum);
+		gSpriteGroupList[groupNum][i].destFormat	= FSReadBELong(refNum);
 
 
 			/* READ BUFFER SIZE */
 
-		count = sizeof(int);
-		FSRead(refNum, &count, &bufferSize);
-		bufferSize = SwizzleLong(&bufferSize);
+		bufferSize = FSReadBELong(refNum);
 
 		buffer = AllocPtr(bufferSize);							// alloc memory for buffer
 		if (buffer == nil)
@@ -214,6 +189,7 @@ MOMaterialData	matData;
 
 		matData.texturePixels[0]= nil;											// we're going to preload
 
+#if 0
 			/* SEE IF NEED TO SHRINK FOR VOODOO 2 */
 
 		if (gLowMemMode)
@@ -278,6 +254,7 @@ MOMaterialData	matData;
 				matData.height /= 2;
 			}
 		}
+#endif
 
 					/* SPRITE IS 16-BIT PACKED PIXEL FORMAT */
 
