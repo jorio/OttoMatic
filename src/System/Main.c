@@ -223,7 +223,7 @@ NumVersion	vers;
 			/* DO BOOT CHECK FOR SCREEN MODE */
 			/*********************************/
 
-	DoScreenModeDialog();
+//	DoScreenModeDialog();
 
 
 	MyFlushEvents();
@@ -1112,7 +1112,7 @@ unsigned long	someLong;
 
 		/* SHOW LEGAL SCREEN */
 
-	DoLegalScreen();
+	SOURCE_PORT_MINOR_PLACEHOLDER(); //DoLegalScreen();
 
 
 		/* MAIN LOOP */

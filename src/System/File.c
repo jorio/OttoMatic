@@ -642,6 +642,7 @@ long				count;
 
 OSErr DrawPictureIntoGWorld(FSSpec *myFSSpec, GWorldPtr *theGWorld, short depth)
 {
+	printf("DrawPictureIntoGWorld: %s\n", myFSSpec->cName);
 	SOURCE_PORT_PLACEHOLDER();
 	return unimpErr;
 #if 0

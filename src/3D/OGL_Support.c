@@ -27,6 +27,9 @@ extern	PrefsType			gGamePrefs;
 extern	int				gGameWindowWidth,gGameWindowHeight,gScratch,gNumSparkles;
 extern	CGrafPtr				gDisplayContextGrafPtr;
 
+extern	SDL_Window		*gSDLWindow;
+
+
 /****************************/
 /*    PROTOTYPES            */
 /****************************/
@@ -252,8 +255,8 @@ OGLSetupOutputType	*data;
 static void OGL_CreateDrawContext(OGLViewDefType *viewDefPtr)
 {
 //AGLPixelFormat 	fmt;
-GLboolean      mkc, ok;
 #if 0
+GLboolean      mkc, ok;
 GLint          attribWindow[]	= {AGL_RGBA, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
 GLint          attrib32bit[] 	= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
 GLint          attrib16bit[] 	= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
@@ -338,7 +341,9 @@ static char			*s;
 			/* CREATE AGL CONTEXT & ATTACH TO WINDOW */
 
 #if 1
-SOURCE_PORT_PLACEHOLDER();
+	gAGLContext = SDL_GL_CreateContext(gSDLWindow);
+	GAME_ASSERT_MESSAGE(gAGLContext, SDL_GetError());
+	GAME_ASSERT(glGetError() == GL_NO_ERROR);
 #else
 	gAGLContext = aglCreateContext(fmt, nil);
 	if ((gAGLContext == nil) || (aglGetError() != AGL_NO_ERROR))
@@ -378,7 +383,8 @@ SOURCE_PORT_PLACEHOLDER();
 			/* ACTIVATE CONTEXT */
 
 #if 1
-SOURCE_PORT_PLACEHOLDER();
+	int mkc = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);
+	GAME_ASSERT_MESSAGE(mkc == 0, SDL_GetError());
 #else
 	mkc = aglSetCurrentContext(gAGLContext);
 	if ((mkc == nil) || (aglGetError() != AGL_NO_ERROR))
@@ -434,7 +440,7 @@ SOURCE_PORT_PLACEHOLDER();
 	glClearColor(0,0,0, 1.0);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glClear(GL_COLOR_BUFFER_BIT);
-	SOURCE_PORT_PLACEHOLDER(); //aglSwapBuffers(gAGLContext);
+	SDL_GL_SwapWindow(gSDLWindow);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(viewDefPtr->clearColor.r, viewDefPtr->clearColor.g, viewDefPtr->clearColor.b, 1.0);
 
@@ -1545,7 +1551,7 @@ SDL_GLContext agl_ctx = gAGLContext;
 	gFontList = glGenLists(256);
 
 #if 1
-	SOURCE_PORT_PLACEHOLDER();
+	SOURCE_PORT_MINOR_PLACEHOLDER();
 #else
     if (!aglUseFont(gAGLContext, kFontIDMonaco, bold, 9, 0, 256, gFontList))
 		DoFatalAlert("OGL_InitFont: aglUseFont failed");
@@ -1567,6 +1573,8 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 void OGL_DrawString(Str255 s, GLint x, GLint y)
 {
+SOURCE_PORT_MINOR_PLACEHOLDER(); return; // TODO: We need OGL_InitFont to work first
+
 
 SDL_GLContext agl_ctx = gAGLContext;
 

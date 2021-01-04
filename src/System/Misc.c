@@ -152,6 +152,7 @@ OSErr	iErr;
 
 	UseResFile(gMainAppRezFile);
 
+	printf("OTTO MATIC Fatal Alert: %s\n", s);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", s, gSDLWindow);
 
 
