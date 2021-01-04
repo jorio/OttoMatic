@@ -263,7 +263,9 @@ void OGL_UpdateCameraFromTo(OGLSetupOutputType *setupInfo, const OGLPoint3D *fro
 void OGL_Texture_SetOpenGLTexture(GLuint textureName);
 GLuint OGL_TextureMap_Load(void *imageMemory, int width, int height,
 							GLint srcFormat,  GLint destFormat, GLint dataType);
-GLenum OGL_CheckError(void);
+GLenum _OGL_CheckError(const char* file, int line);
+#define OGL_CheckError() _OGL_CheckError(__FILE__, __LINE__)
+
 void OGL_GetCurrentViewport(const OGLSetupOutputType *setupInfo, int *x, int *y, int *w, int *h);
 
 void OGL_PushState(void);

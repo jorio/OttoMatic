@@ -1364,50 +1364,18 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 /******************** OGL: CHECK ERROR ********************/
 
-GLenum OGL_CheckError(void)
+GLenum _OGL_CheckError(const char* file, const int line)
 {
-GLenum	err;
-SDL_GLContext agl_ctx = gAGLContext;
-
-
-	err = glGetError();
-	if (err != GL_NO_ERROR)
+	GLenum error = glGetError();
+	if (error != 0)
 	{
-		switch(err)
-		{
-			case	GL_INVALID_ENUM:
-					DoAlert("OGL_CheckError: GL_INVALID_ENUM");
-					DoFatalAlert("This typically means that you have a very old version of OpenGL installed.  Install OpenGL 1.2.1 or later.");
-					break;
-
-			case	GL_INVALID_VALUE:
-					DoAlert("OGL_CheckError: GL_INVALID_VALUE");
-					break;
-
-			case	GL_INVALID_OPERATION:
-					DoAlert("OGL_CheckError: GL_INVALID_OPERATION");
-					break;
-
-			case	GL_STACK_OVERFLOW:
-					DoAlert("OGL_CheckError: GL_STACK_OVERFLOW");
-					break;
-
-			case	GL_STACK_UNDERFLOW:
-					DoAlert("OGL_CheckError: GL_STACK_UNDERFLOW");
-					break;
-
-			case	GL_OUT_OF_MEMORY:
-					DoAlert("OGL_CheckError: GL_OUT_OF_MEMORY  (increase your Virtual Memory setting!)");
-					break;
-
-			default:
-					DoAlert("OGL_CheckError: some other error");
-					ShowSystemErr_NonFatal(err);
-		}
+		static char buf[256];
+		snprintf(buf, 256, "OpenGL Error 0x%x in %s:%d", error, file, line);
+		DoFatalAlert(buf);
 	}
-
-	return(err);
+	return error;
 }
+
 
 
 #pragma mark -
