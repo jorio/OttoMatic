@@ -49,4 +49,8 @@ void SwizzleVector3D(OGLVector3D *pt);
 void SwizzleUV(OGLTextureCoord *pt);
 
 
-
+int16_t FSReadBEShort(short refNum);
+uint16_t FSReadBEUShort(short refNum);
+int32_t FSReadBELong(short refNum);
+uint32_t FSReadBEULong(short refNum);
+float FSReadBEFloat(short refNum);
