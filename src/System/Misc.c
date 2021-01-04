@@ -739,9 +739,9 @@ EventRecord 	theEvent;
 
 /********************* SWIZZLE SHORT **************************/
 
-short SwizzleShort(short *shortPtr)
+int16_t SwizzleShort(int16_t *shortPtr)
 {
-short	theShort = *shortPtr;
+int16_t	theShort = *shortPtr;
 
 #if __LITTLE_ENDIAN__
 
@@ -757,9 +757,9 @@ short	theShort = *shortPtr;
 
 /********************* SWIZZLE USHORT **************************/
 
-u_short SwizzleUShort(u_short *shortPtr)
+uint16_t SwizzleUShort(uint16_t *shortPtr)
 {
-u_short	theShort = *shortPtr;
+uint16_t	theShort = *shortPtr;
 
 #if __LITTLE_ENDIAN__
 
@@ -776,9 +776,9 @@ u_short	theShort = *shortPtr;
 
 /********************* SWIZZLE LONG **************************/
 
-long SwizzleLong(long *longPtr)
+int32_t SwizzleLong(int32_t *longPtr)
 {
-long	theLong = *longPtr;
+int32_t	theLong = *longPtr;
 
 #if __LITTLE_ENDIAN__
 
@@ -797,9 +797,9 @@ long	theLong = *longPtr;
 
 /********************* SWIZZLE U LONG **************************/
 
-u_long SwizzleULong(u_long *longPtr)
+uint32_t SwizzleULong(uint32_t *longPtr)
 {
-u_long	theLong = *longPtr;
+uint32_t	theLong = *longPtr;
 
 #if __LITTLE_ENDIAN__
 
@@ -822,7 +822,7 @@ u_long	theLong = *longPtr;
 float SwizzleFloat(float *floatPtr)
 {
 float	*theFloat;
-u_long	bytes = SwizzleULong((u_long *)floatPtr);
+uint32_t	bytes = SwizzleULong((uint32_t *)floatPtr);
 
 	theFloat = (float *)&bytes;
 

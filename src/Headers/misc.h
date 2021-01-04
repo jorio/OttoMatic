@@ -39,11 +39,11 @@ void MyFlushEvents(void);
 
 
 
-short SwizzleShort(short *shortPtr);
-long SwizzleLong(long *longPtr);
+int16_t SwizzleShort(int16_t *shortPtr);
+int32_t SwizzleLong(int32_t *longPtr);
 float SwizzleFloat(float *floatPtr);
-u_long SwizzleULong(u_long *longPtr);
-u_short SwizzleUShort(u_short *shortPtr);
+uint32_t SwizzleULong(uint32_t *longPtr);
+uint16_t SwizzleUShort(uint16_t *shortPtr);
 void SwizzlePoint3D(OGLPoint3D *pt);
 void SwizzleVector3D(OGLVector3D *pt);
 void SwizzleUV(OGLTextureCoord *pt);
