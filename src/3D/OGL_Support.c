@@ -581,7 +581,8 @@ SDL_GLContext agl_ctx = setupInfo->drawContext;
 	if (!setupInfo->isActive)
 		DoFatalAlert("OGL_DrawScene isActive == false");
 
-  	SOURCE_PORT_PLACEHOLDER(); //aglSetCurrentContext(setupInfo->drawContext);			// make context active
+	int makeCurrentRC = SDL_GL_MakeCurrent(gSDLWindow, setupInfo->drawContext);		// make context active
+	GAME_ASSERT_MESSAGE(makeCurrentRC == 0, SDL_GetError());
 
 
 			/* INIT SOME STUFF */
@@ -810,7 +811,7 @@ do_anaglyph:
 
            /* SWAP THE BUFFS */
 
-	SOURCE_PORT_PLACEHOLDER(); //aglSwapBuffers(setupInfo->drawContext);					// end render loop
+	SDL_GL_SwapWindow(gSDLWindow);					// end render loop
 
 
 	if (gGamePrefs.anaglyph)

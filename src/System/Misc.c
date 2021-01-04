@@ -131,6 +131,7 @@ void DoAlert(const char* s)
 	ParamText(s,NIL_STRING,NIL_STRING,NIL_STRING);
 	NoteAlert(ERROR_ALERT_ID,nil);
 #else
+	printf("OTTO MATIC Alert: %s\n", s);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", s, gSDLWindow);
 #endif
 
@@ -658,7 +659,16 @@ short	dataLen = inSourceStr[0] + 1;
 
 void CalcFramesPerSecond(void)
 {
-	SOURCE_PORT_PLACEHOLDER();
+	static UnsignedWide time;
+	UnsignedWide currTime;
+	unsigned long deltaTime;
+
+slow_down:
+	Microseconds(&currTime);
+	deltaTime = currTime.lo - time.lo;
+
+	gFramesPerSecond = 1000000.0f / deltaTime;
+
 #if 0
 AbsoluteTime currTime,deltaTime;
 static AbsoluteTime time = {0,0};
@@ -672,6 +682,7 @@ slow_down:
 
 	gFramesPerSecond = 1000000.0f / (float)nano.lo;
 	gFramesPerSecond *= 1000.0f;
+#endif
 
 	if (gFramesPerSecond > 100)					// keep from going over 100fps (there were problems in 2.0 of frame rate precision loss)
 		goto slow_down;
@@ -680,9 +691,9 @@ slow_down:
 		gFramesPerSecond = DEFAULT_FPS;
 	gFramesPerSecondFrac = 1.0f/gFramesPerSecond;		// calc fractional for multiplication
 
+//printf("FPS: %f\n", gFramesPerSecond);
 
 	time = currTime;	// reset for next time interval
-#endif
 }
 
 
@@ -907,5 +918,6 @@ float FSReadBEFloat(short refNum)
 	GAME_ASSERT(err == noErr);
 	return SwizzleFloat(&result);
 }
+
 
 
