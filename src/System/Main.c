@@ -1070,7 +1070,7 @@ static void CleanupLevel(void)
 /************************************************************/
 
 
-int main(void)
+int GameMain(void)
 {
 unsigned long	someLong;
 

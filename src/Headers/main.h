@@ -56,7 +56,6 @@ extern	IBNibRef 			gNibs;
 extern	CFBundleRef 		gBundle;
 #endif
 
-extern	int main(void);
 extern	void ToolBoxInit(void);
 void MoveEverything(void);
 void InitDefaultPrefs(void);
