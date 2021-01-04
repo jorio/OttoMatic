@@ -192,8 +192,13 @@ OGLSetupOutputType	*outputPtr;
 				/* SETUP */
 
 	OGL_CreateDrawContext(&setupDefPtr->view);
+	OGL_CheckError();
+
 	OGL_SetStyles(setupDefPtr);
+	OGL_CheckError();
+
 	OGL_CreateLights(&setupDefPtr->lights);
+	OGL_CheckError();
 
 
 				/* PASS BACK INFO */
@@ -464,11 +469,13 @@ SDL_GLContext agl_ctx = gAGLContext;
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		// set default blend func
 	glDisable(GL_BLEND);									// but turn it off by default
 
-	glHint(GL_TRANSFORM_HINT_APPLE, GL_FASTEST);
+//	glHint(GL_TRANSFORM_HINT_APPLE, GL_FASTEST);	// srcport rm
+
 	glDisable(GL_RESCALE_NORMAL);
 
     glHint(GL_FOG_HINT, GL_NICEST);		// pixel accurate fog?
 
+	OGL_CheckError();
 
 			/* ENABLE ALPHA CHANNELS */
 
@@ -491,6 +498,8 @@ SDL_GLContext agl_ctx = gAGLContext;
 	}
 	else
 		glDisable(GL_FOG);
+
+	OGL_CheckError();
 }
 
 
@@ -841,7 +850,6 @@ GLuint OGL_TextureMap_Load(void *imageMemory, int width, int height,
 							GLint srcFormat,  GLint destFormat, GLint dataType)
 {
 GLuint	textureName;
-SDL_GLContext agl_ctx = gAGLContext;
 
 
 	if (gGamePrefs.anaglyph)
