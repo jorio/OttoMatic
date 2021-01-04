@@ -459,7 +459,7 @@ OSErr	err;
 void *AllocPtr(long size)
 {
 Ptr	pr;
-u_long	*cookiePtr;
+uint32_t	*cookiePtr;
 
 	size += 16;								// make room for our cookie & whatever else (also keep to 16-byte alignment!)
 
@@ -471,7 +471,7 @@ u_long	*cookiePtr;
 	if (pr == nil)
 		DoFatalAlert("AllocPtr: NewPtr failed");
 
-	cookiePtr = (u_long *)pr;
+	cookiePtr = (uint32_t *)pr;
 
 	*cookiePtr++ = 'FACE';
 	*cookiePtr++ = 'PTR2';
@@ -491,7 +491,7 @@ u_long	*cookiePtr;
 void *AllocPtrClear(long size)
 {
 Ptr	pr;
-u_long	*cookiePtr;
+uint32_t	*cookiePtr;
 
 	size += 16;								// make room for our cookie & whatever else (also keep to 16-byte alignment!)
 
@@ -504,7 +504,7 @@ u_long	*cookiePtr;
 	if (pr == nil)
 		DoFatalAlert("AllocPtr: NewPtr failed");
 
-	cookiePtr = (u_long *)pr;
+	cookiePtr = (uint32_t *)pr;
 
 	*cookiePtr++ = 'FACE';
 	*cookiePtr++ = 'PTC2';
@@ -523,11 +523,11 @@ u_long	*cookiePtr;
 
 void SafeDisposePtr(Ptr ptr)
 {
-u_long	*cookiePtr;
+uint32_t	*cookiePtr;
 
 	ptr -= 16;					// back up to pt to cookie
 
-	cookiePtr = (u_long *)ptr;
+	cookiePtr = (uint32_t *)ptr;
 
 	if (*cookiePtr != 'FACE')
 		DoFatalAlert("SafeSafeDisposePtr: invalid cookie!");
