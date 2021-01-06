@@ -100,7 +100,7 @@ typedef struct SuperTileMemoryType SuperTileMemoryType;
 
 typedef struct 
 {
-	u_short			flags;
+	uint16_t		flags;
 	Byte			parm[2];
 }TileAttribType;
 
@@ -109,14 +109,14 @@ typedef struct
 typedef struct
 {
 	Boolean		    isEmpty;									// true if supertile is empty
-	u_short		    superTileID;								// ID # of supertile to use here
+	uint16_t		superTileID;								// ID # of supertile to use here
 }SuperTileGridType;
 
 
 typedef struct
 {
-	u_short		numItems;
-	u_short		itemIndex;
+	uint16_t	numItems;
+	uint16_t	itemIndex;
 }SuperTileItemIndexType;
 
 

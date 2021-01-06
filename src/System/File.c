@@ -87,22 +87,23 @@ typedef struct
 
 
 		/* PLAYFIELD HEADER */
+		// READ IN FROM FILE!
 
 typedef struct
 {
 	NumVersion	version;							// version of file
-	long		numItems;							// # items in map
-	long		mapWidth;							// width of map
-	long		mapHeight;							// height of map
-	long		numTilePages;						// # tile pages
-	long		numTilesInList;						// # extracted tiles in list
+	int32_t		numItems;							// # items in map
+	int32_t		mapWidth;							// width of map
+	int32_t		mapHeight;							// height of map
+	int32_t		numTilePages;						// # tile pages
+	int32_t		numTilesInList;						// # extracted tiles in list
 	float		tileSize;							// 3D unit size of a tile
 	float		minY,maxY;							// min/max height values
-	long		numSplines;							// # splines
-	long		numFences;							// # fences
-	long		numUniqueSuperTiles;				// # unique supertile
-	long        numWaterPatches;                    // # water patches
-	long		numCheckpoints;						// # checkpoints
+	int32_t		numSplines;							// # splines
+	int32_t		numFences;							// # fences
+	int32_t		numUniqueSuperTiles;				// # unique supertile
+	int32_t		numWaterPatches;                    // # water patches
+	int32_t		numCheckpoints;						// # checkpoints
 }PlayfieldHeaderType;
 
 
@@ -115,15 +116,15 @@ typedef struct
 
 typedef	struct
 {
-	long		x,z;
+	int32_t		x,z;
 }FencePointType;
 
 
 typedef struct
 {
-	u_short			type;				// type of fence
-	short			numNubs;			// # nubs in fence
-	FencePointType	**nubList;			// handle to nub list
+	uint16_t		type;				// type of fence
+	int16_t			numNubs;			// # nubs in fence
+	int32_t			junk1;//FencePointType	**nubList;			// handle to nub list
 	Rect			bBox;				// bounding box of fence area
 }FileFenceDefType;
 
@@ -738,7 +739,7 @@ void LoadLevelArt(OGLSetupOutputType *setupInfo)
 {
 FSSpec	spec;
 
-const Str255	terrainFiles[NUM_LEVELS] =
+const char*	terrainFiles[NUM_LEVELS] =
 {
 	":Terrain:EarthFarm.ter",
 	":Terrain:BlobWorld.ter",
@@ -752,7 +753,7 @@ const Str255	terrainFiles[NUM_LEVELS] =
 	":Terrain:BrainBoss.ter",
 };
 
-const Str255	levelModelFiles[NUM_LEVELS] =
+const char*	levelModelFiles[NUM_LEVELS] =
 {
 	":Models:level1_farm.bg3d",
 	":Models:level2_slime.bg3d",
@@ -766,7 +767,7 @@ const Str255	levelModelFiles[NUM_LEVELS] =
 	":Models:level10_brainboss.bg3d",
 };
 
-const Str255	levelSpriteFiles[NUM_LEVELS] =
+const char*	levelSpriteFiles[NUM_LEVELS] =
 {
 	":Sprites:level1_farm.sprites",
 	":Sprites:level2_slime.sprites",
@@ -781,7 +782,7 @@ const Str255	levelSpriteFiles[NUM_LEVELS] =
 };
 
 
-const Str255	levelSoundFiles[NUM_LEVELS] =
+const char*	levelSoundFiles[NUM_LEVELS] =
 {
 	":Audio:Farm.sounds",
 	":Audio:Slime.sounds",
@@ -1175,9 +1176,8 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 				/* OPEN THE REZ-FORK */
 
-	fRefNum = FSpOpenResFile(specPtr,fsCurPerm);
-	if (fRefNum == -1)
-		DoFatalAlert("LoadPlayfield: FSpOpenResFile failed");
+	fRefNum = FSpOpenResFile(specPtr,fsRdPerm);
+	GAME_ASSERT_MESSAGE(fRefNum != -1, "FSpOpenResFile failed");
 	UseResFile(fRefNum);
 
 
@@ -1186,11 +1186,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			/************************/
 
 	hand = GetResource('Hedr',1000);
-	if (hand == nil)
-	{
-		DoAlert("ReadDataFromPlayfieldFile: Error reading header resource!");
-		return;
-	}
+	GAME_ASSERT_MESSAGE(hand, "Error reading header resource!");
 
 	header = (PlayfieldHeaderType **)hand;
 	gNumTerrainItems		= SwizzleLong(&(**header).numItems);
@@ -1229,9 +1225,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			/* READ TILE ATTRIBUTES */
 
 	hand = GetResource('Atrb',1000);
-	if (hand == nil)
-		DoAlert("ReadDataFromPlayfieldFile: Error reading tile attrib resource!");
-	else
+	GAME_ASSERT_MESSAGE(hand, "Error reading tile attrib resource!");
 	{
 		DetachResource(hand);
 		HLockHi(hand);
@@ -1250,10 +1244,8 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	Alloc_2d_array(SuperTileGridType, gSuperTileTextureGrid, gNumSuperTilesDeep, gNumSuperTilesWide);
 
 	hand = GetResource('STgd',1000);												// load grid from rez
-	if (hand == nil)
-		DoFatalAlert("ReadDataFromPlayfieldFile: Error reading supertile rez resource!");
-	else																			// copy rez into 2D array
-	{
+	GAME_ASSERT_MESSAGE(hand, "Error reading supertile rez resource!");
+	{																							// copy rez into 2D array
 		SuperTileGridType *src = (SuperTileGridType *)*hand;
 
 		for (row = 0; row < gNumSuperTilesDeep; row++)
@@ -1282,9 +1274,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		u_short	*src;
 
 		hand = GetResource('Layr',1000);
-		if (hand == nil)
-			DoAlert("ReadDataFromPlayfieldFile: Error reading map layer rez");
-		else
+		GAME_ASSERT_MESSAGE(hand, "Error reading map layer rez");
 		{
 			if (gTileGrid)														// free old array
 				Free_2d_array(gTileGrid);
@@ -1312,9 +1302,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	Alloc_2d_array(float, gMapYCoordsOriginal, gTerrainTileDepth+1, gTerrainTileWidth+1);	// and the copy of it
 
 	hand = GetResource('YCrd',1000);
-	if (hand == nil)
-		DoAlert("ReadDataFromPlayfieldFile: Error reading height data resource!");
-	else
+	GAME_ASSERT_MESSAGE(hand, "Error reading height data resource!");
 	{
 		src = (float *)*hand;
 		for (row = 0; row <= gTerrainTileDepth; row++)
@@ -1330,9 +1318,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 				/* READ ITEM LIST */
 
 	hand = GetResource('Itms',1000);
-	if (hand == nil)
-		DoAlert("ReadDataFromPlayfieldFile: Error reading itemlist resource!");
-	else
+	GAME_ASSERT_MESSAGE(hand, "Error reading itemlist resource!");
 	{
 		TerrainItemEntryType   *rezItems;
 
@@ -1354,7 +1340,6 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			(*gMasterItemList)[i].parm[2] = rezItems[i].parm[2];
 			(*gMasterItemList)[i].parm[3] = rezItems[i].parm[3];
 			(*gMasterItemList)[i].flags = SwizzleUShort(&rezItems[i].flags);
-
 		}
 	}
 
@@ -1370,12 +1355,11 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	hand = GetResource('Spln',1000);
 	if (hand)
 	{
-		SplineDefType	*splinePtr = (SplineDefType *)*hand;
+		File_SplineDefType* splinePtr = (File_SplineDefType *)*hand;
 
 		DetachResource(hand);
 		HLockHi(hand);
-		gSplineList = (SplineDefType **)hand;
-
+		gSplineList = (SplineDefType **) NewHandleClear(gNumSplines * sizeof(SplineDefType));
 
 		for (i = 0; i < gNumSplines; i++)
 		{
@@ -1399,8 +1383,11 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	{
 		SplineDefType	*spline = &(*gSplineList)[i];									// point to Nth spline
 
+		// (Bugdom's) Level 2's spline #16 has 0 points. Skip the byteswapping, but do alloc an empty handle, which the game expects.
+		GAME_ASSERT(spline->numPoints != 0);
+
 		hand = GetResource('SpPt',1000+i);
-		if (hand)
+		GAME_ASSERT_MESSAGE(hand, "can't get spline points rez");
 		{
 			SplinePointType	*ptList = (SplinePointType *)*hand;
 
@@ -1413,10 +1400,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 				(*spline->pointList)[j].x = SwizzleFloat(&ptList[j].x);
 				(*spline->pointList)[j].z = SwizzleFloat(&ptList[j].z);
 			}
-
 		}
-		else
-			DoFatalAlert("ReadDataFromPlayfieldFile: cant get spline points rez");
 	}
 
 
@@ -1427,7 +1411,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		SplineDefType	*spline = &(*gSplineList)[i];									// point to Nth spline
 
 		hand = GetResource('SpIt',1000+i);
-		if (hand)
+		GAME_ASSERT_MESSAGE(hand, "ReadDataFromPlayfieldFile: cant get spline items rez");
 		{
 			SplineItemType	*itemList = (SplineItemType *)*hand;
 
@@ -1441,10 +1425,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 				(*spline->itemList)[j].type	= SwizzleUShort(&itemList[j].type);
 				(*spline->itemList)[j].flags	= SwizzleUShort(&itemList[j].flags);
 			}
-
 		}
-		else
-			DoFatalAlert("ReadDataFromPlayfieldFile: cant get spline items rez");
 	}
 
 			/****************************/
@@ -1459,8 +1440,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		FileFenceDefType *inData;
 
 		gFenceList = (FenceDefType *)AllocPtr(sizeof(FenceDefType) * gNumFences);	// alloc new ptr for fence data
-		if (gFenceList == nil)
-			DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed");
+		GAME_ASSERT(gFenceList);
 
 		inData = (FileFenceDefType *)*hand;								// get ptr to input fence list
 
@@ -1483,15 +1463,13 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	for (i = 0; i < gNumFences; i++)
 	{
 		hand = GetResource('FnNb',1000+i);					// get rez
+		GAME_ASSERT_MESSAGE(hand, "cant get fence nub rez");
 		HLock(hand);
-		if (hand)
 		{
    			FencePointType *fileFencePoints = (FencePointType *)*hand;
 
 			gFenceList[i].nubList = (OGLPoint3D *)AllocPtr(sizeof(FenceDefType) * gFenceList[i].numNubs);	// alloc new ptr for nub array
-			if (gFenceList[i].nubList == nil)
-				DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed");
-
+			GAME_ASSERT(gFenceList[i].nubList);
 
 			for (j = 0; j < gFenceList[i].numNubs; j++)		// convert x,z to x,y,z
 			{
@@ -1501,8 +1479,6 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			}
 			ReleaseResource(hand);
 		}
-		else
-			DoFatalAlert("ReadDataFromPlayfieldFile: cant get fence nub rez");
 	}
 
 
@@ -1580,7 +1556,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 				/* OPEN THE DATA FORK */
 
-	iErr = FSpOpenDF(specPtr, fsCurPerm, &fRefNum);
+	iErr = FSpOpenDF(specPtr, fsRdPerm, &fRefNum);
 	if (iErr)
 		DoFatalAlert("ReadDataFromPlayfieldFile: FSpOpenDF failed!");
 
@@ -1588,8 +1564,6 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 	for (i = 0; i < gNumUniqueSuperTiles; i++)
 	{
-		static long	sizeoflong = 4;
-		long	compressedSize,decompressedSize;
 		long	width,height;
 		MOMaterialData	matData;
 		int		x,y;
@@ -1598,18 +1572,13 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 				/* READ THE SIZE OF THE NEXT COMPRESSED SUPERTILE TEXTURE */
 
-		iErr = FSRead(fRefNum, &sizeoflong, &compressedSize);
-		if (iErr)
-			DoFatalAlert("ReadDataFromPlayfieldFile: FSRead failed!");
-
-		compressedSize = SwizzleLong(&compressedSize);
+		int32_t compressedSize = FSReadBELong(fRefNum);
 
 
 				/* READ & DECOMPRESS IT */
 
-		decompressedSize = LZSS_Decode(fRefNum, tempBuffer16, compressedSize);
-		if (decompressedSize != size)
-      			DoFatalAlert("ReadDataFromPlayfieldFile: LZSS_Decode size is wrong!");
+		long decompressedSize = LZSS_Decode(fRefNum, tempBuffer16, compressedSize);
+		GAME_ASSERT_MESSAGE(decompressedSize == size, "LZSS_Decode size is wrong!");
 
 				/* IF LOW MEM MODE THEN SHRINK THE TERRAIN TEXTURES IN HALF */
 
@@ -1643,7 +1612,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 			/* USE PACKED PIXEL TYPE */
 
-		ConvertTexture16To16((u_short *)tempBuffer16, width, height);
+		ConvertTexture16To16((uint16_t *)tempBuffer16, width, height);
 		matData.pixelSrcFormat 	= GL_BGRA_EXT;
 		matData.pixelDstFormat 	= GL_RGBA;
 		matData.textureName[0] 	= OGL_TextureMap_Load(tempBuffer16, width, height,
@@ -1679,12 +1648,6 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		matData.height					= height;
 		matData.texturePixels[0] 		= nil;										// the original pixels are gone (or will be soon)
 		gSuperTileTextureObjects[i] 	= MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);		// create the new object
-
-
-				/* KEEP MUSIC PLAYING */
-
-		if (gSongPlayingFlag && (!gMuteMusicFlag))
-			SOURCE_PORT_PLACEHOLDER(); //MoviesTask(gSongMovie, 0);
 	}
 
 			/* CLOSE THE FILE */

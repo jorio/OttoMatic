@@ -47,10 +47,11 @@ typedef	struct
 typedef struct
 {
 	float			placement;			// where on spline to start item (0=front, 1.0 = end)
-	u_short			type;
+	uint16_t		type;
 	Byte			parm[4];
-	u_short			flags;
+	uint16_t		flags;
 }SplineItemType;
+
 
 
 typedef struct
@@ -61,9 +62,21 @@ typedef struct
 	SplinePointType	**pointList;		// handle to calculated spline points
 	short			numItems;			// # items on the spline
 	SplineItemType	**itemList;			// handle to spline items
-	
+
 	Rect			bBox;				// bounding box of spline area
 }SplineDefType;
+
+// READ IN FROM FILE
+typedef struct
+{
+	int16_t			numNubs;			// # nubs in spline
+	int32_t			junk1;
+	int32_t			numPoints;			// # points in spline
+	int32_t			junk2;
+	int16_t			numItems;			// # items on the spline
+	int32_t			junk3;
+	Rect			bBox;				// bounding box of spline area
+}File_SplineDefType;
 
 
 
@@ -214,13 +227,13 @@ typedef struct
 
 
 			/* TERRAIN ITEM ENTRY TYPE */
-
+			// READ IN FROM FILE!!
 typedef struct
 {
-	u_long							x,y;
-	u_short							type;
+	uint32_t						x,y;
+	uint16_t						type;
 	Byte							parm[4];
-	u_short							flags;									
+	uint16_t						flags;
 }TerrainItemEntryType;
 
 

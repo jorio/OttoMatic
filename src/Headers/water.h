@@ -27,13 +27,14 @@ enum
 };
 
 
+// READ IN FROM FILE!!
 typedef struct
 {
-	u_short			type;							// type of water
-	u_long			flags;							// flags
-	long			height;							// height offset or hard-wired index
-	short			numNubs;						// # nubs in water
-	long			reserved;						// for future use
+	uint16_t		type;							// type of water
+	uint32_t		flags;							// flags
+	int32_t			height;							// height offset or hard-wired index
+	int16_t			numNubs;						// # nubs in water
+	int32_t			reserved;						// for future use
 	OGLPoint2D		nubList[MAX_WATER_POINTS];		// nub list
 	
 	float			hotSpotX,hotSpotZ;				// hot spot coords
