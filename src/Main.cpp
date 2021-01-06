@@ -26,7 +26,7 @@ extern "C"
 	// Lets the game know where to find its asset files
 	extern FSSpec gDataSpec;
 
-	extern SDL_Window* gSDLWindow;
+	SDL_Window* gSDLWindow;
 
 	// Tell Windows graphics driver that we prefer running on a dedicated GPU if available
 #if _WIN32
@@ -79,27 +79,42 @@ static const char* GetWindowTitle()
 
 int CommonMain(int argc, const char** argv)
 {
-	Pomme::InitParams params
-	{
-		.windowName		= GetWindowTitle(),
-		.windowWidth	= 640,
-		.windowHeight	= 480,
-		.msaaSamples	= 0
-	};
-	
-#if ALLOW_MSAA
-	params.msaaSamples = 4;
-#endif
-
 	// Start our "machine"
-	Pomme::Init(params);
+	Pomme::Init();
 
 	// Uncomment to dump the game's resources to a temporary directory.
 //	Pomme_StartDumpingResources("/tmp/OttoRezDump");
 
+	if (0 != SDL_Init(SDL_INIT_VIDEO))
+	{
+		throw std::runtime_error("Couldn't initialize SDL video subsystem.");
+	}
+
+//	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+//#ifndef _WIN32
+//	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+//	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+//#endif
+
+//	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+//	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, msaaSamples);
+
+	gSDLWindow = SDL_CreateWindow(
+			"Otto Matic",
+			SDL_WINDOWPOS_UNDEFINED,
+			SDL_WINDOWPOS_UNDEFINED,
+			1280,
+			720,
+			SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
+
+	if (!gSDLWindow)
+	{
+		throw std::runtime_error("Couldn't create SDL window.");
+	}
+
 	fs::path dataPath = FindGameData();
 #if !(__APPLE__)
-	Pomme::Graphics::SetWindowIconFromIcl8Resource(500);
+	Pomme::Graphics::SetWindowIconFromIcl8Resource(gSDLWindow, 500);
 #endif
 
 	// Init joystick subsystem
@@ -126,6 +141,9 @@ int CommonMain(int argc, const char** argv)
 
 	// Clean up
 	Pomme::Shutdown();
+
+	SDL_DestroyWindow(gSDLWindow);
+	gSDLWindow = nullptr;
 
 	return 0;
 }
