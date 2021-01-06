@@ -75,6 +75,8 @@ ChannelInfoType		gChannelInfo[MAX_CHANNELS];
 
 static short				gMaxChannels = 0;
 
+static	SndChannelPtr		gMusicChannel = nil;
+
 
 static short				gNumSndsInBank[MAX_SOUND_BANKS] = {0,0,0};
 
@@ -265,50 +267,20 @@ static EffectType	gEffectsTable[] =
 
 void InitSoundTools(void)
 {
-#if 1
-FSSpec spec;
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
-OSErr			iErr;
-short			i;
-ExtSoundHeader	sndHdr;
-double			crap = rate44khz;
-SndCommand 	mySndCmd;
-FSSpec			spec;
-
-
-
 	gMaxChannels = 0;
 
 			/* INIT BANK INFO */
 
-	for (i = 0; i < MAX_SOUND_BANKS; i++)
+	for (int i = 0; i < MAX_SOUND_BANKS; i++)
 		gNumSndsInBank[i] = 0;
 
 			/******************/
 			/* ALLOC CHANNELS */
 			/******************/
 
-				/* MAKE DUMMY SOUND HEADER */
+			/* MAKE MUSIC CHANNEL */
 
-	sndHdr.samplePtr 		= nil;
-    sndHdr.sampleRate		= rate44khz;
-    sndHdr.loopStart		= 0;
-    sndHdr.loopEnd			= 0;
-    sndHdr.encode			= extSH;
-    sndHdr.baseFrequency 	= 0;
-    sndHdr.numFrames		= 0;
-    sndHdr.numChannels		= 2;
-   	dtox80(&crap, &sndHdr.AIFFSampleRate);
-    sndHdr.markerChunk		= 0;
-    sndHdr.instrumentChunks	= 0;
-    sndHdr.AESRecording		= 0;
-    sndHdr.sampleSize		= 16;
-    sndHdr.futureUse1		= 0;
-    sndHdr.futureUse2		= 0;
-    sndHdr.futureUse3		= 0;
-    sndHdr.futureUse4		= 0;
-    sndHdr.sampleArea[0]		= 0;
+	SndNewChannel(&gMusicChannel,sampledSynth,initStereo,nil);
 
 
 			/* ALL OTHER CHANNELS */
@@ -317,39 +289,14 @@ FSSpec			spec;
 	{
 			/* NEW SOUND CHANNEL */
 
-		iErr = SndNewChannel(&gSndChannel[gMaxChannels],sampledSynth,initMono+initNoInterp,NewSndCallBackUPP(CallBackFn));
-		if (iErr)												// if err, stop allocating channels
-			break;
-
-
-			/* FOR POST- SM 3.6.5 DO THIS! */
-#if 1
-		mySndCmd.cmd = soundCmd;
-		mySndCmd.param1 = 0;
-		mySndCmd.param2 = (long)&sndHdr;
-		if ((iErr = SndDoImmediate(gSndChannel[gMaxChannels], &mySndCmd)) != noErr)
-		{
-			DoAlert("InitSoundTools: SndDoImmediate failed!");
-			ShowSystemErr_NonFatal(iErr);
-		}
-
-
-		mySndCmd.cmd = reInitCmd;
-		mySndCmd.param1 = 0;
-		mySndCmd.param2 = initNoInterp|initStereo;
-		if ((iErr = SndDoImmediate(gSndChannel[gMaxChannels], &mySndCmd)) != noErr)
-		{
-			DoAlert("InitSoundTools: SndDoImmediate failed 2!");
-			ShowSystemErr_NonFatal(iErr);
-		}
-
-#endif
+		OSErr iErr = SndNewChannel(&gSndChannel[gMaxChannels],sampledSynth,initMono+initNoInterp,/*NewSndCallBackUPP(CallBackFn)*/nil);
+		GAME_ASSERT(!iErr);			// if err, stop allocating channels
 	}
-#endif
 
 
 		/* LOAD DEFAULT SOUNDS */
 
+	FSSpec			spec;
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Main.sounds", &spec);
 	LoadSoundBank(&spec, SOUND_BANK_MAIN);
 }
@@ -435,6 +382,10 @@ OSErr			iErr;
 				/* GET OFFSET INTO IT */
 
 		GetSoundHeaderOffset(gSndHandles[bankNum][i], &gSndOffsets[bankNum][i]);
+
+				/* PRE-DECOMPRESS IT (Source port addition) */
+
+		Pomme_DecompressSoundResource(&gSndHandles[bankNum][i], &gSndOffsets[bankNum][i]);
 	}
 
 	UseResFile(gMainAppRezFile );								// go back to normal res file
@@ -586,13 +537,7 @@ SCStatus				theStatus;
 
 void PlaySong(short songNum, Boolean loopFlag)
 {
-OSErr 	iErr;
-FSSpec	spec;
-short	myRefNum;
-float	volumeTweak;
-GrafPtr	oldPort;
-
-Str32	songNames[] =
+const char*	songNames[] =
 {
 	":Audio:ThemeSong.aif",
 	":Audio:FarmSong.aif",
@@ -641,69 +586,89 @@ float	volumeTweaks[]=
 	KillSong();
 	DoSoundMaintenance();
 
-#if 1
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
+
 			/******************************/
 			/* OPEN APPROPRIATE AIFF FILE */
 			/******************************/
 
-	iErr = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID,songNames[songNum], &spec);
-	if (iErr)
-		DoFatalAlert("PlaySong: song file not found");
+	{
+		FSSpec spec;
+		OSErr iErr;
 
-	volumeTweak = volumeTweaks[songNum];
+		iErr = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, songNames[songNum], &spec);
+		GAME_ASSERT(!iErr);
+
+		iErr = FSpOpenDF(&spec, fsRdPerm, &gMusicFileRefNum);
+		GAME_ASSERT(!iErr);
+	}
 
 	gCurrentSong = songNum;
 
 
-				/*****************/
-				/* START PLAYING */
-				/*****************/
+			/*******************/
+			/* START STREAMING */
+			/*******************/
 
-			/* GOT TO SET A DUMMY PORT OR QT MAY FREAK */
+	SndCommand 		mySndCmd;
 
-	if (gQTDummyPort == nil)						// create a blank graf port
-		gQTDummyPort = CreateNewPort();
+			/* RESET CHANNEL TO DEFAULT VALUES */
 
-	GetPort(&oldPort);								// set as active before NewMovieFromFile()
-	SetPort(gQTDummyPort);
+	uint16_t volumeTweakShort = (uint16_t)(volumeTweaks[songNum] * kFullVolume);
 
-	OpenMovieFile(&spec, &myRefNum, fsRdPerm);
-	if (myRefNum)
-	{
-		iErr = NewMovieFromFile(&gSongMovie, myRefNum, 0, nil, newMovieActive, nil);
-		CloseMovieFile(myRefNum);
+	/*
+	mySndCmd.cmd = volumeCmd;										// set sound playback volume
+	mySndCmd.param1 = 0;
+	mySndCmd.param2 = (volumeTweakShort<<16) | volumeTweakShort;
+	SndDoImmediate(gMusicChannel, &mySndCmd);
 
-		if (iErr == noErr)
-		{
-//			if (gOSX)
-//				LoadMovieIntoRam(gSongMovie, 0, GetMovieDuration(gSongMovie), keepInRam);
-
-			if (loopFlag)
-				SetMoviePlayHints(gSongMovie, hintsLoop, hintsLoop);
+	mySndCmd.cmd 		= freqCmd;									// modify the rate to change the frequency
+	mySndCmd.param1 	= 0;
+	mySndCmd.param2 	= kMiddleC;
+	SndDoImmediate(gMusicChannel, &mySndCmd);
+	*/
 
 
-			SetMovieVolume(gSongMovie, FloatToFixed16(gGlobalVolume * SONG_VOLUME * volumeTweak));						// set volume
-			StartMovie(gSongMovie);
+			/* START PLAYING FROM FILE */
 
-			gSongPlayingFlag = true;
-		}
-	}
+	OSErr iErr = SndStartFilePlay(
+			gMusicChannel,
+			gMusicFileRefNum,
+			0,
+			/*STREAM_BUFFER_SIZE*/0,
+			/*gMusicBuffer*/nil,
+			nil,
+			/*SongCompletionProc*/nil,
+			true);
+	GAME_ASSERT(!iErr);
+	gSongPlayingFlag = true;
 
-	SetPort(oldPort);
 
+			/* SET VOLUME ON STREAM */
+
+	mySndCmd.cmd = volumeCmd;										// set sound playback volume
+	mySndCmd.param1 = 0;
+	mySndCmd.param2 = (volumeTweakShort<<16) | volumeTweakShort;
+	SndDoImmediate(gMusicChannel, &mySndCmd);
+
+
+			/* SET LOOP FLAG ON STREAM */
+			/* So we don't need to re-read the file over and over. */
+
+	mySndCmd.cmd = pommeSetLoopCmd;
+	mySndCmd.param1 = loopFlag ? 1 : 0;
+	mySndCmd.param2 = 0;
+	iErr = SndDoImmediate(gMusicChannel, &mySndCmd);
+	GAME_ASSERT_MESSAGE(!iErr, "PlaySong: SndDoImmediate (pomme loop extension) failed!");
 
 
 			/* SEE IF WANT TO MUTE THE MUSIC */
 
 	if (gMuteMusicFlag)
 	{
-		if (gSongMovie)
-			StopMovie(gSongMovie);
+//		if (gSongMovie)
+//			StopMovie(gSongMovie);
 
 	}
-#endif
 }
 
 
@@ -720,16 +685,18 @@ void KillSong(void)
 
 	gSongPlayingFlag = false;											// tell callback to do nothing
 
-#if 1
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
-	if (gSongMovie)
+	SndStopFilePlay(gMusicChannel, true);
+	if (gMusicFileRefNum == 0x0ded)
+		DoAlert("KillSong: gMusicFileRefNum == 0x0ded");
+	else
 	{
-		StopMovie(gSongMovie);
-		DisposeMovie(gSongMovie);
-		gSongMovie = nil;
+		OSErr iErr = FSClose(gMusicFileRefNum);							// close the file
+		if (iErr)
+		{
+			DoAlert("KillSong: FSClose failed!");
+			ShowSystemErr_NonFatal(iErr);
+		}
 	}
-#endif
 
 	gMusicFileRefNum = 0x0ded;
 }
@@ -739,22 +706,7 @@ void KillSong(void)
 void ToggleMusic(void)
 {
 	gMuteMusicFlag = !gMuteMusicFlag;
-
-#if 1
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
-	if (gSongMovie)
-	{
-		if (gMuteMusicFlag)
-		{
-			StopMovie(gSongMovie);
-		}
-		else
-		{
-			StartMovie(gSongMovie);
-		}
-	}
-#endif
+	SndPauseFilePlay(gMusicChannel);			// pause it
 }
 
 
@@ -1028,28 +980,6 @@ short PlayEffect(short effectNum)
 
 }
 
-/***************************** CALLBACKFN ***************************/
-//
-// Called by the Sound Manager at interrupt time to let us know that
-// the sound is done playing.
-//
-
-#if 0	// srcport rm
-static pascal void CallBackFn (SndChannelPtr chan, SndCommand *cmd) {
-SndCommand      theCmd;
-
-    theCmd.cmd = bufferCmd;
-    theCmd.param1 = 0;
-    theCmd.param2 = cmd->param2;
-
-    // Play the sound again (loop it)
-    (void)SndDoCommand (chan, &theCmd, true);
-
-    // Just reuse the callBackCmd that got us here in the first place
-    (void)SndDoCommand (chan, cmd, true);
-}
-#endif
-
 /***************************** PLAY EFFECT PARMS ***************************/
 //
 // Plays an effect with parameters
@@ -1119,7 +1049,7 @@ static UInt32          loopStart, loopEnd;
 	mySndCmd.cmd = bufferCmd;										// make it play
 	mySndCmd.param1 = 0;
 	mySndCmd.param2 = ((long)*gSndHandles[bankNum][soundNum])+gSndOffsets[bankNum][soundNum];	// pointer to SoundHeader
-    SndDoCommand(chanPtr, &mySndCmd, true);
+    myErr = SndDoImmediate(chanPtr, &mySndCmd);
 	if (myErr)
 		return(-1);
 
@@ -1127,22 +1057,6 @@ static UInt32          loopStart, loopEnd;
 	mySndCmd.param1 	= 0;
 	mySndCmd.param2 	= rateMultiplier;
 	SndDoImmediate(chanPtr, &mySndCmd);
-
-#if 1
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
-    // If the loop start point is before the loop end, then there is a loop
-    sndPtr = (SoundHeaderPtr)(((long)*gSndHandles[bankNum][soundNum])+gSndOffsets[bankNum][soundNum]);
-    loopStart = sndPtr->loopStart;
-    loopEnd = sndPtr->loopEnd;
-    if (loopStart + 1 < loopEnd)
-    {
-    	mySndCmd.cmd = callBackCmd;										// let us know when the buffer is done playing
-    	mySndCmd.param1 = 0;
-    	mySndCmd.param2 = ((long)*gSndHandles[bankNum][soundNum])+gSndOffsets[bankNum][soundNum];	// pointer to SoundHeader
-    	SndDoCommand(chanPtr, &mySndCmd, true);
-	}
-#endif
 
 
 			/* SET MY INFO */
@@ -1275,36 +1189,6 @@ void DoSoundMaintenance(void)
 				gGlobalVolume = 0.0f;
 			UpdateGlobalVolume();
 		}
-	}
-
-				/* UPDATE SONG */
-
-	if (gSongPlayingFlag && (!gMuteMusicFlag))
-	{
-		SOURCE_PORT_MINOR_PLACEHOLDER();
-#if 0
-		if (IsMovieDone(gSongMovie))				// see if the song has completed
-		{
-			if (gLoopSongFlag)						// see if repeat it
-			{
-				GoToBeginningOfMovie(gSongMovie);
-				PrerollMovie (gSongMovie, 0, NORMAL_CHANNEL_RATE);
-				StartMovie(gSongMovie);
-				gMoviesTaskTimer = 0;
-			}
-			else									// otherwise kill the song
-				KillSong();
-		}
-		else
-		{
-			gMoviesTaskTimer -= gFramesPerSecondFrac;
-			if (gMoviesTaskTimer <= 0.0f)
-			{
-				MoviesTask(gSongMovie, 0);
-				gMoviesTaskTimer += .4f;
-			}
-		}
-#endif
 	}
 
 
