@@ -238,9 +238,8 @@ OGLSetupOutputType	*data;
 
 	OGL_FreeFont();
 
-	SOURCE_PORT_PLACEHOLDER();//aglSetCurrentContext(nil);								// make context not current
-	SOURCE_PORT_PLACEHOLDER();//aglSetDrawable(data->drawContext, nil);
-	SOURCE_PORT_PLACEHOLDER();//aglDestroyContext(data->drawContext);					// nuke the AGL context
+	SDL_GL_MakeCurrent(gSDLWindow, NULL);					// make context not current
+	SDL_GL_DeleteContext(data->drawContext);						// nuke the AGL context
 
 
 		/* FREE MEMORY & NIL POINTER */
