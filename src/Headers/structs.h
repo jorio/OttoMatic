@@ -117,11 +117,11 @@ typedef struct
 
 
 		/* CURRENT JOINT STATE */
-		
+		// READ IN FROM FILE!
 typedef struct
 {
-	long		tick;					// time at which this state exists
-	long		accelerationMode;		// mode of in/out acceleration
+	int32_t		tick;					// time at which this state exists
+	int32_t		accelerationMode;		// mode of in/out acceleration
 	OGLPoint3D	coord;					// current 3D coords of joint (relative to link)
 	OGLVector3D	rotation;				// current rotation values of joint (relative to link)
 	OGLVector3D	scale;					// current scale values of joint mesh

@@ -271,6 +271,7 @@ SkeletonObjDataType	*currentSkelObjData;
 	gBBox->min.x = gBBox->min.y = gBBox->min.z = 10000000;
 	gBBox->max.x = gBBox->max.y = gBBox->max.z = -gBBox->min.x;								// init bounding box calc
 
+	GAME_ASSERT(gCurrentSkeleton->NumBones > 0);
 	if (gCurrentSkeleton->Bones[0].parentBone != NO_PREVIOUS_JOINT)
 		DoFatalAlert("UpdateSkinnedGeometry: joint 0 isnt base - fix code Brian!");
 
@@ -304,7 +305,7 @@ SkeletonObjDataType	*currentSkelObjData;
 
 static void UpdateSkinnedGeometry_Recurse(short joint, short skelType)
 {
-long					numChildren,numPoints,p,i,numRefs,r,triMeshNum,p2,c,numNormals,n;
+long					numChildren,numPoints,numRefs,triMeshNum,numNormals;
 OGLMatrix4x4			oldM;
 OGLVector3D				*normalAttribs;
 BoneDefinitionType		*bonePtr;
@@ -316,7 +317,6 @@ const SkeletonObjDataType		*currentSkelObjData = gCurrentSkelObjData;
 const SkeletonDefType	*currentSkeleton = gCurrentSkeleton;
 const OGLMatrix4x4		*jointMat;
 OGLMatrix4x4			*matPtr;
-float					x,y,z;
 const DecomposedPointType	*decomposedPointList = currentSkeleton->decomposedPointList;
 const MOVertexArrayData		*localTriMeshes = &gLocalTriMeshesOfSkelType[skelType][0];
 
@@ -364,13 +364,13 @@ const MOVertexArrayData		*localTriMeshes = &gLocalTriMeshesOfSkelType[skelType][
 	numNormals = bonePtr->numNormalsAttachedToBone;								// get # normals attached to this bone
 
 
-	for (p=0; p < numNormals; p++)
+	for (int p = 0; p < numNormals; p++)
 	{
-		i = bonePtr->normalList[p];												// get index to normal in gDecomposedNormalsList
+		int i = bonePtr->normalList[p];											// get index to normal in gDecomposedNormalsList
 
-		x = currentSkeleton->decomposedNormalsList[i].x;						// get xyz of normal
-		y = currentSkeleton->decomposedNormalsList[i].y;
-		z = currentSkeleton->decomposedNormalsList[i].z;
+		float x = currentSkeleton->decomposedNormalsList[i].x;					// get xyz of normal
+		float y = currentSkeleton->decomposedNormalsList[i].y;
+		float z = currentSkeleton->decomposedNormalsList[i].z;
 
 		gTransformedNormals[i].x = (m00*x) + (m10*y) + (m20*z);					// transform the normal
 		gTransformedNormals[i].y = (m01*x) + (m11*y) + (m21*z);
@@ -383,27 +383,27 @@ const MOVertexArrayData		*localTriMeshes = &gLocalTriMeshesOfSkelType[skelType][
 
 	numPoints = bonePtr->numPointsAttachedToBone;									// get # points attached to this bone
 
-	for (p = 0; p < numPoints; p++)
+	for (int p = 0; p < numPoints; p++)
 	{
-		i = bonePtr->pointList[p];													// get index to point in gDecomposedPointList
+		int i = bonePtr->pointList[p];													// get index to point in gDecomposedPointList
 
 		numRefs = decomposedPointList[i].numRefs;									// get # times this point is referenced
 		if (numRefs == 1)															// SPECIAL CASE IF ONLY 1 REF (OPTIMIZATION)
 		{
 			triMeshNum = decomposedPointList[i].whichTriMesh[0];					// get triMesh # that uses this point
-			p2 = decomposedPointList[i].whichPoint[0];								// get point # in the triMesh
-			n = decomposedPointList[i].whichNormal[0];								// get index into gDecomposedNormalsList
+			int p2 = decomposedPointList[i].whichPoint[0];							// get point # in the triMesh
+			int n = decomposedPointList[i].whichNormal[0];							// get index into gDecomposedNormalsList
 
 			normalAttribs = localTriMeshes[triMeshNum].normals;						// point to normals list
 			normalAttribs[p2] = gTransformedNormals[n];								// copy transformed normal into triMesh
 		}
 		else																		// handle multi-case
 		{
-			for (r = 0; r < numRefs; r++)
+			for (int r = 0; r < numRefs; r++)
 			{
 				triMeshNum = decomposedPointList[i].whichTriMesh[r];
-				p2 = decomposedPointList[i].whichPoint[r];
-				n = decomposedPointList[i].whichNormal[r];
+				int p2 = decomposedPointList[i].whichPoint[r];
+				int n = decomposedPointList[i].whichNormal[r];
 
 				normalAttribs = localTriMeshes[triMeshNum].normals;
 				normalAttribs[p2] = gTransformedNormals[n];
@@ -423,14 +423,12 @@ const MOVertexArrayData		*localTriMeshes = &gLocalTriMeshesOfSkelType[skelType][
 		m30 = matPtr->value[M03];	m31 = matPtr->value[M13];	m32 = matPtr->value[M23];
 	}
 
-	for (p = 0; p < numPoints; p++)
+	for (int p = 0; p < numPoints; p++)
 	{
-		float	x,y,z;
-
-		i = bonePtr->pointList[p];														// get index to point in gDecomposedPointList
-		x = decomposedPointList[i].boneRelPoint.x;										// get xyz of point
-		y = decomposedPointList[i].boneRelPoint.y;
-		z = decomposedPointList[i].boneRelPoint.z;
+		int i = bonePtr->pointList[p];													// get index to point in gDecomposedPointList
+		float x = decomposedPointList[i].boneRelPoint.x;								// get xyz of point
+		float y = decomposedPointList[i].boneRelPoint.y;
+		float z = decomposedPointList[i].boneRelPoint.z;
 
 				/* TRANSFORM & UPDATE BBOX */
 
@@ -459,7 +457,7 @@ const MOVertexArrayData		*localTriMeshes = &gLocalTriMeshesOfSkelType[skelType][
 		if (numRefs == 1)																// SPECIAL CASE IF ONLY 1 REF (OPTIMIZATION)
 		{
 			triMeshNum = decomposedPointList[i].whichTriMesh[0];						// get triMesh # that uses this point
-			p2 = decomposedPointList[i].whichPoint[0];									// get point # in the triMesh
+			int p2 = decomposedPointList[i].whichPoint[0];								// get point # in the triMesh
 
 			localTriMeshes[triMeshNum].points[p2].x = newX;								// set the point in local copy of trimesh
 			localTriMeshes[triMeshNum].points[p2].y = newY;
@@ -467,10 +465,10 @@ const MOVertexArrayData		*localTriMeshes = &gLocalTriMeshesOfSkelType[skelType][
 		}
 		else																			// multi-refs
 		{
-			for (r = 0; r < numRefs; r++)
+			for (int r = 0; r < numRefs; r++)
 			{
 				triMeshNum = decomposedPointList[i].whichTriMesh[r];
-				p2 = decomposedPointList[i].whichPoint[r];
+				int p2 = decomposedPointList[i].whichPoint[r];
 
 				localTriMeshes[triMeshNum].points[p2].x = newX;
 				localTriMeshes[triMeshNum].points[p2].y = newY;
@@ -492,7 +490,7 @@ const MOVertexArrayData		*localTriMeshes = &gLocalTriMeshesOfSkelType[skelType][
 			/* RECURSE THRU ALL CHILDREN */
 
 	numChildren = currentSkeleton->numChildren[joint];									// get # children
-	for (c = 0; c < numChildren; c++)
+	for (int c = 0; c < numChildren; c++)
 	{
 		oldM = gMatrix;																	// push matrix
 		UpdateSkinnedGeometry_Recurse(currentSkeleton->childIndecies[joint][c], skelType);

@@ -516,7 +516,7 @@ SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 /************* MAKE FONT STRING OBJECT *************/
 
-ObjNode *MakeFontStringObject(const Str31 s, NewObjectDefinitionType *newObjDef, OGLSetupOutputType *setupInfo, Boolean center)
+ObjNode *MakeFontStringObject(const char* s, NewObjectDefinitionType *newObjDef, OGLSetupOutputType *setupInfo, Boolean center)
 {
 ObjNode				*newObj;
 MOSpriteObject		*spriteMO;
@@ -538,7 +538,7 @@ float				scale,x,y,z,letterOffset;
 
 	newObj->NumStringSprites = 0;											// no sprites in there yet
 
-	len = s[0];										// get length of string
+	len = strlen(s);										// get length of string
 	if (len > 31)
 		DoFatalAlert("MakeFontStringObject: string > 31 characters!");
 

@@ -9,15 +9,15 @@
 		/***********************/
 		/* RESOURCE STURCTURES */
 		/***********************/
-		
+
 			/* Hedr */
-			
+
 typedef struct
 {
-	short	version;			// 0xaa.bb
-	short	numAnims;			// gNumAnims
-	short	numJoints;			// gNumJoints
-	short	num3DMFLimbs;		// gNumLimb3DMFLimbs
+	int16_t				version;			// 0xaa.bb
+	int16_t				numAnims;			// gNumAnims
+	int16_t				numJoints;			// gNumJoints
+	int16_t				num3DMFLimbs;		// gNumLimb3DMFLimbs
 }SkeletonFile_Header_Type;
 
 			/* Bone resource */
@@ -25,29 +25,16 @@ typedef struct
 			// matches BoneDefinitionType except missing 
 			// point and normals arrays which are stored in other resources.
 			// Also missing other stuff since arent saved anyway.
-			
+
 typedef struct
 {
-	long 				parentBone;			 		// index to previous bone
+	int32_t				parentBone;			 		// index to previous bone
 	unsigned char		name[32];					// text string name for bone
 	OGLPoint3D			coord;						// absolute coord (not relative to parent!) 
-	u_short				numPointsAttachedToBone;	// # vertices/points that this bone has
-	u_short				numNormalsAttachedToBone;	// # vertex normals this bone has
-	u_long				reserved[8];				// reserved for future use
+	uint16_t			numPointsAttachedToBone;	// # vertices/points that this bone has
+	uint16_t			numNormalsAttachedToBone;	// # vertex normals this bone has
+	uint32_t			reserved[8];				// reserved for future use
 }File_BoneDefinitionType;
-
-
-
-			/* Joit */
-			
-typedef struct
-{
-	OGLVector3D		maxRot;						// max rot values of joint
-	OGLVector3D		minRot;						// min rot values of joint
-	long 			parentBone; 		// index to previous link joint definition
-	unsigned char	name[32];						// text string name for joint
-	long			limbIndex;					// index into limb list
-}Joit_Rez_Type;
 
 
 
@@ -56,8 +43,8 @@ typedef struct
 			
 typedef struct
 {
-	Str32	animName;			
-	short	numAnimEvents;	
+	Str32				animName;
+	int16_t				numAnimEvents;
 }SkeletonFile_AnimHeader_Type;
 
 
@@ -70,9 +57,9 @@ typedef struct
 {
 	Byte	difficulty;
 	Boolean	showScreenModeDialog;
-	short	depth;
-	int		screenWidth;
-	int		screenHeight;
+	int16_t	depth;
+	int32_t		screenWidth;
+	int32_t		screenHeight;
 	double	hz;
 	Byte	monitorNum;
 	Byte	language;
@@ -88,15 +75,15 @@ typedef struct
 
 	Boolean	anaglyph;
 	Boolean	anaglyphColor;
-	short	anaglyphCalibrationRed;
-	short	anaglyphCalibrationGreen;
-	short	anaglyphCalibrationBlue;
+	int16_t	anaglyphCalibrationRed;
+	int16_t	anaglyphCalibrationGreen;
+	int16_t	anaglyphCalibrationBlue;
 	Boolean doAnaglyphChannelBalancing;
 
 	Boolean	dontUseHID;
 	HIDControlSettingsType	controlSettings;		
 
-	int		reserved[8];
+	uint32_t	reserved[8];
 }PrefsType;
 
 
