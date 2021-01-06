@@ -337,7 +337,7 @@ static void PlayGame(void)
 		gLevelNum = 0;
 
 #if !DEMO
-		if (GetKeyState(KEY_F10))		// see if do Level cheat
+		if (GetKeyState(SDL_SCANCODE_F10))		// see if do Level cheat
 			if (DoLevelCheatDialog())
 				CleanQuit();
 #endif
@@ -468,7 +468,7 @@ static void PlayArea(void)
 
 			/* SEE IF PAUSED */
 
-		if (GetNewKeyState(KEY_ESC))
+		if (GetNewKeyState(SDL_SCANCODE_ESCAPE))
 			DoPaused();
 
 		CalcFramesPerSecond();
@@ -481,8 +481,8 @@ static void PlayArea(void)
 
 				/* SEE IF TRACK IS COMPLETED */
 
-		if (GetNewKeyState(KEY_F10))			//------- win level cheat
-			if (GetKeyState(KEY_APPLE))
+		if (GetNewKeyState(SDL_SCANCODE_F10))			//------- win level cheat
+			if (GetKeyState(SDL_SCANCODE_GRAVE))
 				break;
 
 		if (gGameOver)													// if we need immediate abort, then bail now

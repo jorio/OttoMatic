@@ -2820,18 +2820,15 @@ static void CheckPlayerActionControls(ObjNode *theNode)
 {
 		/* SEE IF DO CHEAT */
 
-	if (GetKeyState(KEY_B))
+	if (GetKeyState(SDL_SCANCODE_B) &&
+		GetKeyState(SDL_SCANCODE_R) &&
+		GetKeyState(SDL_SCANCODE_I))
 	{
-		if (GetKeyState(KEY_R))
-			if (GetKeyState(KEY_I))
-			{
-				if (gPlayerInfo.lives < 3)
-					gPlayerInfo.lives 	= 3;
-				gPlayerInfo.health 	= 1.0;
-				gPlayerInfo.fuel 	= 1.0;
-				gPlayerInfo.jumpJet = 1.0;
-
-			}
+		if (gPlayerInfo.lives < 3)
+			gPlayerInfo.lives 	= 3;
+		gPlayerInfo.health 	= 1.0;
+		gPlayerInfo.fuel 	= 1.0;
+		gPlayerInfo.jumpJet = 1.0;
 	}
 
 			/***************/

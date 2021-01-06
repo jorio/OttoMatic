@@ -1232,7 +1232,7 @@ static Boolean DoMainMenuControl(void)
 	{
 			/* SPIN LEFT */
 
-		if (GetNewKeyState(KEY_LEFT))
+		if (GetNewKeyState(SDL_SCANCODE_LEFT))
 		{
 			PlayEffect(EFFECT_MENUCHANGE);
 			gTargetRot -= PI2 / (float)NUM_SELECTIONS;
@@ -1244,7 +1244,7 @@ static Boolean DoMainMenuControl(void)
 				/* SPIN RIGHT */
 
 		else
-		if (GetNewKeyState(KEY_RIGHT))
+		if (GetNewKeyState(SDL_SCANCODE_RIGHT))
 		{
 			PlayEffect(EFFECT_MENUCHANGE);
 			gTargetRot += PI2 / (float)NUM_SELECTIONS;
@@ -1256,7 +1256,7 @@ static Boolean DoMainMenuControl(void)
 
 				/* MAKE SELECTION */
 		else
-		if (GetNewKeyState(KEY_RETURN) || GetNewKeyState(KEY_SPACE))
+		if (GetNewKeyState(SDL_SCANCODE_RETURN) || GetNewKeyState(SDL_SCANCODE_SPACE))
 		{
 
 			switch(gSelection)
@@ -1304,7 +1304,7 @@ static Boolean DoMainMenuControl(void)
 		/***************/
 	else
 	{
-		if (GetNewKeyState(KEY_RETURN) || GetNewKeyState(KEY_SPACE))
+		if (GetNewKeyState(SDL_SCANCODE_RETURN) || GetNewKeyState(SDL_SCANCODE_SPACE))
 		{
 			DeleteObject(gLogoObj);
 			StopAChannel(&gLogoAmbience);

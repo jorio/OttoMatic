@@ -189,13 +189,13 @@ Boolean	continueGame = false;
 
 		/* SEE IF CHANGE SELECTION */
 
-	if (GetNewKeyState(KEY_UP) && (gPausedMenuSelection > 0))
+	if (GetNewKeyState(SDL_SCANCODE_UP) && (gPausedMenuSelection > 0))
 	{
 		gPausedMenuSelection--;
 		PlayEffect(EFFECT_WEAPONCLICK);
 	}
 	else
-	if (GetNewKeyState(KEY_DOWN) && (gPausedMenuSelection < 2))
+	if (GetNewKeyState(SDL_SCANCODE_DOWN) && (gPausedMenuSelection < 2))
 	{
 		gPausedMenuSelection++;
 		PlayEffect(EFFECT_WEAPONCLICK);
@@ -224,7 +224,7 @@ Boolean	continueGame = false;
 			/* SEE IF MAKE A SELECTION */
 			/***************************/
 
-	if (GetNewKeyState(KEY_RETURN) || GetNewKeyState(KEY_SPACE))
+	if (GetNewKeyState(SDL_SCANCODE_RETURN) || GetNewKeyState(SDL_SCANCODE_SPACE))
 	{
 //		PlayEffect(EFFECT_SELECTCLICK);
 		switch(gPausedMenuSelection)
@@ -251,7 +251,7 @@ Boolean	continueGame = false;
 			/*****************************/
 
 	else
-	if (GetNewKeyState(KEY_ESC))
+	if (GetNewKeyState(SDL_SCANCODE_ESCAPE))
 	{
 		continueGame = true;
 	}

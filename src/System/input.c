@@ -152,6 +152,8 @@ KeyMapByteArray gKeyMap,gNewKeys,gOldKeys;
 
 #endif
 
+Byte				gRawKeyboardState[SDL_NUM_SCANCODES];
+
 			/**************/
 			/* NEEDS LIST */
 			/**************/
@@ -3164,7 +3166,29 @@ HICommand 			command;
 
 #endif
 
+enum
+{
+	KEYSTATE_OFF,
+	KEYSTATE_DOWN,
+	KEYSTATE_HELD,
+	KEYSTATE_UP,
+};
 
+static inline void UpdateKeyState(Byte* state, bool downNow)
+{
+	switch (*state)	// look at prev state
+	{
+		case KEYSTATE_HELD:
+		case KEYSTATE_DOWN:
+			*state = downNow ? KEYSTATE_HELD : KEYSTATE_UP;
+			break;
+		case KEYSTATE_OFF:
+		case KEYSTATE_UP:
+		default:
+			*state = downNow ? KEYSTATE_DOWN : KEYSTATE_OFF;
+			break;
+	}
+}
 
 
 
@@ -3176,19 +3200,28 @@ void InitInput(void)
 
 void UpdateInput(void)
 {
-	SOURCE_PORT_MINOR_PLACEHOLDER();
+	SDL_PumpEvents();
+	int numkeys = 0;
+	const UInt8* keystate = SDL_GetKeyboardState(&numkeys);
+	uint32_t mouseButtons = SDL_GetMouseState(NULL, NULL);
+
+	{
+		int minNumKeys = numkeys < SDL_NUM_SCANCODES ? numkeys : SDL_NUM_SCANCODES;
+		for (int i = 0; i < minNumKeys; i++)
+			UpdateKeyState(&gRawKeyboardState[i], keystate[i]);
+		for (int i = minNumKeys; i < SDL_NUM_SCANCODES; i++)
+			UpdateKeyState(&gRawKeyboardState[i], false);
+	}
 }
 
-Boolean GetNewKeyState(unsigned short key)
+Boolean GetNewKeyState(unsigned short sdlScanCode)
 {
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-	return false;
+	return gRawKeyboardState[sdlScanCode] == KEYSTATE_DOWN;
 }
 
-Boolean GetKeyState(unsigned short key)
+Boolean GetKeyState(unsigned short sdlScanCode)
 {
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-	return false;
+	return gRawKeyboardState[sdlScanCode] == KEYSTATE_DOWN || gRawKeyboardState[sdlScanCode] == KEYSTATE_HELD;
 }
 
 Boolean AreAnyNewKeysPressed(void)

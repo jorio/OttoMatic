@@ -767,12 +767,12 @@ static const OGLColorRGBA noHiliteColor = {.3,.5,.2,1};
 
 		/* SEE IF CHANGE SELECTION */
 
-	if (GetNewKeyState(KEY_UP) && (gSaveMenuSelection > 0))
+	if (GetNewKeyState(SDL_SCANCODE_UP) && (gSaveMenuSelection > 0))
 	{
 		gSaveMenuSelection--;
 	}
 	else
-	if (GetNewKeyState(KEY_DOWN) && (gSaveMenuSelection < 1))
+	if (GetNewKeyState(SDL_SCANCODE_DOWN) && (gSaveMenuSelection < 1))
 	{
 		gSaveMenuSelection++;
 	}
@@ -800,7 +800,7 @@ static const OGLColorRGBA noHiliteColor = {.3,.5,.2,1};
 			/* SEE IF MAKE A SELECTION */
 			/***************************/
 
-	if (GetNewKeyState(KEY_RETURN) || GetNewKeyState(KEY_SPACE))
+	if (GetNewKeyState(SDL_SCANCODE_RETURN) || GetNewKeyState(SDL_SCANCODE_SPACE))
 	{
 		switch(gSaveMenuSelection)
 		{

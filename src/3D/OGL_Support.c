@@ -692,7 +692,7 @@ do_anaglyph:
 		/* SEE IF SHOW DEBUG INFO */
 		/**************************/
 
-	if (GetNewKeyState(KEY_F8))
+	if (GetNewKeyState(SDL_SCANCODE_F8))
 	{
 		if (++gDebugMode > 3)
 			gDebugMode = 0;
