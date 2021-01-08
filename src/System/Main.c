@@ -290,7 +290,7 @@ long 		keyboardScript, languageCode, i;
 	gGamePrefs.anaglyphCalibrationBlue = DEFAULT_ANAGLYPH_B;
 	gGamePrefs.doAnaglyphChannelBalancing = true;
 
-	gGamePrefs.dontUseHID			= false;
+//	gGamePrefs.dontUseHID			= false;		// srcport rm
 
 	gGamePrefs.reserved[0] 			= 0;
 	gGamePrefs.reserved[1] 			= 0;

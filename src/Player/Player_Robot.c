@@ -984,7 +984,7 @@ static void MovePlayerRobot_JumpJet(ObjNode *theNode)
 	}
 			/* SEE IF DONE WITH JUMP-JET ANIM */
 	else
-	if ((theNode->Skeleton->AnimHasStopped) || (gControlNeeds[kNeed_Jump].newButtonPress))
+	if (theNode->Skeleton->AnimHasStopped || GetNewNeedState(kNeed_Jump))
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, PLAYER_ANIM_FALL, 4.0);		// make fall anim
 	}
@@ -1343,7 +1343,7 @@ static void MovePlayerRobot_Charging(ObjNode *theNode)
 
 	if (gPlayerInfo.superNovaStatic)						// if this obj exists then we're still charging
 	{
-		if (!gControlNeeds[kNeed_Shoot].value)
+		if (!GetNeedState(kNeed_Shoot))
 		{
 			DischargeSuperNova();							// attempt to discharge it
 		}
@@ -2835,7 +2835,7 @@ static void CheckPlayerActionControls(ObjNode *theNode)
 			/* SEE IF JUMP */
 			/***************/
 
-	if (gControlNeeds[kNeed_Jump].newButtonPress)										// see if user pressed the key
+	if (GetNewNeedState(kNeed_Jump))										// see if user pressed the key
 	{
 		/* SEE IF ENTER CANNON ON CLOUD LEVEL */
 
@@ -3305,7 +3305,9 @@ OGLMatrix3x3	m;
 
 	if (gTargetPickup != nil)															// see if already aborted via collision
 	{
-		if (gControlNeeds[kNeed_Jump].newButtonPress || gControlNeeds[kNeed_Shoot].newButtonPress || gControlNeeds[kNeed_PunchPickup].newButtonPress)
+		if (GetNewNeedState(kNeed_Jump)
+			|| GetNewNeedState(kNeed_Shoot)
+			|| GetNewNeedState(kNeed_PunchPickup))
 		{
 			DisableHelpType(HELP_MESSAGE_LETGOMAGNET);							// player has figured it out, so don't show this anymore
 

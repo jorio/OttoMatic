@@ -419,22 +419,22 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 	else
 	if (skeleton->AnimNum != PLAYER_ANIM_BUBBLE)					// user can't swing camera if in bubble
 	{
-		if (gControlNeeds[kNeed_CameraRight].value)
+		if (GetNeedState(kNeed_CameraRight))
 		{
 			gCameraUserRotY -= fps * PI;
-			gForceCameraAlignment = true;								// don't zero userRot out if the player isn't moving
+			gForceCameraAlignment = true;							// don't zero userRot out if the player isn't moving
 		}
 		else
-		if (gControlNeeds[kNeed_CameraLeft].value)
+		if (GetNeedState(kNeed_CameraLeft))
 		{
 			gCameraUserRotY += fps * PI;
-			gForceCameraAlignment = true;								// don't zero userRot out if the player isn't moving
+			gForceCameraAlignment = true;							// don't zero userRot out if the player isn't moving
 		}
 	}
 	else
 		gCameraUserRotY = 0;										// always 0 if in bubble
 
-	if (gControlNeeds[kNeed_CameraMode].value)											// see if re-align camera behind player
+	if (GetNeedState(kNeed_CameraMode))						// see if re-align camera behind player
 	{
 		gCameraUserRotY = 0;
 		gForceCameraAlignment = true;
@@ -807,19 +807,19 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 		gCameraUserRotY += fps * gAutoRotateCameraSpeed;
 	}
 	else
-	if (gControlNeeds[kNeed_CameraRight].value)
+	if (GetNeedState(kNeed_CameraRight))
 	{
 		gCameraUserRotY += fps * PI;
 		gForceCameraAlignment = true;								// don't zero userRot out if the player isn't moving
 	}
 	else
-	if (gControlNeeds[kNeed_CameraLeft].value)
+	if (GetNeedState(kNeed_CameraLeft))
 	{
 		gCameraUserRotY -= fps * PI;
 		gForceCameraAlignment = true;								// don't zero userRot out if the player isn't moving
 	}
 
-	if (gControlNeeds[kNeed_CameraMode].value)											// see if re-align camera behind player
+	if (GetNeedState(kNeed_CameraMode))											// see if re-align camera behind player
 	{
 		gCameraUserRotY = 0;
 		gForceCameraAlignment = true;

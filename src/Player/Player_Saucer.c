@@ -505,7 +505,7 @@ float fps = gFramesPerSecondFrac;
 		{
 			DisplayHelpMessage(HELP_MESSAGE_PRESSJUMPTOLEAVE, 1, true);
 
-			if (gControlNeeds[kNeed_Jump].newButtonPress)												// see if player wants out
+			if (GetNewNeedState(kNeed_Jump))												// see if player wants out
 			{
 						/* START THE BEAM */
 
@@ -670,7 +670,7 @@ static OGLPoint2D origin = {0,0};
 
 				/* SEE IF CHANGE BEAMS */
 
-	if (gControlNeeds[kNeed_NextWeapon].newButtonPress)
+	if (GetNewNeedState(kNeed_NextWeapon))
 	{
 		if (gBeamModeSelected == BEAM_MODE_DESTRUCTO)
 			gBeamModeSelected = BEAM_MODE_TELEPORT;
@@ -683,7 +683,7 @@ static OGLPoint2D origin = {0,0};
 
 				/* SEE IF CHARGE BEAM */
 
-	if (gControlNeeds[kNeed_Shoot].newButtonPress || gBeamIsCharging)
+	if (GetNewNeedState(kNeed_Shoot) || gBeamIsCharging)
 		ChargeBeam(theNode);
 	else
 		DischargeBeam(theNode);

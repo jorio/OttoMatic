@@ -80,8 +80,10 @@ typedef struct
 	int16_t	anaglyphCalibrationBlue;
 	Boolean doAnaglyphChannelBalancing;
 
+#if 0	// srcport rm
 	Boolean	dontUseHID;
 	HIDControlSettingsType	controlSettings;		
+#endif
 
 	uint32_t	reserved[8];
 }PrefsType;

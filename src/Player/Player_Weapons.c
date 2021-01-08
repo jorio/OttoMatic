@@ -160,7 +160,7 @@ int	i;
 
 		/* SEE IF SHOOT GUN */
 
-	if (gControlNeeds[kNeed_Shoot].newButtonPress)							// see if user pressed the key
+	if (GetNewNeedState(kNeed_Shoot))					// see if user pressed the key
 	{
 		ShootWeapon(theNode);
 	}
@@ -168,7 +168,7 @@ int	i;
 		/* SEE IF PUNCH / PICKUP */
 
 	else
-	if (gControlNeeds[kNeed_PunchPickup].newButtonPress)
+	if (GetNewNeedState(kNeed_PunchPickup))
 	{
 		if (!SeeIfDoPickup(theNode))						// if not picking up then punching
 		{
@@ -179,7 +179,7 @@ int	i;
 		/* SEE IF CHANGE WEAPON */
 
 	else
-	if (gControlNeeds[kNeed_NextWeapon].newButtonPress)
+	if (GetNewNeedState(kNeed_NextWeapon))
 	{
 		i = FindWeaponInventoryIndex(gPlayerInfo.currentWeaponType);	// get current into inventory list
 		i++;															// start searching on next slot

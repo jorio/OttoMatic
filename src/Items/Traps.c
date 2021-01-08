@@ -723,7 +723,10 @@ float	s;
 			/* CHECK TIMER & USER ABORT */
 
 	bubble->Health -= fps;
-	if ((bubble->Health <= 0.0f) || gControlNeeds[kNeed_Jump].newButtonPress || gControlNeeds[kNeed_Shoot].newButtonPress || gControlNeeds[kNeed_PunchPickup].newButtonPress)
+	if ((bubble->Health <= 0.0f)
+		|| GetNewNeedState(kNeed_Jump)
+		|| GetNewNeedState(kNeed_Shoot)
+		|| GetNewNeedState(kNeed_PunchPickup))
 	{
 		PopSoapBubble(bubble);
 		return;

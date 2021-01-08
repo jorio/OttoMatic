@@ -576,7 +576,7 @@ float	fps = gFramesPerSecondFrac;
 		/* SEE IF PLAYER WANTS OUT */
 		/***************************/
 
-	if (gControlNeeds[kNeed_Jump].newButtonPress)
+	if (GetNewNeedState(kNeed_Jump))
 	{
 		UpdateInput();				// NOTE:  we do this to clear out the jump key since the player's jump move call will be called on same frame and we don't want to jump-jet accidentally
 		MorphToSkeletonAnim(gPlayerInfo.objNode->Skeleton, PLAYER_ANIM_JUMP, 5.0f);

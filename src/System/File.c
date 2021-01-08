@@ -566,7 +566,7 @@ long		count;
 
 		/* THEY'RE GOOD, SO ALSO RESTORE THE HID CONTROL SETTINGS */
 
-	RestoreHIDControlSettings(&gGamePrefs.controlSettings);
+//	RestoreHIDControlSettings(&gGamePrefs.controlSettings);
 
 
 	return(noErr);
@@ -592,10 +592,9 @@ long				count;
 #if 0 // srcport rm
 	if (!gHIDInitialized)								// can't save prefs unless HID is initialized!
 		return;
-#endif
 
 	BuildHIDControlSettings(&gGamePrefs.controlSettings);
-
+#endif
 
 				/* CREATE BLANK FILE */
 
