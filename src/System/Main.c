@@ -155,6 +155,7 @@ NumVersion	vers;
 			/* BOOT OGL */
 
 	OGL_Boot();
+	OGL_InitFunctions();
 
 
 #if 0	// srcport rm

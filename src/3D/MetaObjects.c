@@ -9,21 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-//#include <AGL/aglmacro.h> // srcport rm
-
 #include "3dmath.h"
-
-GLAPI void GLAPIENTRY glActiveTextureARB(GLenum texture)
-{
-	// TODO get proc
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-}
-
-GLAPI void GLAPIENTRY glClientActiveTextureARB(GLenum texture)
-{
-	// TODO get proc
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-}
 
 extern	Boolean			gMuteMusicFlag;
 extern	float			gCurrentAspectRatio;
