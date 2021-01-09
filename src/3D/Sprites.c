@@ -539,10 +539,6 @@ float				scale,x,y,z,letterOffset;
 	newObj->NumStringSprites = 0;											// no sprites in there yet
 
 	len = strlen(s);										// get length of string
-	if (len > 31)
-		DoFatalAlert("MakeFontStringObject: string > 31 characters!");
-
-
 
 	scale = newObj->Scale.x;												// get scale factor
 	letterOffset = scale * FONT_WIDTH;
@@ -552,7 +548,7 @@ float				scale,x,y,z,letterOffset;
 		int 	numBlanks = 0;													// count # blanks in string
 		float	blankW, charW, halfW;
 
-		for (i = 1; i <= len; i++)
+		for (i = 0; i < len; i++)
 			if (CharToSprite(s[i]) == -1) numBlanks++;
 
 		charW = (float)(len - numBlanks) * letterOffset;					// calc width of line (spaces are spaced differently than chars)
@@ -573,7 +569,7 @@ float				scale,x,y,z,letterOffset;
 
 	for (i = 0; i < len; i++)
 	{
-		sprite = CharToSprite(s[i+1]);										// convert letter to sprite #
+		sprite = CharToSprite(s[i]);										// convert letter to sprite #
 		if (sprite == -1)
 		{
 			x += letterOffset * .75f;										// skip / put space here

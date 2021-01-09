@@ -166,7 +166,7 @@ static float	gHealthMeterRot = 0, gFuelMeterRot = 0, gJumpJetMeterRot=0;
 static float	gWeaponY[MAX_INVENTORY_SLOTS];
 
 short	gDisplayedHelpMessage;
-static Str255	gHelpString;
+static Str255	gHelpStringC;
 static float	gHelpMessageAlpha,gHelpMessageX;
 static float	gHelpMessageTimer;
 
@@ -920,9 +920,6 @@ int	i;
 
 void DisplayHelpMessage(short messNum, float timer, Boolean overrideCurrent)
 {
-short	i,n,s;
-float	size;
-
 	if (gHelpMessageDisabled[messNum])						// dont do it if this message is disabled
 		return;
 
@@ -942,21 +939,15 @@ float	size;
 
 			/* GET THE STRING TEXT TO DISPLAY */
 
-#if 1
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-	gHelpString[0] = sprintf(gHelpString+1, "SRCPORT TODO GETINDSTRING %d %d", 1000 + gGamePrefs.language, messNum+1);
-#else
-	GetIndString(gHelpString, 1000 + gGamePrefs.language, messNum+1);
-#endif
+	GetIndStringC(gHelpStringC, 1000 + gGamePrefs.language, messNum+1);
 
 
 			/* CALC STRING PARAMETERS */
 
-	size = 0;
-	n = gHelpString[0];
-	for (i = 1; i <= n; i++)
+	float size = 0;
+	for (char* c = gHelpStringC; *c; c++)
 	{
-		s = CharToSprite(gHelpString[i]);
+		short s = CharToSprite(*c);
 		if (s == -1)
 			size += LETTER_SPACING * BLANK_LETTER_SPACER;		// blank spaces are shorter
 		else
@@ -972,7 +963,7 @@ float	size;
 static void UpdateHelpMessage(const OGLSetupOutputType *setupInfo)
 {
 float	fps,x,y;
-short	i,n,texNum;
+short	texNum;
 SDL_GLContext agl_ctx = gAGLContext;
 
 	if (gDisplayedHelpMessage == HELP_MESSAGE_NONE)
@@ -1022,16 +1013,14 @@ SDL_GLContext agl_ctx = gAGLContext;
 	x = gHelpMessageX;
 	y = HELP_Y;
 
-	n = gHelpString[0];										// get str len
-
 	gGlobalTransparency = gHelpMessageAlpha;
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
 
-	for (i = 1; i <= n; i++)
+	for (char* c = gHelpStringC; *c; c++)
 	{
 				/* CONVERT LETTER INTO SPRITE # */
 
-		texNum = CharToSprite(gHelpString[i]);
+		texNum = CharToSprite(*c);
 		if (texNum == -1)
 		{
 			x += LETTER_SPACING * BLANK_LETTER_SPACER;

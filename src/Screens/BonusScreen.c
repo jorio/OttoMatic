@@ -700,16 +700,11 @@ short	i;
 
 	for (i = 0; i < 2; i++)
 	{
-		Str255	s;
+		Str255	cstr;
 
-#if 1
-		s[0] = sprintf(s+1, "SRCPORT TODO GETINDSTRING %d %d", 3000 + gGamePrefs.language, i + 1);
-		SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
-		GetIndString(s, 3000 + gGamePrefs.language, i + 1);
-#endif
+		GetIndStringC(cstr, 3000 + gGamePrefs.language, i + 1);
 
-		gSaveIcons[i] = MakeFontStringObject(s, &gNewObjectDefinition, gGameViewInfoPtr, true);
+		gSaveIcons[i] = MakeFontStringObject(cstr, &gNewObjectDefinition, gGameViewInfoPtr, true);
 		gSaveIcons[i]->ColorFilter.a = 0;
 		gNewObjectDefinition.coord.y 	+= SAVE_TEXT_SIZE * .7f;
 	}
