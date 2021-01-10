@@ -258,15 +258,6 @@ OGLSetupOutputType	*data;
 
 static void OGL_CreateDrawContext(OGLViewDefType *viewDefPtr)
 {
-//AGLPixelFormat 	fmt;
-#if 0
-GLboolean      mkc, ok;
-GLint          attribWindow[]	= {AGL_RGBA, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
-GLint          attrib32bit[] 	= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
-GLint          attrib16bit[] 	= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 32, AGL_ALL_RENDERERS, AGL_ACCELERATED, AGL_NO_RECOVERY, AGL_NONE};
-GLint          attrib2[] 		= {AGL_RGBA, AGL_FULLSCREEN, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 16, AGL_ALL_RENDERERS, AGL_NONE};
-#endif
-SDL_GLContext agl_ctx;
 GLint			maxTexSize;
 static char			*s;
 
@@ -344,17 +335,9 @@ static char			*s;
 
 			/* CREATE AGL CONTEXT & ATTACH TO WINDOW */
 
-#if 1
 	gAGLContext = SDL_GL_CreateContext(gSDLWindow);
 	GAME_ASSERT_MESSAGE(gAGLContext, SDL_GetError());
 	GAME_ASSERT(glGetError() == GL_NO_ERROR);
-#else
-	gAGLContext = aglCreateContext(fmt, nil);
-	if ((gAGLContext == nil) || (aglGetError() != AGL_NO_ERROR))
-		DoFatalAlert("OGL_CreateDrawContext: aglCreateContext failed!");
-#endif
-
-	agl_ctx = gAGLContext;
 
 #if 1
 	SOURCE_PORT_MINOR_PLACEHOLDER();	// fullscreen/non-fullscreen
@@ -386,19 +369,8 @@ static char			*s;
 
 			/* ACTIVATE CONTEXT */
 
-#if 1
 	int mkc = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);
 	GAME_ASSERT_MESSAGE(mkc == 0, SDL_GetError());
-#else
-	mkc = aglSetCurrentContext(gAGLContext);
-	if ((mkc == nil) || (aglGetError() != AGL_NO_ERROR))
-		return;
-
-
-			/* NO LONGER NEED PIXEL FORMAT */
-
-	aglDestroyPixelFormat(fmt);
-#endif
 
 
 
@@ -457,13 +429,11 @@ static char			*s;
 static void OGL_SetStyles(OGLSetupInputType *setupDefPtr)
 {
 OGLStyleDefType *styleDefPtr = &setupDefPtr->styles;
-SDL_GLContext agl_ctx = gAGLContext;
 
 
 	glEnable(GL_CULL_FACE);									// activate culling
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);									// CCW is front face
-	glEnable(GL_DITHER);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		// set default blend func
 	glDisable(GL_BLEND);									// but turn it off by default
@@ -513,7 +483,6 @@ static void OGL_CreateLights(OGLLightDefType *lightDefPtr)
 {
 int		i;
 GLfloat	ambient[4];
-SDL_GLContext agl_ctx = gAGLContext;
 
 	OGL_EnableLighting();
 
@@ -573,7 +542,6 @@ SDL_GLContext agl_ctx = gAGLContext;
 void OGL_DrawScene(OGLSetupOutputType *setupInfo, void (*drawRoutine)(OGLSetupOutputType *))
 {
 int	x,y,w,h;
-SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 	if (setupInfo == nil)										// make sure it's legit
 		DoFatalAlert("OGL_DrawScene setupInfo == nil");
@@ -595,9 +563,10 @@ SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 	if (gDebugMode)
 	{
-		gVRAMUsedThisFrame = gGameWindowWidth * gGameWindowHeight * (gGamePrefs.depth / 8);				// backbuffer size
-		gVRAMUsedThisFrame += gGameWindowWidth * gGameWindowHeight * 2;										// z-buffer size
-		gVRAMUsedThisFrame += gGamePrefs.screenWidth * gGamePrefs.screenHeight * (gGamePrefs.depth / 8);	// display size
+		int depth = 32;
+		gVRAMUsedThisFrame = gGameWindowWidth * gGameWindowHeight * (depth / 8);	// backbuffer size
+		gVRAMUsedThisFrame += gGameWindowWidth * gGameWindowHeight * 2;				// z-buffer size
+		gVRAMUsedThisFrame += gGameWindowWidth * gGameWindowHeight * (depth / 8);	// display size
 	}
 
 
@@ -1190,8 +1159,6 @@ u_long	a;
 
 void OGL_Texture_SetOpenGLTexture(GLuint textureName)
 {
-SDL_GLContext agl_ctx = gAGLContext;
-
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	if (OGL_CheckError())
 		DoFatalAlert("OGL_Texture_SetOpenGLTexture: glPixelStorei failed!");
@@ -1284,7 +1251,6 @@ float	aspect;
 OGLCameraPlacement	*placement;
 int		temp, w, h, i;
 OGLLightDefType	*lights;
-SDL_GLContext agl_ctx = gAGLContext;
 
 	OGL_GetCurrentViewport(setupInfo, &temp, &temp, &w, &h);
 	aspect = (float)w/(float)h;
@@ -1396,7 +1362,6 @@ GLenum _OGL_CheckError(const char* file, const int line)
 void OGL_PushState(void)
 {
 int	i;
-SDL_GLContext agl_ctx = gAGLContext;
 
 		/* PUSH MATRIES WITH OPENGL */
 
@@ -1436,7 +1401,6 @@ SDL_GLContext agl_ctx = gAGLContext;
 void OGL_PopState(void)
 {
 int		i;
-SDL_GLContext agl_ctx = gAGLContext;
 
 		/* RETREIVE OPENGL MATRICES */
 
@@ -1501,8 +1465,6 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 void OGL_EnableLighting(void)
 {
-SDL_GLContext agl_ctx = gAGLContext;
-
 	gMyState_Lighting = true;
 	glEnable(GL_LIGHTING);
 }
@@ -1511,8 +1473,6 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 void OGL_DisableLighting(void)
 {
-SDL_GLContext agl_ctx = gAGLContext;
-
 	gMyState_Lighting = false;
 	glDisable(GL_LIGHTING);
 }
@@ -1524,8 +1484,6 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 static void OGL_InitFont(void)
 {
-SDL_GLContext agl_ctx = gAGLContext;
-
 	gFontList = glGenLists(256);
 
 #if 1
@@ -1541,10 +1499,7 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 static void OGL_FreeFont(void)
 {
-
-SDL_GLContext agl_ctx = gAGLContext;
 	glDeleteLists(gFontList, 256);
-
 }
 
 /**************** OGL_DRAW STRING ********************/
@@ -1553,8 +1508,6 @@ void OGL_DrawString(Str255 s, GLint x, GLint y)
 {
 SOURCE_PORT_MINOR_PLACEHOLDER(); return; // TODO: We need OGL_InitFont to work first
 
-
-SDL_GLContext agl_ctx = gAGLContext;
 
 	OGL_PushState();
 

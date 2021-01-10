@@ -47,8 +47,6 @@ unsigned char	gRegInfo[64];
 Boolean	gGameIsRegistered = false;
 Boolean	gSerialWasVerified = false;
 
-Boolean	gLowMemMode = false;
-
 Str255  gSerialFileName = ":OttoMatic:Info";
 
 

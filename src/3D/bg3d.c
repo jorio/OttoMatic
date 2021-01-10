@@ -10,7 +10,7 @@
 /****************************/
 
 
-extern	Boolean			gSongPlayingFlag,gLowMemMode,gMuteMusicFlag;
+extern	Boolean			gSongPlayingFlag,gMuteMusicFlag;
 //extern	Movie				gSongMovie;
 
 
@@ -814,72 +814,6 @@ void				*pixels;
 			h 			= matData->height;						// get height
 
 
-				/* SEE IF NEED TO SHRINK */
-
-			if (gLowMemMode)
-			{
-				if (matData->pixelSrcFormat == GL_RGB)
-				{
-					int		x,y;
-					u_char	*src,*dest;
-
-					dest = src = (u_char *)pixels;
-
-					for (y = 0; y < h; y+=2)
-					{
-						for (x = 0; x < w; x+=2)
-						{
-							*dest++ = src[x*3];
-							*dest++ = src[x*3+1];
-							*dest++ = src[x*3+2];
-						}
-						src += w*2*3;
-					}
-					w /= 2;
-					h /= 2;
-				}
-				else
-				if (matData->pixelSrcFormat == GL_RGBA)
-				{
-					int		x,y;
-					u_long	*src,*dest;
-
-					dest = src = (u_long *)pixels;
-
-					for (y = 0; y < h; y+=2)
-					{
-						for (x = 0; x < w; x+=2)
-						{
-							*dest++ = src[x];
-						}
-						src += w*2;
-					}
-					w /= 2;
-					h /= 2;
-				}
-
-				else
-				if (matData->pixelSrcFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV)
-				{
-					int		x,y;
-					u_short	*src,*dest;
-
-					dest = src = (u_short *)pixels;
-
-					for (y = 0; y < h; y+=2)
-					{
-						for (x = 0; x < w; x+=2)
-						{
-							*dest++ = src[x];
-						}
-						src += w*2;
-					}
-					w /= 2;
-					h /= 2;
-				}
-			}
-
-
 				/********************/
 				/* LOAD INTO OPENGL */
 				/********************/
@@ -915,12 +849,6 @@ void				*pixels;
 			SafeDisposePtr(pixels);
 			matData->texturePixels[0] = nil;
 		}
-
-				/* KEEP MUSIC PLAYING */
-
-		if (gSongPlayingFlag && (!gMuteMusicFlag))
-			SOURCE_PORT_MINOR_PLACEHOLDER();//MoviesTask(gSongMovie, 0);
-
 	}
 }
 

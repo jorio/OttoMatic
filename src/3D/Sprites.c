@@ -16,7 +16,7 @@
 
 extern	float	gCurrentAspectRatio,gGlobalTransparency;
 extern	int		gPolysThisFrame;
-extern	Boolean			gSongPlayingFlag,gLowMemMode,gMuteMusicFlag;
+extern	Boolean			gSongPlayingFlag,gMuteMusicFlag;
 //extern	Movie				gSongMovie;
 extern	u_long			gGlobalMaterialFlags;
 
@@ -189,73 +189,6 @@ MOMaterialData	matData;
 
 		matData.texturePixels[0]= nil;											// we're going to preload
 
-#if 0
-			/* SEE IF NEED TO SHRINK FOR VOODOO 2 */
-
-		if (gLowMemMode)
-		{
-			if (matData.pixelSrcFormat == GL_RGB)
-			{
-				int		x,y;
-				u_char	*src,*dest;
-
-				dest = src = (u_char *)buffer;
-
-				for (y = 0; y < h; y+=2)
-				{
-					for (x = 0; x < w; x+=2)
-					{
-						*dest++ = src[x*3];
-						*dest++ = src[x*3+1];
-						*dest++ = src[x*3+2];
-					}
-					src += w*2*3;
-				}
-				matData.width /= 2;
-				matData.height /= 2;
-			}
-			else
-			if (matData.pixelSrcFormat == GL_RGBA)
-			{
-				int		x,y;
-				u_long	*src,*dest;
-
-				dest = src = (u_long *)buffer;
-
-				for (y = 0; y < h; y+=2)
-				{
-					for (x = 0; x < w; x+=2)
-					{
-						*dest++ = src[x];
-					}
-					src += w*2;
-				}
-				matData.width /= 2;
-				matData.height /= 2;
-			}
-
-			else
-			if (matData.pixelSrcFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV)
-			{
-				int		x,y;
-				u_short	*src,*dest;
-
-				dest = src = (u_short *)buffer;
-
-				for (y = 0; y < h; y+=2)
-				{
-					for (x = 0; x < w; x+=2)
-					{
-						*dest++ = src[x];
-					}
-					src += w*2;
-				}
-				matData.width /= 2;
-				matData.height /= 2;
-			}
-		}
-#endif
-
 					/* SPRITE IS 16-BIT PACKED PIXEL FORMAT */
 
 		if (matData.pixelSrcFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV)	// see if convert 24 to 16-bit
@@ -295,11 +228,6 @@ MOMaterialData	matData;
 
 
 		SafeDisposePtr((Ptr)buffer);														// free the buffer
-
-			/* KEEP MUSIC PLAYING */
-
-		if (gSongPlayingFlag && (!gMuteMusicFlag))
-			SOURCE_PORT_MINOR_PLACEHOLDER(); //MoviesTask(gSongMovie, 0);
 	}
 
 

@@ -33,7 +33,7 @@ extern	u_short			**gTileGrid;
 extern	MOMaterialObject	*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];
 extern	PrefsType			gGamePrefs;
 extern	SDL_GLContext		gAGLContext;
-extern	Boolean			gSongPlayingFlag,gLowMemMode,gMuteMusicFlag,gMuteMusicFlag,gLoadedDrawSprocket,gOSX;
+extern	Boolean			gSongPlayingFlag,gMuteMusicFlag,gMuteMusicFlag,gLoadedDrawSprocket,gOSX;
 //extern	Movie				gSongMovie;
 extern	WaterDefType	**gWaterListHandle, *gWaterList;
 extern	PlayerInfoType	gPlayerInfo;
@@ -560,9 +560,6 @@ long		count;
 			/****************/
 			/* VERIFY PREFS */
 			/****************/
-
-	if ((gGamePrefs.depth != 16) && (gGamePrefs.depth != 32))
-		goto err;
 
 		/* THEY'RE GOOD, SO ALSO RESTORE THE HID CONTROL SETTINGS */
 
@@ -1579,29 +1576,8 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		long decompressedSize = LZSS_Decode(fRefNum, tempBuffer16, compressedSize);
 		GAME_ASSERT_MESSAGE(decompressedSize == size, "LZSS_Decode size is wrong!");
 
-				/* IF LOW MEM MODE THEN SHRINK THE TERRAIN TEXTURES IN HALF */
-
-		if (gLowMemMode)
-		{
-			dest = src = (u_short *)tempBuffer16;
-
-			for (y = 0; y < SUPERTILE_TEXMAP_SIZE; y+=2)
-			{
-				for (x = 0; x < SUPERTILE_TEXMAP_SIZE; x+=2)
-				{
-					*dest++ = src[x];
-				}
-				src += SUPERTILE_TEXMAP_SIZE*2;
-			}
-
-			width = SUPERTILE_TEXMAP_SIZE/2;
-			height = SUPERTILE_TEXMAP_SIZE/2;
-		}
-		else
-		{
-			width = SUPERTILE_TEXMAP_SIZE;
-			height = SUPERTILE_TEXMAP_SIZE;
-		}
+		width = SUPERTILE_TEXMAP_SIZE;
+		height = SUPERTILE_TEXMAP_SIZE;
 
 
 				/**************************/

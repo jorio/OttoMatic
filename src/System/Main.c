@@ -271,11 +271,6 @@ long 		keyboardScript, languageCode, i;
 
 	gGamePrefs.difficulty			= 0;
 	gGamePrefs.showScreenModeDialog = true;
-	gGamePrefs.depth				= 32;
-	gGamePrefs.screenWidth			= 1024;
-	gGamePrefs.screenHeight			= 768;
-	gGamePrefs.hz					= 0;
-	gGamePrefs.monitorNum			= 0;			// main monitor by default
 	gGamePrefs.playerRelControls	= false;
 
 #if 0	// srcport rm

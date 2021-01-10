@@ -24,6 +24,7 @@ extern	u_long			gAutoFadeStatusBits;
 extern	PrefsType			gGamePrefs;
 extern	SpriteType	*gSpriteGroupList[];
 extern	Boolean				gOSX;
+extern	int				gGameWindowWidth,gGameWindowHeight;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -429,7 +430,7 @@ SDL_GLContext agl_ctx = setupInfo->drawContext;
 								setupInfo->cameraPlacement.cameraLocation.x,setupInfo->cameraPlacement.cameraLocation.z);
 	size *= 700.0f / dist;
 
-	w = (float)(gGamePrefs.screenHeight / 15) * size;
+	w = (float)(gGameWindowHeight / 15) * size;
 
 	if (gOSX)					// check max line width differently since OS 9 Rage 128 drivers seem to crash when lines get too wide
 	{

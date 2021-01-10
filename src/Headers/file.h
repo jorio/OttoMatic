@@ -57,34 +57,14 @@ typedef struct
 {
 	Byte	difficulty;
 	Boolean	showScreenModeDialog;
-	int16_t	depth;
-	int32_t		screenWidth;
-	int32_t		screenHeight;
-	double	hz;
-	Byte	monitorNum;
 	Byte	language;
 	Boolean	playerRelControls;
-
-#if 0 // srcport rm
-	DateTimeRec	lastVersCheckDate;
-	Byte	didThisNote[MAX_HTTP_NOTES];
-	Boolean customerHasRegistered;		// not the serial number, but the customer info registration
-
-	int		numHTTPReadFails;			// counter which determines how many times an HTTP read has failed - possible pirate hacking
-#endif
-
 	Boolean	anaglyph;
 	Boolean	anaglyphColor;
 	int16_t	anaglyphCalibrationRed;
 	int16_t	anaglyphCalibrationGreen;
 	int16_t	anaglyphCalibrationBlue;
 	Boolean doAnaglyphChannelBalancing;
-
-#if 0	// srcport rm
-	Boolean	dontUseHID;
-	HIDControlSettingsType	controlSettings;		
-#endif
-
 	uint32_t	reserved[8];
 }PrefsType;
 
