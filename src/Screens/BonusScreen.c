@@ -700,9 +700,7 @@ short	i;
 
 	for (i = 0; i < 2; i++)
 	{
-		Str255	cstr;
-
-		GetIndStringC(cstr, 3000 + gGamePrefs.language, i + 1);
+		const char* cstr = GetLanguageString(i + STRING_OFFSET_BONUS_SCREEN);
 
 		gSaveIcons[i] = MakeFontStringObject(cstr, &gNewObjectDefinition, gGameViewInfoPtr, true);
 		gSaveIcons[i]->ColorFilter.a = 0;

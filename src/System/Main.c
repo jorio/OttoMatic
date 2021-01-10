@@ -301,6 +301,9 @@ long 		keyboardScript, languageCode, i;
 	for (i = 0; i < MAX_HTTP_NOTES; i++)
 		gGamePrefs.diMAdThisNote[i] = false;
 #endif
+
+
+	LoadLanguageStrings(gGamePrefs.language);
 }
 
 

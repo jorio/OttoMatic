@@ -166,7 +166,7 @@ static float	gHealthMeterRot = 0, gFuelMeterRot = 0, gJumpJetMeterRot=0;
 static float	gWeaponY[MAX_INVENTORY_SLOTS];
 
 short	gDisplayedHelpMessage;
-static Str255	gHelpStringC;
+static const char*	gHelpStringC;
 static float	gHelpMessageAlpha,gHelpMessageX;
 static float	gHelpMessageTimer;
 
@@ -939,13 +939,13 @@ void DisplayHelpMessage(short messNum, float timer, Boolean overrideCurrent)
 
 			/* GET THE STRING TEXT TO DISPLAY */
 
-	GetIndStringC(gHelpStringC, 1000 + gGamePrefs.language, messNum+1);
+	gHelpStringC = GetLanguageString(messNum + STRING_OFFSET_IN_GAME_HELP);
 
 
 			/* CALC STRING PARAMETERS */
 
 	float size = 0;
-	for (char* c = gHelpStringC; *c; c++)
+	for (const char* c = gHelpStringC; *c; c++)
 	{
 		short s = CharToSprite(*c);
 		if (s == -1)
@@ -1016,7 +1016,7 @@ SDL_GLContext agl_ctx = gAGLContext;
 	gGlobalTransparency = gHelpMessageAlpha;
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
 
-	for (char* c = gHelpStringC; *c; c++)
+	for (const char* c = gHelpStringC; *c; c++)
 	{
 				/* CONVERT LETTER INTO SPRITE # */
 

@@ -707,20 +707,6 @@ ObjNode	*ring,*glow,*ringGlow;
 static void MakeIconString(void)
 {
 ObjNode	*newObj;
-static Str31 strings[] =
-{
-	"PLAY GAME",
-	"LOAD SAVED GAME",
-	"HELP",
-	"QUIT",
-	"CREDITS",
-	"HIGH SCORES",
-	"SETTINGS"
-};
-
-
-	if (gGamePrefs.language != LANGUAGE_ENGLISH)		// only english for now
-		return;
 
 			/* BUILD NEW TEXT STRINGS */
 
@@ -733,7 +719,7 @@ static Str31 strings[] =
 	gNewObjectDefinition.scale 	    = 25.0;
 	gNewObjectDefinition.slot 		= SPRITE_SLOT;
 
-	newObj = MakeFontStringObject(strings[gSelection], &gNewObjectDefinition, gGameViewInfoPtr, true);		// title
+	newObj = MakeFontStringObject(GetLanguageString(2 + gSelection), &gNewObjectDefinition, gGameViewInfoPtr, true);		// title
 	newObj->ColorFilter.a = 0;
 
 	gFadeInIconString = true;

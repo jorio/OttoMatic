@@ -565,6 +565,7 @@ long		count;
 
 //	RestoreHIDControlSettings(&gGamePrefs.controlSettings);
 
+	LoadLanguageStrings(gGamePrefs.language);
 
 	return(noErr);
 
