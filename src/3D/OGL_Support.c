@@ -41,7 +41,7 @@ static void OGL_CreateLights(OGLLightDefType *lightDefPtr);
 static void OGL_InitFont(void);
 static void OGL_FreeFont(void);
 
-static void ColorBalanceRGBForAnaglyph(u_long *rr, u_long *gg, u_long *bb);
+static void ColorBalanceRGBForAnaglyph(uint32_t *rr, uint32_t *gg, uint32_t *bb);
 static void	ConvertTextureToGrey(void *imageMemory, short width, short height, GLint srcFormat, GLint dataType);
 static void	ConvertTextureToColorAnaglyph(void *imageMemory, short width, short height, GLint srcFormat, GLint dataType);
 
@@ -270,7 +270,7 @@ static char			*s;
 	{
 		if (gGamePrefs.anaglyphColor)
 		{
-			u_long	r,g,b;
+			uint32_t	r,g,b;
 
 			r = viewDefPtr->clearColor.r * 255.0f;
 			g = viewDefPtr->clearColor.g * 255.0f;
@@ -841,18 +841,18 @@ GLuint	textureName;
 	if (OGL_CheckError())
 		DoFatalAlert("OGL_TextureMap_Load: glBindTexture failed!");
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
- 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		glTexImage2D(GL_TEXTURE_2D,
-					0,										// mipmap level
-					destFormat,								// format in OpenGL
-					width,									// width in pixels
-					height,									// height in pixels
-					0,										// border
-					srcFormat,								// what my format is
-					dataType,								// size of each r,g,b
-					imageMemory);							// pointer to the actual texture pixels
+	glTexImage2D(GL_TEXTURE_2D,
+				0,										// mipmap level
+				destFormat,								// format in OpenGL
+				width,									// width in pixels
+				height,									// height in pixels
+				0,										// border
+				srcFormat,								// what my format is
+				dataType,								// size of each r,g,b
+				imageMemory);							// pointer to the actual texture pixels
 
 			/* SEE IF RAN OUT OF MEMORY WHILE COPYING TO OPENGL */
 
@@ -877,19 +877,19 @@ static void	ConvertTextureToGrey(void *imageMemory, short width, short height, G
 {
 long	x,y;
 float	r,g,b;
-u_long	a,q,rq,bq;
-u_long   redCal = gGamePrefs.anaglyphCalibrationRed;
-u_long   blueCal =  gGamePrefs.anaglyphCalibrationBlue;
+uint32_t	a,q,rq,bq;
+uint32_t   redCal = gGamePrefs.anaglyphCalibrationRed;
+uint32_t   blueCal =  gGamePrefs.anaglyphCalibrationBlue;
 
 
 	if (dataType == GL_UNSIGNED_INT_8_8_8_8_REV)
 	{
-		u_long	*pix32 = (u_long *)imageMemory;
+		uint32_t	*pix32 = (uint32_t *)imageMemory;
 		for (y = 0; y < height; y++)
 		{
 			for (x = 0; x < width; x++)
 			{
-				u_long	pix = pix32[x];
+				uint32_t	pix = pix32[x];
 
 				r = (float)((pix >> 16) & 0xff) / 255.0f * .299f;
 				g = (float)((pix >> 8) & 0xff) / 255.0f * .586f;
@@ -915,12 +915,12 @@ u_long   blueCal =  gGamePrefs.anaglyphCalibrationBlue;
 	else
 	if ((dataType == GL_UNSIGNED_BYTE) && (srcFormat == GL_RGBA))
 	{
-		u_long	*pix32 = (u_long *)imageMemory;
+		uint32_t	*pix32 = (uint32_t *)imageMemory;
 		for (y = 0; y < height; y++)
 		{
 			for (x = 0; x < width; x++)
 			{
-				u_long	pix = SwizzleULong(&pix32[x]);
+				uint32_t	pix = SwizzleULong(&pix32[x]);
 
 				r = (float)((pix >> 24) & 0xff) / 255.0f * .299f;
 				g = (float)((pix >> 16) & 0xff) / 255.0f * .586f;
@@ -945,12 +945,12 @@ u_long   blueCal =  gGamePrefs.anaglyphCalibrationBlue;
 	else
 	if (dataType == GL_UNSIGNED_SHORT_1_5_5_5_REV)
 	{
-		u_short	*pix16 = (u_short *)imageMemory;
+		uint16_t	*pix16 = (uint16_t *)imageMemory;
 		for (y = 0; y < height; y++)
 		{
 			for (x = 0; x < width; x++)
 			{
-				u_short	pix = pix16[x]; //SwizzleUShort(&pix16[x]);
+				uint16_t	pix = pix16[x]; //SwizzleUShort(&pix16[x]);
 
 				r = (float)((pix >> 10) & 0x1f) / 31.0f * .299f;
 				g = (float)((pix >> 5) & 0x1f) / 31.0f * .586f;
@@ -988,9 +988,9 @@ u_long   blueCal =  gGamePrefs.anaglyphCalibrationBlue;
 
 /******************* COLOR BALANCE RGB FOR ANAGLYPH *********************/
 
-void ColorBalanceRGBForAnaglyph(u_long *rr, u_long *gg, u_long *bb)
+void ColorBalanceRGBForAnaglyph(uint32_t *rr, uint32_t *gg, uint32_t *bb)
 {
-long	r,g,b;
+uint32_t	r,g,b;
 float	d;
 float   lumR, lumGB, ratio;
 const Boolean	allowChannelBalancing = true;
@@ -1077,12 +1077,12 @@ const Boolean	allowChannelBalancing = true;
 static void	ConvertTextureToColorAnaglyph(void *imageMemory, short width, short height, GLint srcFormat, GLint dataType)
 {
 long	x,y;
-u_long	r,g,b;
-u_long	a;
+uint32_t	r,g,b;
+uint32_t	a;
 
 	if (dataType == GL_UNSIGNED_INT_8_8_8_8_REV)
 	{
-		u_long	*pix32 = (u_long *)imageMemory;
+		uint32_t	*pix32 = (uint32_t *)imageMemory;
 		for (y = 0; y < height; y++)
 		{
 			for (x = 0; x < width; x++)
@@ -1103,12 +1103,12 @@ u_long	a;
 	else
 	if ((dataType == GL_UNSIGNED_BYTE) && (srcFormat == GL_RGBA))
 	{
-		u_long	*pix32 = (u_long *)imageMemory;
+		uint32_t	*pix32 = (uint32_t *)imageMemory;
 		for (y = 0; y < height; y++)
 		{
 			for (x = 0; x < width; x++)
 			{
-				u_long	pix = SwizzleULong(&pix32[x]);
+				uint32_t	pix = SwizzleULong(&pix32[x]);
 
 				a = ((pix >> 0) & 0xff);
 				r = ((pix >> 24) & 0xff);

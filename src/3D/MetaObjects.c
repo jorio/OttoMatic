@@ -450,11 +450,9 @@ Rect		r;
 	width = r.right - r.left;		// get width/height
 	height = r.bottom - r.top;
 
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-#if 0
 	hPixMap = GetGWorldPixMap(gworld);							// get gworld's pixmap
 	pictMapAddr = GetPixBaseAddr(hPixMap);
-	pictRowBytes = (u_long)(**hPixMap).rowBytes & 0x3fff;
+	pictRowBytes = (uint32_t)(**hPixMap).rowBytes & 0x3fff;
 
 	depth = (*hPixMap)->pixelSize;								// get pixel bitdepth
 	if (depth == 32)
@@ -583,9 +581,11 @@ Rect		r;
 
 			if (depth == 32)
 			{
-				u_long	r,g,b,a;
-				int		x,y;
-				u_long	pixels, *dest = (u_long *)destPtr, *src = (u_long *)srcPtr;
+				uint32_t	r,g,b,a;
+				int			x,y;
+				uint32_t	pixels;
+				uint32_t 	*dest	= (uint32_t *)destPtr;
+				uint32_t 	*src	= (uint32_t *)srcPtr;
 
 				for (y = 0; y < vertCellSize; y++)
 				{
@@ -657,7 +657,6 @@ Rect		r;
 
 	DisposeGWorld (gworld);
 	SafeDisposePtr(buffer);
-#endif
 }
 
 
@@ -2089,7 +2088,7 @@ GWorldPtr 		pGWorld;
 PixMapHandle 	hPixMap;
 Ptr				buffer;
 Ptr 			pictMapAddr;
-u_long 			pictRowBytes;
+uint32_t		pictRowBytes;
 int				y,x;
 Boolean			destHasAlpha;
 Rect			r;
@@ -2147,11 +2146,8 @@ Rect			r;
 	if (buffer == nil)
 		DoFatalAlert("MO_GetTextureFromResource: AllocPtr failed!");
 
-	SOURCE_PORT_PLACEHOLDER();
-	return nil;
-#if 0
 	pictMapAddr = GetPixBaseAddr(hPixMap);
-	pictRowBytes = (u_long)(**hPixMap).rowBytes & 0x3fff;
+	pictRowBytes = (uint32_t)(**hPixMap).rowBytes & 0x3fff;
 	pictMapAddr += pictRowBytes * (height-1);						// start @ bottom to flip texture
 
 
@@ -2159,11 +2155,11 @@ Rect			r;
 
 	if (depth == 32)
 	{
-		u_long	r,g,b,a;
-		u_long	pixels, *dest, *src;
+		uint32_t	r,g,b,a;
+		uint32_t	pixels, *dest, *src;
 
-		src = (u_long *)pictMapAddr;
-		dest = (u_long *)buffer;
+		src = (uint32_t *)pictMapAddr;
+		dest = (uint32_t *)buffer;
 
 		for (y = 0; y < height; y++)
 		{
@@ -2233,7 +2229,6 @@ Rect			r;
 	SafeDisposePtr(buffer);									// dispose of our copy of the buffer
 
 	return(obj);
-#endif
 }
 
 /*************** MO: GEOMETRY OFFSET UVS *********************/
