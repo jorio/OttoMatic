@@ -171,7 +171,7 @@ long			count;
 
 	count = sizeof(BG3DHeaderType);
 
-	if (FSRead(refNum, &count, &headerData) != noErr)
+	if (FSRead(refNum, &count, (Ptr) &headerData) != noErr)
 		DoFatalAlert("ReadBG3DHeader: FSRead failed");
 
 			/* VERIFY FILE */
@@ -371,7 +371,7 @@ MOMaterialData	*data;
 			/***********************/
 
 	count = sizeof(BG3DTextureHeader);
-	FSRead(refNum, &count, &textureHeader);		// read header
+	FSRead(refNum, &count, (Ptr) &textureHeader);		// read header
 
 	textureHeader.width			= SwizzleULong(&textureHeader.width);
 	textureHeader.height		= SwizzleULong(&textureHeader.height);
@@ -498,7 +498,7 @@ MetaObjectPtr		newObj;
 			/* READ GEOMETRY HEADER */
 
 	count = sizeof(BG3DGeometryHeader);
-	FSRead(refNum, &count, &geoHeader);		// read header
+	FSRead(refNum, &count, (Ptr) &geoHeader);		// read header
 
 	geoHeader.type = SwizzleULong(&geoHeader.type);
 	geoHeader.numMaterials = SwizzleLong(&geoHeader.numMaterials);
@@ -595,7 +595,7 @@ OGLPoint3D			*pointList;
 	if (pointList == nil)
 		DoFatalAlert("ReadVertexArray: AllocPtr failed!");
 
-	FSRead(refNum, &count, pointList);								// read the data
+	FSRead(refNum, &count, (Ptr) pointList);						// read the data
 
 
 	for (i = 0; i < numPoints; i++)						// swizzle
@@ -627,7 +627,7 @@ OGLVector3D			*normalList;
 	if (normalList == nil)
 		DoFatalAlert("ReadNormalArray: AllocPtr failed!");
 
-	FSRead(refNum, &count, normalList);								// read the data
+	FSRead(refNum, &count, (Ptr) normalList);						// read the data
 
 	for (i = 0; i < numPoints; i++)						// swizzle
 	{
@@ -658,7 +658,7 @@ OGLTextureCoord		*uvList;
 	if (uvList == nil)
 		DoFatalAlert("ReadUVArray: AllocPtr failed!");
 
-	FSRead(refNum, &count, uvList);									// read the data
+	FSRead(refNum, &count, (Ptr) uvList);							// read the data
 
 	for (i = 0; i < numPoints; i++)						// swizzle
 	{
@@ -689,7 +689,7 @@ OGLColorRGBA		*colorsF;
 	if (colorList == nil)
 		DoFatalAlert("ReadVertexColorArray: AllocPtr failed!");
 
-	FSRead(refNum, &count, colorList);								// read the data
+	FSRead(refNum, &count, (Ptr) colorList);						// read the data
 
 	data->colorsByte = colorList;									// assign color array to geometry header
 
@@ -733,7 +733,7 @@ MOTriangleIndecies	*triList;
 	if (triList == nil)
 		DoFatalAlert("ReadTriangleArray: AllocPtr failed!");
 
-	FSRead(refNum, &count, triList);								// read the data
+	FSRead(refNum, &count, (Ptr) triList);							// read the data
 
 	for (i = 0; i < numTriangles; i++)							//	swizzle
 	{

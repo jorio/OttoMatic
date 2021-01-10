@@ -617,7 +617,7 @@ long				count;
 				/* WRITE DATA */
 
 	count = sizeof(PrefsType);
-	FSWrite(refNum, &count, &gGamePrefs);
+	FSWrite(refNum, &count, (Ptr) &gGamePrefs);
 	FSClose(refNum);
 }
 

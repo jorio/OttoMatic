@@ -156,7 +156,7 @@ MOMaterialData	matData;
 			/* READ THE SPRITE PIXEL BUFFER */
 
 		count = bufferSize;
-		FSRead(refNum, &count, buffer);
+		FSRead(refNum, &count, (Ptr) buffer);
 
 		if (gSpriteGroupList[groupNum][i].srcFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV)
 		{
