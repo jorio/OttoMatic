@@ -1123,15 +1123,16 @@ short	s;
 				break;
 
 		case	MACROMAN_EGRAVE:
-				s = HELPTEXT_SObjType_EE;
-				break;
-
 		case	MACROMAN_ECIRC:
 				s = HELPTEXT_SObjType_E;
 				break;
 
 		case	MACROMAN_AGRAVE:
 				s = HELPTEXT_SObjType_Ax;
+				break;
+
+		case	MACROMAN_ACIRC:
+				s = HELPTEXT_SObjType_A;
 				break;
 
 		case	MACROMAN_OCIRC:
@@ -1142,7 +1143,11 @@ short	s;
 				s = HELPTEXT_SObjType_Oa;
 				break;
 
-		case	CHAR_APOSTROPHE:
+		case	MACROMAN_CCEDIL:
+				s = HELPTEXT_SObjType_C;
+				break;
+
+		case	'\'':
 				s = HELPTEXT_SObjType_Apostrophe;
 				break;
 
