@@ -320,7 +320,7 @@ Str32	s;
 
 /***************** DRAW SCORE TEXT ***********************/
 
-void DrawScoreText(unsigned char *s, float x, float y, OGLSetupOutputType *info)
+void DrawScoreText(const char *s, float x, float y, OGLSetupOutputType *info)
 {
 int	n,i,texNum;
 

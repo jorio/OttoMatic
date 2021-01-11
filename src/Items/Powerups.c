@@ -86,11 +86,6 @@ enum
 #define	AtomDelayToActive	SpecialF[4]
 #define	AtomOnWater			Flag[0]
 
-#define	GeneratorActive		Flag[0]
-#define	GeneratorCenterX	SpecialF[0]
-#define	GeneratorCenterZ	SpecialF[1]
-#define	ShieldObj			Special[0]
-
 
 
 /********************** SPEW ATOMS ***************************/

@@ -7,7 +7,7 @@
 
 typedef struct
 {
-	unsigned char	name[MAX_NAME_LENGTH+1];
+	char			name[MAX_NAME_LENGTH+1];
 	unsigned long	score;
 }HighScoreType;
 

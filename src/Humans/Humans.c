@@ -736,7 +736,7 @@ short	humanType = itemPtr->parm[1];
 short	numHumans = itemPtr->parm[0];
 
 	if (numHumans == 0)												// see if random #
-		numHumans = 1 + MyRandomLong()&7;
+		numHumans = 1 + (MyRandomLong()&7);
 
 
 			/******************/

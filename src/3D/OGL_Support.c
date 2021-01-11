@@ -25,7 +25,6 @@ extern	Boolean			gOSX;
 extern	u_long			gGlobalMaterialFlags;
 extern	PrefsType			gGamePrefs;
 extern	int				gGameWindowWidth,gGameWindowHeight,gScratch,gNumSparkles;
-extern	CGrafPtr				gDisplayContextGrafPtr;
 
 extern	SDL_Window		*gSDLWindow;
 
@@ -1535,7 +1534,7 @@ void OGL_DrawFloat(float f, GLint x, GLint y)
 
 Str255	s;
 
-	FloatToString(f,s);
+	snprintf(s, 256, "%f", f);
 	OGL_DrawString(s,x,y);
 
 }

@@ -21,10 +21,8 @@ extern	SDL_GLContext		gAGLContext;
 extern	Byte			gDebugMode;
 extern	PrefsType			gGamePrefs;
 extern	Boolean			gSongPlayingFlag;
-//extern	Movie				gSongMovie;
 extern	OGLMatrix4x4	gWorldToFrustumMatrix,gWorldToViewMatrix,gViewToFrustumMatrix;
 extern	OGLMatrix4x4	*gCurrentObjMatrix;
-extern	CGrafPtr				gDisplayContextGrafPtr;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 
@@ -434,7 +432,6 @@ MOPictureData	*picData = &pictObj->objectData;
 Ptr			buffer,pictMapAddr;
 u_long		bufferRowBytes,pictRowBytes;
 MOMaterialData	matData;
-Rect		r;
 
 		/* LOAD PICTURE INTO GWORLD */
 
@@ -444,11 +441,13 @@ Rect		r;
 
 			/* GET GWORLD INFO */
 
-	GetPortBounds(gworld, &r);
+	{
+		Rect r;
+		GetPortBounds(gworld, &r);
 
-
-	width = r.right - r.left;		// get width/height
-	height = r.bottom - r.top;
+		width = r.right - r.left;        // get width/height
+		height = r.bottom - r.top;
+	}
 
 	hPixMap = GetGWorldPixMap(gworld);							// get gworld's pixmap
 	pictMapAddr = GetPixBaseAddr(hPixMap);
@@ -732,7 +731,6 @@ MOPictureData	*picData = &obj->objectData;				//  point to pic obj's data
 Point			pt;
 int				x,y,w,h;
 
-	SetPort(gDisplayContextGrafPtr);
 	GetMouse(&pt);										// get mouse screen coords
 
 			/* CONVERT SCREEN COORD TO OPENGL COORD */
@@ -2091,7 +2089,6 @@ Ptr 			pictMapAddr;
 uint32_t		pictRowBytes;
 int				y,x;
 Boolean			destHasAlpha;
-Rect			r;
 
 		/*******************************/
 		/* CREATE TEXTURE PIXEL BUFFER */
@@ -2124,10 +2121,13 @@ Rect			r;
 
 			/* GET GWORLD INFO */
 
-	GetPortBounds(pGWorld, &r);
+	{
+		Rect r;
+		GetPortBounds(pGWorld, &r);
 
-	width = r.right - r.left;		// get width/height
-	height = r.bottom - r.top;
+		width = r.right - r.left;			// get width/height
+		height = r.bottom - r.top;
+	}
 
 	if ((!IsPowerOf2(width)) || (!IsPowerOf2(height)))				// make sure its a power of 2
 		DoFatalAlert("MO_GetTextureFromFile: dimensions not power of 2");

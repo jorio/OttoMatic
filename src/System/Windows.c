@@ -68,18 +68,8 @@ EventHandlerUPP gWinEvtHandler;
 #endif
 
 
-WindowPtr		gGameWindow;
-GrafPtr			gGameWindowGrafPtr;
-GDHandle 		gGDevice;
-
-
 static short				gNumVideoModes = 0;
 static VideoModeType		gVideoModeList[MAX_VIDEO_MODES];
-
-long					gScreenXOffset,gScreenYOffset;
-Boolean					gLoadedDrawSprocket = false;
-
-CGrafPtr				gDisplayContextGrafPtr = nil;
 
 
 float		gGammaFadePercent = 1.0;
@@ -340,9 +330,6 @@ void GammaOff(void)
 
 void CleanupDisplay(void)
 {
-	SOURCE_PORT_MINOR_PLACEHOLDER(); //CGReleaseAllDisplays();
-
-	gDisplayContextGrafPtr = nil;
 }
 
 
@@ -442,16 +429,7 @@ float	speed = theNode->Speed * fps;
 
 void GameScreenToBlack(void)
 {
-Rect	r;
-
-	if (!gDisplayContextGrafPtr)
-		return;
-
-	SetPort(gDisplayContextGrafPtr);
-	BackColor(blackColor);
-
-	GetPortBounds(gDisplayContextGrafPtr, &r);
-	EraseRect(&r);
+	SOURCE_PORT_MINOR_PLACEHOLDER();
 }
 
 

@@ -11,7 +11,6 @@
 
 
 extern	Boolean			gSongPlayingFlag,gMuteMusicFlag;
-//extern	Movie				gSongMovie;
 
 
 /****************************/

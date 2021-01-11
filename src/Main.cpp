@@ -100,7 +100,7 @@ int CommonMain(int argc, const char** argv)
 //	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, msaaSamples);
 
 	gSDLWindow = SDL_CreateWindow(
-			"Otto Matic",
+			GetWindowTitle(),
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
 			1280,
