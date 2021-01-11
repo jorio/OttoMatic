@@ -322,7 +322,10 @@ int	i;
 
 				/* NUKE WATER PATCH */
 
-	DisposeHandle((Handle)gWaterListHandle);
+	if (gWaterListHandle != nil)
+	{
+		DisposeHandle((Handle)gWaterListHandle);
+	}
 	gWaterListHandle = nil;
 	gWaterList = nil;
 	gNumWaterPatches = 0;

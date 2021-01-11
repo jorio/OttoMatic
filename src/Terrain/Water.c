@@ -43,7 +43,7 @@ static void MakeWaterGeometry(void);
 long			gNumWaterPatches = 0;
 short			gNumWaterDrawn;
 WaterDefType	**gWaterListHandle = nil;
-WaterDefType	*gWaterList;
+WaterDefType	*gWaterList = nil;
 
 
 static MOVertexArrayData		gWaterTriMeshData[MAX_WATER];
