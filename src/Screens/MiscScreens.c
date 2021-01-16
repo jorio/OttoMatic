@@ -22,6 +22,7 @@ extern	int			gLevelNum;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	OGLVector3D	gDelta;
 extern	short		gMainAppRezFile;
+extern	SDL_Window	*gSDLWindow;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -191,52 +192,51 @@ FSSpec	spec;
 
 Boolean DoLevelCheatDialog(void)
 {
-	SOURCE_PORT_PLACEHOLDER();
-#if 0	// srcport: awaiting reimplementation
-DialogPtr 		myDialog;
-short			itemHit;
-Boolean			dialogDone = false;
+	const SDL_MessageBoxButtonData buttons[] =
+			{
+					{ 0, 0, "1" },
+					{ 0, 1, "2" },
+					{ 0, 2, "3" },
+					{ 0, 3, "4" },
+					{ 0, 4, "5" },
+					{ 0, 5, "6" },
+					{ 0, 6, "7" },
+					{ 0, 7, "8" },
+					{ 0, 8, "9" },
+					{ 0, 9, "10" },
+					{ 0, 10, "Quit" },
+			};
 
-	Enter2D();
-//	InitCursor();
-	myDialog = GetNewDialog(132,nil,MOVE_TO_FRONT);
-	if (!myDialog)
+	const SDL_MessageBoxData messageboxdata =
+			{
+					SDL_MESSAGEBOX_INFORMATION,		// .flags
+					gSDLWindow,						// .window
+					"LEVEL SELECT",					// .title
+					"PICK A LEVEL",					// .message
+					SDL_arraysize(buttons),			// .numbuttons
+					buttons,						// .buttons
+					NULL							// .colorScheme
+			};
+
+	int buttonid;
+	if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0)
 	{
-		DoAlert("DoLevelCheatDialog: GetNewDialog failed!");
-		ShowSystemErr(ResError());
+		DoAlert(SDL_GetError());
+		CleanQuit();
+		return false;
 	}
 
-	AutoSizeDialog(myDialog);
-
-
-
-//	GammaFadeIn();
-
-
-				/* DO IT */
-
-	MyFlushEvents();
-	while(!dialogDone)
+	switch (buttonid)
 	{
-		ModalDialog(nil, &itemHit);
-		switch (itemHit)
-		{
-			case 	1:									// hit Quit
-					CleanQuit();
-
-			default:									// selected a level
-					gLevelNum = (itemHit - 2);
-					dialogDone = true;
-		}
+		case 10: // quit
+			CleanQuit();
+			return false;
+		default: // resume
+			gLevelNum = buttonid;
+			break;
 	}
-	DisposeDialog(myDialog);
-	Exit2D();
-//	HideCursor();
-	GammaFadeOut();
-	GameScreenToBlack();
 
-#endif
-	return(false);
+	return false;
 }
 
 #if 1
@@ -247,7 +247,7 @@ Boolean			dialogDone = false;
 
 void DoGameSettingsDialog(void)
 {
-	SOURCE_PORT_PLACEHOLDER();
+	SOURCE_PORT_MINOR_PLACEHOLDER();
 #if 0	// srcport: awaiting reimplementation
 OSErr			err;
 EventTypeSpec	list[] = { { kEventClassCommand,  kEventProcessCommand } };

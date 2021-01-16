@@ -337,8 +337,18 @@ static void PlayGame(void)
 
 #if !DEMO
 		if (GetKeyState(SDL_SCANCODE_F10))		// see if do Level cheat
+		{
 			if (DoLevelCheatDialog())
 				CleanQuit();
+		}
+		else
+		{
+			for (int i = 0; i < 10; i++)		// see if do level cheat by holding down number key
+			{
+				if (GetKeyState(SDL_SCANCODE_1 + i))	// scancodes 1,2,...,9,0 are contiguous
+					gLevelNum = i;
+			}
+		}
 #endif
 	}
 
