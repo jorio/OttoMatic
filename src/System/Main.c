@@ -20,7 +20,6 @@ extern	ObjNode				*gFirstNodePtr, *gAlienSaucer;
 extern	short		gNumSuperTilesDrawn;
 extern	float		gGlobalTransparency;
 extern	int			gMaxItemsAllocatedInAPass,gNumObjectNodes,gNumHumansRescuedTotal;
-extern	SavePlayerType	gPlayerSaveData;
 extern	PrefsType	gGamePrefs;
 extern	short	gNumTerrainDeformations;
 extern	DeformationType	gDeformationList[];
@@ -235,6 +234,8 @@ NumVersion	vers;
 
 void InitDefaultPrefs(void)
 {
+	memset(&gGamePrefs, 0, sizeof(gGamePrefs));
+
 #if 0	// srcport rm. TODO: There's std::locale in C++.
 long 		keyboardScript, languageCode, i;
 
@@ -269,15 +270,7 @@ long 		keyboardScript, languageCode, i;
 	gGamePrefs.language				= LANGUAGE_ENGLISH;
 #endif
 
-	gGamePrefs.difficulty			= 0;
-	gGamePrefs.showScreenModeDialog = true;
 	gGamePrefs.playerRelControls	= false;
-
-#if 0	// srcport rm
-	gGamePrefs.lastVersCheckDate.year = 0;
-	gGamePrefs.customerHasRegistered = false;
-	gGamePrefs.numHTTPReadFails		= 0;
-#endif
 
 	gGamePrefs.anaglyph				= false;
 	gGamePrefs.anaglyphColor		= true;
@@ -285,23 +278,6 @@ long 		keyboardScript, languageCode, i;
 	gGamePrefs.anaglyphCalibrationGreen = DEFAULT_ANAGLYPH_G;
 	gGamePrefs.anaglyphCalibrationBlue = DEFAULT_ANAGLYPH_B;
 	gGamePrefs.doAnaglyphChannelBalancing = true;
-
-//	gGamePrefs.dontUseHID			= false;		// srcport rm
-
-	gGamePrefs.reserved[0] 			= 0;
-	gGamePrefs.reserved[1] 			= 0;
-	gGamePrefs.reserved[2] 			= 0;
-	gGamePrefs.reserved[3] 			= 0;
-	gGamePrefs.reserved[4] 			= 0;
-	gGamePrefs.reserved[5] 			= 0;
-	gGamePrefs.reserved[6] 			= 0;
-	gGamePrefs.reserved[7] 			= 0;
-
-#if 0	// srcport rm
-	for (i = 0; i < MAX_HTTP_NOTES; i++)
-		gGamePrefs.diMAdThisNote[i] = false;
-#endif
-
 
 	LoadLanguageStrings(gGamePrefs.language);
 }

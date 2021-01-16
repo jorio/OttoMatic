@@ -48,35 +48,21 @@ typedef struct
 }SkeletonFile_AnimHeader_Type;
 
 
-#define	MAX_HTTP_NOTES	1000
-
 
 		/* PREFERENCES */
 		
 typedef struct
 {
-	Byte	difficulty;
-	Boolean	showScreenModeDialog;
 	Byte	language;
 	Boolean	playerRelControls;
 	Boolean	anaglyph;
 	Boolean	anaglyphColor;
-	int16_t	anaglyphCalibrationRed;
-	int16_t	anaglyphCalibrationGreen;
-	int16_t	anaglyphCalibrationBlue;
+	uint8_t	anaglyphCalibrationRed;
+	uint8_t	anaglyphCalibrationGreen;
+	uint8_t	anaglyphCalibrationBlue;
 	Boolean doAnaglyphChannelBalancing;
 	uint32_t	reserved[8];
 }PrefsType;
-
-
-
-		/* SAVE PLAYER */
-		
-typedef struct
-{
-	Byte		numAgesCompleted;		// encode # ages in lower 4 bits, and stage in upper 4 bits
-	Str255		playerName;
-}SavePlayerType;
 
 extern	PrefsType			gGamePrefs;
 
@@ -95,14 +81,6 @@ void SetDefaultDirectory(void);
 
 Boolean SaveGame(void);
 Boolean LoadSavedGame(void);
-
-
-#if 0 // srcport rm
-void GetLibVersion(ConstStrFileNameParam libName, NumVersion *version);
-#endif
-
-void VerifyApplicationFileID(void);
-
 
 
 #endif
