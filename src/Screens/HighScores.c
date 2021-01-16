@@ -110,56 +110,54 @@ void NewScore(void)
 
 		if (!gDrawScoreVerbage)
 		{
-			SOURCE_PORT_MINOR_PLACEHOLDER(); // TODO: reimplement for SDL input
-#if 0
-			EventRecord 	theEvent;
-
-			GetNextEvent(keyDownMask|autoKeyMask, &theEvent);							// poll event queue
-			if ((theEvent.what == keyDown) || (theEvent.what == autoKeyMask))			// see if key pressed
+			if (GetNewKeyState(SDL_SCANCODE_RETURN)
+				|| GetNewKeyState(SDL_SCANCODE_KP_ENTER))
 			{
-				char	theChar = theEvent.message & charCodeMask;						// extract key
-				int		i;
-
-				switch(theChar)
-				{
-					case	CHAR_RETURN:
-							gExitHighScores = true;
-							break;
-
-					case	CHAR_LEFT:
-							if (gCursorIndex > 0)
-								gCursorIndex--;
-							break;
-
-					case	CHAR_RIGHT:
-							if (gCursorIndex < (MAX_NAME_LENGTH-1))
-								gCursorIndex++;
-							else
-								gCursorIndex = MAX_NAME_LENGTH-1;
-							break;
-
-					case	CHAR_DELETE:
-							if (gCursorIndex > 0)
-							{
-								gCursorIndex--;
-								for (i = gCursorIndex+1; i < MAX_NAME_LENGTH; i++)
-									gHighScores[gNewScoreSlot].name[i] = gHighScores[gNewScoreSlot].name[i+1];
-								gHighScores[gNewScoreSlot].name[MAX_NAME_LENGTH] = ' ';
-							}
-							break;
-
-					default:
-							if (gCursorIndex < MAX_NAME_LENGTH)								// dont add anything more if maxxed out now
-							{
-								if ((theChar >= 'a') && (theChar <= 'z'))					// see if convert lower case to upper case a..z
-									theChar = 'A' + (theChar-'a');
-								gHighScores[gNewScoreSlot].name[gCursorIndex+1] = theChar;
-								gCursorIndex++;
-							}
-				}
-
+				gExitHighScores = true;
 			}
-#endif
+			else if (GetNewKeyState(SDL_SCANCODE_LEFT))
+			{
+				if (gCursorIndex > 0)
+					gCursorIndex--;
+			}
+			else if (GetNewKeyState(SDL_SCANCODE_RIGHT))
+			{
+				if (gCursorIndex < (MAX_NAME_LENGTH - 1))
+					gCursorIndex++;
+				else
+					gCursorIndex = MAX_NAME_LENGTH - 1;
+			}
+			else if (GetNewKeyState(SDL_SCANCODE_BACKSPACE))
+			{
+				if (gCursorIndex > 0)
+				{
+					gCursorIndex--;
+					for (int i = gCursorIndex+1; i < MAX_NAME_LENGTH; i++)
+						gHighScores[gNewScoreSlot].name[i] = gHighScores[gNewScoreSlot].name[i+1];
+					gHighScores[gNewScoreSlot].name[MAX_NAME_LENGTH] = ' ';
+				}
+			}
+			else
+			{
+				SDL_Event event;
+				//SDL_PumpEvents();	// not needed because UpdateInput does it already
+				if (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_TEXTINPUT, SDL_TEXTINPUT) > 0)
+				{
+					GAME_ASSERT(event.type == SDL_TEXTINPUT);
+					// The text event gives us UTF-8. Use the key only if it's a printable ASCII character.
+					if (event.text.text[0] >= ' ' && event.text.text[0] <= '~')
+					{
+						char theChar = event.text.text[0];
+						if (gCursorIndex < MAX_NAME_LENGTH)								// dont add anything more if maxxed out now
+						{
+							if ((theChar >= 'a') && (theChar <= 'z'))					// see if convert lower case to upper case a..z
+								theChar = 'A' + (theChar-'a');
+							gHighScores[gNewScoreSlot].name[gCursorIndex+1] = theChar;
+							gCursorIndex++;
+						}
+					}
+				}
+			}
 		}
 	}
 

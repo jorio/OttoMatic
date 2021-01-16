@@ -574,23 +574,8 @@ int		i;
 
 void MyFlushEvents(void)
 {
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-#if 0
-EventRecord 	theEvent;
-
-	FlushEvents (everyEvent, REMOVE_ALL_EVENTS);
-	FlushEventQueue(GetMainEventQueue());
-
-#if 1
-			/* POLL EVENT QUEUE TO BE SURE THINGS ARE FLUSHED OUT */
-
-	while (GetNextEvent(mDownMask|mUpMask|keyDownMask|keyUpMask|autoKeyMask, &theEvent));
-
-
-	FlushEvents (everyEvent, REMOVE_ALL_EVENTS);
-	FlushEventQueue(GetMainEventQueue());
-#endif
-#endif
+	SDL_FlushEvents(SDL_KEYDOWN, SDL_JOYBUTTONUP);
+	SDL_FlushEvents(SDL_CONTROLLERAXISMOTION, SDL_CONTROLLERBUTTONUP);
 }
 
 
