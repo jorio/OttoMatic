@@ -149,9 +149,9 @@ static inline void AngleToVector(float angle, OGLVector2D *theVector)
 
 /***************** FAST VECTOR LENGTH 3D/2D *********************/
 
-#define VectorLength3D(_r, _inX, _inY, _inZ)	_r = sqrt((_inY*_inY) + (_inX*_inX) + (_inZ*_inZ));
+#define VectorLength3D(_r, _inX, _inY, _inZ)	_r = sqrtf((_inY*_inY) + (_inX*_inX) + (_inZ*_inZ));
 
-#define VectorLength2D(_r, _inX, _inY)	_r = sqrt((_inY*_inY) + (_inX*_inX));
+#define VectorLength2D(_r, _inX, _inY)			_r = sqrtf((_inY)*(_inY) + (_inX)*(_inX));
 
 
 
