@@ -12,33 +12,22 @@
 
 #define	USE_GL_COLOR_MATERIAL	1
 
-#define	SetColor4fv(colorVV) 													\
-{																				\
-	if (USE_GL_COLOR_MATERIAL)													\
-	{																			\
-		glColor4fv((GLfloat *)colorVV);		/* set current diffuse color */		\
-	}																			\
-	else																		\
-	{																			\
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat *)colorVV);	\
-	}																			\
-}
-
-#define	SetColor4f(r, g, b, a)													\
-{																				\
-	if (USE_GL_COLOR_MATERIAL)													\
-	{																			\
+#if USE_GL_COLOR_MATERIAL
+	#define SetColor4fv(colorVV)		glColor4fv((GLfloat *)colorVV)		// set current diffuse color
+	#define SetColor4f(r, g, b, a)		\
+	do {																		\
 		glColor4f(r, g, b, a);													\
 		glEnable(GL_COLOR_MATERIAL);											\
-	}																			\
-	else																		\
-	{																			\
+	} while(0)
+#else
+	#define SetColor4fv(colorVV)		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat *)colorVV)
+	#define SetColor4f(r, g, b, a) \
+	do {																		\
 		GLfloat	c[4];															\
 		c[0] = r;	c[1] = g; c[2] = b; c[3] = a;								\
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, c);				\
-	}																			\
-}
-
+	} while(0)
+#endif
 
 		/* 4x4 MATRIX INDECIES */
 enum
