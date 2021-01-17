@@ -33,8 +33,8 @@ static void DrawHighScoresAndCursor(OGLSetupOutputType *info);
 static void SetHighScoresSpriteState(void);
 static void StartEnterName(void);
 static void MoveHighScoresCyc(ObjNode *theNode);
-static Boolean IsThisScoreInList(u_long score);
-static short AddNewScore(u_long newScore);
+static Boolean IsThisScoreInList(uint32_t score);
+static short AddNewScore(uint32_t newScore);
 static void SaveHighScores(void);
 
 /***************************/
@@ -656,7 +656,7 @@ char				blank[MAX_NAME_LENGTH] = "EMPTY----------";
 // Returns high score slot that score was inserted to or -1 if none
 //
 
-static short AddNewScore(u_long newScore)
+static short AddNewScore(uint32_t newScore)
 {
 short	slot,i;
 
@@ -690,7 +690,7 @@ got_slot:
 // Returns True if this score value is anywhere in the high scores already
 //
 
-static Boolean IsThisScoreInList(u_long score)
+static Boolean IsThisScoreInList(uint32_t score)
 {
 short	slot;
 
