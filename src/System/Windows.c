@@ -9,8 +9,6 @@
 /* EXTERNALS   */
 /***************/
 
-
-
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	ObjNode	*gCurrentNode,*gFirstNodePtr;
 extern	float	gFramesPerSecondFrac;
@@ -27,16 +25,7 @@ extern	SDL_Window			*gSDLWindow;
 /****************************/
 
 static void MoveFadeEvent(ObjNode *theNode);
-
-#if 0	// srcport rm
-static void CreateDisplayModeList(void);
-pascal void ModeListCallback(void *userData, DMListIndexType a, DMDisplayModeListEntryPtr displaymodeInfo);
-pascal void ShowVideoMenuSelection (DialogPtr dlogPtr, short item);
-static void CalcVRAMAfterBuffers(void);
-static void GetDisplayVRAM(void);
-static pascal OSStatus DoScreenModeDialog_EventHandler(EventHandlerCallRef myHandler, EventRef event, void* userData);
-static void BuildResolutionMenu(void);
-#endif
+static void DrawFadePane(ObjNode* theNode, const OGLSetupOutputType* setupInfo);
 
 
 /****************************/
@@ -44,15 +33,6 @@ static void BuildResolutionMenu(void);
 /****************************/
 
 #define		DO_GAMMA	1
-
-typedef struct
-{
-	int		rezH,rezV;
-	int		hz;
-}VideoModeType;
-
-
-#define	MAX_VIDEO_MODES		50
 
 
 /**********************/
@@ -63,138 +43,15 @@ u_long			gDisplayVRAM = 0;
 u_long			gVRAMAfterBuffers = 0;
 
 
-#if 0	// srcport rm
-WindowRef 		gDialogWindow = nil;
-EventHandlerUPP gWinEvtHandler;
-#endif
-
-
-static short				gNumVideoModes = 0;
-static VideoModeType		gVideoModeList[MAX_VIDEO_MODES];
-
-
 float		gGammaFadePercent = 1.0;
 
 int				gGameWindowWidth, gGameWindowHeight;
-
-short			g2DStackDepth = 0;
-
-
-Boolean			gPlayFullScreen;
-#if 0	// srcport - awaiting reimplementation
-static	CGDirectDisplayID	gCGDisplayID;
-
-CGGammaValue gOriginalRedTable[256];
-CGGammaValue gOriginalGreenTable[256];
-CGGammaValue gOriginalBlueTable[256];
-
-
-static CGGammaValue gGammaRedTable[256];
-static CGGammaValue gGammaGreenTable[256];
-static CGGammaValue gGammaBlueTable[256];
-#endif
-
-
-float		gGammaTweak = 1.0f;
 
 
 /****************  INIT WINDOW STUFF *******************/
 
 void InitWindowStuff(void)
 {
-#if 0		// srcport - awaiting reimplementation
-Rect				r;
-float				w,h;
-CFDictionaryRef 	refDisplayMode = 0;
-CGTableCount 		sampleCount;
-
-
-	gPlayFullScreen = true;				//!gGamePrefs.playInWindow;
-
-	if (gPlayFullScreen)
-	{
-
-		CGDisplayCapture(gCGDisplayID);
-
-				/* FIND BEST MATCH */
-
-		refDisplayMode = CGDisplayBestModeForParametersAndRefreshRate(gCGDisplayID, gGamePrefs.depth,
-																	gGamePrefs.screenWidth, gGamePrefs.screenHeight,
-																	gGamePrefs.hz,
-																	NULL);
-		if (refDisplayMode == nil)
-			DoFatalAlert("InitWindowStuff: CGDisplayBestModeForParameters failed!");
-
-
-				/* SWITCH TO IT */
-
-		CGDisplaySwitchToMode (gCGDisplayID, refDisplayMode);
-
-
-					/* GET GDEVICE & INFO */
-
-		DMGetGDeviceByDisplayID ((DisplayIDType)gCGDisplayID, &gGDevice, false);
-
-		w = gGamePrefs.screenWidth;
-		h = gGamePrefs.screenHeight;
-
-		r.top  		= (short) ((**gGDevice).gdRect.top + ((**gGDevice).gdRect.bottom - (**gGDevice).gdRect.top) / 2);	  	// h center
-		r.top  		-= (short) (h / 2);
-		r.left  	= (short) ((**gGDevice).gdRect.left + ((**gGDevice).gdRect.right - (**gGDevice).gdRect.left) / 2);		// v center
-		r.left  	-= (short) (w / 2);
-		r.right 	= (short) (r.left + w);
-		r.bottom 	= (short) (r.top + h);
-
-
-
-
-					/* GET ORIGINAL GAMMA TABLE */
-
-		CGGetDisplayTransferByTable(gCGDisplayID, 256, gOriginalRedTable, gOriginalGreenTable, gOriginalBlueTable, &sampleCount);
-
-	}
-
-
-				/********************/
-				/* INIT SOME WINDOW */
-				/********************/
-	else
-	{
-		int			w;
-		gGDevice = GetMainDevice();
-
-				/* SIZE WINDOW TO HALF SCREEN SIZE */
-
-		w = (**gGDevice).gdRect.right;				// get width/height of display
-		h = (**gGDevice).gdRect.bottom;
-
-		r.left = r.top = 0;
-		r.right = w / 2;
-		r.bottom = h / 2;
-
-		if (r.right < 640)			// keep minimum at 640 wide
-		{
-			r.right = 640;
-			r.bottom = 480;
-		}
-
-		gGameWindow = NewCWindow(nil, &r, "", false, plainDBox, (WindowPtr)-1L, false, 0);
-
-
-		gGameWindowGrafPtr = GetWindowPort(gGameWindow);
-
-				/* MOVE WINDOW TO CENTER OF SCREEN */
-
-		MoveWindow(gGameWindow, r.right/2, r.bottom/2, true);
-		ShowWindow(gGameWindow);
-	}
-
-
-
-	gGameWindowWidth = r.right - r.left;
-	gGameWindowHeight = r.bottom - r.top;
-
-#endif
 }
 
 
@@ -310,47 +167,11 @@ void GammaOn(void)
 {
 #if DO_GAMMA
 
-	if (!gPlayFullScreen)
-		return;
-
 	if (gGammaFadePercent != 1.0f)
 	{
 		gGammaFadePercent = 1.0f;
 
 		SOURCE_PORT_MINOR_PLACEHOLDER(); // CGSetDisplayTransferByTable(0, 256, gOriginalRedTable, gOriginalGreenTable, gOriginalBlueTable);
-	}
-#endif
-}
-
-
-
-/********************** GAMMA OFF *********************/
-
-void GammaOff(void)
-{
-#if DO_GAMMA
-
-	if (!gPlayFullScreen)
-		return;
-
-	if (gGammaFadePercent != 0.0f)
-	{
-		int			i;
-
-		gGammaFadePercent = 0.0f;
-
-#if 1
-		SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
-	    for (i = 0; i < 256 ; i++)
-	    {
-	        gGammaRedTable[i] 	= gOriginalRedTable[i] * gGammaFadePercent * gGammaTweak;
-	        gGammaGreenTable[i] = gOriginalGreenTable[i] * gGammaFadePercent * gGammaTweak;
-	        gGammaBlueTable[i] 	= gOriginalBlueTable[i] * gGammaFadePercent * gGammaTweak;
-	    }
-
-		CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
-#endif
 	}
 #endif
 }
@@ -397,6 +218,7 @@ ObjNode		*thisNodePtr;
 	gNewObjectDefinition.slot = SLOT_OF_DUMB + 1000;
 	gNewObjectDefinition.moveCall = MoveFadeEvent;
 	newObj = MakeNewObject(&gNewObjectDefinition);
+	newObj->CustomDrawFunction = DrawFadePane;
 
 	newObj->Flag[0] = fadeIn;
 
@@ -433,29 +255,30 @@ float	speed = theNode->Speed * fps;
 			DeleteObject(theNode);
 		}
 	}
-
-
-	if (gPlayFullScreen)
-	{
-#if 1
-		SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
-		int			i;
-
-	    for (i = 0; i < 256 ; i++)
-	    {
-	        gGammaRedTable[i] 	= gOriginalRedTable[i] * gGammaFadePercent * gGammaTweak;
-	        gGammaGreenTable[i] = gOriginalGreenTable[i] * gGammaFadePercent * gGammaTweak;
-	        gGammaBlueTable[i] 	= gOriginalBlueTable[i] * gGammaFadePercent * gGammaTweak;
-	    }
-
-		CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
-#endif
-	}
-
 }
 
+/******************** DRAW FADE PANE *********************/
 
+static void DrawFadePane(ObjNode* theNode, const OGLSetupOutputType* setupInfo)
+{
+	OGL_PushState();
+
+	SetInfobarSpriteState();
+
+	glColor4f(0, 0, 0, 1.0f - gGammaFadePercent);
+
+	glDisable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBegin(GL_QUADS);
+	glVertex3f(0,		0,		0);
+	glVertex3f(640,		0,		0);
+	glVertex3f(640,		480,	0);
+	glVertex3f(0,		480,	0);
+	glEnd();
+	glDisable(GL_BLEND);
+
+	OGL_PopState();
+}
 
 /************************ GAME SCREEN TO BLACK ************************/
 
@@ -472,41 +295,6 @@ void GameScreenToBlack(void)
 
 void Enter2D(void)
 {
-	InitCursor();
-	MyFlushEvents();
-
-	g2DStackDepth++;
-	if (g2DStackDepth > 1)						// see if already in 2D
-	{
-		GammaOn();
-		return;
-	}
-
-	if (gPlayFullScreen)
-	{
-		GammaOff();
-
-#if 1
-		SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
-		if (gAGLContext)
-		{
-			glFlush();
-			glFinish();
-
-			aglSetDrawable(gAGLContext, nil);		// diable GL so our dialogs will show up
-			glFlush();
-			glFinish();
-		}
-
-			/* NEED TO UN-CAPTURE THE CG DISPLAY */
-
-		CGDisplayRelease(gCGDisplayID);
-#endif
-	}
-
-	GammaOn();
-
 }
 
 
@@ -517,26 +305,6 @@ void Enter2D(void)
 
 void Exit2D(void)
 {
-	g2DStackDepth--;
-	if (g2DStackDepth > 0)			// don't exit unless on final exit
-		return;
-
-	HideCursor();
-
-#if 1
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
-	if (gPlayFullScreen)
-	{
-//		if (gAGLContext)
-		{
-			CGDisplayCapture(gCGDisplayID);
-			if (gAGLContext)
-				aglSetFullScreen(gAGLContext, 0, 0, 0, 0);		//re-enable GL
-		}
-	}
-#endif
-
 }
 
 
