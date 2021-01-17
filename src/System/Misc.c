@@ -540,6 +540,10 @@ slow_down:
 
 	if (gFramesPerSecond < DEFAULT_FPS)			// (avoid divide by 0's later)
 		gFramesPerSecond = DEFAULT_FPS;
+
+	if (GetKeyState(SDL_SCANCODE_GRAVE) && GetKeyState(SDL_SCANCODE_KP_PLUS))		// debug speed-up with `+KP_PLUS
+		gFramesPerSecond = 10;
+
 	gFramesPerSecondFrac = 1.0f/gFramesPerSecond;		// calc fractional for multiplication
 
 //printf("FPS: %f\n", gFramesPerSecond);
