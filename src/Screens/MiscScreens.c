@@ -155,36 +155,6 @@ FSSpec	spec;
 
 #pragma mark -
 
-#if DEMO
-
-/****************** DO DEMO EXPIRED SCREEN **************************/
-
-void DoDemoExpiredScreen(void)
-{
-FSSpec	spec;
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Images:DemoExpired", &spec);
-	DisplayPicture(&spec);
-	CleanQuit();
-}
-
-
-/*************** SHOW DEMO QUIT SCREEN **********************/
-
-void ShowDemoQuitScreen(void)
-{
-FSSpec	spec;
-
-	SaveDemoTimer();						// make sure to save this before we bail
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Images:DemoQuit", &spec);
-	DisplayPicture(&spec);
-
-}
-
-
-#endif
-
 
 
 

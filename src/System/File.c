@@ -18,7 +18,6 @@ extern	long			gTerrainTileWidth,gTerrainTileDepth,gTerrainUnitWidth,gTerrainUnit
 extern	long			gNumSuperTilesDeep,gNumSuperTilesWide;
 extern	FSSpec			gDataSpec;
 extern	u_long			gScore,gLoadedScore;
-extern	float			gDemoVersionTimer;
 extern  u_short			**gTileDataHandle;
 extern	float			**gMapYCoords,**gMapYCoordsOriginal;
 extern	Byte			**gMapSplitMode;
@@ -537,11 +536,7 @@ long		count;
 				/* READ FILE */
 				/*************/
 
-#if DEMO
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":OttoMatic:DemoPreferences5", &file);
-#else
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":OttoMatic:Preferences5", &file);
-#endif
 	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);
 	if (iErr)
 		return(iErr);
@@ -584,22 +579,9 @@ OSErr				iErr;
 short				refNum;
 long				count;
 
-		/* GET THE CURRENT CONTROL SETTINGS */
-
-#if 0 // srcport rm
-	if (!gHIDInitialized)								// can't save prefs unless HID is initialized!
-		return;
-
-	BuildHIDControlSettings(&gGamePrefs.controlSettings);
-#endif
-
 				/* CREATE BLANK FILE */
 
-#if DEMO
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":OttoMatic:DemoPreferences5", &file);
-#else
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":OttoMatic:Preferences5", &file);
-#endif
 	FSpDelete(&file);															// delete any existing file
 	iErr = FSpCreate(&file, 'Otto', 'Pref', smSystemScript);					// create blank file
 	if (iErr)
@@ -837,11 +819,8 @@ const char*	levelSoundFiles[NUM_LEVELS] =
 
 	LoadASkeleton(SKELETON_TYPE_FARMER, setupInfo);
 	LoadASkeleton(SKELETON_TYPE_BEEWOMAN, setupInfo);
-
-#if !DEMO
 	LoadASkeleton(SKELETON_TYPE_SCIENTIST, setupInfo);
 	LoadASkeleton(SKELETON_TYPE_SKIRTLADY, setupInfo);
-#endif
 
 			/* LOAD LEVEL-SPECIFIC SKELETONS & APPLY REFLECTION MAPS */
 

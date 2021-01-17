@@ -1,35 +1,14 @@
  
 		/* MY BUILD OPTIONS */
-		
-#define	TARGET_API_MAC_CARBON				1
-
-#define	DEMO	0
-#define	OEM		0
 
 #define __LITTLE_ENDIAN__	1
 
 
 		/* HEADERS */
-		
-#if 0 // srcport mod
-#include <Carbon/Carbon.h>
 
-#include <IOKit/IOKitLib.h>
-#include <IOKit/IOCFPlugIn.h>
-#include <IOKit/hid/IOHIDLib.h>
-#include <IOKit/hid/IOHIDKeys.h>
-#include <Kernel/IOKit/hidsystem/IOHIDUsageTables.h>
-
-
-#include <Quicktime/Movies.h>
-#include <AGL/agl.h> 
-#include <AGL/glu.h>
-#include <OpenGL/glext.h>
-#else
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
-#endif
 
 #include "globals.h"
 #include "structs.h"

@@ -4,7 +4,6 @@
 /* By Brian Greenstone      */
 /****************************/
 
-#if !DEMO
 
 /****************************/
 /*    EXTERNALS             */
@@ -660,23 +659,4 @@ float	fps = gFramesPerSecondFrac;
 
 
 }
-
-
-
-#endif // DEMO
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -42,12 +42,6 @@ float	gFramesPerSecond, gFramesPerSecondFrac;
 
 int		gNumPointers = 0;
 
-unsigned char	gRegInfo[64];
-
-Boolean	gGameIsRegistered = false;
-Boolean	gSerialWasVerified = false;
-
-Str255  gSerialFileName = ":OttoMatic:Info";
 
 
 /**********************/
@@ -182,10 +176,6 @@ static Boolean	beenHere = false;
 	{
 		beenHere = true;
 
-#if DEMO
-		DeleteAllObjects();
-#endif
-
 		ShutdownSound();								// cleanup sound stuff
 
 		DisposeTerrain();								// dispose of any memory allocated by terrain manager
@@ -194,12 +184,6 @@ static Boolean	beenHere = false;
 
 		if (gGameViewInfoPtr)							// see if need to dispose this
 			OGL_DisposeWindowSetup(&gGameViewInfoPtr);
-
-#if DEMO
-		GammaFadeOut();
-		ShowDemoQuitScreen();
-#endif
-
 	}
 
 	GameScreenToBlack();
@@ -449,11 +433,7 @@ long		createdDirID;
 
 			/* VERIFY & MAKE FSSPEC FOR DATA FOLDER */
 
-#if DEMO
-	iErr = FSMakeFSSpec(0, 0, ":DemoData:Images", &gDataSpec);
-#else
 	iErr = FSMakeFSSpec(0, 0, ":Data:Images", &gDataSpec);
-#endif
 	if (iErr)
 	{
 		DoFatalAlert("Data folder not found.");

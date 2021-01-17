@@ -11,7 +11,7 @@
 
 #include "3dmath.h"
 
-extern	Boolean			gDrawLensFlare,gGameIsRegistered,gSerialWasVerified,gSuccessfulHTTPRead,gDisableHiccupTimer,gDoDeathExit, gLittleSnitch;
+extern	Boolean			gDrawLensFlare,gDisableHiccupTimer,gDoDeathExit;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	float			gFramesPerSecond,gFramesPerSecondFrac,gAutoFadeStartDist,gAutoFadeEndDist,gAutoFadeRange_Frac,gStartingLightTimer;
 extern	float			gTileSlipperyFactor,gSpinningPlatformRot;
@@ -27,7 +27,6 @@ extern	long			gTerrainUnitWidth,gTerrainUnitDepth;
 extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 extern	short	gPrefsFolderVRefNum;
 extern	long	gPrefsFolderDirID;
-extern	Handle		gHTTPDataHandle;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -94,19 +93,9 @@ float				gBestCheckpointAim;
 int					gScratch = 0;
 float				gScratchF = 0;
 
-Boolean				gShareware = false;
-
-#if DEMO
-float	gDemoVersionTimer = 0;
-#endif
-
 u_long	gScore,gLoadedScore;
 
 
-#if 0	// srcport rm
-CFBundleRef 		gBundle = nil;
-IBNibRef 			gNibs = nil;
-#endif
 
 
 //======================================================================================
@@ -119,28 +108,9 @@ IBNibRef 			gNibs = nil;
 
 void ToolBoxInit(void)
 {
-long		response;
-OSErr		iErr;
-NumVersion	vers;
-
-
-
 	MyFlushEvents();
 
 	gMainAppRezFile = CurResFile();
-
-
-#if 0	// srcport rm
-			/*****************/
-			/* INIT NIB INFO */
-			/*****************/
-
-	gBundle = CFBundleGetMainBundle();
-	if (gBundle == nil)
-		DoFatalAlert("ToolBoxInit: CFBundleGetMainBundle() failed!");
-	if (CreateNibReferenceWithCFBundle(gBundle, CFSTR(kDefaultNibFileName), &gNibs) != noErr)
-		DoFatalAlert("ToolBoxInit: CreateNibReferenceWithCFBundle() failed!");
-#endif
 
 
 
@@ -157,47 +127,6 @@ NumVersion	vers;
 	OGL_InitFunctions();
 
 
-#if 0	// srcport rm
-			/******************/
-			/* INIT QUICKTIME */
-			/******************/
-
-			/* SEE IF QT INSTALLED */
-
-	iErr = Gestalt(gestaltQuickTime,&response);
-	if(iErr != noErr)
-		DoFatalAlert("This application requires Quicktime 4 or newer");
-
-
-			/* SEE IF HAVE 4 */
-
-	iErr = Gestalt(gestaltQuickTimeVersion,(long *)&vers);
-	if ((vers.majorRev < 4) ||
-		((vers.majorRev == 4) && (vers.minorAndBugRev < 0x11)))
-			DoFatalAlert("This application requires Quicktime 4.1.1 or newer which you can download from www.apple.com/quicktime");
-
-
-			/* START QUICKTIME */
-
-	EnterMovies();
-
-
-
-
-		/* SEE IF PROCESSOR SUPPORTS frsqrte */
-
-	if (!Gestalt(gestaltNativeCPUtype, &response))
-	{
-		switch(response)
-		{
-			case	gestaltCPU601:				// 601 is only that doesnt support it
-					DoFatalAlert("Sorry, but this app will not run on a PowerPC 601, only on newer Macintoshes.");
-					break;
-		}
-	}
-#endif
-
-
  	InitInput();
 
 
@@ -207,15 +136,6 @@ NumVersion	vers;
 
 	InitDefaultPrefs();
 	LoadPrefs(&gGamePrefs);
-
-
-			/************************************/
-            /* SEE IF GAME IS REGISTERED OR NOT */
-			/************************************/
-
-	gShareware = false;
-	gGameIsRegistered = true;
-	gSerialWasVerified = true;
 
 
 
@@ -311,7 +231,6 @@ static void PlayGame(void)
 	{
 		gLevelNum = 0;
 
-#if !DEMO
 		if (GetKeyState(SDL_SCANCODE_F10))		// see if do Level cheat
 		{
 			if (DoLevelCheatDialog())
@@ -325,7 +244,6 @@ static void PlayGame(void)
 					gLevelNum = i;
 			}
 		}
-#endif
 	}
 
 	GammaFadeOut();
@@ -357,9 +275,6 @@ static void PlayGame(void)
 		CleanupLevel();
 		GameScreenToBlack();
 
-#if DEMO
-		break;
-#else
 
 			/***************/
 			/* SEE IF LOST */
@@ -375,11 +290,8 @@ static void PlayGame(void)
 		/* DO END-LEVEL BONUS SCREEN */
 
 		DoBonusScreen();
-#endif
-
 	}
 
-#if !DEMO
 
 			/**************/
 			/* SEE IF WON */
@@ -394,7 +306,6 @@ static void PlayGame(void)
 			/* DO HIGH SCORES */
 
 	NewScore();
-#endif
 }
 
 
@@ -422,10 +333,6 @@ static void PlayArea(void)
 				//
 				// Also gathers frame rate info for the net clients.
 				//
-
-#if DEMO
-		gDemoVersionTimer += gFramesPerSecondFrac;							// count the seconds for DEMO
-#endif
 
 
 		UpdateInput();									// read local keys
@@ -1084,14 +991,7 @@ unsigned long	someLong;
 	SetMyRandomSeed(someLong);
 	HideCursor();
 
-			/* SEE IF DEMO VERSION EXPIRED */
-
-#if DEMO
-	GetDemoTimer();
-
-#else
 //	DoWinScreen();	//---------
-#endif
 
 
 

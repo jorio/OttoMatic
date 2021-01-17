@@ -1268,15 +1268,11 @@ static Boolean DoMainMenuControl(void)
 						break;
 
 				case	SELECT_LOADSAVEDGAME:
-#if DEMO
-						DoAlert("Saved Games are not available in the demo version.");
-#else
 						if (LoadSavedGame())
 						{
 							gPlayingFromSavedGame = true;
 							return(true);
 						}
-#endif
 						break;
 
 				case	SELECT_QUIT:
@@ -1661,9 +1657,7 @@ static void DoHighScores(void)
 {
 ObjNode	*pane;
 
-#if !DEMO
 	PlaySong(SONG_HIGHSCORE, true);
-#endif
 
 			/* LOAD HIGH SCORES */
 
@@ -1739,9 +1733,7 @@ ObjNode	*pane;
 	DeleteObject(pane);
 	UpdateInput();
 	gDrawHighScores = false;
-#if !DEMO
 	PlaySong(SONG_THEME, true);
-#endif
 }
 
 
