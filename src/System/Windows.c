@@ -20,6 +20,7 @@ extern	Boolean				gMuteMusicFlag;
 extern	PrefsType			gGamePrefs;
 extern	Boolean			gSongPlayingFlag;
 extern	SDL_GLContext		gAGLContext;
+extern	SDL_Window			*gSDLWindow;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -200,75 +201,106 @@ CGTableCount 		sampleCount;
 #pragma mark -
 
 
-/**************** GAMMA FADE IN *************************/
-
-void GammaFadeIn(void)
+/**************** GAMMA FADE OUT *************************/
+static void CheckGLError(const char* file, const int line)
 {
-#if DO_GAMMA
-int			i;
-
-	if (!gPlayFullScreen)							// only do gamma in full-screen mode
-		return;
-
-
-	while(gGammaFadePercent < 1.0f)
+	static char buf[256];
+	GLenum error = glGetError();
+	if (error != 0)
 	{
-		gGammaFadePercent += .07f;
-		if (gGammaFadePercent > 1.0f)
-			gGammaFadePercent = 1.0f;
-
-#if 1
-		SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
-	    for (i = 0; i < 256 ; i++)
-	    {
-	        gGammaRedTable[i] 	= gOriginalRedTable[i] * gGammaFadePercent * gGammaTweak;
-	        gGammaGreenTable[i] = gOriginalGreenTable[i] * gGammaFadePercent * gGammaTweak;
-	        gGammaBlueTable[i] 	= gOriginalBlueTable[i] * gGammaFadePercent * gGammaTweak;
-	    }
-#endif
-
-		Wait(1);
-
-		SOURCE_PORT_MINOR_PLACEHOLDER(); //CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
+		snprintf(buf, 256, "OpenGL Error %d in %s:%d", error, file, line);
+		DoFatalAlert(buf);
 	}
-#endif
 }
 
+#define CHECK_GL_ERROR() CheckGLError(__func__, __LINE__)
 
-/**************** GAMMA FADE OUT *************************/
 
 void GammaFadeOut(void)
 {
 #if DO_GAMMA
 
-int			i;
-
-	if (!gPlayFullScreen)							// only do gamma in full-screen mode
-		return;
-
-	while(gGammaFadePercent > 0.0f)
+	SDL_GLContext currentContext = SDL_GL_GetCurrentContext();
+	if (!currentContext)
 	{
-		gGammaFadePercent -= .07f;
+		printf("%s: no GL context; skipping fade out\n", __func__);
+		return;
+	}
+
+	SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);
+
+	int windowWidth, windowHeight;
+	SDL_GetWindowSize(gSDLWindow, &windowWidth, &windowHeight);
+	int width4rem = windowWidth % 4;
+	int width4ceil = windowWidth - width4rem + (width4rem == 0? 0: 4);
+
+	GLint textureWidth = width4ceil;
+	GLint textureHeight = windowHeight;
+	char* textureData = AllocPtr(textureWidth * textureHeight * 3);
+
+	//SDL_GL_SwapWindow(gSDLWindow);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, textureWidth);
+	glReadPixels(0, 0, textureWidth, textureHeight, GL_BGR, GL_UNSIGNED_BYTE, textureData);
+	CHECK_GL_ERROR();
+
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, textureWidth, textureHeight, 0, GL_BGR, GL_UNSIGNED_BYTE, textureData);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+#if 0
+	FILE* TGAfile = fopen("/tmp/FadeCapture.tga", "wb");
+	uint8_t TGAhead[] = {0,0, 2, 0,0,0,0,0, 0,0,0,0, textureWidth&0xFF, (textureWidth>>8)&0xFF, textureHeight&0xFF, (textureHeight>>8)&0xFF, 24, 0<<5};
+	fwrite(TGAhead, 1, sizeof(TGAhead), TGAfile);
+	fwrite(textureData, textureHeight, 3*textureWidth, TGAfile);
+	fclose(TGAfile);
+#endif
+
+	OGL_PushState();
+
+	SetInfobarSpriteState();
+
+	const float fadeDuration = .25f;
+	Uint32 startTicks = SDL_GetTicks();
+	Uint32 endTicks = startTicks + fadeDuration * 1000.0f;
+
+	for (Uint32 ticks = startTicks; ticks <= endTicks; ticks = SDL_GetTicks())
+	{
+		gGammaFadePercent = 1.0f - ((ticks - startTicks) / 1000.0f / fadeDuration);
 		if (gGammaFadePercent < 0.0f)
 			gGammaFadePercent = 0.0f;
 
-#if 1
-		SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
-	    for (i = 0; i < 256 ; i++)
-	    {
-	        gGammaRedTable[i] 	= gOriginalRedTable[i] * gGammaFadePercent * gGammaTweak;
-	        gGammaGreenTable[i] = gOriginalGreenTable[i] * gGammaFadePercent * gGammaTweak;
-	        gGammaBlueTable[i] 	= gOriginalBlueTable[i] * gGammaFadePercent * gGammaTweak;
-	    }
-#endif
+		SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
+		glDisable(GL_CULL_FACE);
 
-		Wait(1);
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture);
 
-		SOURCE_PORT_MINOR_PLACEHOLDER(); // CGSetDisplayTransferByTable( 0, 256, gGammaRedTable, gGammaGreenTable, gGammaBlueTable);
+		glColor4f(gGammaFadePercent, gGammaFadePercent, gGammaFadePercent, 1.0f);
 
+		glBegin(GL_QUADS);
+		glTexCoord2f(0,1); glVertex3f(   0,   0,0);
+		glTexCoord2f(1,1); glVertex3f( 640,   0,0);
+		glTexCoord2f(1,0); glVertex3f( 640, 480,0);
+		glTexCoord2f(0,0); glVertex3f(   0, 480,0);
+		glEnd();
+		SDL_GL_SwapWindow(gSDLWindow);
+		CHECK_GL_ERROR();
+
+		SDL_Delay(15);
 	}
+
+	SafeDisposePtr(textureData);
+	glDeleteTextures(1, &texture);
+
+	OGL_PopState();
+
+	gGammaFadePercent = 0;
 #endif
 }
 
@@ -556,20 +588,6 @@ PixMapHandle pm;
 	pm = GetGWorldPixMap(world);
 	if (LockPixels(pm) == false)
 		DoFatalAlert("PixMap Went Bye,Bye?!");
-}
-
-
-/********************** WAIT **********************/
-
-void Wait(u_long ticks)
-{
-u_long	start;
-
-	start = TickCount();
-
-	while (TickCount()-start < ticks)
-		MyFlushEvents();
-
 }
 
 

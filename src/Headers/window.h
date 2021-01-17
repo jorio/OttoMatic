@@ -21,7 +21,6 @@ void DumpGWorld2(GWorldPtr thisWorld, WindowPtr thisWindow,Rect *destRect);
 
 extern	void CleanupDisplay(void);
 extern	void GammaFadeOut(void);
-extern	void GammaFadeIn(void);
 extern	void GammaOn(void);
 void GammaOff(void);
 
@@ -31,8 +30,6 @@ void DoLockPixels(GWorldPtr world);
 void DoScreenModeDialog(void);
 
 void DoScreenModeDialog(void);
-
-void Wait(u_long ticks);
 
 void Enter2D(void);
 void Exit2D(void);
