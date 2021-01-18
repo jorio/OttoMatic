@@ -19,16 +19,12 @@ extern void	DoLockPixels(GWorldPtr);
 void MakeFadeEvent(Boolean fadeIn, float fadeSpeed);
 void DumpGWorld2(GWorldPtr thisWorld, WindowPtr thisWindow,Rect *destRect);
 
-extern	void CleanupDisplay(void);
 extern	void GammaFadeOut(void);
 extern	void GammaOn(void);
 
 extern	void GameScreenToBlack(void);
 
 void DoLockPixels(GWorldPtr world);
-void DoScreenModeDialog(void);
-
-void DoScreenModeDialog(void);
 
 void Enter2D(void);
 void Exit2D(void);
