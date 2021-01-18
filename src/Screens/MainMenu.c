@@ -32,7 +32,6 @@ extern	HighScoreType	gHighScores[];
 
 static void SetupMainMenuScreen(void);
 static void FreeMainMenuScreen(void);
-static void DrawMainMenuCallback(OGLSetupOutputType *info);
 static Boolean DoMainMenuControl(void);
 static void MoveSaturn(ObjNode *theNode);
 static void MoveStar(ObjNode *theNode);
@@ -199,7 +198,7 @@ void DoMainMenuScreen(void)
 
 /***************** DRAW MAINMENU CALLBACK *******************/
 
-static void DrawMainMenuCallback(OGLSetupOutputType *info)
+void DrawMainMenuCallback(OGLSetupOutputType *info)
 {
 
 	DrawObjects(info);
@@ -333,9 +332,6 @@ int	n,i,texNum;
 			DrawInfobarSprite2(x, y, SCORE_TEXT_SPACING * 1.9f, SPRITE_GROUP_FONT, texNum, info);
 		x += SCORE_TEXT_SPACING;
 	}
-
-
-
 }
 
 
@@ -719,7 +715,7 @@ ObjNode	*newObj;
 	gNewObjectDefinition.scale 	    = 25.0;
 	gNewObjectDefinition.slot 		= SPRITE_SLOT;
 
-	newObj = MakeFontStringObject(GetLanguageString(2 + gSelection), &gNewObjectDefinition, gGameViewInfoPtr, true);		// title
+	newObj = MakeFontStringObject(GetLanguageString(STR_OFFSET_MAIN_MENU + gSelection), &gNewObjectDefinition, gGameViewInfoPtr, true);		// title
 	newObj->ColorFilter.a = 0;
 
 	gFadeInIconString = true;
@@ -761,8 +757,12 @@ float	fps = gFramesPerSecondFrac;
 	{
 		if (theNode->StatusBits & STATUS_BIT_HIDDEN)	// if going from hidden to not, then reset alpha so will fade in
 		{
-			theNode->StatusBits &= ~STATUS_BIT_HIDDEN;
-			theNode->ColorFilter.a = 0;
+			//theNode->StatusBits &= ~STATUS_BIT_HIDDEN;
+			//theNode->ColorFilter.a = 0;
+
+			// Recreate the object so it appears in the correct language after backing out from the settings screen
+			DeleteObject(theNode);
+			MakeIconString();
 		}
 	}
 
@@ -1260,7 +1260,9 @@ static Boolean DoMainMenuControl(void)
 						break;
 
 				case	SELECT_OPTIONS:
-						DoGameSettingsDialog();
+						gHideIconString = true;
+						DoSettingsOverlay();
+						gHideIconString = false;
 						break;
 
 				case	SELECT_CREDITS:

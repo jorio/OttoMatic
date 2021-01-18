@@ -132,7 +132,7 @@ short	i;
 
 	for (i = 0; i < 3; i++)
 	{
-		const char* cstr = GetLanguageString(i + STRING_OFFSET_PAUSE_MENU);
+		const char* cstr = GetLanguageString(i + STR_OFFSET_PAUSE_MENU);
 
 		gPausedIcons[i] = MakeFontStringObject(cstr, &gNewObjectDefinition, gGameViewInfoPtr, true);
 		gPausedIcons[i]->ColorFilter.a = 0;

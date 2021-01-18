@@ -41,10 +41,7 @@ void ClearHighScores(void);
 void DoLoseScreen(void);
 void DoWinScreen(void);
 
-void DoDemoExpiredScreen(void);
-void ShowDemoQuitScreen(void);
-
 void DrawDarkenPane(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
 void MoveCredits(ObjNode *text);
 
-void DoHTTPMultipleFailureWarning(void);
+void DoSettingsOverlay(void);

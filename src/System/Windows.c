@@ -312,3 +312,12 @@ PixMapHandle pm;
 }
 
 
+
+/******************* SET FULLSCREEN MODE FROM PREFS **************/
+
+void SetFullscreenModeFromPrefs(void)
+{
+	SDL_SetWindowFullscreen(
+			gSDLWindow,
+			gGamePrefs.fullscreen? SDL_WINDOW_FULLSCREEN_DESKTOP: 0);
+}

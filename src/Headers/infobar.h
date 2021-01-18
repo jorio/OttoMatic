@@ -48,5 +48,6 @@ void DisableHelpType(short messNum);
 short CharToSprite(char c);
 
 void DrawInfobarSprite2(float x, float y, float size, short group, short texNum, const OGLSetupOutputType *setupInfo);
+void DrawInfobarSprite2_Scaled(float x, float y, float scaleX, float scaleY, short group, short texNum, const OGLSetupOutputType *setupInfo);
 
 void SetInfobarSpriteState(void);

@@ -700,7 +700,7 @@ short	i;
 
 	for (i = 0; i < 2; i++)
 	{
-		const char* cstr = GetLanguageString(i + STRING_OFFSET_BONUS_SCREEN);
+		const char* cstr = GetLanguageString(i + STR_OFFSET_BONUS_SCREEN);
 
 		gSaveIcons[i] = MakeFontStringObject(cstr, &gNewObjectDefinition, gGameViewInfoPtr, true);
 		gSaveIcons[i]->ColorFilter.a = 0;

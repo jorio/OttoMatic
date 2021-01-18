@@ -187,7 +187,6 @@ static Boolean	beenHere = false;
 	}
 
 	GameScreenToBlack();
-	CleanupDisplay();								// unloads Draw Sprocket
 
 
 	UseResFile(gMainAppRezFile);

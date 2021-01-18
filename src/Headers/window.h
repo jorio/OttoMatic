@@ -28,3 +28,5 @@ void DoLockPixels(GWorldPtr world);
 
 void Enter2D(void);
 void Exit2D(void);
+
+void SetFullscreenModeFromPrefs(void);

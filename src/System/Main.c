@@ -27,6 +27,7 @@ extern	long			gTerrainUnitWidth,gTerrainUnitDepth;
 extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 extern	short	gPrefsFolderVRefNum;
 extern	long	gPrefsFolderDirID;
+extern	SDL_Window	*gSDLWindow;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -137,6 +138,12 @@ void ToolBoxInit(void)
 	InitDefaultPrefs();
 	LoadPrefs(&gGamePrefs);
 
+	if (gSDLWindow)
+	{
+		SDL_SetWindowFullscreen(
+				gSDLWindow,
+				gGamePrefs.fullscreen? SDL_WINDOW_FULLSCREEN_DESKTOP: 0);
+	}
 
 
 			/*********************************/
@@ -187,17 +194,18 @@ long 		keyboardScript, languageCode, i;
 	}
 #else
 	SOURCE_PORT_MINOR_PLACEHOLDER();
-	gGamePrefs.language				= LANGUAGE_ENGLISH;
+	gGamePrefs.language						= LANGUAGE_ENGLISH;
 #endif
 
-	gGamePrefs.playerRelControls	= false;
-
-	gGamePrefs.anaglyph				= false;
-	gGamePrefs.anaglyphColor		= true;
-	gGamePrefs.anaglyphCalibrationRed = DEFAULT_ANAGLYPH_R;
-	gGamePrefs.anaglyphCalibrationGreen = DEFAULT_ANAGLYPH_G;
-	gGamePrefs.anaglyphCalibrationBlue = DEFAULT_ANAGLYPH_B;
-	gGamePrefs.doAnaglyphChannelBalancing = true;
+	gGamePrefs.fullscreen					= true;
+	gGamePrefs.antialiasing					= true;
+	gGamePrefs.playerRelControls			= false;
+	gGamePrefs.anaglyph						= false;
+	gGamePrefs.anaglyphColor				= true;
+	gGamePrefs.anaglyphCalibrationRed		= DEFAULT_ANAGLYPH_R;
+	gGamePrefs.anaglyphCalibrationGreen		= DEFAULT_ANAGLYPH_G;
+	gGamePrefs.anaglyphCalibrationBlue		= DEFAULT_ANAGLYPH_B;
+	gGamePrefs.doAnaglyphChannelBalancing	= true;
 
 	LoadLanguageStrings(gGamePrefs.language);
 }

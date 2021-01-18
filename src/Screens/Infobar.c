@@ -470,6 +470,30 @@ float				aspect;
 }
 
 
+void DrawInfobarSprite2_Scaled(float x, float y, float scaleX, float scaleY, short group, short texNum, const OGLSetupOutputType *setupInfo)
+{
+	SDL_GLContext agl_ctx = gAGLContext;
+	MOMaterialObject	*mo;
+	float				aspect;
+
+	/* ACTIVATE THE MATERIAL */
+
+	mo = gSpriteGroupList[group][texNum].materialObject;
+	MO_DrawMaterial(mo, setupInfo);
+
+	aspect = (float)mo->objectData.height / (float)mo->objectData.width;
+
+	/* DRAW IT */
+
+	glBegin(GL_QUADS);
+	glTexCoord2f(0,1);	glVertex2f(x, 			y);
+	glTexCoord2f(1,1);	glVertex2f(x+scaleX, 	y);
+	glTexCoord2f(1,0);	glVertex2f(x+scaleX, 	y+(scaleY*aspect));
+	glTexCoord2f(0,0);	glVertex2f(x,			y+(scaleY*aspect));
+	glEnd();
+}
+
+
 #pragma mark -
 
 #if 0
@@ -939,7 +963,7 @@ void DisplayHelpMessage(short messNum, float timer, Boolean overrideCurrent)
 
 			/* GET THE STRING TEXT TO DISPLAY */
 
-	gHelpStringC = GetLanguageString(messNum + STRING_OFFSET_IN_GAME_HELP);
+	gHelpStringC = GetLanguageString(messNum + STR_OFFSET_IN_GAME_HELP);
 
 
 			/* CALC STRING PARAMETERS */
@@ -1145,6 +1169,15 @@ short	s;
 
 		case	MACROMAN_CCEDIL:
 				s = HELPTEXT_SObjType_C;
+				break;
+
+		case	MACROMAN_AACUTE:
+				s = HELPTEXT_SObjType_A;
+				break;
+
+		case	MACROMAN_IACUTE:
+		case	MACROMAN_IGRAVE:
+				s = HELPTEXT_SObjType_I;
 				break;
 
 		case	'\'':

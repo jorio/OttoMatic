@@ -7,4 +7,4 @@
 
 void DoMainMenuScreen(void);
 void DrawScoreText(const char *s, float x, float y, OGLSetupOutputType *info);
-
+void DrawMainMenuCallback(OGLSetupOutputType *info);
