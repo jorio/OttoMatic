@@ -296,74 +296,11 @@ static char			*s;
 		}
 	}
 
-			/***********************/
-			/* CHOOSE PIXEL FORMAT */
-			/***********************/
-
-			/* PLAY IN WINDOW */
-
-#if 1
-			SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
-	if (!gPlayFullScreen)
-	{
-		fmt = aglChoosePixelFormat(&gGDevice, 1, attribWindow);
-	}
-
-			/* FULL-SCREEN */
-	else
-	{
-		if (gGamePrefs.depth == 32)
-			fmt = aglChoosePixelFormat(&gGDevice, 1, attrib32bit);						// 32-bit display
-		else
-			fmt = aglChoosePixelFormat(&gGDevice, 1, attrib16bit);						// 16-bit display
-	}
-
-			/* BACKUP PLAN IF ERROR */
-
-	if ((fmt == NULL) || (aglGetError() != AGL_NO_ERROR))
-	{
-		fmt = aglChoosePixelFormat(&gGDevice, 1, attrib2);							// try being less stringent
-		if ((fmt == NULL) || (aglGetError() != AGL_NO_ERROR))
-		{
-			DoFatalAlert("aglChoosePixelFormat failed!  OpenGL could not initialize your video card for 3D.  Check that your video card meets the game's minimum system requirements.");
-		}
-	}
-#endif
-
-
 			/* CREATE AGL CONTEXT & ATTACH TO WINDOW */
 
 	gAGLContext = SDL_GL_CreateContext(gSDLWindow);
 	GAME_ASSERT_MESSAGE(gAGLContext, SDL_GetError());
 	GAME_ASSERT(glGetError() == GL_NO_ERROR);
-
-#if 1
-	SOURCE_PORT_MINOR_PLACEHOLDER();	// fullscreen/non-fullscreen
-#else
-	if (gPlayFullScreen)
-	{
-		gAGLWin = nil;
-		aglEnable (gAGLContext, AGL_FS_CAPTURE_SINGLE);
-		aglSetFullScreen(gAGLContext, 0, 0, 0, 0);
-	}
-	else
-	{
-		gAGLWin = (AGLDrawable)gGameWindowGrafPtr;
-		ok = aglSetDrawable(gAGLContext, gAGLWin);
-		if ((!ok) || (aglGetError() != AGL_NO_ERROR))
-		{
-			if (aglGetError() == AGL_BAD_ALLOC)
-			{
-				gGamePrefs.showScreenModeDialog	= true;
-				SavePrefs();
-				DoFatalAlert("Not enough VRAM for the selected video mode.  Please try again and select a different mode.");
-			}
-			else
-				DoFatalAlert("OGL_CreateDrawContext: aglSetDrawable failed!");
-		}
-	}
-#endif
 
 
 			/* ACTIVATE CONTEXT */
