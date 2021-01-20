@@ -28,7 +28,8 @@ enum
 	STR_ON,
 	STR_OFF,
 	STR_PRESS					= 52,
-	STR_KEYBINDING_DESCRIPTION_0= 54,
+	STR_RESET_KEYBINDINGS,
+	STR_KEYBINDING_DESCRIPTION_0= 55,
 };
 
 void LoadLanguageStrings(int languageID);

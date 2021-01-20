@@ -12,6 +12,7 @@ extern	float					gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
 extern	OGLColorRGB				gGlobalColorFilter;
 extern	SDL_Window				*gSDLWindow;
 extern	Boolean					gAllowAudioKeys;
+extern const KeyBinding			gDefaultKeyBindings[NUM_CONTROL_NEEDS];
 
 /****************************/
 /*    PROTOTYPES            */
@@ -116,7 +117,7 @@ static int gNumSettingRows = sizeof(gSettingEntries) / sizeof(gSettingEntries[0]
 // Keybindings menu
 static int gHighlightedKeybindingRow = 0;
 static int gHighlightedKeybindingColumn = 0;
-static int gNumKeybindingRows = NUM_CONTROL_NEEDS + 1;		// 1 extra row for back button
+static int gNumKeybindingRows = NUM_CONTROL_NEEDS + 2;		// 2 extra row for reset & back buttons
 
 static float gSettingsFadeAlpha = 0;
 static int gSettingsState = SETTINGS_STATE_OFF;
@@ -265,16 +266,7 @@ static void NavigateKeybindings(void)
 	bool valueActivated = GetNewKeyState(SDL_SCANCODE_SPACE) || GetNewKeyState(SDL_SCANCODE_RETURN);
 	bool valueNuked = GetNewKeyState(SDL_SCANCODE_DELETE) || GetNewKeyState(SDL_SCANCODE_BACKSPACE);
 
-	if (gHighlightedKeybindingRow == NUM_CONTROL_NEEDS)		// last row: back
-	{
-		if (valueActivated)
-		{
-			MyFlushEvents();
-			PlayEffect(EFFECT_WEAPONCLICK);
-			cb_Back();
-		}
-	}
-	else
+	if (gHighlightedKeybindingRow < NUM_CONTROL_NEEDS)
 	{
 		KeyBinding* entry = &gGamePrefs.keys[gHighlightedKeybindingRow];
 		int16_t* entryKey = gHighlightedKeybindingColumn == 0 ? &entry->key1 : &entry->key2;
@@ -295,6 +287,19 @@ static void NavigateKeybindings(void)
 			PlayEffect(EFFECT_MENUCHANGE);
 			gSettingsState = SETTINGS_STATE_CONTROLS_AWAITING_PRESS;
 		}
+	}
+	else if (valueActivated && gHighlightedKeybindingRow == NUM_CONTROL_NEEDS + 0)		// reset
+	{
+		MyFlushEvents();
+		PlayEffect(EFFECT_FLAREEXPLODE);
+		memcpy(gGamePrefs.keys, gDefaultKeyBindings, sizeof(gDefaultKeyBindings));
+		_Static_assert(sizeof(gDefaultKeyBindings) == sizeof(gGamePrefs.keys));
+	}
+	else if (valueActivated && gHighlightedKeybindingRow == NUM_CONTROL_NEEDS + 1)		// back
+	{
+		MyFlushEvents();
+		PlayEffect(EFFECT_WEAPONCLICK);
+		cb_Back();
 	}
 }
 
@@ -468,6 +473,11 @@ static void DrawKeybindingScreen(OGLSetupOutputType *info)
 
 		y += SCORE_TEXT_SPACING * 1.5f;
 	}
+
+	// Draw reset button
+	y += SCORE_TEXT_SPACING * 1.5f;
+	SetSettingColor(gHighlightedKeybindingRow == gNumKeybindingRows - 2);
+	DrawText(GetLanguageString(STR_RESET_KEYBINDINGS), 150, y, .66f, 1.0f, info);
 
 	// Draw back button
 	y += SCORE_TEXT_SPACING * 1.5f;
