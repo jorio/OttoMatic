@@ -75,6 +75,20 @@ set(GAME_ALL_SOURCES
 	${GAME_HEADERS}
 )
 
+set(NATIVEFILEDIALOG_SOURCES
+	${CMAKE_CURRENT_SOURCE_DIR}/extern/nativefiledialog/src/common.h
+	${CMAKE_CURRENT_SOURCE_DIR}/extern/nativefiledialog/src/nfd_common.c
+	${CMAKE_CURRENT_SOURCE_DIR}/extern/nativefiledialog/src/nfd_common.h
+)
+
+if(APPLE)
+	list(APPEND NATIVEFILEDIALOG_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/extern/nativefiledialog/src/nfd_cocoa.m)
+elseif(WIN32)
+	list(APPEND NATIVEFILEDIALOG_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/extern/nativefiledialog/src/nfd_win.cpp)
+else()
+	list(APPEND NATIVEFILEDIALOG_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/extern/nativefiledialog/src/nfd_zenity.c)
+endif()
+
 #------------------------------------------------------------------------------
 # SOURCE GROUPS
 #------------------------------------------------------------------------------
@@ -97,15 +111,22 @@ endif()
 
 if(WIN32)
 	# "WIN32" here is equivalent to /SUBSYSTEM:WINDOWS for MSVC
-	add_executable(${GAME_TARGET} WIN32 ${GAME_ALL_SOURCES})
+	add_executable(${GAME_TARGET} WIN32
+		${NATIVEFILEDIALOG_SOURCES}
+		${GAME_ALL_SOURCES}
+	)
 elseif(APPLE)
 	add_executable(${GAME_TARGET} MACOSX_BUNDLE
+		${NATIVEFILEDIALOG_SOURCES}
 		${GAME_ALL_SOURCES}
 		${GAME_ICNS}
 		${SDL2_LIBRARIES}
 	)
 else()
-	add_executable(${GAME_TARGET} ${GAME_ALL_SOURCES})
+	add_executable(${GAME_TARGET}
+		${NATIVEFILEDIALOG_SOURCES}
+		${GAME_ALL_SOURCES}
+	)
 endif()
 
 target_include_directories(${GAME_TARGET} PRIVATE
@@ -116,6 +137,7 @@ target_include_directories(${GAME_TARGET} PRIVATE
 	${GAME_SRCDIR}/Headers
 	${GAME_SRCDIR}/Headers/Glue
 	#${GAME_SRCDIR}/Headers/QD3DCompat
+	${CMAKE_CURRENT_SOURCE_DIR}/extern/nativefiledialog/src/include
 )
 
 target_link_libraries(${GAME_TARGET}
@@ -124,6 +146,7 @@ target_link_libraries(${GAME_TARGET}
 	${OPENGL_LIBRARIES}
 	"$<$<BOOL:${APPLE}>:-framework Foundation>"		# Required for KillMacMouseAcceleration
 	"$<$<BOOL:${APPLE}>:-framework IOKit>"			# Required for KillMacMouseAcceleration
+	"$<$<BOOL:${APPLE}>:-framework AppKit>"			# Required for nativefiledialog
 )
 
 #------------------------------------------------------------------------------
