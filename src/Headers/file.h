@@ -5,6 +5,7 @@
 #ifndef FILE_H
 #define FILE_H
 
+#include "input.h"
 
 		/***********************/
 		/* RESOURCE STURCTURES */
@@ -50,7 +51,7 @@ typedef struct
 
 
 		/* PREFERENCES */
-		
+
 typedef struct
 {
 	Boolean	fullscreen;
@@ -63,7 +64,7 @@ typedef struct
 	uint8_t	anaglyphCalibrationGreen;
 	uint8_t	anaglyphCalibrationBlue;
 	Boolean doAnaglyphChannelBalancing;
-	uint32_t	reserved[8];
+	KeyBinding	keys[NUM_CONTROL_NEEDS];
 }PrefsType;
 
 extern	PrefsType			gGamePrefs;

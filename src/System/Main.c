@@ -158,6 +158,7 @@ void ToolBoxInit(void)
 
 
 /********** INIT DEFAULT PREFS ******************/
+extern const KeyBinding gDefaultKeyBindings[NUM_CONTROL_NEEDS];
 
 void InitDefaultPrefs(void)
 {
@@ -206,6 +207,9 @@ long 		keyboardScript, languageCode, i;
 	gGamePrefs.anaglyphCalibrationGreen		= DEFAULT_ANAGLYPH_G;
 	gGamePrefs.anaglyphCalibrationBlue		= DEFAULT_ANAGLYPH_B;
 	gGamePrefs.doAnaglyphChannelBalancing	= true;
+
+	memcpy(gGamePrefs.keys, gDefaultKeyBindings, sizeof(gGamePrefs.keys));
+	_Static_assert(sizeof(gGamePrefs.keys) == sizeof(gGamePrefs.keys));
 
 	LoadLanguageStrings(gGamePrefs.language);
 }

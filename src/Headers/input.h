@@ -7,13 +7,21 @@
 
 
 		/* NEEDS */
-		
+
+typedef struct KeyBinding
+{
+	int16_t		key1;
+	int16_t		key2;
+	int16_t		mouseButton;
+	int16_t		gamepadButton;
+} KeyBinding;
+
 enum
 {
-	kNeed_TurnLeft	= 0,
-	kNeed_TurnRight,
 	kNeed_Forward,
 	kNeed_Backward,
+	kNeed_TurnLeft,
+	kNeed_TurnRight,
 	kNeed_NextWeapon,
 	kNeed_Shoot,
 	kNeed_PunchPickup,

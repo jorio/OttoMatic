@@ -34,15 +34,6 @@ bool				gAnyNewKeysPressed = false;
 
 Byte				gNeedStates[NUM_CONTROL_NEEDS];
 
-typedef struct KeyBinding
-{
-	const char* name;
-	int key1;
-	int key2;
-	int mouseButton;
-	int gamepadButton;
-} KeyBinding;
-
 			/**************/
 			/* NEEDS LIST */
 			/**************/
@@ -55,19 +46,19 @@ typedef struct KeyBinding
 	#define DEFAULT_SHOOT_SC2 SDL_SCANCODE_RCTRL
 #endif
 
-KeyBinding gKeyBindings[NUM_CONTROL_NEEDS] =
+const KeyBinding gDefaultKeyBindings[NUM_CONTROL_NEEDS] =
 {
-[kNeed_Forward		] = { "Move Forward",		SDL_SCANCODE_UP,		SDL_SCANCODE_W,			0,					SDL_CONTROLLER_BUTTON_DPAD_UP, },
-[kNeed_Backward		] = { "Move Backwards",		SDL_SCANCODE_DOWN,		SDL_SCANCODE_S,			0,					SDL_CONTROLLER_BUTTON_DPAD_DOWN, },
-[kNeed_TurnLeft		] = { "Turn Left",			SDL_SCANCODE_LEFT,		SDL_SCANCODE_A,			0,					SDL_CONTROLLER_BUTTON_DPAD_LEFT, },
-[kNeed_TurnRight	] = { "Turn Right",			SDL_SCANCODE_RIGHT,		SDL_SCANCODE_D,			0,					SDL_CONTROLLER_BUTTON_DPAD_RIGHT, },
-[kNeed_NextWeapon	] = { "Next Weapon",		SDL_SCANCODE_LSHIFT,	SDL_SCANCODE_RSHIFT,	SDL_BUTTON_MIDDLE,	SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, },
-[kNeed_Shoot		] = { "Shoot",				DEFAULT_SHOOT_SC1,		DEFAULT_SHOOT_SC2,		SDL_BUTTON_LEFT,	SDL_CONTROLLER_BUTTON_X, },
-[kNeed_PunchPickup	] = { "Punch/Pickup/Drop",	SDL_SCANCODE_LALT,		SDL_SCANCODE_RALT,		SDL_BUTTON_RIGHT,	SDL_CONTROLLER_BUTTON_B, },
-[kNeed_Jump			] = { "Jump",				SDL_SCANCODE_SPACE,		0,						0,					SDL_CONTROLLER_BUTTON_A, },
-[kNeed_CameraMode	] = { "Camera Mode",		SDL_SCANCODE_TAB,		0,						0,					SDL_CONTROLLER_BUTTON_RIGHTSTICK, },
-[kNeed_CameraLeft	] = { "Camera Swing Left",	SDL_SCANCODE_COMMA,		0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
-[kNeed_CameraRight	] = { "Camera Swing Right",	SDL_SCANCODE_PERIOD,	0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
+[kNeed_Forward		] = {SDL_SCANCODE_UP,		SDL_SCANCODE_W,			0,					SDL_CONTROLLER_BUTTON_DPAD_UP, },
+[kNeed_Backward		] = {SDL_SCANCODE_DOWN,		SDL_SCANCODE_S,			0,					SDL_CONTROLLER_BUTTON_DPAD_DOWN, },
+[kNeed_TurnLeft		] = {SDL_SCANCODE_LEFT,		SDL_SCANCODE_A,			0,					SDL_CONTROLLER_BUTTON_DPAD_LEFT, },
+[kNeed_TurnRight	] = {SDL_SCANCODE_RIGHT,	SDL_SCANCODE_D,			0,					SDL_CONTROLLER_BUTTON_DPAD_RIGHT, },
+[kNeed_NextWeapon	] = {SDL_SCANCODE_LSHIFT,	SDL_SCANCODE_RSHIFT,	SDL_BUTTON_MIDDLE,	SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, },
+[kNeed_Shoot		] = {DEFAULT_SHOOT_SC1,		DEFAULT_SHOOT_SC2,		SDL_BUTTON_LEFT,	SDL_CONTROLLER_BUTTON_X, },
+[kNeed_PunchPickup	] = {SDL_SCANCODE_LALT,		SDL_SCANCODE_RALT,		SDL_BUTTON_RIGHT,	SDL_CONTROLLER_BUTTON_B, },
+[kNeed_Jump			] = {SDL_SCANCODE_SPACE,	0,						0,					SDL_CONTROLLER_BUTTON_A, },
+[kNeed_CameraMode	] = {SDL_SCANCODE_TAB,		0,						0,					SDL_CONTROLLER_BUTTON_RIGHTSTICK, },
+[kNeed_CameraLeft	] = {SDL_SCANCODE_COMMA,	0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
+[kNeed_CameraRight	] = {SDL_SCANCODE_PERIOD,	0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
 //[kNeed_Pause			] = { "Pause",				SDL_SCANCODE_ESCAPE,	0,						0,					SDL_CONTROLLER_BUTTON_START, },
 //[kKey_ToggleMusic		] = { "Toggle Music",		SDL_SCANCODE_M,			0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
 //[kKey_ToggleFullscreen	] = { "Toggle Fullscreen",	SDL_SCANCODE_F11,		0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
@@ -83,6 +74,7 @@ KeyBinding gKeyBindings[NUM_CONTROL_NEEDS] =
 /**********************/
 /* STATIC FUNCTIONS   */
 /**********************/
+
 
 static inline void UpdateKeyState(Byte* state, bool downNow)
 {
@@ -138,7 +130,7 @@ void UpdateInput(void)
 
 	for (int i = 0; i < NUM_CONTROL_NEEDS; i++)
 	{
-		const KeyBinding* kb = &gKeyBindings[i];
+		const KeyBinding* kb = &gGamePrefs.keys[i];
 
 		bool downNow = false;
 

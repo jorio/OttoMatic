@@ -11,6 +11,7 @@ extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	float					gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
 extern	OGLColorRGB				gGlobalColorFilter;
 extern	SDL_Window				*gSDLWindow;
+extern	Boolean					gAllowAudioKeys;
 
 /****************************/
 /*    PROTOTYPES            */
@@ -42,8 +43,12 @@ enum
 	SETTINGS_STATE_OFF,
 	SETTINGS_STATE_FADE_IN,
 	SETTINGS_STATE_READY,
+	SETTINGS_STATE_CONTROLS_READY,
+	SETTINGS_STATE_CONTROLS_AWAITING_PRESS,
 	SETTINGS_STATE_FADE_OUT,
 };
+
+const static OGLColorRGB kTitleColor = {1.0, 1.0, 0.7};
 
 static SettingEntry gSettingEntries[] =
 {
@@ -72,7 +77,6 @@ static SettingEntry gSettingEntries[] =
 		0,
 	},
 	*/
-	/*
 	{
 		&gGamePrefs.anaglyph,
 		STR_ANAGLYPH,
@@ -81,8 +85,6 @@ static SettingEntry gSettingEntries[] =
 		0,
 		false,
 	},
-	*/
-	/*
 	// Configure controls
 	{
 		NULL,
@@ -92,7 +94,6 @@ static SettingEntry gSettingEntries[] =
 		0,
 		true,
 	},
-	*/
 	// BACK
 	{
 		NULL,
@@ -108,16 +109,23 @@ static SettingEntry gSettingEntries[] =
 /*    VARIABLES            */
 /****************************/
 
-static int gSettingsMenuSelection = 0;
-static int gSettingsMenuCount = 0;
+// Main settings menu
+static int gHighlightedSettingRow = 0;
+static int gNumSettingRows = sizeof(gSettingEntries) / sizeof(gSettingEntries[0]);
+
+// Keybindings menu
+static int gHighlightedKeybindingRow = 0;
+static int gHighlightedKeybindingColumn = 0;
+static int gNumKeybindingRows = NUM_CONTROL_NEEDS + 1;		// 1 extra row for back button
 
 static float gSettingsFadeAlpha = 0;
 static int gSettingsState = SETTINGS_STATE_OFF;
 
+#pragma mark -
 
-/****************************/
-/*    CALLBACKS            */
-/****************************/
+/***************************************************************/
+/*                       CALLBACKS                             */
+/***************************************************************/
 
 static void cb_SetLanguage(void)
 {
@@ -126,16 +134,32 @@ static void cb_SetLanguage(void)
 
 static void cb_ConfigureControls(void)
 {
-	DoAlert("Implement me");
+	gSettingsState = SETTINGS_STATE_CONTROLS_READY;
 }
 
 static void cb_Back(void)
 {
-	gSettingsState = SETTINGS_STATE_FADE_OUT;
+	switch (gSettingsState)
+	{
+		case SETTINGS_STATE_CONTROLS_AWAITING_PRESS:
+			gSettingsState = SETTINGS_STATE_CONTROLS_READY;
+			break;
+
+		case SETTINGS_STATE_CONTROLS_READY:
+			gSettingsState = SETTINGS_STATE_READY;
+			break;
+
+		default:
+			gSettingsState = SETTINGS_STATE_FADE_OUT;
+			break;
+	}
 }
 
-/***************************************************************/
+#pragma mark -
 
+/***************************************************************/
+/*                       NAVIGATION                            */
+/***************************************************************/
 
 static unsigned int PositiveModulo(int value, unsigned int m)
 {
@@ -158,19 +182,18 @@ static void NavigateSettings(void)
 	{
 		cb_Back();
 	}
-	else if (GetNewKeyState(SDL_SCANCODE_UP) && (gSettingsMenuSelection > 0))
+	else if (GetNewKeyState(SDL_SCANCODE_UP))
 	{
-		gSettingsMenuSelection--;
+		gHighlightedSettingRow = PositiveModulo(gHighlightedSettingRow - 1, gNumSettingRows);
 		PlayEffect(EFFECT_WEAPONCLICK);
 	}
-	else if (GetNewKeyState(SDL_SCANCODE_DOWN) && (gSettingsMenuSelection < gSettingsMenuCount - 1))
+	else if (GetNewKeyState(SDL_SCANCODE_DOWN))
 	{
-		gSettingsMenuSelection++;
+		gHighlightedSettingRow = PositiveModulo(gHighlightedSettingRow + 1, gNumSettingRows);
 		PlayEffect(EFFECT_WEAPONCLICK);
 	}
 
-
-	const SettingEntry* entry = &gSettingEntries[gSettingsMenuSelection];
+	const SettingEntry* entry = &gSettingEntries[gHighlightedSettingRow];
 	bool activateWithArrows = entry->valuePtr != nil;
 
 	valueActivated = GetNewKeyState(SDL_SCANCODE_SPACE) || GetNewKeyState(SDL_SCANCODE_RETURN);
@@ -187,7 +210,6 @@ static void NavigateSettings(void)
 	{
 		valueDelta = 0;
 	}
-
 
 	if (valueDelta != 0)
 	{
@@ -206,33 +228,251 @@ static void NavigateSettings(void)
 		}
 	}
 
-
-//	if (valueActivated || valueDelta)
-//		MyFlushEvents();
+	if (valueActivated || valueDelta)
+		MyFlushEvents();
 }
 
-static void DrawSettingsText(int stringID, float x, float y, OGLSetupOutputType *info)
+static void NavigateKeybindings(void)
 {
-	const float xs = .66f;
+	UpdateInput();
 
-	for (const char* c = GetLanguageString(stringID); *c; c++)
+	if (GetNewKeyState(SDL_SCANCODE_ESCAPE))
 	{
-		float cw = SCORE_TEXT_SPACING * xs;
+		cb_Back();
+	}
+	else if (GetNewKeyState(SDL_SCANCODE_UP))
+	{
+		gHighlightedKeybindingRow = PositiveModulo(gHighlightedKeybindingRow - 1, gNumKeybindingRows);
+		PlayEffect(EFFECT_WEAPONCLICK);
+	}
+	else if (GetNewKeyState(SDL_SCANCODE_DOWN))
+	{
+		gHighlightedKeybindingRow = PositiveModulo(gHighlightedKeybindingRow + 1, gNumKeybindingRows);
+		PlayEffect(EFFECT_WEAPONCLICK);
+	}
+	else if (GetNewKeyState(SDL_SCANCODE_LEFT) && (gHighlightedKeybindingColumn > 0))
+	{
+		gHighlightedKeybindingColumn--;
+		PlayEffect(EFFECT_WEAPONCLICK);
+	}
+	else if (GetNewKeyState(SDL_SCANCODE_RIGHT) && (gHighlightedKeybindingColumn < 1))
+	{
+		gHighlightedKeybindingColumn++;
+		PlayEffect(EFFECT_WEAPONCLICK);
+	}
 
-		int texNum = CharToSprite(*c);				// get texture #
+
+	bool valueActivated = GetNewKeyState(SDL_SCANCODE_SPACE) || GetNewKeyState(SDL_SCANCODE_RETURN);
+	bool valueNuked = GetNewKeyState(SDL_SCANCODE_DELETE) || GetNewKeyState(SDL_SCANCODE_BACKSPACE);
+
+	if (gHighlightedKeybindingRow == NUM_CONTROL_NEEDS)		// last row: back
+	{
+		if (valueActivated)
+		{
+			MyFlushEvents();
+			PlayEffect(EFFECT_WEAPONCLICK);
+			cb_Back();
+		}
+	}
+	else
+	{
+		KeyBinding* entry = &gGamePrefs.keys[gHighlightedKeybindingRow];
+		int16_t* entryKey = gHighlightedKeybindingColumn == 0 ? &entry->key1 : &entry->key2;
+
+		if (valueNuked)
+		{
+			MyFlushEvents();
+			if (*entryKey != 0)
+			{
+				PlayEffect(EFFECT_FLAREEXPLODE);
+				*entryKey = 0;
+			}
+		}
+
+		if (valueActivated)
+		{
+			MyFlushEvents();
+			PlayEffect(EFFECT_MENUCHANGE);
+			gSettingsState = SETTINGS_STATE_CONTROLS_AWAITING_PRESS;
+		}
+	}
+}
+
+static void NavigateKeybinding_AwaitNewKey(void)
+{
+	GAME_ASSERT(gHighlightedKeybindingRow < NUM_CONTROL_NEEDS);
+
+	UpdateInput();
+
+	if (GetNewKeyState(SDL_SCANCODE_ESCAPE))
+	{
+		gSettingsState = SETTINGS_STATE_CONTROLS_READY;
+		MyFlushEvents();
+	}
+	else
+	{
+		for (int i = 0; i < SDL_NUM_SCANCODES; i++)
+		{
+			if (GetNewKeyState(i))
+			{
+				PlayEffect(EFFECT_MENUCHANGE);
+				KeyBinding* entry = &gGamePrefs.keys[gHighlightedKeybindingRow];
+				int16_t* entryKey = gHighlightedKeybindingColumn == 0 ? &entry->key1 : &entry->key2;
+				*entryKey = i;
+				gSettingsState = SETTINGS_STATE_CONTROLS_READY;
+				MyFlushEvents();
+				break;
+			}
+		}
+	}
+}
+
+#pragma mark -
+
+/***************************************************************/
+/*                       RENDERING                             */
+/***************************************************************/
+
+static void DrawText(
+		const char* s,
+		float x,
+		float y,
+		float xs,
+		float ys,
+		OGLSetupOutputType *info)
+{
+	const float cw = SCORE_TEXT_SPACING * xs /* * gs*/;
+
+	for (const char* c = s; *c; c++)
+	{
+		if (*c == ' ')
+		{
+			x += cw * .5f;
+			continue;
+		}
+
+		int texNum = CharToSprite(toupper(*c));				// get texture #
+		if (texNum == -1)
+		{
+			texNum = CharToSprite('?');
+		}
 		if (texNum != -1)
 		{
 			DrawInfobarSprite2_Scaled(
-					x + cw/2.0f,
+					x,
 					y,
-					SCORE_TEXT_SPACING * 2.0f * xs,
-					SCORE_TEXT_SPACING * 2.0f,
+					SCORE_TEXT_SPACING * xs * 2.0f,
+					SCORE_TEXT_SPACING * ys * 2.0f,
 					SPRITE_GROUP_FONT,
 					texNum,
 					info);
 		}
+
 		x += cw;
 	}
+}
+
+static void SetSettingColor(bool highlight)
+{
+	if (highlight)											// highlight
+	{
+		float rf = .7f + RandomFloat() * .29f;
+		gGlobalColorFilter = (OGLColorRGB){rf, rf, rf};
+	}
+	else													// no highlight
+	{
+		gGlobalColorFilter = (OGLColorRGB){.3, .5, .2};
+	}
+}
+
+static void DrawMainSettingsScreen(OGLSetupOutputType* info)
+{
+	float y = 70.0f;
+
+	// Draw title
+	gGlobalColorFilter = kTitleColor;
+	DrawText(GetLanguageString(STR_OFFSET_MAIN_MENU + 6), 150, y, 1.33f, 2.0f, info);
+	y += SCORE_TEXT_SPACING * 5.0f;
+
+	// Draw setting rows
+	for (int settingID = 0; settingID < gNumSettingRows; settingID++)
+	{
+		const SettingEntry* entry = &gSettingEntries[settingID];
+
+		if (entry->extraPadding)								// add extra padding above if needed
+		{
+			y += SCORE_TEXT_SPACING * 1.5f;
+		}
+
+		SetSettingColor(gHighlightedSettingRow == settingID);
+
+		DrawText(GetLanguageString(entry->labelStrID), 150, y, .66f, 1.0f, info);
+
+		if (entry->valuePtr)
+		{
+			int valueStrID = 0;
+			if (entry->valuePtr == &gGamePrefs.language)
+				valueStrID = STR_LANGUAGE_NAME;
+			else
+				valueStrID = entry->choiceStrID[*entry->valuePtr];
+			DrawText(GetLanguageString(valueStrID), 350, y, .66f, 1.0f, info);
+		}
+
+		y += SCORE_TEXT_SPACING * 1.5f;
+	}
+}
+
+static void DrawKeybindingScreen(OGLSetupOutputType *info)
+{
+	float y = 70.0f;
+	bool blinkFlux = SDL_GetTicks() % 500 < 300;
+
+	// Draw title
+	gGlobalColorFilter = kTitleColor;
+	DrawText(GetLanguageString(STR_CONFIGURE_CONTROLS), 150, y, 1.33f, 2.0f, info);
+	y += SCORE_TEXT_SPACING * 5.0f;
+
+	// Draw binding text
+	for (int bindingID = 0; bindingID < NUM_CONTROL_NEEDS; bindingID++)
+	{
+		bool isRowHighlighted = gHighlightedKeybindingRow == bindingID;
+
+		const char* caption = GetLanguageString(STR_KEYBINDING_DESCRIPTION_0 + bindingID);
+		const char* value1 = "---";
+		const char* value2 = "---";
+
+		if (gGamePrefs.keys[bindingID].key1 != 0)
+			value1 = SDL_GetScancodeName(gGamePrefs.keys[bindingID].key1);
+
+		if (gGamePrefs.keys[bindingID].key2 != 0)
+			value2 = SDL_GetScancodeName(gGamePrefs.keys[bindingID].key2);
+
+		if (isRowHighlighted && gSettingsState == SETTINGS_STATE_CONTROLS_AWAITING_PRESS)
+		{
+			if (gHighlightedKeybindingColumn == 0)
+			{
+				value1 = blinkFlux ? GetLanguageString(STR_PRESS) : "";
+			}
+			else
+			{
+				value2 = blinkFlux ? GetLanguageString(STR_PRESS) : "";
+			}
+		}
+
+		SetSettingColor(isRowHighlighted);
+		DrawText(caption, 150, y, .5f, 1.0f, info);
+		SetSettingColor(isRowHighlighted && gHighlightedKeybindingColumn == 0);
+		DrawText(value1, 320, y, .5f, 1.0f, info);
+		SetSettingColor(isRowHighlighted && gHighlightedKeybindingColumn == 1);
+		DrawText(value2, 400, y, .5f, 1.0f, info);
+
+		y += SCORE_TEXT_SPACING * 1.5f;
+	}
+
+	// Draw back button
+	y += SCORE_TEXT_SPACING * 1.5f;
+	SetSettingColor(gHighlightedKeybindingRow == gNumKeybindingRows - 1);
+	DrawText(GetLanguageString(STR_BACK), 150, y, .66f, 1.0f, info);
 }
 
 static void DrawSettings(OGLSetupOutputType *info)
@@ -255,45 +495,17 @@ static void DrawSettings(OGLSetupOutputType *info)
 
 	gGlobalTransparency = gSettingsFadeAlpha;
 
-
 	/*****************/
 	/* DRAW THE TEXT */
 	/*****************/
 
-	float y = 120;
-
-	for (int settingID = 0; settingID < gSettingsMenuCount; settingID++)
+	if (gSettingsState == SETTINGS_STATE_CONTROLS_READY || gSettingsState == SETTINGS_STATE_CONTROLS_AWAITING_PRESS)
 	{
-		const SettingEntry* entry = &gSettingEntries[settingID];
-
-		if (entry->extraPadding)								// add extra padding above if needed
-		{
-			y += SCORE_TEXT_SPACING * 2;
-		}
-
-		if (gSettingsMenuSelection == settingID)				// highlight
-		{
-			float rf = .7f + RandomFloat() * .29f;
-			gGlobalColorFilter = (OGLColorRGB){rf, rf, rf};
-		}
-		else													// no highlight
-		{
-			gGlobalColorFilter = (OGLColorRGB){.3, .5, .2};
-		}
-
-		DrawSettingsText(entry->labelStrID, 150, y, info);		// draw text
-
-		if (entry->valuePtr)
-		{
-			int valueStrID = 0;
-			if (entry->valuePtr == &gGamePrefs.language)
-				valueStrID = STR_LANGUAGE_NAME;
-			else
-				valueStrID = entry->choiceStrID[*entry->valuePtr];
-			DrawSettingsText(valueStrID, 350, y, info);
-		}
-
-		y += SCORE_TEXT_SPACING * 1.5f;
+		DrawKeybindingScreen(info);
+	}
+	else
+	{
+		DrawMainSettingsScreen(info);
 	}
 
 	/***********/
@@ -311,11 +523,18 @@ static void MenuBackgroundDrawRoutineWrapper(OGLSetupOutputType *info)
 	DrawSettings(info);
 }
 
+#pragma mark -
+
+/***************************************************************/
+/*                       MAIN LOOP                             */
+/***************************************************************/
+
 void DoSettingsOverlay(void)
 {
+	gAllowAudioKeys = false;					// dont interfere with keyboard binding
+
 	PlayEffect(MyRandomLong()&1? EFFECT_ACCENTDRONE1: EFFECT_ACCENTDRONE2);
 
-	gSettingsMenuCount = sizeof(gSettingEntries) / sizeof(gSettingEntries[0]);
 	gSettingsState = SETTINGS_STATE_FADE_IN;
 	gSettingsFadeAlpha = 0;
 
@@ -373,6 +592,14 @@ void DoSettingsOverlay(void)
 				NavigateSettings();
 				break;
 
+			case SETTINGS_STATE_CONTROLS_READY:
+				NavigateKeybindings();
+				break;
+
+			case SETTINGS_STATE_CONTROLS_AWAITING_PRESS:
+				NavigateKeybinding_AwaitNewKey();
+				break;
+
 			default:
 				break;
 		}
@@ -393,4 +620,6 @@ void DoSettingsOverlay(void)
 	SavePrefs();
 
 	MyFlushEvents();
+
+	gAllowAudioKeys = true;
 }

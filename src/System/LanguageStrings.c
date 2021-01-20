@@ -2,7 +2,7 @@
 // (C) 2021 Iliyas Jorio
 // This file is part of Otto Matic. https://github.com/jorio/ottomatic
 
-#define MAX_STRINGS 64
+#define MAX_STRINGS 128
 
 extern	FSSpec		gDataSpec;
 
