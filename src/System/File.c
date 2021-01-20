@@ -5,6 +5,9 @@
 /****************************/
 
 
+#include "nfd.h"
+
+
 /***************/
 /* EXTERNALS   */
 /***************/
@@ -46,18 +49,6 @@ static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, 
 static void ReadDataFromPlayfieldFile(FSSpec *specPtr, OGLSetupOutputType *setupInfo);
 static void	ConvertTexture16To16(u_short *textureBuffer, int width, int height);
 
-#if 0	// srcport rm
-static OSErr GetFileWithNavServices(const FSSpecPtr defaultLocationfssPtr, FSSpec *documentFSSpec);
-pascal void myEventProc(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms,
-						NavCallBackUserData callBackUD);
-pascal Boolean myFilterProc(AEDesc*theItem,void*info, NavCallBackUserData callBackUD, NavFilterModes filterMode);
-static OSErr PutFileWithNavServices(NavReplyRecord *reply, FSSpec *outSpec);
-
-
-static Boolean FindSharedLib(ConstStrFileNameParam libName, FSSpec *spec);
-static UInt32	GetFileVersion(FSSpec *spec);
-#endif
-
 
 /****************************/
 /*    CONSTANTS             */
@@ -65,20 +56,19 @@ static UInt32	GetFileVersion(FSSpec *spec);
 
 #define	BASE_PATH_TILE		900					// tile # of 1st path tile
 
-#define	PICT_HEADER_SIZE	512
-
 #define	SKELETON_FILE_VERS_NUM	0x0110			// v1.1
 
 #define	SAVE_GAME_VERSION	0x0100		// 1.0
 
 		/* SAVE GAME */
+		// READ IN FROM FILE!
 
 typedef struct
 {
-	u_long		version;
-	u_long		score;
-	short		realLevel;
-	short		numLives;
+	uint32_t	version;
+	uint32_t	score;
+	int16_t		realLevel;
+	int16_t		numLives;
 	float		health;
 	float		jumpJet;
 }SaveGameType;
@@ -132,8 +122,6 @@ typedef struct
 
 
 float	g3DTileSize, g3DMinY, g3DMaxY;
-
-static 	FSSpec		gSavedGameSpec;
 
 static	FSSpec	gApplicationFSSpec;								// spec of this application
 
@@ -1680,345 +1668,6 @@ Boolean	blackOpaq;
 }
 
 
-#pragma mark -
-
-
-/************************ NAV SERVICES:  EVENT PROC *****************************/
-
-#if 0	// srcport rm
-pascal void myEventProc(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms,
-						NavCallBackUserData callBackUD)
-{
-
-#pragma unused (callBackUD)
-
-
-	switch (callBackSelector)
-	{
-		case	kNavCBEvent:
-				switch (((callBackParms->eventData).eventDataParms).event->what)
-				{
-					case 	updateEvt:
-							break;
-				}
-				break;
-	}
-}
-
-
-
-
-
-/******************** NAV SERVICES: GET DOCUMENT ***********************/
-
-static OSErr GetFileWithNavServices(const FSSpecPtr defaultLocationfssPtr, FSSpec *documentFSSpec)
-{
-NavDialogOptions 	dialogOptions;
-AEDesc 				defaultLocation;
-NavEventUPP 		eventProc 	= NewNavEventUPP(myEventProc);
-NavObjectFilterUPP filterProc 	= nil; //NewNavObjectFilterUPP(myFilterProc);
-OSErr 				anErr 		= noErr;
-
-#if CUSTOM
-NavDialogRef				navRef;
-NavDialogCreationOptions	createOption;
-#endif
-			/* Specify default options for dialog box */
-
-	anErr = NavGetDefaultDialogOptions(&dialogOptions);
-	if (anErr == noErr)
-	{
-			/* Adjust the options to fit our needs */
-
-		dialogOptions.dialogOptionFlags |= kNavSelectDefaultLocation;	// Set default location option
-		dialogOptions.dialogOptionFlags ^= kNavAllowPreviews;			// Clear preview option
-		dialogOptions.dialogOptionFlags ^= kNavAllowMultipleFiles;		// Clear multiple files option
-
-
-				/* make descriptor for default location */
-
-		anErr = AECreateDesc(typeFSS,defaultLocationfssPtr, sizeof(*defaultLocationfssPtr), &defaultLocation);
-//		if (anErr ==noErr)
-		{
-			/* Get 'open'resource.  A nil handle being returned is OK, this simply means no automatic file filtering. */
-
-			static NavTypeList			typeList = {'Otto', 0, 1, 'OSav'};	// set types to filter
-
-			NavTypeListPtr 	typeListPtr = &typeList;	// = (NavTypeListHandle)GetResource('open',128);
-			NavReplyRecord 		reply;
-
-
-			/* Call NavGetFile() with specified options and declare our app-defined functions and type list */
-
-			anErr = NavGetFile(&defaultLocation, &reply, &dialogOptions, eventProc, nil, filterProc, &typeListPtr,nil);
-			if ((anErr == noErr) && (reply.validRecord))
-			{
-					/* Deal with multiple file selection */
-
-				long 	count;
-
-				anErr = AECountItems(&(reply.selection),&count);
-
-
-					/* Set up index for file list */
-
-				if (anErr == noErr)
-				{
-					long i;
-
-					for (i = 1; i <= count; i++)
-					{
-						AEKeyword 	theKeyword;
-						DescType 	actualType;
-						Size 		actualSize;
-
-						/* Get a pointer to selected file */
-
-						anErr = AEGetNthPtr(&(reply.selection), i, typeFSS,&theKeyword, &actualType,
-											documentFSSpec, sizeof(FSSpec), &actualSize);
-					}
-				}
-
-
-				/* Dispose of NavReplyRecord,resources,descriptors */
-
-				anErr = NavDisposeReply(&reply);
-			}
-
-			(void)AEDisposeDesc(&defaultLocation);
-		}
-	}
-
-
-		/* CLEAN UP */
-
-	if (eventProc)
-	{
-		DisposeNavEventUPP(eventProc);
-		eventProc = nil;
-	}
-	if (filterProc)
-	{
-		DisposeNavObjectFilterUPP(filterProc);
-		filterProc = nil;
-	}
-
-#if CUSTOM
-	NavDialogDispose(navRef);
-#endif
-	return anErr;
-}
-
-
-/********************** PUT FILE WITH NAV SERVICES *************************/
-
-static OSErr PutFileWithNavServices(NavReplyRecord *reply, FSSpec *outSpec)
-{
-OSErr 				anErr 			= noErr;
-NavDialogOptions 	dialogOptions;
-OSType 				fileTypeToSave 	='PSav';
-OSType 				creatorType 	='Otto';
-NavEventUPP 		eventProc = nil; //NewNavEventUPP(myEventProc);
-Str255				name = "Otto Saved Game";
-
-	anErr = NavGetDefaultDialogOptions(&dialogOptions);
-	if (anErr == noErr)
-	{
-		CopyPStr(name, dialogOptions.savedFileName);					// set default name
-
-		anErr = NavPutFile(nil, reply, &dialogOptions, nil, fileTypeToSave, creatorType, nil);
-		if ((anErr == noErr) && (reply->validRecord))
-		{
-			AEKeyword	theKeyword;
-			DescType 	actualType;
-			Size 		actualSize;
-
-			anErr = AEGetNthPtr(&(reply->selection),1,typeFSS, &theKeyword,&actualType, outSpec, sizeof(FSSpec), &actualSize);
-		}
-	}
-
-	if (eventProc)
-	{
-		DisposeNavEventUPP(eventProc);
-		eventProc = nil;
-	}
-
-	return anErr;
-}
-
-
-
-
-
-
-#pragma mark -
-
-/******************** GET LIBRARY VERSION *******************/
-//
-// Returns the version # of the input extension/library (used to get OpenGL version #)
-//
-
-void GetLibVersion(ConstStrFileNameParam libName, NumVersion *version)
-{
-	FSSpec				spec;
-	UInt32				versCode;
-//	char				versStr[32];
-
-	if (FindSharedLib(libName, &spec))
-	{
-		versCode = GetFileVersion(&spec);
-//		VersionCodeToText(versCode, versStr);
-
-//		printf("Shared lib '%#s' found!\n", libName);
-//		printf("    Filename is '%#s'\n", spec.name);
-//		printf("    Version code is: 0x%08X\n", versCode);
-//		printf("    Version str  is: %s\n", versStr);
-	}
-	else
-	{
-		DoAlert("GetLibVersion: lib not found");
-	}
-
-	version->majorRev 		= (versCode & 0xff000000) >> 24;
-	version->minorAndBugRev = (versCode & 0x00ff0000) >> 16;
-	version->stage 			= 0;
-	version->nonRelRev 		= 0;
-}
-
-
-static UInt32	GetFileVersion(FSSpec *spec)
-{
-	SInt16						fRefNum, saveRefNum;
-	Handle						versH;
-	UInt32						versCode;
-
-	saveRefNum = CurResFile();
-	fRefNum = FSpOpenResFile(spec, fsRdPerm);
-	if (fRefNum == -1)
-		return 0;
-
-	if ((versH = Get1Resource('vers', 1)) == NULL)
-		versH = Get1Resource('vers', 2);
-
-	if (versH)
-		versCode = *(UInt32 *) (*versH);
-	else
-		versCode = 0;
-
-	CloseResFile(fRefNum);
-	UseResFile(saveRefNum);
-
-	return versCode;
-}
-
-#if 0
-static void VersionCodeToText(UInt32 versCode, char *versStr)
-{
-	char			temp[128];
-
-	if (!versCode) {
-		versStr[0] = '?';
-		versStr[1] = 0;
-	}
-	else {
-		sprintf(versStr, "%d.%d", (versCode & 0x0F000000) >> 24, (versCode & 0x00F00000) >> 20);
-		if (versCode & 0x000F0000) {
-			sprintf(temp, ".%d", (versCode & 0x000F0000) >> 16);
-			strcat(versStr, temp);
-		}
-		if ((versCode & 0x0000FFFF) != 0x8000) {
-			char		c;
-
-			switch (versCode & 0xFF00) {
-				case 0x8000:
-					c = 'f';
-					break;
-				case 0x6000:
-					c = 'b';
-					break;
-				case 0x4000:
-					c = 'a';
-					break;
-				default:
-					c = 'd';
-					break;
-			}
-			sprintf(temp, "%c%d", c, (versCode & 0xFF));
-			strcat(versStr, temp);
-		}
-	}
-}
-#endif
-
-static Boolean MatchSharedLib(ConstStrFileNameParam libName, FSSpec *spec)
-{
-	SInt16						fRefNum, saveRefNum, i;
-	Boolean						result;
-	CFragResourcePtr			*cfrg;
-	CFragResourceMemberPtr		member;
-
-	saveRefNum = CurResFile();
-	fRefNum = FSpOpenResFile(spec, fsRdPerm);
-	if (fRefNum == -1)
-		return false;
-
-	result = false;
-	cfrg = (CFragResourcePtr *) Get1Resource(kCFragResourceType, kCFragResourceID);
-	if (cfrg && (**cfrg).memberCount) {
-		member = &(**cfrg).firstMember;
-		for (i=0; i<(**cfrg).memberCount; i++) {
-			if (EqualString(libName, member->name, false, true)) {
-				result = true;
-				break;
-			}
-			member = (CFragResourceMemberPtr) (((char *) member) + member->memberSize);
-		}
-	}
-
-	CloseResFile(fRefNum);
-	UseResFile(saveRefNum);
-	return result;
-}
-
-
-static Boolean FindSharedLib(ConstStrFileNameParam libName, FSSpec *spec)
-{
-	SInt16						extVRefNum;
-	SInt32						extDirID;
-	StrFileName					fName;
-	SInt32						fIndex;
-	OSErr						err;
-	CInfoPBRec					cpb;
-	HFileInfo					*fpb = (HFileInfo *) &cpb;
-
-	if (FindFolder(kOnSystemDisk, kExtensionFolderType, kDontCreateFolder, &extVRefNum, &extDirID) != noErr)
-		return false;
-
-	if (FSMakeFSSpec(extVRefNum, extDirID, libName, spec) == noErr)
-		return true;
-
-	fpb->ioVRefNum = extVRefNum;
-	fpb->ioNamePtr = fName;
-	fIndex = 1;
-	do {
-		fpb->ioDirID = extDirID;
-		fpb->ioFDirIndex = fIndex;
-
-		err = PBGetCatInfoSync(&cpb);
-		if (err == noErr) {
-			if (!(fpb->ioFlAttrib & 16) && fpb->ioFlFndrInfo.fdType == kCFragLibraryFileType) {
-				FSMakeFSSpec(extVRefNum, extDirID, fName, spec);
-				if (MatchSharedLib(libName, spec))
-					return true;
-			}
-			fIndex ++;
-		}
-	} while (err == noErr);
-
-	return false;
-}
-#endif
-
 
 #pragma mark -
 
@@ -2030,14 +1679,8 @@ static Boolean FindSharedLib(ConstStrFileNameParam libName, FSSpec *spec)
 
 Boolean SaveGame(void)
 {
-	SOURCE_PORT_PLACEHOLDER();
-	return false;
-#if 0
 SaveGameType	saveData;
-short			fRefNum;
 FSSpec			*specPtr;
-NavReplyRecord	navReply;
-long			count;
 Boolean			success = false;
 
 	Enter2D();
@@ -2072,57 +1715,51 @@ Boolean			success = false;
 		/* DO NAV SERVICES */
 		/*******************/
 
-	if (PutFileWithNavServices(&navReply, &gSavedGameSpec))
-		goto bail;
-	specPtr = &gSavedGameSpec;
-	if (navReply.replacing)										// see if delete old
-		FSpDelete(specPtr);
+	nfdchar_t *outPath = NULL;
+	nfdresult_t result = NFD_SaveDialog("ottosave", NULL, &outPath);
 
-
-				/* CREATE & OPEN THE REZ-FORK */
-
-	if (FSpCreate(specPtr,'Otto','OSav',nil) != noErr)
+	if (result == NFD_OKAY)
 	{
-		DoAlert("Error creating Save file");
+		FILE* file = fopen(outPath, "wb");
+		if (!file)
+		{
+			DoAlert("Couldn't open this file for writing.");
+			goto bail;
+		}
+
+		size_t count = sizeof(SaveGameType);
+		size_t effectiveCount = fwrite(&saveData, 1, count, file);
+		fclose(file);
+
+		if (count != effectiveCount)
+		{
+			DoAlert("Couldn't save successfully.");
+			goto bail;
+		}
+	}
+	else if (result == NFD_CANCEL)
+	{
 		goto bail;
 	}
-
-	FSpOpenDF(specPtr,fsRdWrPerm, &fRefNum);
-	if (fRefNum == -1)
+	else
 	{
-		DoAlert("Error opening Save file");
+		DoAlert(NFD_GetError());
 		goto bail;
 	}
-
-
-				/* WRITE TO FILE */
-
-	count = sizeof(SaveGameType);
-	if (FSWrite(fRefNum, &count, (Ptr)&saveData) != noErr)
-	{
-		DoAlert("Error writing Save file");
-		FSClose(fRefNum);
-		goto bail;
-	}
-
-			/* CLOSE FILE */
-
-	FSClose(fRefNum);
-
-
-			/* CLEANUP NAV SERVICES */
-
-	NavCompleteSave(&navReply, kNavTranslateInPlace);
 
 	success = true;
 
 bail:
-	NavDisposeReply(&navReply);
 	HideCursor();
 	Exit2D();
 
+	if (outPath != NULL)
+	{
+		free(outPath);		// we're responsible for freeing this after nativefiledialog allocates it
+		outPath = NULL;
+	}
+
 	return(success);
-#endif
 }
 
 
@@ -2130,17 +1767,8 @@ bail:
 
 Boolean LoadSavedGame(void)
 {
-	SOURCE_PORT_PLACEHOLDER();
-	return false;
-#if 0
 SaveGameType	saveData;
-short			fRefNum;
-long			count;
 Boolean			success = false;
-//short			oldSong;
-
-//	oldSong = gCurrentSong;							// turn off playing music to get around bug in OS X
-//	KillSong();
 
 	Enter2D();
 
@@ -2150,33 +1778,37 @@ Boolean			success = false;
 
 				/* GET FILE WITH NAVIGATION SERVICES */
 
-	if (GetFileWithNavServices(nil, &gSavedGameSpec) != noErr)
-		goto bail;
+	nfdchar_t *outPath = NULL;
+	nfdresult_t result = NFD_OpenDialog("ottosave", NULL, &outPath);
 
-
-				/* OPEN THE REZ-FORK */
-
-	FSpOpenDF(&gSavedGameSpec,fsRdPerm, &fRefNum);
-	if (fRefNum == -1)
+	if (result == NFD_OKAY)
 	{
-		DoAlert("Error opening Save file");
+		FILE* file = fopen(outPath, "rb");
+		if (!file)
+		{
+			DoAlert("Couldn't open this file for reading.");
+			goto bail;
+		}
+
+		size_t count = sizeof(SaveGameType);
+		size_t effectiveCount = fread(&saveData, 1, count, file);
+		fclose(file);
+
+		if (count != effectiveCount)
+		{
+			DoAlert("This is not an Otto Matic save file.");
+			goto bail;
+		}
+	}
+	else if (result == NFD_CANCEL)
+	{
 		goto bail;
 	}
-
-				/* READ FROM FILE */
-
-	count = sizeof(SaveGameType);
-	if (FSRead(fRefNum, &count, &saveData) != noErr)
+	else
 	{
-		DoAlert("Error reading Save file");
-		FSClose(fRefNum);
+		DoAlert(NFD_GetError());
 		goto bail;
 	}
-
-			/* CLOSE FILE */
-
-	FSClose(fRefNum);
-
 
 			/**********************/
 			/* USE SAVE GAME DATA */
@@ -2197,19 +1829,11 @@ bail:
 	Exit2D();
 	HideCursor();
 
-
-//	if (!success)								// user cancelled, so start song again before returning
-//		PlaySong(oldSong, true);
+	if (outPath != NULL)
+	{
+		free(outPath);		// we're responsible for freeing this after nativefiledialog allocates it
+		outPath = NULL;
+	}
 
 	return(success);
-#endif
 }
-
-
-#pragma mark -
-
-
-
-
-
-
