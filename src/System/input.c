@@ -31,6 +31,7 @@ extern	PrefsType			gGamePrefs;
 
 Byte				gRawKeyboardState[SDL_NUM_SCANCODES];
 bool				gAnyNewKeysPressed = false;
+char				gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
 
 Byte				gNeedStates[NUM_CONTROL_NEEDS];
 
@@ -103,7 +104,78 @@ void InitInput(void)
 
 void UpdateInput(void)
 {
+
+	gTextInput[0] = '\0';
+
+
+			/**********************/
+			/* DO SDL MAINTENANCE */
+			/**********************/
+
 	SDL_PumpEvents();
+	SDL_Event event;
+	while (SDL_PollEvent(&event))
+	{
+		switch (event.type)
+		{
+			case SDL_QUIT:
+				ExitToShell();			// throws Pomme::QuitRequest
+				return;
+
+			case SDL_WINDOWEVENT:
+				switch (event.window.event)
+				{
+					case SDL_WINDOWEVENT_CLOSE:
+						ExitToShell();	// throws Pomme::QuitRequest
+						return;
+
+					/*
+					case SDL_WINDOWEVENT_RESIZED:
+						QD3D_OnWindowResized(event.window.data1, event.window.data2);
+						break;
+					*/
+
+					case SDL_WINDOWEVENT_FOCUS_LOST:
+#if __APPLE__
+						// On Mac, always restore system mouse accel if cmd-tabbing away from the game
+						RestoreMacMouseAcceleration();
+#endif
+						break;
+
+					case SDL_WINDOWEVENT_FOCUS_GAINED:
+#if __APPLE__
+						// On Mac, kill mouse accel when focus is regained only if the game has captured the mouse
+						if (SDL_GetRelativeMouseMode())
+							KillMacMouseAcceleration();
+#endif
+						break;
+				}
+				break;
+
+				case SDL_TEXTINPUT:
+					memcpy(gTextInput, event.text.text, sizeof(gTextInput));
+					_Static_assert(sizeof(gTextInput) == sizeof(event.text.text));
+					break;
+
+					/*
+				case SDL_MOUSEMOTION:
+					if (!gEatMouse)
+					{
+						MouseSmoothing_OnMouseMotion(&event.motion);
+					}
+					break;
+
+				case SDL_JOYDEVICEADDED:	 // event.jdevice.which is the joy's INDEX (not an instance id!)
+					TryOpenController(false);
+					break;
+
+				case SDL_JOYDEVICEREMOVED:	// event.jdevice.which is the joy's UNIQUE INSTANCE ID (not an index!)
+					OnJoystickRemoved(event.jdevice.which);
+					break;
+				 */
+		}
+	}
+
 	int numkeys = 0;
 	const UInt8* keystate = SDL_GetKeyboardState(&numkeys);
 	uint32_t mouseButtons = SDL_GetMouseState(NULL, NULL);

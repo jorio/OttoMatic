@@ -20,6 +20,7 @@ extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	u_long			gScore,gGlobalMaterialFlags,gLoadedScore;
 extern	Boolean			gPlayingFromSavedGame,gAllowAudioKeys;
 extern	SDL_GLContext		gAGLContext;
+extern	char				gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
 
 /****************************/
 /*    PROTOTYPES            */
@@ -137,25 +138,16 @@ void NewScore(void)
 					gHighScores[gNewScoreSlot].name[MAX_NAME_LENGTH] = ' ';
 				}
 			}
-			else
+			else if (gTextInput[0] && gTextInput[0] >= ' ' && gTextInput[0] < '~')
 			{
-				SDL_Event event;
-				//SDL_PumpEvents();	// not needed because UpdateInput does it already
-				if (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_TEXTINPUT, SDL_TEXTINPUT) > 0)
+				// The text event gives us UTF-8. Use the key only if it's a printable ASCII character.
+				char theChar = gTextInput[0];
+				if (gCursorIndex < MAX_NAME_LENGTH)								// dont add anything more if maxxed out now
 				{
-					GAME_ASSERT(event.type == SDL_TEXTINPUT);
-					// The text event gives us UTF-8. Use the key only if it's a printable ASCII character.
-					if (event.text.text[0] >= ' ' && event.text.text[0] <= '~')
-					{
-						char theChar = event.text.text[0];
-						if (gCursorIndex < MAX_NAME_LENGTH)								// dont add anything more if maxxed out now
-						{
-							if ((theChar >= 'a') && (theChar <= 'z'))					// see if convert lower case to upper case a..z
-								theChar = 'A' + (theChar-'a');
-							gHighScores[gNewScoreSlot].name[gCursorIndex+1] = theChar;
-							gCursorIndex++;
-						}
-					}
+					if ((theChar >= 'a') && (theChar <= 'z'))					// see if convert lower case to upper case a..z
+						theChar = 'A' + (theChar-'a');
+					gHighScores[gNewScoreSlot].name[gCursorIndex+1] = theChar;
+					gCursorIndex++;
 				}
 			}
 		}
