@@ -65,6 +65,7 @@ typedef struct
 	uint8_t	anaglyphCalibrationBlue;
 	Boolean doAnaglyphChannelBalancing;
 	KeyBinding	keys[NUM_CONTROL_NEEDS];
+	char	lastFileDialogPath[4096];
 }PrefsType;
 
 extern	PrefsType			gGamePrefs;

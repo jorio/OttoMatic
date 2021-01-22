@@ -60,6 +60,14 @@ static void	ConvertTexture16To16(u_short *textureBuffer, int width, int height);
 
 #define	SAVE_GAME_VERSION	0x0100		// 1.0
 
+#define	SAVE_GAME_EXTENSION	"ottosave"
+
+#if _WIN32
+#define PATH_SEPARATOR '\\'
+#else
+#define PATH_SEPARATOR '/'
+#endif
+
 		/* SAVE GAME */
 		// READ IN FROM FILE!
 
@@ -1668,6 +1676,15 @@ Boolean	blackOpaq;
 #pragma mark -
 
 
+static void RememberLastFileDialogPath(const char* outPath)
+{
+	GAME_ASSERT(outPath != NULL);
+	memset(gGamePrefs.lastFileDialogPath, 0, sizeof(gGamePrefs.lastFileDialogPath));
+	strncpy(gGamePrefs.lastFileDialogPath, outPath, sizeof(gGamePrefs.lastFileDialogPath));
+	SavePrefs();
+}
+
+
 /***************************** SAVE GAME ********************************/
 //
 // Returns true if saving was successful
@@ -1711,8 +1728,20 @@ Boolean			success = false;
 		/* DO NAV SERVICES */
 		/*******************/
 
+	char defaultPath[4096];
+	char directory[4096];
+	strncpy(directory, gGamePrefs.lastFileDialogPath, sizeof(directory));
+	char* lastSlash = strrchr(directory, PATH_SEPARATOR);
+	if (lastSlash)
+		*(lastSlash + 1) = '\0';
+	else
+		directory[0] = '\0';
+	snprintf(defaultPath, sizeof(defaultPath),
+			"%sOtto Matic - Level %d - Score %lu.%s",
+			directory, gLevelNum+2, gScore, SAVE_GAME_EXTENSION);
+
 	nfdchar_t *outPath = NULL;
-	nfdresult_t result = NFD_SaveDialog("ottosave", NULL, &outPath);
+	nfdresult_t result = NFD_SaveDialog(SAVE_GAME_EXTENSION, defaultPath, &outPath);
 
 	if (result == NFD_OKAY)
 	{
@@ -1745,6 +1774,8 @@ Boolean			success = false;
 
 	success = true;
 
+	RememberLastFileDialogPath(outPath);
+
 bail:
 	HideCursor();
 	Exit2D();
@@ -1775,7 +1806,7 @@ Boolean			success = false;
 				/* GET FILE WITH NAVIGATION SERVICES */
 
 	nfdchar_t *outPath = NULL;
-	nfdresult_t result = NFD_OpenDialog("ottosave", NULL, &outPath);
+	nfdresult_t result = NFD_OpenDialog(SAVE_GAME_EXTENSION, gGamePrefs.lastFileDialogPath, &outPath);
 
 	if (result == NFD_OKAY)
 	{
@@ -1819,6 +1850,8 @@ Boolean			success = false;
 	gPlayerInfo.jumpJet	= SwizzleFloat(&saveData.jumpJet);
 
 	success = true;
+
+	RememberLastFileDialogPath(outPath);
 
 
 bail:
