@@ -534,6 +534,7 @@ long		count;
 	if (iErr)
 	{
 		FSClose(refNum);
+		InitDefaultPrefs();
 		return(iErr);
 	}
 
@@ -549,10 +550,6 @@ long		count;
 
 	LoadLanguageStrings(gGamePrefs.language);
 
-	return(noErr);
-
-err:
-	InitDefaultPrefs();
 	return(noErr);
 }
 
@@ -577,7 +574,7 @@ long				count;
 
 				/* OPEN FILE */
 
-	iErr = FSpOpenDF(&file, fsRdWrPerm, &refNum);
+	iErr = FSpOpenDF(&file, fsWrPerm, &refNum);
 	if (iErr)
 	{
 		FSpDelete(&file);
@@ -1132,7 +1129,6 @@ Handle					hand;
 PlayfieldHeaderType		**header;
 long					row,col,j,i,size;
 float					yScale;
-float					*src;
 short					fRefNum;
 OSErr					iErr;
 Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
@@ -1267,7 +1263,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	hand = GetResource('YCrd',1000);
 	GAME_ASSERT_MESSAGE(hand, "Error reading height data resource!");
 	{
-		src = (float *)*hand;
+		float* src = (float *)*hand;
 		for (row = 0; row <= gTerrainTileDepth; row++)
 			for (col = 0; col <= gTerrainTileWidth; col++)
 				gMapYCoordsOriginal[row][col] = gMapYCoords[row][col] = SwizzleFloat(src++) * yScale;
