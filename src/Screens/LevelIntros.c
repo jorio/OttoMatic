@@ -583,7 +583,7 @@ ObjNode	*newObj;
 
 static void FreeIntroScreen(void)
 {
-	FlushEvents (everyEvent, REMOVE_ALL_EVENTS);
+	MyFlushEvents();
 	DeleteAllObjects();
 	DisposeParticleSystem();
 	DisposeAllSpriteGroups();
