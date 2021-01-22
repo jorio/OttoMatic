@@ -262,7 +262,7 @@ struct ObjNode
 	void			(*MoveCall)(struct ObjNode *);			// pointer to object's move routine
 	void			(*SplineMoveCall)(struct ObjNode *);	// pointer to object's spline move routine
 	void			(*CustomDrawFunction)(struct ObjNode *, const OGLSetupOutputType *setupInfo);// pointer to object's custom draw function
-	u_long			StatusBits;			// various status bits
+	uint32_t			StatusBits;			// various status bits
 	
 	OGLPoint3D		Coord;				// coord of object
 	OGLPoint3D		OldCoord;			// coord @ previous frame
@@ -282,9 +282,9 @@ struct ObjNode
 	OGLPoint3D		WeaponAutoTargetOff;	// offset from coord where weapon should auto target
 
 			/* COLLISION INFO */
-			
-	u_long			CType;				// collision type bits
-	u_long			CBits;				// collision attribute bits
+
+	uint32_t			CType;				// collision type bits
+	uint32_t			CBits;				// collision attribute bits
 	Byte				NumCollisionBoxes;
 	CollisionBoxType	CollisionBoxes[MAX_COLLISION_BOXES];// Array of collision rectangles
 	int					LeftOff,RightOff,FrontOff,BackOff,TopOff,BottomOff;		// box offsets (only used by simple objects with 1 collision box)	
@@ -302,7 +302,7 @@ struct ObjNode
 	Boolean			POWRegenerate;		// true if powerup should auto-regen
 	
 	signed char		Flag[6];
-	long			Special[6];
+	int32_t			Special[6];
 	float			SpecialF[6];
 	float			Timer;				// misc use timer
 	
@@ -327,7 +327,7 @@ struct ObjNode
 
 	short				EffectChannel;			// effect sound channel index (-1 = none)
 	short				ParticleGroup;
-	u_long				ParticleMagicNum;
+	uint32_t				ParticleMagicNum;
 	float				ParticleTimer;
 	
 	MOSpriteObject		*SpriteMO;				// ref to sprite meta object for sprite genre.
@@ -350,7 +350,7 @@ typedef struct
 {
 	Byte		genre,group,type,animNum;
 	OGLPoint3D	coord;
-	unsigned long	flags;
+	uint32_t	flags;
 	short		slot;
 	void		(*moveCall)(ObjNode *);
 	float		rot,scale;
