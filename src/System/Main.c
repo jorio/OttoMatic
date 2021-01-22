@@ -258,8 +258,6 @@ static void PlayGame(void)
 		}
 	}
 
-	GammaFadeOut();
-
 	for (;gLevelNum < 10; gLevelNum++)
 	{
 				/* DO LEVEL INTRO */
@@ -285,7 +283,6 @@ static void PlayGame(void)
 		MyFlushEvents();
 		GammaFadeOut();
 		CleanupLevel();
-		GameScreenToBlack();
 
 
 			/***************/
@@ -335,6 +332,8 @@ static void PlayArea(void)
 	CalcFramesPerSecond();
 	gDisableHiccupTimer = true;
 
+	MakeFadeEvent(true, 1.0);
+
 		/******************/
 		/* MAIN GAME LOOP */
 		/******************/
@@ -376,9 +375,6 @@ static void PlayArea(void)
 			DoPaused();
 
 		CalcFramesPerSecond();
-
-		if (gGameFrameNum == 0)						// if that was 1st frame, then create a fade event
-			MakeFadeEvent(true, 1.0);
 
 		gGameFrameNum++;
 

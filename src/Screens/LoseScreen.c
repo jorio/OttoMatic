@@ -96,8 +96,6 @@ void DoLoseScreen(void)
 {
 float	timer = 43.0f;
 
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupLoseScreen();

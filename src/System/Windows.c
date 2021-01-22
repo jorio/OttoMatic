@@ -272,14 +272,6 @@ static void DrawFadePane(ObjNode* theNode, const OGLSetupOutputType* setupInfo)
 	OGL_PopState();
 }
 
-/************************ GAME SCREEN TO BLACK ************************/
-
-void GameScreenToBlack(void)
-{
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-}
-
-
 /************************** ENTER 2D *************************/
 //
 // For OS X - turn off DSp when showing 2D

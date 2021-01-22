@@ -186,9 +186,6 @@ static Boolean	beenHere = false;
 			OGL_DisposeWindowSetup(&gGameViewInfoPtr);
 	}
 
-	GameScreenToBlack();
-
-
 	UseResFile(gMainAppRezFile);
 
 	InitCursor();

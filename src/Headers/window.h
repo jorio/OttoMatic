@@ -22,8 +22,6 @@ void DumpGWorld2(GWorldPtr thisWorld, WindowPtr thisWindow,Rect *destRect);
 extern	void GammaFadeOut(void);
 extern	void GammaOn(void);
 
-extern	void GameScreenToBlack(void);
-
 void DoLockPixels(GWorldPtr world);
 
 void Enter2D(void);

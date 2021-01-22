@@ -488,6 +488,16 @@ int	x,y,w,h;
 	GAME_ASSERT_MESSAGE(makeCurrentRC == 0, SDL_GetError());
 
 
+
+	if (gGammaFadePercent <= 0)							// if we just finished fading out and haven't started fading in yet, just show black
+	{
+		glClearColor(0, 0, 0, 1);
+		glClear(GL_COLOR_BUFFER_BIT);
+		SDL_GL_SwapWindow(gSDLWindow);					// end render loop
+		return;
+	}
+
+
 			/* INIT SOME STUFF */
 
 	if (gGamePrefs.anaglyph)
