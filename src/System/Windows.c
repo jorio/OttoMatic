@@ -273,22 +273,26 @@ static void DrawFadePane(ObjNode* theNode, const OGLSetupOutputType* setupInfo)
 }
 
 /************************** ENTER 2D *************************/
-//
-// For OS X - turn off DSp when showing 2D
-//
 
 void Enter2D(void)
 {
+#if !__APPLE__ && !_WIN32		// Linux: work around game window sent to background after showing a dialog box
+	SDL_SetWindowFullscreen(gSDLWindow, false);
+	SDL_HideWindow(gSDLWindow);
+	SDL_PumpEvents();
+#endif
 }
 
 
 /************************** EXIT 2D *************************/
-//
-// For OS X - turn ON DSp when NOT 2D
-//
 
 void Exit2D(void)
 {
+#if !__APPLE__ && !_WIN32		// Linux: work around game window sent to background after showing a dialog box
+	SDL_PumpEvents();
+	SDL_ShowWindow(gSDLWindow);
+	SetFullscreenModeFromPrefs();
+#endif
 }
 
 
