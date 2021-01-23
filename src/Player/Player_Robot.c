@@ -121,7 +121,11 @@ static void VerifyTargetPickup(void);
 #define	JUMP_JET_ACCELERATION_GIANT	(JUMP_JET_ACCELERATION * .5f)
 #define	JUMP_JET_DECELERATION		2000.0f
 
-#define	DELTA_SUBDIV			15.0f				// smaller == more subdivisions per frame
+#define	DELTA_SUBDIV			30.0f				// smaller == more subdivisions per frame
+// Source port note: DELTA_SUBDIV was originally 15. At 60 fps, that value caused hiccups in the player's
+// movement speed when walking on non-ground objects, such as spinning platforms in level 3.
+// These hiccups start disappearing at about 75 fps, which was ok in the original game because the framerate
+// was uncapped. For 60 fps (v-sync), a delta subdiv of 30 gets rid of this issue.
 
 #define	CONTROL_SENSITIVITY		2200.0f
 #define	CONTROL_SENSITIVITY_AIR	5000.0f
