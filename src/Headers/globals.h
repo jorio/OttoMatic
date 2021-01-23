@@ -21,6 +21,8 @@
 #define	NIL_STRING			""
 #define REMOVE_ALL_EVENTS	 0
 
+#define CLAMP(x, lo, hi) ( (x) < (lo) ? (lo) : ( (x) > (hi) ? (hi) : (x) ) )
+
 
 
 		/* CLOSE ENOUGH TO ZERO */

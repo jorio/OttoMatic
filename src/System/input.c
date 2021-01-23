@@ -2,6 +2,9 @@
 // (c)2021 Iliyas Jorio
 // This file is part of Otto Matic. https://github.com/jorio/ottomatic
 
+#include "mousesmoothing.h"
+
+
 /***************/
 /* CONSTANTS   */
 /***************/
@@ -34,6 +37,8 @@ bool				gAnyNewKeysPressed = false;
 char				gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
 
 Byte				gNeedStates[NUM_CONTROL_NEEDS];
+
+bool				gEatMouse = false;
 
 			/**************/
 			/* NEEDS LIST */
@@ -112,6 +117,8 @@ void UpdateInput(void)
 			/* DO SDL MAINTENANCE */
 			/**********************/
 
+	MouseSmoothing_StartFrame();
+
 	SDL_PumpEvents();
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
@@ -157,7 +164,6 @@ void UpdateInput(void)
 					_Static_assert(sizeof(gTextInput) == sizeof(event.text.text));
 					break;
 
-					/*
 				case SDL_MOUSEMOTION:
 					if (!gEatMouse)
 					{
@@ -165,6 +171,7 @@ void UpdateInput(void)
 					}
 					break;
 
+					/*
 				case SDL_JOYDEVICEADDED:	 // event.jdevice.which is the joy's INDEX (not an instance id!)
 					TryOpenController(false);
 					break;
@@ -270,29 +277,37 @@ void UpdateInput(void)
 
 		/* AND FINALLY SEE IF MOUSE DELTAS ARE BEST */
 
-		/*
-	mouseDX = gMouseDeltaX * 0.015f;											// scale down deltas for our use
-	mouseDY = gMouseDeltaY * 0.015f;
+	int mdx, mdy;
+	MouseSmoothing_GetDelta(&mdx, &mdy);
+	float mouseDX = mdx * 0.015f;								// scale down deltas for our use
+	float mouseDY = mdy * 0.015f;
+	mouseDX *= 10;
+	mouseDY *= 10;
 
-	if (mouseDX > 1.0f)											// keep x values pinned
-		mouseDX = 1.0f;
-	else
-	if (mouseDX < -1.0f)
-		mouseDX = -1.0f;
+	mouseDX = CLAMP(mouseDX, -1.0f, 1.0f);						// keep values pinned
+	mouseDY = CLAMP(mouseDY, -1.0f, 1.0f);
 
-	if (fabs(mouseDX) > fabs(gPlayerInfo.analogControlX))		// is the mouse delta better than what we've got from the other devices?
+	if (fabsf(mouseDX) > fabsf(gPlayerInfo.analogControlX))		// is the mouse delta better than what we've got from the other devices?
 		gPlayerInfo.analogControlX = mouseDX;
 
-
-	if (mouseDY > 1.0f)											// keep y values pinned
-		mouseDY = 1.0f;
-	else
-	if (mouseDY < -1.0f)
-		mouseDY = -1.0f;
-
-	if (fabs(mouseDY) > fabs(gPlayerInfo.analogControlZ))		// is the mouse delta better than what we've got from the other devices?
+	if (fabsf(mouseDY) > fabsf(gPlayerInfo.analogControlZ))		// is the mouse delta better than what we've got from the other devices?
 		gPlayerInfo.analogControlZ = mouseDY;
-		 */
+}
+
+void CaptureMouse(Boolean doCapture)
+{
+	SDL_PumpEvents();	// Prevent SDL from thinking mouse buttons are stuck as we switch into relative mode
+	SDL_SetRelativeMouseMode(doCapture ? SDL_TRUE : SDL_FALSE);
+	SDL_ShowCursor(doCapture ? 0 : 1);
+//	ClearMouseState();
+//	EatMouseEvents();
+
+#if __APPLE__
+	if (doCapture)
+        KillMacMouseAcceleration();
+    else
+        RestoreMacMouseAcceleration();
+#endif
 }
 
 Boolean GetNewKeyState(unsigned short sdlScanCode)

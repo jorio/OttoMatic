@@ -327,6 +327,7 @@ static void PlayArea(void)
 
 			/* PREP STUFF */
 
+	CaptureMouse(true);
 	UpdateInput();
 	CalcFramesPerSecond();
 	CalcFramesPerSecond();
@@ -372,7 +373,11 @@ static void PlayArea(void)
 			/* SEE IF PAUSED */
 
 		if (GetNewKeyState(SDL_SCANCODE_ESCAPE))
+		{
+			CaptureMouse(false);
 			DoPaused();
+			CaptureMouse(true);
+		}
 
 		CalcFramesPerSecond();
 
@@ -398,6 +403,9 @@ static void PlayArea(void)
 		gDisableHiccupTimer = false;									// reenable this after the 1st frame
 
 	}
+
+
+	CaptureMouse(false);
 
 }
 
