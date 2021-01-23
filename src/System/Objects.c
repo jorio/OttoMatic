@@ -701,10 +701,11 @@ short			skelType;
 		if (theNode->CustomDrawFunction)							// if has custom draw function, then override and use that
 			goto custom_draw;
 
+		MOMaterialObject	*overrideTexture = nil;
+		MOMaterialObject	*oldTexture = nil;
+
 		switch(theNode->Genre)
 		{
-			MOMaterialObject	*overrideTexture, *oldTexture = nil;
-
 			case	SKELETON_GENRE:
 					UpdateSkinnedGeometry(theNode);													// update skeleton geometry
 					numTriMeshes = theNode->Skeleton->skeletonDefinition->numDecomposedTriMeshes;

@@ -657,8 +657,8 @@ const int	numNubs = NUM_SPLINE_NUBS;
 		b[i] = b[i - 1];
 
 	b[0].x = b[numNubs - 1].x =
-	b[0].x = b[numNubs - 1].y =
-	b[0].y = b[numNubs - 1].z = 0;
+	b[0].y = b[numNubs - 1].y =
+	b[0].z = b[numNubs - 1].z = 0;
 	hi_a = a + numNubs - 1;
 
 	for (; a < hi_a; a++, b++, c++, d++)

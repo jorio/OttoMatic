@@ -477,8 +477,6 @@ GLfloat	ambient[4];
 
 void OGL_DrawScene(OGLSetupOutputType *setupInfo, void (*drawRoutine)(OGLSetupOutputType *))
 {
-int	x,y,w,h;
-
 	if (setupInfo == nil)										// make sure it's legit
 		DoFatalAlert("OGL_DrawScene setupInfo == nil");
 	if (!setupInfo->isActive)
@@ -574,9 +572,12 @@ do_anaglyph:
 
 				/* SET VIEWPORT */
 
-	OGL_GetCurrentViewport(setupInfo, &x, &y, &w, &h);
-	glViewport(x,y, w, h);
-	gCurrentAspectRatio = (float)w/(float)h;
+	{
+		int x, y, w, h;
+		OGL_GetCurrentViewport(setupInfo, &x, &y, &w, &h);
+		glViewport(x, y, w, h);
+		gCurrentAspectRatio = (float) w / (float) h;
+	}
 
 
 			/* GET UPDATED GLOBAL COPIES OF THE VARIOUS MATRICES */
