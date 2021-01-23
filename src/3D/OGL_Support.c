@@ -568,6 +568,11 @@ do_anaglyph:
 
 		CalcAnaglyphCameraOffset(gAnaglyphPass);
 	}
+	else
+	{
+		gAnaglyphPass = 0;
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);		// this lets us hot-switch between anaglyph and non-anaglyph in the settings
+	}
 
 
 				/* SET VIEWPORT */
