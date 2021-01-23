@@ -68,6 +68,11 @@ static void	ConvertTexture16To16(u_short *textureBuffer, int width, int height);
 #define PATH_SEPARATOR '/'
 #endif
 
+#define PREFS_HEADER_LENGTH 16
+#define PREFS_FILE_NAME ":OttoMatic:Preferences6"
+const char PREFS_HEADER_STRING[PREFS_HEADER_LENGTH+1] = "OttoMaticPrefs06";		// Bump this every time prefs struct changes -- note: this will reset user prefs
+
+
 		/* SAVE GAME */
 		// READ IN FROM FILE!
 
@@ -527,15 +532,31 @@ OSErr		iErr;
 short		refNum;
 FSSpec		file;
 long		count;
+char		header[PREFS_HEADER_LENGTH + 1];
 
 				/*************/
 				/* READ FILE */
 				/*************/
 
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":OttoMatic:Preferences5", &file);
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, PREFS_FILE_NAME, &file);
 	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);
 	if (iErr)
 		return(iErr);
+
+				/* READ HEADER */
+
+	count = PREFS_HEADER_LENGTH;
+	iErr = FSRead(refNum, &count, header);
+	header[PREFS_HEADER_LENGTH] = '\0';
+	if (iErr
+		|| count != PREFS_HEADER_LENGTH
+		|| 0 != strncmp(header, PREFS_HEADER_STRING, PREFS_HEADER_LENGTH))
+	{
+		FSClose(refNum);
+		return badFileFormat;
+	}
+
+			/* READ PREFS STRUCT */
 
 	count = sizeof(PrefsType);
 	iErr = FSRead(refNum, &count,  (Ptr)prefBlock);		// read data from file
@@ -574,7 +595,7 @@ long				count;
 
 				/* CREATE BLANK FILE */
 
-	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, ":OttoMatic:Preferences5", &file);
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, PREFS_FILE_NAME, &file);
 	FSpDelete(&file);															// delete any existing file
 	iErr = FSpCreate(&file, 'Otto', 'Pref', smSystemScript);					// create blank file
 	if (iErr)
@@ -588,6 +609,13 @@ long				count;
 		FSpDelete(&file);
 		return;
 	}
+
+			/* WRITE HEADER */
+
+	count = PREFS_HEADER_LENGTH;
+	iErr = FSWrite(refNum, &count, (Ptr) PREFS_HEADER_STRING);
+	GAME_ASSERT(iErr == noErr);
+	GAME_ASSERT(count == PREFS_HEADER_LENGTH);
 
 				/* WRITE DATA */
 
