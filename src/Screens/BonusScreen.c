@@ -935,7 +935,7 @@ u_long	vol;
 
 			/* UPDATE AUDIO */
 
-	vol = gGammaFadePercent / 100.0f * (FULL_CHANNEL_VOLUME/2);
+	vol = gGammaFadePercent * FULL_CHANNEL_VOLUME / 2;
 	if (rocket->EffectChannel == -1)
 		rocket->EffectChannel = PlayEffect_Parms(EFFECT_BONUSROCKET, vol, vol, NORMAL_CHANNEL_RATE);
 	else
@@ -1762,7 +1762,7 @@ u_long	vol;
 
 			/* UPDATE AUDIO */
 
-	vol = gGammaFadePercent / 100.0f * (FULL_CHANNEL_VOLUME/2);
+	vol = gGammaFadePercent * FULL_CHANNEL_VOLUME / 2;
 	if (rocket->EffectChannel == -1)
 		rocket->EffectChannel = PlayEffect_Parms(EFFECT_BONUSROCKET, vol, vol, NORMAL_CHANNEL_RATE);
 	else
