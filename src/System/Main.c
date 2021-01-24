@@ -164,40 +164,7 @@ void InitDefaultPrefs(void)
 {
 	memset(&gGamePrefs, 0, sizeof(gGamePrefs));
 
-#if 0	// srcport rm. TODO: There's std::locale in C++.
-long 		keyboardScript, languageCode, i;
-
-		/* DETERMINE WHAT LANGUAGE IS ON THIS MACHINE */
-
-	keyboardScript = GetScriptManagerVariable(smKeyScript);
-	languageCode = GetScriptVariable(keyboardScript, smScriptLang);
-
-	switch(languageCode)
-	{
-		case	langFrench:
-				gGamePrefs.language 			= LANGUAGE_FRENCH;
-				break;
-
-		case	langGerman:
-				gGamePrefs.language 			= LANGUAGE_GERMAN;
-				break;
-
-		case	langSpanish:
-				gGamePrefs.language 			= LANGUAGE_SPANISH;
-				break;
-
-		case	langItalian:
-				gGamePrefs.language 			= LANGUAGE_ITALIAN;
-				break;
-
-		default:
-				gGamePrefs.language 			= LANGUAGE_ENGLISH;
-	}
-#else
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-	gGamePrefs.language						= LANGUAGE_ENGLISH;
-#endif
-
+	gGamePrefs.language						= GetBestLanguageIDFromSystemLocale();
 	gGamePrefs.fullscreen					= true;
 	gGamePrefs.antialiasing					= true;
 	gGamePrefs.playerRelControls			= false;

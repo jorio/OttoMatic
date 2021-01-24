@@ -10,14 +10,14 @@ static int				gCurrentStringsLanguage = -1;
 static Ptr				gStringsBuffer = nil;
 static const char*		gStringsTable[MAX_STRINGS];
 
-static const char* kLanguageCodes[MAX_LANGUAGES] =
+static const char kLanguageCodesISO639_1[MAX_LANGUAGES][3] =
 {
-	"English",
-	"French",
-	"German",
-	"Spanish",
-	"Italian",
-	"Swedish"
+	[LANGUAGE_ENGLISH	] = "en",
+	[LANGUAGE_FRENCH	] = "fr",
+	[LANGUAGE_GERMAN	] = "de",
+	[LANGUAGE_SPANISH	] = "es",
+	[LANGUAGE_ITALIAN	] = "it",
+	[LANGUAGE_SWEDISH	] = "sv",
 };
 
 void LoadLanguageStrings(int languageID)
@@ -39,7 +39,7 @@ void LoadLanguageStrings(int languageID)
 	GAME_ASSERT(languageID < MAX_LANGUAGES);
 
 	Str255 cName;
-	snprintf(cName, 256, ":System:Strings_%s.txt", kLanguageCodes[languageID]);
+	snprintf(cName, 256, ":System:Strings_%s.txt", kLanguageCodesISO639_1[languageID]);
 
 	FSSpec spec;
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, cName, &spec);
@@ -98,4 +98,30 @@ const char* GetLanguageString(int stringID)
 		return "";
 
 	return gStringsTable[stringID];
+}
+
+int GetBestLanguageIDFromSystemLocale(void)
+{
+	int languageID = LANGUAGE_ENGLISH;
+
+	SDL_Locale* localeList = SDL_GetPreferredLocales();
+	if (!localeList)
+		return languageID;
+
+	for (SDL_Locale* locale = localeList; locale->language; locale++)
+	{
+		for (int i = 0; i < MAX_LANGUAGES; i++)
+		{
+			if (0 == strncmp(locale->language, kLanguageCodesISO639_1[i], 2))
+			{
+				languageID = i;
+				goto foundLocale;
+			}
+		}
+	}
+
+foundLocale:
+	SDL_free(localeList);
+
+	return languageID;
 }

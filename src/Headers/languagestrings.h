@@ -35,3 +35,5 @@ enum
 void LoadLanguageStrings(int languageID);
 
 const char* GetLanguageString(int stringID);
+
+int GetBestLanguageIDFromSystemLocale(void);
