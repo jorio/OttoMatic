@@ -963,7 +963,7 @@ void DisplayHelpMessage(short messNum, float timer, Boolean overrideCurrent)
 
 			/* GET THE STRING TEXT TO DISPLAY */
 
-	gHelpStringC = GetLanguageString(messNum + STR_OFFSET_IN_GAME_HELP);
+	gHelpStringC = GetLanguageString(messNum + STR_IN_GAME_HELP_0);
 
 
 			/* CALC STRING PARAMETERS */

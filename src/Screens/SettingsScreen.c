@@ -396,7 +396,7 @@ static void DrawMainSettingsScreen(OGLSetupOutputType* info)
 
 	// Draw title
 	gGlobalColorFilter = kTitleColor;
-	DrawText(GetLanguageString(STR_OFFSET_MAIN_MENU + 6), 150, y, 1.33f, 2.0f, info);
+	DrawText(GetLanguageString(STR_SETTINGS), 150, y, 1.33f, 2.0f, info);
 	y += SCORE_TEXT_SPACING * 5.0f;
 
 	// Draw setting rows

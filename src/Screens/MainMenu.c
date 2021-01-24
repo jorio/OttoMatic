@@ -715,7 +715,7 @@ ObjNode	*newObj;
 	gNewObjectDefinition.scale 	    = 25.0;
 	gNewObjectDefinition.slot 		= SPRITE_SLOT;
 
-	newObj = MakeFontStringObject(GetLanguageString(STR_OFFSET_MAIN_MENU + gSelection), &gNewObjectDefinition, gGameViewInfoPtr, true);		// title
+	newObj = MakeFontStringObject(GetLanguageString(STR_NEW_GAME + gSelection), &gNewObjectDefinition, gGameViewInfoPtr, true);		// title
 	newObj->ColorFilter.a = 0;
 
 	gFadeInIconString = true;
