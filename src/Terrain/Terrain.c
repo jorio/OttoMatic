@@ -95,7 +95,6 @@ const float 	gOneOver_TERRAIN_POLYGON_SIZE = (1.0f / TERRAIN_POLYGON_SIZE);
 
 
 TileAttribType	**gTileAttribList = nil;
-u_char			gTileAttribParm[3];
 u_short			gTileAttribFlags;
 float			gTileSlipperyFactor = 1.0f;			// 1 = totally slippery, 0 = no slippery
 
@@ -1641,11 +1640,6 @@ u_short	tile;
 	gTileAttribFlags = (*gTileAttribList)[tile].flags;			// get attribute flags
 
 	gTileAttribFlags = SwizzleUShort(&gTileAttribFlags);		// swizzle attrib
-
-
-	gTileAttribParm[0] = (*gTileAttribList)[tile].parm[0];		// and parameters
-	gTileAttribParm[1] = (*gTileAttribList)[tile].parm[1];
-	gTileAttribParm[2] = (*gTileAttribList)[tile].parm[2];
 
 	return(gTileAttribFlags);
 }

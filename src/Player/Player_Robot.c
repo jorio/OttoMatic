@@ -27,7 +27,6 @@ extern	OGLMatrix4x4			gWorldToWindowMatrix;
 extern	PlayerInfoType			gPlayerInfo;
 extern	Boolean					gLevelCompleted,gFreezeCameraFromXZ;
 extern	int						gLevelNum,gScratch;
-extern	u_char					gTileAttribParm;
 extern	u_short					gTileAttribFlags;
 extern	ParticleGroupType		*gParticleGroups[];
 extern	SpriteType			*gSpriteGroupList[MAX_SPRITE_GROUPS];
