@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
 
 project(OttoMatic
-	VERSION 2.0.0
+	VERSION 4.0.0
 	LANGUAGES C CXX
 )
 
