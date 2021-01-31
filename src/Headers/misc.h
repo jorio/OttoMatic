@@ -33,6 +33,7 @@ void MyFlushEvents(void);
 int16_t SwizzleShort(int16_t *shortPtr);
 int32_t SwizzleLong(int32_t *longPtr);
 float SwizzleFloat(float *floatPtr);
+uint64_t SwizzleULong64(uint64_t *longPtr);
 uint32_t SwizzleULong(uint32_t *longPtr);
 uint16_t SwizzleUShort(uint16_t *shortPtr);
 void SwizzlePoint3D(OGLPoint3D *pt);

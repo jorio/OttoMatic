@@ -1270,11 +1270,14 @@ static Boolean DoMainMenuControl(void)
 						break;
 
 				case	SELECT_LOADSAVEDGAME:
-						if (LoadSavedGame())
+						gHideIconString = true;
+						if (DoFileScreen(FILE_SCREEN_TYPE_LOAD, DrawMainMenuCallback))
 						{
+							gHideIconString = false;
 							gPlayingFromSavedGame = true;
-							return(true);
+							return true;
 						}
+						gHideIconString = false;
 						break;
 
 				case	SELECT_QUIT:

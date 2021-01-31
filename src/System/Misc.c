@@ -644,6 +644,39 @@ uint32_t	theLong = *longPtr;
 
 
 
+/********************* SWIZZLE U LONG **************************/
+
+uint64_t SwizzleULong64(uint64_t *u64Ptr)
+{
+	uint64_t	u64 = *u64Ptr;
+
+#if __LITTLE_ENDIAN__
+	uint64_t	b1 = (u64 >>  0) & 0xff;
+	uint64_t	b2 = (u64 >>  8) & 0xff;
+	uint64_t	b3 = (u64 >> 16) & 0xff;
+	uint64_t	b4 = (u64 >> 24) & 0xff;
+	uint64_t	b5 = (u64 >> 32) & 0xff;
+	uint64_t	b6 = (u64 >> 40) & 0xff;
+	uint64_t	b7 = (u64 >> 48) & 0xff;
+	uint64_t	b8 = (u64 >> 56) & 0xff;
+
+	u64	= (b1 << 56)
+		| (b2 << 48)
+		| (b3 << 40)
+		| (b4 << 32)
+		| (b5 << 24)
+		| (b6 << 16)
+		| (b7 << 8)
+		| (b8);
+#endif
+
+	return u64;
+}
+
+
+
+
+
 /********************* SWIZZLE FLOAT **************************/
 
 float SwizzleFloat(float *floatPtr)

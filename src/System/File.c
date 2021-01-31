@@ -5,7 +5,7 @@
 /****************************/
 
 
-#include "nfd.h"
+#include <time.h>
 
 
 /***************/
@@ -54,37 +54,14 @@ static void	ConvertTexture16To16(u_short *textureBuffer, int width, int height);
 /*    CONSTANTS             */
 /****************************/
 
-#define	BASE_PATH_TILE		900					// tile # of 1st path tile
-
 #define	SKELETON_FILE_VERS_NUM	0x0110			// v1.1
 
-#define	SAVE_GAME_VERSION	0x0100		// 1.0
-
-#define	SAVE_GAME_EXTENSION	"ottosave"
-
-#if _WIN32
-#define PATH_SEPARATOR '\\'
-#else
-#define PATH_SEPARATOR '/'
-#endif
+#define	SAVE_GAME_VERSION	0x0200		// 2.0
+#define SAVE_PATH_FORMAT ":OttoMatic:save_%02d.ottosave"
 
 #define PREFS_HEADER_LENGTH 16
 #define PREFS_FILE_NAME ":OttoMatic:Preferences6"
 const char PREFS_HEADER_STRING[PREFS_HEADER_LENGTH+1] = "OttoMaticPrefs06";		// Bump this every time prefs struct changes -- note: this will reset user prefs
-
-
-		/* SAVE GAME */
-		// READ IN FROM FILE!
-
-typedef struct
-{
-	uint32_t	version;
-	uint32_t	score;
-	int16_t		realLevel;
-	int16_t		numLives;
-	float		health;
-	float		jumpJet;
-}SaveGameType;
 
 
 		/* PLAYFIELD HEADER */
@@ -1704,31 +1681,18 @@ Boolean	blackOpaq;
 #pragma mark -
 
 
-static void RememberLastFileDialogPath(const char* outPath)
-{
-	GAME_ASSERT(outPath != NULL);
-	memset(gGamePrefs.lastFileDialogPath, 0, sizeof(gGamePrefs.lastFileDialogPath));
-	strncpy(gGamePrefs.lastFileDialogPath, outPath, sizeof(gGamePrefs.lastFileDialogPath));
-	SavePrefs();
-}
-
-
 /***************************** SAVE GAME ********************************/
 //
 // Returns true if saving was successful
 //
 
-Boolean SaveGame(void)
+bool SaveGame(int saveSlot)
 {
 SaveGameType	saveData;
-FSSpec			*specPtr;
-Boolean			success = false;
-
-	Enter2D();
-
-
-	InitCursor();
-	MyFlushEvents();
+FSSpec			spec;
+OSErr			err;
+short			refNum;
+Str255			saveFilePath;
 
 			/*************************/
 			/* CREATE SAVE GAME DATA */
@@ -1752,145 +1716,104 @@ Boolean			success = false;
 	saveData.jumpJet		= gPlayerInfo.jumpJet;
 	saveData.jumpJet		= SwizzleFloat(&saveData.jumpJet);
 
+	saveData.timestamp		= time(NULL);
+	saveData.timestamp		= SwizzleULong64(&saveData.timestamp);
+
 		/*******************/
 		/* DO NAV SERVICES */
 		/*******************/
 
-	char defaultPath[4096];
-	char directory[4096];
-	strncpy(directory, gGamePrefs.lastFileDialogPath, sizeof(directory));
-	char* lastSlash = strrchr(directory, PATH_SEPARATOR);
-	if (lastSlash)
-		*(lastSlash + 1) = '\0';
-	else
-		directory[0] = '\0';
-	snprintf(defaultPath, sizeof(defaultPath),
-			"%sOtto Matic - Level %d - Score %lu.%s",
-			directory, gLevelNum+2, gScore, SAVE_GAME_EXTENSION);
+	snprintf(saveFilePath, sizeof(saveFilePath), SAVE_PATH_FORMAT, saveSlot);
 
-	nfdchar_t *outPath = NULL;
-	nfdresult_t result = NFD_SaveDialog(SAVE_GAME_EXTENSION, defaultPath, &outPath);
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, saveFilePath, &spec);
 
-	if (result == NFD_OKAY)
+	err = FSpCreate(&spec, 'Otto', 'OSav', 0);
+	if (err != noErr)
 	{
-		FILE* file = fopen(outPath, "wb");
-		if (!file)
-		{
-			DoAlert("Couldn't open this file for writing.");
-			goto bail;
-		}
-
-		size_t count = sizeof(SaveGameType);
-		size_t effectiveCount = fwrite(&saveData, 1, count, file);
-		fclose(file);
-
-		if (count != effectiveCount)
-		{
-			DoAlert("Couldn't save successfully.");
-			goto bail;
-		}
-	}
-	else if (result == NFD_CANCEL)
-	{
-		goto bail;
-	}
-	else
-	{
-		DoAlert(NFD_GetError());
-		goto bail;
+		DoAlert("Couldn't create save file.");
+		return false;
 	}
 
-	success = true;
+	err = FSpOpenDF(&spec, fsWrPerm, &refNum);
 
-	RememberLastFileDialogPath(outPath);
-
-bail:
-	HideCursor();
-	Exit2D();
-
-	if (outPath != NULL)
+	if (err != noErr)
 	{
-		free(outPath);		// we're responsible for freeing this after nativefiledialog allocates it
-		outPath = NULL;
+		DoAlert("Couldn't open file for writing.");
+		return false;
 	}
 
-	return(success);
+	long count = sizeof(SaveGameType);
+	err = FSWrite(refNum, &count, (Ptr) &saveData);
+	FSClose(refNum);
+
+	if (count != sizeof(SaveGameType) || err != noErr)
+	{
+		DoAlert("Couldn't write saved game file.");
+		return false;
+	}
+
+	return true;
 }
 
 
 /***************************** LOAD SAVED GAME ********************************/
 
-Boolean LoadSavedGame(void)
+bool LoadSaveGameStruct(int saveSlot, SaveGameType* saveData)
 {
-SaveGameType	saveData;
-Boolean			success = false;
-
-	Enter2D();
-
-	InitCursor();
-	MyFlushEvents();
-
+FSSpec			spec;
+OSErr			err;
+short			refNum;
+Str255			saveFilePath;
 
 				/* GET FILE WITH NAVIGATION SERVICES */
 
-	nfdchar_t *outPath = NULL;
-	nfdresult_t result = NFD_OpenDialog(SAVE_GAME_EXTENSION, gGamePrefs.lastFileDialogPath, &outPath);
+	snprintf(saveFilePath, sizeof(saveFilePath), SAVE_PATH_FORMAT, saveSlot);
 
-	if (result == NFD_OKAY)
-	{
-		FILE* file = fopen(outPath, "rb");
-		if (!file)
-		{
-			DoAlert("Couldn't open this file for reading.");
-			goto bail;
-		}
+	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, saveFilePath, &spec);
+	err = FSpOpenDF(&spec, fsRdPerm, &refNum);
 
-		size_t count = sizeof(SaveGameType);
-		size_t effectiveCount = fread(&saveData, 1, count, file);
-		fclose(file);
+	if (err != noErr)
+	{
+		return false;
+	}
 
-		if (count != effectiveCount)
-		{
-			DoAlert("This is not an Otto Matic save file.");
-			goto bail;
-		}
-	}
-	else if (result == NFD_CANCEL)
+	long count = sizeof(SaveGameType);
+	err = FSRead(refNum, &count, (Ptr) saveData);
+	FSClose(refNum);
+
+	if (count != sizeof(SaveGameType) || err != noErr)
 	{
-		goto bail;
+		return false;
 	}
-	else
-	{
-		DoAlert(NFD_GetError());
-		goto bail;
-	}
+
+	saveData->score		= SwizzleULong(&saveData->score);
+	saveData->realLevel	= SwizzleShort(&saveData->realLevel);
+	saveData->numLives	= SwizzleShort(&saveData->numLives);
+	saveData->health	= SwizzleFloat(&saveData->health);
+	saveData->jumpJet	= SwizzleFloat(&saveData->jumpJet);
+	saveData->timestamp	= SwizzleULong64(&saveData->timestamp);
+
+	return true;
+}
+
+bool LoadSavedGame(int saveSlot)
+{
+SaveGameType	saveData;
+
+				/* GET FILE WITH NAVIGATION SERVICES */
+
+	if (!LoadSaveGameStruct(saveSlot, &saveData))
+		return false;
 
 			/**********************/
 			/* USE SAVE GAME DATA */
 			/**********************/
 
-	gLoadedScore = gScore = SwizzleULong(&saveData.score);
+	gLoadedScore = gScore = saveData.score;
+	gLevelNum			= saveData.realLevel;
+	gPlayerInfo.lives 	= saveData.numLives;
+	gPlayerInfo.health	= saveData.health;
+	gPlayerInfo.jumpJet	= saveData.jumpJet;
 
-	gLevelNum			= SwizzleShort(&saveData.realLevel);
-
-	gPlayerInfo.lives 	= SwizzleShort(&saveData.numLives);
-	gPlayerInfo.health	= SwizzleFloat(&saveData.health);
-	gPlayerInfo.jumpJet	= SwizzleFloat(&saveData.jumpJet);
-
-	success = true;
-
-	RememberLastFileDialogPath(outPath);
-
-
-bail:
-	Exit2D();
-	HideCursor();
-
-	if (outPath != NULL)
-	{
-		free(outPath);		// we're responsible for freeing this after nativefiledialog allocates it
-		outPath = NULL;
-	}
-
-	return(success);
+	return true;
 }

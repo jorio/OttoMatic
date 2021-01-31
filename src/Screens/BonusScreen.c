@@ -54,8 +54,8 @@ static void MoveBonusInventoryIcon(ObjNode *theNode);
 static void DoTotalBonusTally(void);
 static void DrawBonusToScore(OGLSetupOutputType *info);
 static void DrawScore(OGLSetupOutputType *info);
-static void DoSaveGame(void);
-static Boolean NavigateSaveMenu(void);
+static int DoSaveGamePrompt(void);
+static int NavigateSaveMenu(void);
 static void DoTractorBeam(void);
 static void InitBonusTractorBeam(void);
 static void MoveBonusTractorBeam(ObjNode *beam);
@@ -119,6 +119,15 @@ enum
 	SHOW_SCORE_MODE_INVENTORY,
 	SHOW_SCORE_MODE_ADDTOSCORE
 };
+
+
+enum
+{
+	SAVE_MENU_SELECTION_NONE,
+	SAVE_MENU_SELECTION_SAVE,
+	SAVE_MENU_SELECTION_CONTINUE,
+};
+
 
 #define DIGIT_SPACING 	30.0f
 #define	DIGIT_SPACING_Q	20.0f						// for inventory quantity number
@@ -226,7 +235,14 @@ void DoBonusScreen(void)
 			/* DO SAVE GAME */
 
 	if (gLevelNum < LEVEL_NUM_BRAINBOSS)		// dont save on last level
-		DoSaveGame();
+	{
+		int saveMenuSelection = DoSaveGamePrompt();
+
+		if (saveMenuSelection == SAVE_MENU_SELECTION_SAVE)
+		{
+			DoFileScreen(FILE_SCREEN_TYPE_SAVE, DrawBonusCallback);
+		}
+	}
 
 
 		/* DO TRACTOR BEAM FOR JUNGLE-BOSS */
@@ -679,7 +695,7 @@ float	tick;
 
 /*************************** DO SAVE GAME ********************************/
 
-static void DoSaveGame(void)
+static int DoSaveGamePrompt(void)
 {
 short	i;
 
@@ -714,13 +730,16 @@ short	i;
 	CalcFramesPerSecond();
 	UpdateInput();
 
+	int saveMenuOutcome = SAVE_MENU_SELECTION_NONE;
+
 	while(true)
 	{
 		DoSoundMaintenance();
 
 			/* SEE IF MAKE SELECTION */
 
-		if (NavigateSaveMenu())
+		saveMenuOutcome = NavigateSaveMenu();
+		if (saveMenuOutcome != SAVE_MENU_SELECTION_NONE)
 			break;
 
 			/* DRAW STUFF */
@@ -747,15 +766,16 @@ short	i;
 
 	for (i = 0; i < 2; i++)
 		DeleteObject(gSaveIcons[i]);
+
+
+	return saveMenuOutcome;
 }
 
 
 /*********************** NAVIGATE SAVE MENU **************************/
 
-static Boolean NavigateSaveMenu(void)
+static int NavigateSaveMenu(void)
 {
-short	i;
-Boolean	continueGame = false;
 static const OGLColorRGBA noHiliteColor = {.3,.5,.2,1};
 
 		/* SEE IF CHANGE SELECTION */
@@ -772,7 +792,7 @@ static const OGLColorRGBA noHiliteColor = {.3,.5,.2,1};
 
 		/* SET APPROPRIATE FRAMES FOR ICONS */
 
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		if (i == gSaveMenuSelection)
 		{
@@ -798,21 +818,16 @@ static const OGLColorRGBA noHiliteColor = {.3,.5,.2,1};
 		switch(gSaveMenuSelection)
 		{
 			case	0:								// SAVE GAME
-//					if (gOSX)
-//						KillSong();					// stop song since it won't be needed again anyways, and this makes OS X crash less
-					if (SaveGame())
-						continueGame = true;
-					break;
+					return SAVE_MENU_SELECTION_SAVE;
 
 			case	1:								// CONTINUE
-					continueGame = true;
-					break;
+					return SAVE_MENU_SELECTION_CONTINUE;
 		}
 	}
 
 
 
-	return(continueGame);
+	return SAVE_MENU_SELECTION_NONE;
 }
 
 

@@ -23,6 +23,12 @@ enum
 	WIN_SObjType_QGlow
 };
 
+enum
+{
+	FILE_SCREEN_TYPE_LOAD,
+	FILE_SCREEN_TYPE_SAVE,
+};
+
 
 
 void DisplayPicture(FSSpec *spec);
@@ -45,3 +51,5 @@ void DrawDarkenPane(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
 void MoveCredits(ObjNode *text);
 
 void DoSettingsOverlay(void);
+
+bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(OGLSetupOutputType *));

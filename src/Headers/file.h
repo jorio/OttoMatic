@@ -7,6 +7,8 @@
 
 #include "input.h"
 
+#define NUM_SAVE_SLOTS 12
+
 		/***********************/
 		/* RESOURCE STURCTURES */
 		/***********************/
@@ -65,11 +67,27 @@ typedef struct
 	uint8_t	anaglyphCalibrationBlue;
 	Boolean doAnaglyphChannelBalancing;
 	KeyBinding	keys[NUM_CONTROL_NEEDS];
-	char	lastFileDialogPath[4096];
 }PrefsType;
 
 extern	PrefsType			gGamePrefs;
 
+
+
+
+
+		/* SAVE GAME */
+		// READ IN FROM FILE!
+
+typedef struct
+{
+	uint32_t	version;
+	uint32_t	score;
+	int16_t		realLevel;
+	int16_t		numLives;
+	float		health;
+	float		jumpJet;
+	uint64_t	timestamp;		// new in file version 0x0200
+}SaveGameType;
 
 
 //=================================================
@@ -83,8 +101,9 @@ void LoadLevelArt(OGLSetupOutputType *setupInfo);
 OSErr DrawPictureIntoGWorld(FSSpec *myFSSpec, GWorldPtr *theGWorld, short depth);
 void SetDefaultDirectory(void);
 
-Boolean SaveGame(void);
-Boolean LoadSavedGame(void);
+bool SaveGame(int saveSlot);
+bool LoadSaveGameStruct(int saveSlot, SaveGameType* saveData);
+bool LoadSavedGame(int saveSlot);
 
 
 #endif
