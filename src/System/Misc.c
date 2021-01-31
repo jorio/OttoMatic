@@ -299,6 +299,18 @@ void InitMyRandomSeed(void)
 }
 
 
+/**************** POSITIVE MODULO *******************/
+
+int PositiveModulo(int value, unsigned int m)
+{
+	int mod = value % (int) m;
+	if (mod < 0)
+	{
+		mod += m;
+	}
+	return mod;
+}
+
 #pragma mark -
 
 /****************** ALLOC HANDLE ********************/

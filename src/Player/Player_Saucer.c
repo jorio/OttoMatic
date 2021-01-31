@@ -670,7 +670,7 @@ static OGLPoint2D origin = {0,0};
 
 				/* SEE IF CHANGE BEAMS */
 
-	if (GetNewNeedState(kNeed_NextWeapon))
+	if (GetNewNeedState(kNeed_NextWeapon) || GetNewNeedState(kNeed_PrevWeapon))
 	{
 		if (gBeamModeSelected == BEAM_MODE_DESTRUCTO)
 			gBeamModeSelected = BEAM_MODE_TELEPORT;

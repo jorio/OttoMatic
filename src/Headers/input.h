@@ -22,6 +22,7 @@ enum
 	kNeed_Backward,
 	kNeed_TurnLeft,
 	kNeed_TurnRight,
+	kNeed_PrevWeapon,
 	kNeed_NextWeapon,
 	kNeed_Shoot,
 	kNeed_PunchPickup,

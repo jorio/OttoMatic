@@ -24,11 +24,10 @@ extern	void ShowSystemErr_NonFatal(long err);
 void CalcFramesPerSecond(void);
 Boolean IsPowerOf2(int num);
 float RandomFloat2(void);
+int PositiveModulo(int value, unsigned int m);
 
 void SafeDisposePtr(Ptr ptr);
 void MyFlushEvents(void);
-
-
 
 int16_t SwizzleShort(int16_t *shortPtr);
 int32_t SwizzleLong(int32_t *longPtr);

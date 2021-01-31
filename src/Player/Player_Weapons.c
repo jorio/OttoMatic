@@ -43,7 +43,7 @@ static Boolean DoWeaponCollisionDetect(ObjNode *theNode);
 static void	WeaponAutoTarget(OGLPoint3D *where, OGLVector3D *aim);
 static Boolean SeeIfDoPickup(ObjNode *player);
 static void MoveDisposedWeapon(ObjNode *theNode);
-static void ChangeWeapons(short startIndex);
+static void ChangeWeapons(int startIndex, int delta, bool tryStartSlotFirst);
 static void StartSuperNovaCharge(ObjNode *player);
 static void DrawSuperNovaCharge(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
 static void ShootFreezeGun(ObjNode *theNode, OGLPoint3D *where, OGLVector3D *aim);
@@ -175,16 +175,22 @@ int	i;
 		}
 	}
 
-		/* SEE IF CHANGE WEAPON */
+		/* SEE IF CHANGE WEAPON (NEXT) */
 
 	else
 	if (GetNewNeedState(kNeed_NextWeapon))
 	{
 		i = FindWeaponInventoryIndex(gPlayerInfo.currentWeaponType);	// get current into inventory list
-		i++;															// start searching on next slot
-		if (i >= MAX_INVENTORY_SLOTS)
-			i = 0;
-		ChangeWeapons(i);
+		ChangeWeapons(i, 1, false);
+	}
+
+		/* SEE IF CHANGE WEAPON (PREVIOUS) */
+
+	else
+	if (GetNewNeedState(kNeed_PrevWeapon))
+	{
+		i = FindWeaponInventoryIndex(gPlayerInfo.currentWeaponType);	// get current into inventory list
+		ChangeWeapons(i, -1, false);
 	}
 
 }
@@ -368,7 +374,7 @@ static const short weaponToModel[] =
 			/* CHANGE TO NEXT WEAPON IF ANY */
 
 		gPlayerInfo.currentWeaponType = NO_INVENTORY_HERE;			// clear this so change will not try to do any funky anims
-		ChangeWeapons(i);
+		ChangeWeapons(i, 1, true);
 
 		if ((gPlayerInfo.currentWeaponType == WEAPON_TYPE_SUPERNOVA) &&		// dont allow automatic switch to supernova since that screws up the player
 			(gPlayerInfo.wasHoldingGun))
@@ -501,12 +507,19 @@ float fps = gFramesPerSecondFrac;
 // INPUT:	i = starting index in inventory to scan
 //
 
-static void ChangeWeapons(short startIndex)
+static void ChangeWeapons(int startIndex, int delta, bool tryStartSlotFirst)
 {
 int		i,newWeapon;
 Boolean	wasHoldingGun = gPlayerInfo.holdingGun;
 
-	i = startIndex;
+	if (tryStartSlotFirst)
+	{
+		i = startIndex;
+	}
+	else
+	{
+		i = PositiveModulo(startIndex + delta, MAX_INVENTORY_SLOTS);
+	}
 
 			/* SCAN FOR NEXT WEAPON */
 
@@ -539,19 +552,9 @@ Boolean	wasHoldingGun = gPlayerInfo.holdingGun;
 			return;
 		}
 
-		i++;
-		if (i >= NUM_WEAPON_TYPES)								// wrap around?
-			i = 0;
+		i = PositiveModulo(i + delta, MAX_INVENTORY_SLOTS);
 
 	}while(i != startIndex);
-
-
-			/* NOTHING IN INVENTORY */
-			//
-			// should never get here since we always have the fist!
-			//
-
-	DoFatalAlert("ChangeWeapons: somehow the inventory is empty?!");
 }
 
 

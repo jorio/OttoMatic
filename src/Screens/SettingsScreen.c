@@ -164,16 +164,6 @@ static void cb_Back(void)
 /*                       NAVIGATION                            */
 /***************************************************************/
 
-static unsigned int PositiveModulo(int value, unsigned int m)
-{
-	int mod = value % (int) m;
-	if (mod < 0)
-	{
-		mod += m;
-	}
-	return mod;
-}
-
 static void NavigateSettings(void)
 {
 	UpdateInput();
