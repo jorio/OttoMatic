@@ -9,7 +9,7 @@
 /* EXTERNALS   */
 /***************/
 
-#include "3dmath.h"
+#include "game.h"
 
 extern	short		gMainAppRezFile;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;

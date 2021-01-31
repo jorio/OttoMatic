@@ -9,6 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
+#include "game.h"
 
 extern	Boolean			gSongPlayingFlag,gMuteMusicFlag;
 

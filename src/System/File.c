@@ -5,6 +5,7 @@
 /****************************/
 
 
+#include "game.h"
 #include <time.h>
 
 

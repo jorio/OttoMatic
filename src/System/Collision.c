@@ -9,7 +9,7 @@
 /* EXTERNALS   */
 /***************/
 
-#include "3dmath.h"
+#include "game.h"
 
 
 extern	OGLPoint3D	gCoord;

@@ -10,7 +10,7 @@
 /****************************/
 
 
-#include "3dmath.h"
+#include "game.h"
 
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	ObjNode					*gCurrentNode,*gFirstNodePtr;

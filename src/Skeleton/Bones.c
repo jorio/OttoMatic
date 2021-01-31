@@ -9,7 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "3dmath.h"
+#include "game.h"
 
 extern	MOVertexArrayData	**gLocalTriMeshesOfSkelType;
 extern	BG3DFileContainer		*gBG3DContainerList[];

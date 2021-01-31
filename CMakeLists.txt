@@ -47,7 +47,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.in ${GAME_SRCDIR}/Hea
 
 file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS ${GAME_SRCDIR}/*.c ${GAME_SRCDIR}/*.cpp)
 
-file(GLOB_RECURSE GAME_HEADERS CONFIGURE_DEPENDS ${GAME_SRCDIR}/*.h ${GAME_SRCDIR}/*.pch)
+file(GLOB_RECURSE GAME_HEADERS CONFIGURE_DEPENDS ${GAME_SRCDIR}/*.h)
 set(GAME_GLUE_SOURCES
 	# ${GAME_SRCDIR}/Main.cpp
 	# ${GAME_SRCDIR}/Glue/DrawPicture.cpp
@@ -80,16 +80,6 @@ set(GAME_ALL_SOURCES
 #------------------------------------------------------------------------------
 
 source_group(TREE ${GAME_SRCDIR} PREFIX "" FILES ${GAME_ALL_SOURCES})
-
-#------------------------------------------------------------------------------
-# SOURCE FILE PROPERTIES
-#------------------------------------------------------------------------------
-
-if(NOT MSVC)
-	set_source_files_properties(${GAME_SOURCES} PROPERTIES COMPILE_FLAGS "-include Pomme.h -include MyPCH_Normal.pch")
-else()
-#	set_source_files_properties(${GAME_SOURCES} PROPERTIES COMPILE_FLAGS /FIbugdom.h)
-endif()
 
 #------------------------------------------------------------------------------
 # EXECUTABLE TARGET

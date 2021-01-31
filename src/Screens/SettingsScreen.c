@@ -6,6 +6,8 @@
 /*    EXTERNALS            */
 /****************************/
 
+#include "game.h"
+
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	float					gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;

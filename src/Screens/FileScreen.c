@@ -2,11 +2,8 @@
 // (C) 2021 Iliyas Jorio
 // This file is part of Otto Matic. https://github.com/jorio/ottomatic
 
+#include "game.h"
 #include <time.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 /****************************/
 /*    EXTERNALS            */

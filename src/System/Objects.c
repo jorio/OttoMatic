@@ -9,7 +9,7 @@
 /* EXTERNALS   */
 /***************/
 
-#include "3dmath.h"
+#include "game.h"
 
 extern	Byte					gDebugMode;
 extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];

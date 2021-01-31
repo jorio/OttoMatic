@@ -3,8 +3,7 @@
 /**********************/
 
 
-#include "3dmath.h"
-//#include <AGL/aglmacro.h> // srcport rm
+#include "game.h"
 
 
 /***************/

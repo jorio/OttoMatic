@@ -2,7 +2,9 @@
 // (c)2021 Iliyas Jorio
 // This file is part of Otto Matic. https://github.com/jorio/ottomatic
 
+#include "game.h"
 #include "mousesmoothing.h"
+#include "killmacmouseacceleration.h"
 
 
 /***************/

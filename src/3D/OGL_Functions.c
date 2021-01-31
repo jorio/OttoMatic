@@ -1,6 +1,8 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+#include "game.h"
+
 PFNGLACTIVETEXTUREARBPROC			procptr_glActiveTextureARB			= NULL;
 PFNGLCLIENTACTIVETEXTUREARBPROC		procptr_glClientActiveTextureARB	= NULL;
 

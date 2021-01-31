@@ -9,8 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "3dmath.h"
-//#include <AGL/aglmacro.h> // srcport rm
+#include "game.h"
 
 extern	float					gCurrentAspectRatio,gGlobalTransparency,gFramesPerSecondFrac;
 extern	PlayerInfoType			gPlayerInfo;

@@ -9,13 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-#include "3dmath.h"
-
-#if __APPLE__
-	#include <OpenGL/glu.h>		// gluPerspective
-#else
-	#include <GL/glu.h>			// gluPerspective
-#endif
+#include "game.h"
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond,gCurrentAspectRatio,gSpinningPlatformRot;
 extern	OGLPoint3D			gCoord;

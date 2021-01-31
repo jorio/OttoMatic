@@ -9,8 +9,7 @@
 /* EXTERNALS   */
 /***************/
 
-#include "3dmath.h"
-//#include <AGL/aglmacro.h> // srcport rm
+#include "game.h"
 
 extern	OGLBoundingBox	gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 extern	float		gFramesPerSecondFrac,gGlobalTransparency;

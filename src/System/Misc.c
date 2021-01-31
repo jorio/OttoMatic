@@ -9,6 +9,7 @@
 /* EXTERNALS   */
 /***************/
 
+#include "game.h"
 
 extern	short		gMainAppRezFile;
 extern	Boolean		gOSX,gG4;

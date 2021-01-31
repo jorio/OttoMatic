@@ -9,6 +9,8 @@
 /* EXTERNALS   */
 /***************/
 
+#include "game.h"
+
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	ObjNode	*gCurrentNode,*gFirstNodePtr;
 extern	float	gFramesPerSecondFrac;

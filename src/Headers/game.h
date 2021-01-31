@@ -1,4 +1,5 @@
- 
+#pragma once
+
 		/* MY BUILD OPTIONS */
 
 #define __LITTLE_ENDIAN__	1
@@ -9,6 +10,14 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
+
+#if __APPLE__
+	#include <OpenGL/glu.h>		// gluPerspective
+#else
+	#include <GL/glu.h>			// gluPerspective
+#endif
+
+#include "Pomme.h"
 
 #include "globals.h"
 #include "structs.h"
@@ -52,6 +61,7 @@
 #include "objects.h"
 #include "mainmenu.h"
 #include "lzss.h"
+#include "3dmath.h"
 #include "ogl_functions.h"
 #include "languagestrings.h"
 

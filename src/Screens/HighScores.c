@@ -9,7 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-//#include <AGL/aglmacro.h> // srcport rm
+#include "game.h"
 
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	float			gFramesPerSecond,gFramesPerSecondFrac,gGlobalTransparency;

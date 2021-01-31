@@ -2,6 +2,8 @@
 // (C) 2021 Iliyas Jorio
 // This file is part of Otto Matic. https://github.com/jorio/ottomatic
 
+#include "game.h"
+
 #define MAX_STRINGS 128
 
 extern	FSSpec		gDataSpec;

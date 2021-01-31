@@ -9,9 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-//#include <SoundSprocket.h>
-
-#include "3dmath.h"
+#include "game.h"
 
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;

@@ -10,7 +10,7 @@
 /****************************/
 
 
-#include "3dmath.h"
+#include "game.h"
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency,gGravity;
 extern	OGLPoint3D			gCoord;
