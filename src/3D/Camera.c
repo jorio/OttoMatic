@@ -26,6 +26,7 @@ extern	int						gLevelNum;
 extern	float					gScratchF;
 extern	Boolean					gPlayerHasLanded;
 extern	PrefsType			gGamePrefs;
+extern	OGLVector2D			gCameraControlDelta;
 
 
 /****************************/
@@ -417,15 +418,9 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 	else
 	if (skeleton->AnimNum != PLAYER_ANIM_BUBBLE)					// user can't swing camera if in bubble
 	{
-		if (GetNeedState(kNeed_CameraRight))
+		if (gCameraControlDelta.x != 0)
 		{
-			gCameraUserRotY -= fps * PI;
-			gForceCameraAlignment = true;							// don't zero userRot out if the player isn't moving
-		}
-		else
-		if (GetNeedState(kNeed_CameraLeft))
-		{
-			gCameraUserRotY += fps * PI;
+			gCameraUserRotY += fps * PI * gCameraControlDelta.x;
 			gForceCameraAlignment = true;							// don't zero userRot out if the player isn't moving
 		}
 	}

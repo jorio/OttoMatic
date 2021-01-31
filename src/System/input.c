@@ -49,6 +49,8 @@ Byte				gNeedStates[NUM_CONTROL_NEEDS];
 
 bool				gEatMouse = false;
 
+OGLVector2D			gCameraControlDelta;
+
 
 static OGLVector2D GetThumbStickVector(bool rightStick);
 
@@ -298,6 +300,27 @@ void UpdateInput(void)
 
 	if (fabsf(mouseDY) > fabsf(gPlayerInfo.analogControlZ))		// is the mouse delta better than what we've got from the other devices?
 		gPlayerInfo.analogControlZ = mouseDY;
+
+
+
+
+			/* UPDATE SWIVEL CAMERA */
+
+	gCameraControlDelta.x = 0;
+	gCameraControlDelta.y = 0;
+
+	if (gSDLController)
+	{
+		OGLVector2D rsVec = GetThumbStickVector(true);
+		gCameraControlDelta.x -= rsVec.x * 1.0f;
+		gCameraControlDelta.y += rsVec.y * 1.0f;
+	}
+
+	if (GetNeedState(kNeed_CameraLeft))
+		gCameraControlDelta.x -= 1.0f;
+
+	if (GetNeedState(kNeed_CameraRight))
+		gCameraControlDelta.x += 1.0f;
 }
 
 void CaptureMouse(Boolean doCapture)
