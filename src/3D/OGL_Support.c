@@ -11,8 +11,11 @@
 
 #include "3dmath.h"
 
-//#include <AGL/aglmacro.h> // srcport rm
-#include <GL/glu.h>		// gluPerspective
+#if __APPLE__
+	#include <OpenGL/glu.h>		// gluPerspective
+#else
+	#include <GL/glu.h>			// gluPerspective
+#endif
 
 
 extern int				gNumObjectNodes,gNumPointers;
