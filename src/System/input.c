@@ -22,17 +22,24 @@ enum
 	KEYSTATE_ACTIVE_BIT	= 0b10,
 };
 
+#define JOYSTICK_DEAD_ZONE .1f
+#define JOYSTICK_DEAD_ZONE_SQUARED (JOYSTICK_DEAD_ZONE*JOYSTICK_DEAD_ZONE)
+
 /***************/
 /* EXTERNALS   */
 /***************/
 
 extern	SDL_GLContext		gAGLContext;
+extern	SDL_Window		*gSDLWindow;
 extern	float			gFramesPerSecondFrac,gFramesPerSecond,gScratchF;
 extern	PrefsType			gGamePrefs;
 
 /**********************/
 /*     PROTOTYPES     */
 /**********************/
+
+SDL_GameController	*gSDLController = NULL;
+SDL_JoystickID		gSDLJoystickInstanceID = -1;		// ID of the joystick bound to gSDLController
 
 Byte				gRawKeyboardState[SDL_NUM_SCANCODES];
 bool				gAnyNewKeysPressed = false;
@@ -41,6 +48,10 @@ char				gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
 Byte				gNeedStates[NUM_CONTROL_NEEDS];
 
 bool				gEatMouse = false;
+
+
+static OGLVector2D GetThumbStickVector(bool rightStick);
+
 
 			/**************/
 			/* NEEDS LIST */
@@ -173,7 +184,6 @@ void UpdateInput(void)
 					}
 					break;
 
-					/*
 				case SDL_JOYDEVICEADDED:	 // event.jdevice.which is the joy's INDEX (not an instance id!)
 					TryOpenController(false);
 					break;
@@ -181,7 +191,6 @@ void UpdateInput(void)
 				case SDL_JOYDEVICEREMOVED:	// event.jdevice.which is the joy's UNIQUE INSTANCE ID (not an index!)
 					OnJoystickRemoved(event.jdevice.which);
 					break;
-				 */
 		}
 	}
 
@@ -224,8 +233,8 @@ void UpdateInput(void)
 		if (kb->mouseButton)
 			downNow |= 0 != (mouseButtons & SDL_BUTTON(kb->mouseButton));
 
-//		if (gSDLController && kb->gamepadButton != SDL_CONTROLLER_BUTTON_INVALID)
-//			downNow |= 0 != SDL_GameControllerGetButton(gSDLController, kb->gamepadButton);
+		if (gSDLController && kb->gamepadButton != SDL_CONTROLLER_BUTTON_INVALID)
+			downNow |= 0 != SDL_GameControllerGetButton(gSDLController, kb->gamepadButton);
 
 		UpdateKeyState(&gNeedStates[i], downNow);
 	}
@@ -243,21 +252,15 @@ void UpdateInput(void)
 
 			/* FIRST CHECK ANALOG AXES */
 
-			/*
-	analog = gControlNeeds[kNeed_XAxis].value;
-	if (analog != 0.0f)														// is X-Axis being used?
+	if (gSDLController)
 	{
-		analog *= 1.0f / AXIS_RANGE;										// convert to  -1.0 to 1.0 range
-		gPlayerInfo.analogControlX = analog;
+		OGLVector2D thumbVec = GetThumbStickVector(false);
+		if (thumbVec.x != 0 || thumbVec.y != 0)
+		{
+			gPlayerInfo.analogControlX = thumbVec.x;
+			gPlayerInfo.analogControlZ = thumbVec.y;
+		}
 	}
-
-	analog = gControlNeeds[kNeed_YAxis].value;
-	if (analog != 0.0f)														// is Y-Axis being used?
-	{
-		analog *= 1.0f / AXIS_RANGE;										// convert to  -1.0 to 1.0 range
-		gPlayerInfo.analogControlZ = analog;
-	}
-			 */
 
 			/* NEXT CHECK THE DIGITAL KEYS */
 
@@ -342,4 +345,96 @@ Boolean GetNewNeedState(int needID)
 void DoInputConfigDialog(void)
 {
 	SOURCE_PORT_MINOR_PLACEHOLDER();
+}
+
+#pragma mark -
+
+/****************************** SDL JOYSTICK FUNCTIONS ********************************/
+
+SDL_GameController* TryOpenController(bool showMessage)
+{
+	if (gSDLController)
+	{
+		printf("Already have a valid controller.\n");
+		return gSDLController;
+	}
+
+	if (SDL_NumJoysticks() == 0)
+	{
+		return NULL;
+	}
+
+	for (int i = 0; gSDLController == NULL && i < SDL_NumJoysticks(); ++i)
+	{
+		if (SDL_IsGameController(i))
+		{
+			gSDLController = SDL_GameControllerOpen(i);
+			gSDLJoystickInstanceID = SDL_JoystickGetDeviceInstanceID(i);
+		}
+	}
+
+	if (!gSDLController)
+	{
+		printf("Joystick(s) found, but none is suitable as an SDL_GameController.\n");
+		if (showMessage)
+		{
+			char messageBuf[1024];
+			snprintf(messageBuf, sizeof(messageBuf),
+					 "The game does not support your controller yet (\"%s\").\n\n"
+					 "You can play with the keyboard and mouse instead. Sorry!",
+					 SDL_JoystickNameForIndex(0));
+			SDL_ShowSimpleMessageBox(
+					SDL_MESSAGEBOX_WARNING,
+					"Controller not supported",
+					messageBuf,
+					gSDLWindow);
+		}
+		return NULL;
+	}
+
+	printf("Opened joystick %d as controller: %s\n", gSDLJoystickInstanceID, SDL_GameControllerName(gSDLController));
+
+	/*
+	gSDLHaptic = SDL_HapticOpenFromJoystick(SDL_GameControllerGetJoystick(gSDLController));
+	if (!gSDLHaptic)
+		printf("This joystick can't do haptic.\n");
+	else
+		printf("This joystick can do haptic!\n");
+	*/
+
+	return gSDLController;
+}
+
+void OnJoystickRemoved(SDL_JoystickID which)
+{
+	if (NULL == gSDLController)		// don't care, I didn't open any controller
+		return;
+
+	if (which != gSDLJoystickInstanceID)	// don't care, this isn't the joystick I'm using
+		return;
+
+	printf("Current joystick was removed: %d\n", which);
+
+	// Nuke reference to this controller+joystick
+	SDL_GameControllerClose(gSDLController);
+	gSDLController = NULL;
+	gSDLJoystickInstanceID = -1;
+
+	// Try to open another joystick if any is connected.
+	TryOpenController(false);
+}
+
+static OGLVector2D GetThumbStickVector(bool rightStick)
+{
+	Sint16 dxRaw = SDL_GameControllerGetAxis(gSDLController, rightStick ? SDL_CONTROLLER_AXIS_RIGHTX : SDL_CONTROLLER_AXIS_LEFTX);
+	Sint16 dyRaw = SDL_GameControllerGetAxis(gSDLController, rightStick ? SDL_CONTROLLER_AXIS_RIGHTY : SDL_CONTROLLER_AXIS_LEFTY);
+
+	float dx = dxRaw / 32767.0f;
+	float dy = dyRaw / 32767.0f;
+
+	float magnitudeSquared = dx*dx + dy*dy;
+	if (magnitudeSquared < JOYSTICK_DEAD_ZONE_SQUARED)
+		return (OGLVector2D) { 0, 0 };
+	else
+		return (OGLVector2D) { dx, dy };
 }

@@ -118,7 +118,6 @@ int CommonMain(int argc, const char** argv)
 #endif
 
 	// Init joystick subsystem
-	/*
 	{
 		SDL_Init(SDL_INIT_JOYSTICK);
 		auto gamecontrollerdbPath8 = (dataPath / "System" / "gamecontrollerdb.txt").u8string();
@@ -127,7 +126,6 @@ int CommonMain(int argc, const char** argv)
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Otto Matic", "Couldn't load gamecontrollerdb.txt!", gSDLWindow);
 		}
 	}
-	 */
 
 	// Start the game
 	try
