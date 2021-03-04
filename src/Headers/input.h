@@ -47,9 +47,6 @@ Boolean AreAnyNewKeysPressed(void);
 Boolean GetNewNeedState(int needID);
 Boolean GetNeedState(int needID);
 
-void DoInputConfigDialog(void);
-
-
 SDL_GameController* TryOpenController(bool showMessageOnFailure);
 void OnJoystickRemoved(SDL_JoystickID which);
 

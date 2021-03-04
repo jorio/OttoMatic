@@ -366,11 +366,6 @@ Boolean GetNewNeedState(int needID)
 	return gNeedStates[needID] == KEYSTATE_PRESSED;
 }
 
-void DoInputConfigDialog(void)
-{
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-}
-
 #pragma mark -
 
 /****************************** SDL JOYSTICK FUNCTIONS ********************************/
