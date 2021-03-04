@@ -14,6 +14,9 @@ project(OttoMatic
 set(GAME_TARGET ${PROJECT_NAME})
 set(GAME_ICNS cmake/${PROJECT_NAME}.icns)
 
+set(POMME_NO_VIDEO TRUE)		# compile Pomme without QuickTime movie support
+set(POMME_NO_QD3D TRUE)			# compile Pomme without QuickDraw3D/3DMF support
+
 #------------------------------------------------------------------------------
 # GLOBAL OPTIONS (BEFORE ADDING SUBDIRECTORIES)
 #------------------------------------------------------------------------------
