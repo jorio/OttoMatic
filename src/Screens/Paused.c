@@ -121,8 +121,8 @@ short	i;
 
 			/* BUILD NEW TEXT STRINGS */
 
-	gNewObjectDefinition.coord.x 	= 320;
-	gNewObjectDefinition.coord.y 	= 240;
+	gNewObjectDefinition.coord.x 	= 0;		// centered
+	gNewObjectDefinition.coord.y 	= 0;		// centered
 	gNewObjectDefinition.coord.z 	= 0;
 	gNewObjectDefinition.flags 		= 0;
 	gNewObjectDefinition.moveCall 	= nil;

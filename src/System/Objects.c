@@ -16,6 +16,8 @@ extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 extern	int						gNumObjectsInBG3DGroupList[MAX_BG3D_GROUPS];
 extern	int						gNumObjectsInBG3DGroupList[MAX_BG3D_GROUPS];
 extern	float					gFramesPerSecondFrac,gGlobalTransparency;
+extern	float					g2DLogicalWidth;
+extern	float					g2DLogicalHeight;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	MOVertexArrayData		**gLocalTriMeshesOfSkelType;
 extern	OGLColorRGB				gGlobalColorFilter;
@@ -744,7 +746,7 @@ short			skelType;
 					{
 						OGL_PushState();								// keep state
 
-						SetInfobarSpriteState();
+						SetInfobarSpriteState(true);
 
 						theNode->SpriteMO->objectData.coord = theNode->Coord;	// update Meta Object's coord info
 						theNode->SpriteMO->objectData.scaleX = theNode->Scale.x;
@@ -763,7 +765,7 @@ short			skelType;
 					{
 						glMatrixMode(GL_PROJECTION);					// clear projection matrix
 						glLoadIdentity();
-						glOrtho(0, 640, 480, 0, 0, 1);
+						glOrtho(-g2DLogicalWidth*.5f, g2DLogicalWidth*.5f, g2DLogicalHeight*.5f, -g2DLogicalHeight*.5f, 0, 1);
 						glMatrixMode(GL_MODELVIEW);
 						glLoadIdentity();
 

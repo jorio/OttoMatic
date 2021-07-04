@@ -251,7 +251,7 @@ const short textSprites[] =
 	if (info->useFog)
 		glDisable(GL_FOG);
 
-	SetInfobarSpriteState();
+	SetInfobarSpriteState(false);
 
 
 			/* DRAW LEVEL TEXT */

@@ -12,6 +12,8 @@
 #include "game.h"
 
 extern	float					gCurrentAspectRatio,gGlobalTransparency,gFramesPerSecondFrac;
+extern	float					g2DLogicalWidth;
+extern	float					g2DLogicalHeight;
 extern	PlayerInfoType			gPlayerInfo;
 extern	int						gLevelNum;
 extern	FSSpec					gDataSpec;
@@ -56,7 +58,7 @@ static void MoveHelpBeacon(ObjNode *theNode);
 #define	HEALTH_SIZE		50.0f
 
 #define FUEL_SIZE		HEALTH_SIZE
-#define	FUEL_X			(640.0f-FUEL_SIZE-HEALTH_X)
+#define	FUEL_XFROMRIGHT	(-FUEL_SIZE-HEALTH_X)
 #define	FUEL_Y			HEALTH_Y
 
 #define JUMP_SIZE		HEALTH_SIZE
@@ -83,7 +85,7 @@ static void MoveHelpBeacon(ObjNode *theNode);
 #define	BEAM_Y				(BEAM_CUP_Y - BEAM_SCALE/2)
 
 #define	HUMAN_SCALE			25.0f
-#define	HUMAN_X				(630.0f -HUMAN_SCALE/2)
+#define	HUMAN_XFROMRIGHT	(-10 - HUMAN_SCALE/2)
 #define	HUMAN_Y				150.0f
 #define	HUMAN_SPACING		(HUMAN_SCALE * 2.8f)
 
@@ -173,7 +175,7 @@ static float	gHelpMessageTimer;
 
 Boolean	gHelpMessageDisabled[NUM_HELP_MESSAGES];
 
-static	float	gHumanFrameX[NUM_HUMAN_TYPES];
+static	float	gHumanFrameXFromRight[NUM_HUMAN_TYPES];
 
 
 /********************* INIT INFOBAR ****************************/
@@ -191,7 +193,7 @@ int	i;
 
 
 	for (i = 0; i < NUM_HUMAN_TYPES; i++)
-		gHumanFrameX[i] = 700.0f;
+		gHumanFrameXFromRight[i] = 60.0f;
 
 	gHealthOccilate = 0;
 	gHealthMeterRot = gFuelMeterRot = gJumpJetMeterRot = 0;
@@ -230,7 +232,7 @@ void DisposeInfobar(void)
 
 /***************** SET INFOBAR SPRITE STATE *******************/
 
-void SetInfobarSpriteState(void)
+void SetInfobarSpriteState(bool centered)
 {
 SDL_GLContext agl_ctx = gAGLContext;
 
@@ -245,7 +247,10 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, 640, 480, 0, 0, 1);
+	if (centered)
+		glOrtho(-g2DLogicalWidth*.5f, g2DLogicalWidth*.5f, g2DLogicalHeight*.5f, -g2DLogicalHeight*.5f, 0, 1);
+	else
+		glOrtho(0, g2DLogicalWidth, g2DLogicalHeight, 0, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
@@ -269,7 +274,7 @@ SDL_GLContext agl_ctx = gAGLContext;
 	if (setupInfo->useFog)
 		glDisable(GL_FOG);
 
-	SetInfobarSpriteState();
+	SetInfobarSpriteState(false);
 
 
 
@@ -480,7 +485,10 @@ void DrawInfobarSprite2_Scaled(float x, float y, float scaleX, float scaleY, sho
 	mo = gSpriteGroupList[group][texNum].materialObject;
 	MO_DrawMaterial(mo, setupInfo);
 
+//	scaleY = scaleX;
+
 	aspect = (float)mo->objectData.height / (float)mo->objectData.width;
+//	aspect *= 4.0f / 3.0f;
 
 	/* DRAW IT */
 
@@ -626,7 +634,7 @@ static void Infobar_DrawGirders(const OGLSetupOutputType *setupInfo)
 
 	DrawInfobarSprite(0,0, 100, INFOBAR_SObjType_LeftGirder, setupInfo);
 
-	DrawInfobarSprite(640-100,0, 100, INFOBAR_SObjType_RightGirder, setupInfo);
+	DrawInfobarSprite(g2DLogicalWidth-100, 0, 100, INFOBAR_SObjType_RightGirder, setupInfo);
 }
 
 
@@ -664,17 +672,20 @@ static const float scales[NUM_HUMAN_TYPES] =
 
 				/* SCROLL INTO POSITION */
 
-		x = gHumanFrameX[i];									// get current scroll X
-		if (x > HUMAN_X)										// see if need to move it
+		x = gHumanFrameXFromRight[i];							// get current scroll X
+		if (x > HUMAN_XFROMRIGHT)								// see if need to move it
 		{
 			x -= gFramesPerSecondFrac * 150.0f;
-			if (x < HUMAN_X)
-				x = HUMAN_X;
-			gHumanFrameX[i] = x;
+			if (x < HUMAN_XFROMRIGHT)
+				x = HUMAN_XFROMRIGHT;
+			gHumanFrameXFromRight[i] = x;
 		}
 
 		y = HUMAN_Y + HUMAN_SPACING * i;
 
+					/* ADJUST X */
+
+		x += g2DLogicalWidth;
 
 					/* DRAW FRAME */
 
@@ -777,7 +788,7 @@ static void Infobar_DrawFuel(const OGLSetupOutputType *setupInfo)
 SDL_GLContext agl_ctx = gAGLContext;
 float	x,y,size;
 float	n, fps = gFramesPerSecondFrac;
-
+float	FUEL_X = g2DLogicalWidth + FUEL_XFROMRIGHT;
 
 			/* DRAW ROCKET ICON */
 
@@ -977,7 +988,7 @@ void DisplayHelpMessage(short messNum, float timer, Boolean overrideCurrent)
 			size += LETTER_SPACING;		// some day do proportional spacing here
 	}
 
-	gHelpMessageX = 320.0f - (size * .5f);	// center the message
+	gHelpMessageX = (g2DLogicalWidth - size) * .5f;	// center the message
 }
 
 
@@ -1022,8 +1033,8 @@ SDL_GLContext agl_ctx = gAGLContext;
 	SetColor4f(.2,.2,.2,gHelpMessageAlpha * .5f);
 	glBegin(GL_QUADS);
 	glVertex2f(0, 	HELP_Y + 16);
-	glVertex2f(640, HELP_Y + 16);
-	glVertex2f(640, HELP_Y);
+	glVertex2f(g2DLogicalWidth, HELP_Y + 16);
+	glVertex2f(g2DLogicalWidth, HELP_Y);
 	glVertex2f(0,	HELP_Y);
 	glEnd();
 	SetColor4f(1,1,1,1);

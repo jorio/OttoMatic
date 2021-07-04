@@ -14,6 +14,8 @@
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	ObjNode	*gCurrentNode,*gFirstNodePtr;
 extern	float	gFramesPerSecondFrac;
+extern	float					g2DLogicalWidth;
+extern	float					g2DLogicalHeight;
 extern	short	gPrefsFolderVRefNum,gCurrentSong;
 extern	long	gPrefsFolderDirID;
 extern	Boolean				gMuteMusicFlag;
@@ -120,7 +122,7 @@ void GammaFadeOut(void)
 
 	OGL_PushState();
 
-	SetInfobarSpriteState();
+	SetInfobarSpriteState(false);
 
 	const float fadeDuration = .25f;
 	Uint32 startTicks = SDL_GetTicks();
@@ -143,10 +145,10 @@ void GammaFadeOut(void)
 		glColor4f(gGammaFadePercent, gGammaFadePercent, gGammaFadePercent, 1.0f);
 
 		glBegin(GL_QUADS);
-		glTexCoord2f(0,1); glVertex3f(   0,   0,0);
-		glTexCoord2f(1,1); glVertex3f( 640,   0,0);
-		glTexCoord2f(1,0); glVertex3f( 640, 480,0);
-		glTexCoord2f(0,0); glVertex3f(   0, 480,0);
+		glTexCoord2f(0,1); glVertex3f(0, 0, 0);
+		glTexCoord2f(1,1); glVertex3f(g2DLogicalWidth, 0, 0);
+		glTexCoord2f(1,0); glVertex3f(g2DLogicalWidth, g2DLogicalHeight, 0);
+		glTexCoord2f(0,0); glVertex3f(0, g2DLogicalHeight, 0);
 		glEnd();
 		SDL_GL_SwapWindow(gSDLWindow);
 		CHECK_GL_ERROR();
@@ -257,17 +259,17 @@ static void DrawFadePane(ObjNode* theNode, const OGLSetupOutputType* setupInfo)
 {
 	OGL_PushState();
 
-	SetInfobarSpriteState();
+	SetInfobarSpriteState(false);
 
 	glColor4f(0, 0, 0, 1.0f - gGammaFadePercent);
 
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBegin(GL_QUADS);
-	glVertex3f(0,		0,		0);
-	glVertex3f(640,		0,		0);
-	glVertex3f(640,		480,	0);
-	glVertex3f(0,		480,	0);
+	glVertex3f(0,					0,					0);
+	glVertex3f(g2DLogicalWidth,		0,					0);
+	glVertex3f(g2DLogicalWidth,		g2DLogicalHeight,	0);
+	glVertex3f(0,					g2DLogicalHeight,	0);
 	glEnd();
 	glDisable(GL_BLEND);
 

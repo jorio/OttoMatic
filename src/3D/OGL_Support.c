@@ -70,6 +70,8 @@ OGLMatrix4x4	gViewToFrustumMatrix,gWorldToViewMatrix,gWorldToFrustumMatrix;
 OGLMatrix4x4	gWorldToWindowMatrix,gFrustumToWindowMatrix;
 
 float	gCurrentAspectRatio = 1;
+float	g2DLogicalWidth		= 640.0f;
+float	g2DLogicalHeight	= 480.0f;
 
 
 Boolean		gStateStack_Lighting[STATE_STACK_SIZE];
@@ -483,7 +485,6 @@ void OGL_DrawScene(OGLSetupOutputType *setupInfo, void (*drawRoutine)(OGLSetupOu
 	GAME_ASSERT_MESSAGE(makeCurrentRC == 0, SDL_GetError());
 
 
-
 	if (gGammaFadePercent <= 0)							// if we just finished fading out and haven't started fading in yet, just show black
 	{
 		glClearColor(0, 0, 0, 1);
@@ -578,7 +579,14 @@ do_anaglyph:
 		int x, y, w, h;
 		OGL_GetCurrentViewport(setupInfo, &x, &y, &w, &h);
 		glViewport(x, y, w, h);
-		gCurrentAspectRatio = (float) w / (float) h;
+		gCurrentAspectRatio = (float) w / (float) (h == 0? 1: h);
+
+		// Compute logical width & height for 2D elements
+		g2DLogicalHeight = 480.0f;
+		if (gCurrentAspectRatio < 4.0f/3.0f)
+			g2DLogicalWidth = 640.0f;
+		else
+			g2DLogicalWidth = 480.0f * gCurrentAspectRatio;
 	}
 
 

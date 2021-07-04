@@ -705,8 +705,8 @@ short	i;
 			/* BUILD TEXT STRINGS */
 			/**********************/
 
-	gNewObjectDefinition.coord.x 	= 320;
-	gNewObjectDefinition.coord.y 	= 240;
+	gNewObjectDefinition.coord.x 	= 0;		// FONTSTRING_GENRE objects are centered
+	gNewObjectDefinition.coord.y 	= 0;
 	gNewObjectDefinition.coord.z 	= 0;
 	gNewObjectDefinition.flags 		= 0;
 	gNewObjectDefinition.moveCall 	= nil;
@@ -1042,7 +1042,7 @@ static void DrawHumanBonus(OGLSetupOutputType *info)
 
 	OGL_PushState();
 
-	SetInfobarSpriteState();
+	SetInfobarSpriteState(true);
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
 
@@ -1055,13 +1055,13 @@ static void DrawHumanBonus(OGLSetupOutputType *info)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
-	DrawInfobarSprite2(320-150, 335, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_BonusGlow, info);
+	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_BonusGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gScoreAlpha;
-	DrawInfobarSprite2(320-150, 335, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_BonusText, info);
+	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_BonusText, info);
 
 
 			/************************/
@@ -1094,7 +1094,7 @@ static void DrawInventoryBonus(OGLSetupOutputType *info)
 
 	OGL_PushState();
 
-	SetInfobarSpriteState();
+	SetInfobarSpriteState(true);
 
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
@@ -1108,13 +1108,13 @@ static void DrawInventoryBonus(OGLSetupOutputType *info)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
-	DrawInfobarSprite2(320-150, 335, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_InventoryGlow, info);
+	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_InventoryGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gScoreAlpha;
-	DrawInfobarSprite2(320-150, 335, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_InventoryText, info);
+	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_InventoryText, info);
 
 
 			/************************/
@@ -1160,7 +1160,7 @@ float	x;
 	NumToString(gInventoryQuantity, s);
 	n = s[0];										// get str len
 
-	x = 320.0f - ((float)n / 2.0f) * DIGIT_SPACING_Q - (DIGIT_SPACING_Q/2);	// calc starting x
+	x = - ((float)n / 2.0f) * DIGIT_SPACING_Q - (DIGIT_SPACING_Q/2);	// calc starting x
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (i = 1; i <= n; i++)
@@ -1168,7 +1168,7 @@ float	x;
 		texNum = CharToSprite(s[i]);				// get texture #
 
 		gGlobalTransparency = (.9f + RandomFloat()*.099f) * gScoreAlpha;
-		DrawInfobarSprite2(x, 230, DIGIT_SPACING_Q * 1.9f, SPRITE_GROUP_FONT, texNum, info);
+		DrawInfobarSprite2(x, -10, DIGIT_SPACING_Q * 1.9f, SPRITE_GROUP_FONT, texNum, info);
 		x += DIGIT_SPACING_Q;
 	}
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1187,7 +1187,7 @@ static void DrawBonusToScore(OGLSetupOutputType *info)
 
 	OGL_PushState();
 
-	SetInfobarSpriteState();
+	SetInfobarSpriteState(true);
 
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
@@ -1201,13 +1201,13 @@ static void DrawBonusToScore(OGLSetupOutputType *info)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
-	DrawInfobarSprite2(320-150, 340, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusGlow, info);
+	DrawInfobarSprite2(-150, 100, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gScoreAlpha;
-	DrawInfobarSprite2(320-150, 340, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusText, info);
+	DrawInfobarSprite2(-150, 100, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusText, info);
 
 
 			/************************/
@@ -1226,13 +1226,13 @@ static void DrawBonusToScore(OGLSetupOutputType *info)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
-	DrawInfobarSprite2(320-150, 210, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreGlow, info);
+	DrawInfobarSprite2(-150, -30, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gScoreAlpha;
-	DrawInfobarSprite2(320-150, 210, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreText, info);
+	DrawInfobarSprite2(-150, -30, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreText, info);
 
 			/* DRAW VALUE */
 
@@ -1264,7 +1264,7 @@ float	x;
 	NumToString(gBonus, s);
 	n = s[0];										// get str len
 
-	x = 320.0f - ((float)n / 2.0f) * DIGIT_SPACING - (DIGIT_SPACING/2);	// calc starting x
+	x = - ((float)n / 2.0f) * DIGIT_SPACING - (DIGIT_SPACING/2);	// calc starting x
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (i = 1; i <= n; i++)
@@ -1272,7 +1272,7 @@ float	x;
 		texNum = CharToSprite(s[i]);				// get texture #
 
 		gGlobalTransparency = (.9f + RandomFloat()*.099f) * gScoreAlpha;
-		DrawInfobarSprite2(x, 390, DIGIT_SPACING * 1.9f, SPRITE_GROUP_FONT, texNum, info);
+		DrawInfobarSprite2(x, 150, DIGIT_SPACING * 1.9f, SPRITE_GROUP_FONT, texNum, info);
 		x += DIGIT_SPACING;
 	}
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1290,7 +1290,7 @@ float	x;
 	NumToString(gScore, s);
 	n = s[0];										// get str len
 
-	x = 320.0f - ((float)n / 2.0f) * DIGIT_SPACING - (DIGIT_SPACING/2);	// calc starting x
+	x = - ((float)n / 2.0f) * DIGIT_SPACING - (DIGIT_SPACING/2);	// calc starting x
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (i = 1; i <= n; i++)
@@ -1298,7 +1298,7 @@ float	x;
 		texNum = CharToSprite(s[i]);				// get texture #
 
 		gGlobalTransparency = (.9f + RandomFloat()*.099f) * gScoreAlpha;
-		DrawInfobarSprite2(x, 260, DIGIT_SPACING * 1.9f, SPRITE_GROUP_FONT, texNum, info);
+		DrawInfobarSprite2(x, 20, DIGIT_SPACING * 1.9f, SPRITE_GROUP_FONT, texNum, info);
 		x += DIGIT_SPACING;
 	}
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

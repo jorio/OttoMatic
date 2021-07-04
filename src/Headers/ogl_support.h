@@ -243,7 +243,6 @@ void OGL_NewViewDef(OGLSetupInputType *viewDef);
 void OGL_SetupWindow(OGLSetupInputType *setupDefPtr, OGLSetupOutputType **outputHandle);
 void OGL_DisposeWindowSetup(OGLSetupOutputType **dataHandle);
 void OGL_DrawScene(OGLSetupOutputType *setupInfo, void (*drawRoutine)(OGLSetupOutputType *));
-void OGL_ChangeDrawSize(OGLSetupOutputType *setupInfo);
 void OGL_Camera_SetPlacementAndUpdateMatrices(OGLSetupOutputType *setupInfo);
 void OGL_MoveCameraFromTo(OGLSetupOutputType *setupInfo, float fromDX, float fromDY, float fromDZ, float toDX, float toDY, float toDZ);
 void OGL_MoveCameraFrom(OGLSetupOutputType *setupInfo, float fromDX, float fromDY, float fromDZ);

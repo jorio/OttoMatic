@@ -12,6 +12,8 @@
 #include "game.h"
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
+extern	float				g2DLogicalWidth;
+extern	float				g2DLogicalHeight;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	FSSpec				gDataSpec;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
@@ -231,10 +233,10 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, 640, 480, 0, 0, 1);
+	glOrtho(0, g2DLogicalWidth, g2DLogicalHeight, 0, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glTranslatef(510,50,0);
+	glTranslatef(g2DLogicalWidth-130,50,0);
 	glScalef(.25,-.25,.25);
 
 			/* DRAW IT */
@@ -270,7 +272,7 @@ Str32	s;
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, 640, 480, 0, 0, 1);
+	glOrtho(0, g2DLogicalWidth, g2DLogicalHeight, 0, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
@@ -287,7 +289,7 @@ Str32	s;
 	{
 				/* DRAW NAME */
 
-		DrawScoreText(gHighScores[i].name, 150,y,info);
+		DrawScoreText(gHighScores[i].name, g2DLogicalWidth*.5f - 170, y, info);
 
 				/* DRAW SCORE */
 
@@ -302,7 +304,7 @@ Str32	s;
 
 			s[0] = SCORE_DIGITS;
 		}
-		DrawScoreText(s, 350,y,info);
+		DrawScoreText(s, g2DLogicalWidth*.5f + 30, y, info);
 
 		y += SCORE_TEXT_SPACING * 1.3f;
 	}
@@ -705,8 +707,8 @@ ObjNode	*newObj;
 
 			/* BUILD NEW TEXT STRINGS */
 
-	gNewObjectDefinition.coord.x 	= 640/2;
-	gNewObjectDefinition.coord.y 	= 480-60;
+	gNewObjectDefinition.coord.x 	= 0;		// FONTSTRING_GENRE objects are centered
+	gNewObjectDefinition.coord.y 	= 180;
 	gNewObjectDefinition.coord.z 	= 0;
 	gNewObjectDefinition.flags 		= 0;
 	gNewObjectDefinition.moveCall 	= MoveIconString;

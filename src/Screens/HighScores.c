@@ -13,6 +13,8 @@
 
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	float			gFramesPerSecond,gFramesPerSecondFrac,gGlobalTransparency;
+extern	float					g2DLogicalWidth;
+extern	float					g2DLogicalHeight;
 extern	short	gPrefsFolderVRefNum;
 extern	long	gPrefsFolderDirID;
 extern	FSSpec	gDataSpec;
@@ -356,7 +358,7 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, 640, 480, 0, 0, 1);
+	glOrtho(-g2DLogicalWidth*.5f, g2DLogicalWidth*.5f, g2DLogicalHeight*.5f, -g2DLogicalHeight*.5f, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
@@ -395,13 +397,13 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gFinalScoreAlpha;
-	DrawInfobarSprite2(320-150, 170, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreTextGlow, info);
+	DrawInfobarSprite2(-150, -70, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreTextGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gFinalScoreAlpha;
-	DrawInfobarSprite2(320-150, 170, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreText, info);
+	DrawInfobarSprite2(-150, -70, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreText, info);
 
 
 			/**************/
@@ -411,7 +413,7 @@ SDL_GLContext agl_ctx = gAGLContext;
 	NumToString(gScore, s);
 	n = s[0];										// get str len
 
-	x = 320.0f - ((float)n / 2.0f) * MYSCORE_DIGIT_SPACING - (MYSCORE_DIGIT_SPACING/2);	// calc starting x
+	x = - ((float)n / 2.0f) * MYSCORE_DIGIT_SPACING - (MYSCORE_DIGIT_SPACING/2);	// calc starting x
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	for (i = 1; i <= n; i++)
@@ -419,7 +421,7 @@ SDL_GLContext agl_ctx = gAGLContext;
 		texNum = CharToSprite(s[i]);				// get texture #
 
 		gGlobalTransparency = (.9f + RandomFloat()*.099f) * gFinalScoreAlpha;
-		DrawInfobarSprite2(x, 230, MYSCORE_DIGIT_SPACING * 1.9f, SPRITE_GROUP_FONT, texNum, info);
+		DrawInfobarSprite2(x, -10, MYSCORE_DIGIT_SPACING * 1.9f, SPRITE_GROUP_FONT, texNum, info);
 		x += MYSCORE_DIGIT_SPACING;
 	}
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -454,13 +456,13 @@ Str32	s;
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gFinalScoreAlpha;
-	DrawInfobarSprite2(320-250, 10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameGlow, info);
+	DrawInfobarSprite2(-250, -240+10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gFinalScoreAlpha;
-	DrawInfobarSprite2(320-250, 10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameText, info);
+	DrawInfobarSprite2(-250, -240+10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameText, info);
 
 
 	gGlobalTransparency = gFinalScoreAlpha;
@@ -472,18 +474,18 @@ Str32	s;
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
 
-	y = 120;
+	y = -120;
 	for (i = 0; i < NUM_SCORES; i++)
 	{
 		if (i == gNewScoreSlot)								// see if cursor will go on this line
 		{
 			cursorY = y;
-			cursorX = 150.0f + (SCORE_TEXT_SPACING * gCursorIndex);
+			cursorX = -170 + (SCORE_TEXT_SPACING * gCursorIndex);
 		}
 
 				/* DRAW NAME */
 
-		DrawScoreText(gHighScores[i].name, 150,y,info);
+		DrawScoreText(gHighScores[i].name, -170, y, info);
 
 				/* DRAW SCORE */
 
@@ -498,7 +500,7 @@ Str32	s;
 
 			s[0] = SCORE_DIGITS;
 		}
-		DrawScoreText(s, 350,y,info);
+		DrawScoreText(s, 30, y, info);
 
 		y += SCORE_TEXT_SPACING * 1.3f;
 	}

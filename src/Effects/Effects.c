@@ -1565,7 +1565,7 @@ float	s = 2.0;
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, 640, 480, 0, 0, 1);
+	glOrtho(0, 640, 480, 0, 0, 1);		// this one must NOT use g2DLogicalWidth
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 

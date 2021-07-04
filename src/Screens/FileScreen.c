@@ -12,6 +12,8 @@
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	float					gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
+extern	float					g2DLogicalWidth;
+extern	float					g2DLogicalHeight;
 extern	OGLColorRGB				gGlobalColorFilter;
 extern	SDL_Window				*gSDLWindow;
 extern	Boolean					gAllowAudioKeys;
@@ -200,7 +202,7 @@ static void DrawFileScreen(OGLSetupOutputType *info)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, 640, 480, 0, 0, 1);
+	glOrtho(0, g2DLogicalWidth, g2DLogicalHeight, 0, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
@@ -218,7 +220,7 @@ static void DrawFileScreen(OGLSetupOutputType *info)
 		// Draw title
 		gGlobalColorFilter = kTitleColor;
 		int titleStringID = gFileScreenType == FILE_SCREEN_TYPE_LOAD ? STR_LOAD_GAME : STR_SAVE_GAME;
-		DrawText(GetLanguageString(titleStringID), 150, y, 1.33f, 2.0f, info);
+		DrawText(GetLanguageString(titleStringID), g2DLogicalWidth*.5f - 170, y, 1.33f, 2.0f, info);
 		y += SCORE_TEXT_SPACING * 5.0f;
 
 		// Draw rows
@@ -226,7 +228,7 @@ static void DrawFileScreen(OGLSetupOutputType *info)
 		{
 			SetSettingColor(gFileScreenHighlightedRow == saveID);
 
-			DrawText(gFileScreenLabels[saveID], 150, y, .66f, 1.0f, info);
+			DrawText(gFileScreenLabels[saveID], g2DLogicalWidth*.5f - 170, y, .66f, 1.0f, info);
 
 			y += SCORE_TEXT_SPACING * 1.5f;
 		}

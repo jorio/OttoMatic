@@ -12,6 +12,8 @@
 #include "game.h"
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
+extern	float					g2DLogicalWidth;
+extern	float					g2DLogicalHeight;
 extern	FSSpec		gDataSpec;
 extern	NewObjectDefinitionType	gNewObjectDefinition;
 extern	Boolean		gSongPlayingFlag,gDisableAnimSounds;
@@ -156,9 +158,6 @@ float	timer;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 	    = 1;
 	pane = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
-
-	pane->Scale.x = 640;
-	pane->Scale.y = 480;
 	pane->ColorFilter.a = 0;
 
 
@@ -166,8 +165,8 @@ float	timer;
 			/* GLOW */
 
 	gNewObjectDefinition.type 		= WIN_SObjType_TheEnd_Glow;
-	gNewObjectDefinition.coord.x 	= 640/2 - scale.x/2;
-	gNewObjectDefinition.coord.y 	= 480/2 - scale.y/2 - 100;
+	gNewObjectDefinition.coord.x 	= -scale.x/2;
+	gNewObjectDefinition.coord.y 	= -scale.y/2 - 100;
 	gNewObjectDefinition.flags 		= STATUS_BIT_GLOW;
 	gNewObjectDefinition.moveCall 	= MoveTheEndText;
 	glow = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
@@ -189,8 +188,8 @@ float	timer;
 			/* Q-GLOW */
 
 	gNewObjectDefinition.type 		= WIN_SObjType_QGlow;
-	gNewObjectDefinition.coord.x 	= 640/2 - scale2.x/2;
-	gNewObjectDefinition.coord.y 	= 480/2 - scale2.y/2 + 40;
+	gNewObjectDefinition.coord.x 	= -scale2.x/2;
+	gNewObjectDefinition.coord.y 	= -scale2.y/2 + 40;
 	gNewObjectDefinition.flags 		= STATUS_BIT_GLOW;
 	gNewObjectDefinition.moveCall 	= MoveTheEndText;
 	glow = MakeSpriteObject(&gNewObjectDefinition, gGameViewInfoPtr);
@@ -239,6 +238,12 @@ static void MoveTheEndPane(ObjNode *theNode)
 	theNode->ColorFilter.a += gFramesPerSecondFrac * .6f;
 	if (theNode->ColorFilter.a > .7f)
 		theNode->ColorFilter.a = .7f;
+
+	theNode->Coord.x = -g2DLogicalWidth*.5f;
+	theNode->Coord.y = -g2DLogicalHeight*.5f;
+	theNode->Scale.x = g2DLogicalWidth;
+	theNode->Scale.y = g2DLogicalHeight;
+	UpdateObjectTransforms(theNode);
 }
 
 
@@ -531,8 +536,8 @@ ObjNode	*newObj;
 
 	gNewObjectDefinition.group 		= MODEL_GROUP_WINSCREEN;
 	gNewObjectDefinition.type 		= WIN_ObjType_Tabloid;
-	gNewObjectDefinition.coord.x 	= 640/2;
-	gNewObjectDefinition.coord.y 	= 480/2;
+	gNewObjectDefinition.coord.x 	= 0;				// centered
+	gNewObjectDefinition.coord.y 	= 0;				// centered
 	gNewObjectDefinition.coord.z 	= 0;
 	gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_NOLIGHTING | STATUS_BIT_NOZBUFFER | STATUS_BIT_DONTCULL;
 	gNewObjectDefinition.slot 		= SLOT_OF_DUMB;
@@ -590,7 +595,7 @@ static void DrawTabloid(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
 	OGL_PushState();
 
-	SetInfobarSpriteState();
+	SetInfobarSpriteState(true);
 
 	MO_DrawObject(theNode->BaseGroup, setupInfo);
 

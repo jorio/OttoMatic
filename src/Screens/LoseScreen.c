@@ -12,6 +12,8 @@
 #include "game.h"
 
 extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
+extern	float					g2DLogicalWidth;
+extern	float					g2DLogicalHeight;
 extern	FSSpec		gDataSpec;
 extern	Boolean		gGameOver;
 extern	KeyMap gKeyMap,gNewKeys;
@@ -333,12 +335,12 @@ static void DrawLoseCallback(OGLSetupOutputType *info)
 
 	OGL_PushState();
 
-	SetInfobarSpriteState();
+	SetInfobarSpriteState(true);
 
 				/* DRAW GAME OVER */
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	DrawInfobarSprite2(320-200, 10, 400, SPRITE_GROUP_LOSE, LOSE_SObjType_GameOver, info);
+	DrawInfobarSprite2(-200, -230, 400, SPRITE_GROUP_LOSE, LOSE_SObjType_GameOver, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	OGL_PopState();
