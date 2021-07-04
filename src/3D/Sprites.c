@@ -500,6 +500,12 @@ float				scale,x,y,z,letterOffset;
 			continue;
 		}
 
+		if (newObj->NumStringSprites >= sizeof(newObj->StringCharacters)/sizeof(newObj->StringCharacters[0]))
+		{
+			DoAlert("MakeFontStringObject: string too long!");
+			break;
+		}
+
 		spriteData.loadFile = false;										// these sprites are already loaded into gSpriteList
 		spriteData.group	= newObjDef->group;								// set group
 		spriteData.type 	= sprite;										// convert letter into a sprite index
