@@ -118,41 +118,6 @@ static	FSSpec	gApplicationFSSpec;								// spec of this application
 
 
 
-/****************** SET DEFAULT DIRECTORY ********************/
-//
-// This function needs to be called for OS X because OS X doesnt automatically
-// set the default directory to the application directory.
-//
-
-void SetDefaultDirectory(void)
-{
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-#if 0
-ProcessSerialNumber serial;
-ProcessInfoRec info;
-WDPBRec wpb;
-OSErr	iErr;
-
-	serial.highLongOfPSN = 0;
-	serial.lowLongOfPSN = kCurrentProcess;
-
-
-	info.processInfoLength = sizeof(ProcessInfoRec);
-	info.processName = NULL;
-	info.processAppSpec = &gApplicationFSSpec;
-
-	iErr = GetProcessInformation(&serial, & info);
-
-	wpb.ioVRefNum = gApplicationFSSpec.vRefNum;
-	wpb.ioWDDirID = gApplicationFSSpec.parID;
-	wpb.ioNamePtr = NULL;
-
-	iErr = PBHSetVolSync(&wpb);
-#endif
-}
-
-
-
 /******************* LOAD SKELETON *******************/
 //
 // Loads a skeleton file & creates storage for it.
@@ -169,7 +134,7 @@ QDErr		iErr;
 short		fRefNum;
 FSSpec		fsSpec;
 SkeletonDefType	*skeleton;
-const Str63	fileNames[MAX_SKELETON_TYPES] =
+const char *fileNames[MAX_SKELETON_TYPES] =
 {
 	":Skeletons:Otto.skeleton",
 	":Skeletons:Farmer.skeleton",

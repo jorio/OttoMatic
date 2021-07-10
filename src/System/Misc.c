@@ -437,17 +437,6 @@ void VerifySystem(void)
 OSErr	iErr;
 long		createdDirID;
 
-	SetDefaultDirectory();							// be sure to get the default directory
-
-
-			/* VERIFY & MAKE FSSPEC FOR DATA FOLDER */
-
-	iErr = FSMakeFSSpec(0, 0, ":Data:Images", &gDataSpec);
-	if (iErr)
-	{
-		DoFatalAlert("Data folder not found.");
-		return;
-	}
 
 	gG4 = true;
 

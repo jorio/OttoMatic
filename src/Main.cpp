@@ -65,6 +65,10 @@ static fs::path FindGameData()
 	// Use application resource file
 	auto applicationSpec = Pomme::Files::HostPathToFSSpec(dataPath / "System" / "Application");
 	short resFileRefNum = FSpOpenResFile(&applicationSpec, fsRdPerm);
+
+	if (resFileRefNum == -1)
+		throw std::runtime_error("Data folder not found.");
+
 	UseResFile(resFileRefNum);
 
 	return dataPath;
@@ -186,7 +190,7 @@ int main(int argc, char** argv)
 	if (showFinalErrorMessage)
 	{
 		std::cerr << "Uncaught exception: " << finalErrorMessage << "\n";
-		SDL_ShowSimpleMessageBox(0, "Uncaught exception", finalErrorMessage.c_str(), nullptr);
+		SDL_ShowSimpleMessageBox(0, "Otto Matic", finalErrorMessage.c_str(), nullptr);
 	}
 
 	return returnCode;

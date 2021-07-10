@@ -99,7 +99,6 @@ void SavePrefs(void);
 void LoadPlayfield(FSSpec *specPtr, OGLSetupOutputType *setupInfo);
 void LoadLevelArt(OGLSetupOutputType *setupInfo);
 OSErr DrawPictureIntoGWorld(FSSpec *myFSSpec, GWorldPtr *theGWorld, short depth);
-void SetDefaultDirectory(void);
 
 bool SaveGame(int saveSlot);
 bool LoadSaveGameStruct(int saveSlot, SaveGameType* saveData);
