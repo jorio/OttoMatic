@@ -42,7 +42,6 @@ static void MO_DeleteObjectInfo_Material(MOMaterialObject *obj);
 static void MO_GetNewGroupReference(MOGroupObject *obj);
 static void MO_GetNewVertexArrayReference(MOVertexArrayObject *obj);
 static void MO_CalcBoundingBox_Recurse(MetaObjectPtr object, OGLBoundingBox *bBox);
-static void SetMetaObjectToPicture(MOPictureObject *pictObj, OGLSetupOutputType *setupInfo, FSSpec *inData, int destPixelFormat);
 static void MO_DisposeObject_Picture(MOPictureObject *obj);
 static void MO_DeleteObjectInfo_Picture(MOPictureObject *obj);
 
@@ -192,7 +191,7 @@ MetaObjectPtr	mo;
 				break;
 
 		case	MO_TYPE_PICTURE:
-				SetMetaObjectToPicture(mo, (OGLSetupOutputType *)subType, data, GL_RGB);
+				DoFatalAlert("MO_CreateNewObjectOfType: MO_TYPE_PICTURE unsupported");
 				break;
 
 		case	MO_TYPE_SPRITE:
@@ -415,252 +414,6 @@ static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData)
 }
 
 
-/******************* SET META OBJECT TO PICTURE ********************/
-//
-// INPUT:	mo = meta object which has already been allocated and added to linked list.
-//
-// This takes the given input data and copies it.
-//
-
-static void SetMetaObjectToPicture(MOPictureObject *pictObj, OGLSetupOutputType *setupInfo, FSSpec *inData, int destPixelFormat)
-{
-GWorldPtr	gworld;
-int			width,height,depth,cellNum,numCells;
-int			horizCellSize, vertCellSize,segRow,segCol;
-int			numHorizCells, numVertCells;
-PixMapHandle 	hPixMap;
-int			bytesPerPixel;
-MOPictureData	*picData = &pictObj->objectData;
-Ptr			buffer,pictMapAddr;
-u_long		bufferRowBytes,pictRowBytes;
-MOMaterialData	matData;
-
-		/* LOAD PICTURE INTO GWORLD */
-
-	if (DrawPictureIntoGWorld(inData , &gworld, 32))
-		DoFatalAlert("SetMetaObjectToPicture: DrawPictureIntoGWorld failed!");
-
-
-			/* GET GWORLD INFO */
-
-	{
-		Rect r;
-		GetPortBounds(gworld, &r);
-
-		width = r.right - r.left;        // get width/height
-		height = r.bottom - r.top;
-	}
-
-	hPixMap = GetGWorldPixMap(gworld);							// get gworld's pixmap
-	pictMapAddr = GetPixBaseAddr(hPixMap);
-	pictRowBytes = (uint32_t)(**hPixMap).rowBytes & 0x3fff;
-
-	depth = (*hPixMap)->pixelSize;								// get pixel bitdepth
-	if (depth == 32)
-		bytesPerPixel = 4;
-	else
-		bytesPerPixel = 2;
-
-
-		/***********************************/
-		/* DETERMINE BEST SIZE OF SEGMENTS */
-		/***********************************/
-
-			/* DO WIDTH */
-
-	switch(width)
-	{
-		case	32:
-				horizCellSize = 32;
-				numHorizCells = 1;
-				break;
-
-		case	64:
-				horizCellSize = 64;
-				numHorizCells = 1;
-				break;
-
-		case	320:
-				horizCellSize = 64;
-				numHorizCells = 5;
-				break;
-
-		case	640:
-				horizCellSize = 128;
-				numHorizCells = width/horizCellSize;
-				break;
-
-		case	1024:
-				horizCellSize = 256;
-				numHorizCells = width/horizCellSize;
-				break;
-
-		default:
-				DoFatalAlert("SetMetaObjectToPicture: this width not implemented yet");
-	}
-
-			/* DO HEIGHT */
-
-	switch(height)
-	{
-		case	32:
-				vertCellSize = 32;
-				numVertCells = 1;
-				break;
-
-		case	64:
-				vertCellSize = 64;
-				numVertCells = 1;
-				break;
-
-		case	480:
-				vertCellSize = 32;
-				numVertCells = height/vertCellSize;
-				break;
-
-		case	768:
-				vertCellSize = 256;
-				numVertCells = height/vertCellSize;
-				break;
-
-		default:
-				DoFatalAlert("SetMetaObjectToPicture: this height not implemented yet");
-				return;
-	}
-
-
-			/********************************/
-			/* SET SOME PICTURE OBJECT DATA */
-			/********************************/
-
-	picData->drawCoord.x	= -1.0;						// assume upper left corner
-	picData->drawCoord.y	= 1.0;
-	picData->drawCoord.z	= .999;						// assume in back
-	picData->drawScaleX		= 1.0;						// scale is normal
-	picData->drawScaleY		= 1.0;
-
-	picData->fullWidth 		= width;
-	picData->fullHeight		= height;
-	picData->numCellsWide 	= numHorizCells;
-	picData->numCellsHigh 	= numVertCells;
-	picData->cellWidth 		= horizCellSize;
-	picData->cellHeight 	= vertCellSize;
-
-	numCells = numHorizCells * numVertCells;
-
-	picData->materials 		= (MOMaterialObject **)AllocPtr(sizeof(MOMaterialObject *) * numCells);	// alloc array of material objects
-	if (picData->materials == nil)
-		DoFatalAlert("SetMetaObjectToPicture: AllocPtr failed!");
-
-
-		/*************************************/
-		/* CREATE TEXTURES FOR EACH SEGMENT  */
-		/*************************************/
-
-		/* ALLOCATE SEGMENT BUFFER */
-
-	buffer = AllocPtr(horizCellSize * vertCellSize * bytesPerPixel);
-	if (buffer == nil)
-		DoFatalAlert("SetMetaObjectToPicture: AllocPtr failed!");
-	bufferRowBytes = horizCellSize * bytesPerPixel;
-
-
-	cellNum = 0;
-
-	for (segRow = 0; segRow < numVertCells; segRow++)
-	{
-		for (segCol = 0; segCol < numHorizCells; segCol++)
-		{
-			Ptr		srcPtr,destPtr;
-
-			srcPtr = pictMapAddr + (segRow * vertCellSize * pictRowBytes) + (segCol * horizCellSize * bytesPerPixel);
-			destPtr = buffer + (vertCellSize-1) * bufferRowBytes;				// start @ bottom of buffer to flip image for OpenGL
-
-
-				/*********************************/
-				/* COPY THIS SEGMENT INTO BUFFER */
-				/*********************************/
-
-			if (depth == 32)
-			{
-				uint32_t	r,g,b,a;
-				int			x,y;
-				uint32_t	pixels;
-				uint32_t 	*dest	= (uint32_t *)destPtr;
-				uint32_t 	*src	= (uint32_t *)srcPtr;
-
-				for (y = 0; y < vertCellSize; y++)
-				{
-					for (x = 0; x < horizCellSize; x++)							// copy & convert a line of pixels
-					{
-						pixels = SwizzleULong(&src[x]);										// get pixel
-
-//						if (pixels == 0)
-//							a = 0;
-//						else
-							a = 0xff;											// pictures are opqaue
-
-						r = (pixels & 0x00ff0000) >> 16;
-						g = (pixels & 0x0000ff00) >> 8;
-						b = pixels & 0xff;
-
-						pixels = (r << 24) | (g << 16) | (b << 8) | a;			// save pixel
-						dest[x] = SwizzleULong(&pixels);
-					}
-					dest -= bufferRowBytes/4;
-					src += pictRowBytes/4;
-				}
-			}
-			else
-			{
-				DoFatalAlert("SetMetaObjectToPicture: 16-bit not implemented yet");
-			}
-
-					/***************************/
-					/* CREATE A TEXTURE OBJECT */
-					/***************************/
-
-			matData.setupInfo		= setupInfo;
-			matData.flags			= BG3D_MATERIALFLAG_TEXTURED|BG3D_MATERIALFLAG_CLAMP_U|BG3D_MATERIALFLAG_CLAMP_V;
-			matData.diffuseColor.r	= 1;
-			matData.diffuseColor.g	= 1;
-			matData.diffuseColor.b	= 1;
-			matData.diffuseColor.a	= 1;
-
-			matData.numMipmaps		= 1;
-			matData.width			= horizCellSize;
-			matData.height			= vertCellSize;
-
-			switch(depth)
-			{
-				case	32:
-						matData.pixelSrcFormat	= GL_RGBA;
-						break;
-
-			 	default:
-						matData.pixelSrcFormat	= GL_RGB;
-			}
-
-			matData.pixelDstFormat 	= destPixelFormat;
-			matData.texturePixels[0]= nil;						// we're going to preload
-			matData.textureName[0] 	= OGL_TextureMap_Load(buffer, horizCellSize, vertCellSize,
-														 matData.pixelSrcFormat, destPixelFormat, GL_UNSIGNED_BYTE);
-
-			picData->materials[cellNum] = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
-			cellNum++;
-
-			if (cellNum > numCells)
-				DoFatalAlert("SetMetaObjectToPicture: cellNum overflow");
-		}
-	}
-
-
-			/* CLEANUP */
-
-	DisposeGWorld (gworld);
-	SafeDisposePtr(buffer);
-}
-
 
 /******************* SET META OBJECT TO SPRITE ********************/
 //
@@ -678,6 +431,7 @@ MOSpriteData	*spriteData = &spriteObj->objectData;
 
 	if (inData->loadFile)
 	{
+#if 0
 		GLint	destPixelFormat = inData->pixelFormat;									// use passed in format
 
 		spriteData->material = MO_GetTextureFromFile(&inData->spec, setupInfo, destPixelFormat);
@@ -685,6 +439,9 @@ MOSpriteData	*spriteData = &spriteObj->objectData;
 		spriteData->width = spriteData->material->objectData.width;						// get dimensions of the texture
 		spriteData->height = spriteData->material->objectData.width;
 		spriteData->aspectRatio = spriteData->height / spriteData->width;				// calc aspect ratio
+#else
+		DoFatalAlert("SetMetaObjectToSprite: loading texture from file not supported");
+#endif
 	}
 
 			/* GET MATERIAL FROM SPRITE LIST */
@@ -2075,164 +1832,6 @@ float				x,y,z;
 
 
 #pragma mark -
-
-
-
-/******************* MO: GET TEXTURE FROM FILE ************************/
-
-MOMaterialObject *MO_GetTextureFromFile(FSSpec *spec, OGLSetupOutputType *setupInfo, int destPixelFormat)
-{
-MetaObjectPtr	obj;
-MOMaterialData	matData;
-int				width,height,depth,destDepth;
-GWorldPtr 		pGWorld;
-PixMapHandle 	hPixMap;
-Ptr				buffer;
-Ptr 			pictMapAddr;
-uint32_t		pictRowBytes;
-int				y,x;
-Boolean			destHasAlpha;
-
-		/*******************************/
-		/* CREATE TEXTURE PIXEL BUFFER */
-		/*******************************/
-
-	switch(destPixelFormat)
-	{
-		case	GL_RGB:
-				destHasAlpha 	= false;
-				destDepth 		= 32;
-				break;
-
-		case	GL_RGBA:
-				destHasAlpha 	= true;
-				destDepth 		= 32;
-				break;
-
-		case	GL_RGB5_A1:
-				destHasAlpha 	= true;
-				destDepth 		= 16;
-				break;
-	}
-
-
-		/* LOAD PICTURE INTO GWORLD */
-
-	if (DrawPictureIntoGWorld(spec , &pGWorld, 32))			//--- for now, must be 32bit for OpenGL internal b/c 16bit not supported
-		DoFatalAlert("MO_GetTextureFromFile: DrawPictureIntoGWorld failed!");
-
-
-			/* GET GWORLD INFO */
-
-	{
-		Rect r;
-		GetPortBounds(pGWorld, &r);
-
-		width = r.right - r.left;			// get width/height
-		height = r.bottom - r.top;
-	}
-
-	if ((!IsPowerOf2(width)) || (!IsPowerOf2(height)))				// make sure its a power of 2
-		DoFatalAlert("MO_GetTextureFromFile: dimensions not power of 2");
-
-	hPixMap = GetGWorldPixMap(pGWorld);								// get gworld's pixmap
-	depth = (*hPixMap)->pixelSize;									// get gworld pixel bitdepth
-
-
-		/*************************************/
-		/* CREATE TEXTURE OBJECT FROM PIXELS */
-		/*************************************/
-
-		/* COPY PIXELS FROM GWORLD INTO BUFFER */
-
-	buffer = AllocPtr(width * height * 4);							// alloc enough for a 32bit texture
-	if (buffer == nil)
-		DoFatalAlert("MO_GetTextureFromResource: AllocPtr failed!");
-
-	pictMapAddr = GetPixBaseAddr(hPixMap);
-	pictRowBytes = (uint32_t)(**hPixMap).rowBytes & 0x3fff;
-	pictMapAddr += pictRowBytes * (height-1);						// start @ bottom to flip texture
-
-
-			/* COPY 32-BIT */
-
-	if (depth == 32)
-	{
-		uint32_t	r,g,b,a;
-		uint32_t	pixels, *dest, *src;
-
-		src = (uint32_t *)pictMapAddr;
-		dest = (uint32_t *)buffer;
-
-		for (y = 0; y < height; y++)
-		{
-			for (x = 0; x < width; x++)
-			{
-				pixels = src[x];
-				if (destHasAlpha && (destDepth == 32))		// see if use file's alpha channel for 32bit destinations
-					a = (pixels & 0xff000000) >> 24;
-				else										// otherwise just do 0 or ff
-				{
-					if (pixels == 0)
-						a = 0;
-					else
-						a = 0xff;
-				}
-				r = (pixels & 0x00ff0000) >> 16;
-				g = (pixels & 0x0000ff00) >> 8;
-				b = pixels & 0xff;
-
-				dest[x] = (r << 24) | (g << 16) | (b << 8) | a;
-			}
-			dest += width;
-			src -= pictRowBytes/4;
-		}
-	}
-
-		/* COPY 16-BIT */
-
-	else
-	{
-		DoFatalAlert("MO_GetTextureFromFile: 16 bit textures not supported yet.");
-		//-------- TODO
-	}
-
-	DisposeGWorld (pGWorld);
-
-
-			/* CREATE NEW TEXTURE OBJECT */
-
-	matData.setupInfo		= setupInfo;
-	matData.flags			= BG3D_MATERIALFLAG_TEXTURED;
-	matData.diffuseColor.r	= 1;
-	matData.diffuseColor.g	= 1;
-	matData.diffuseColor.b	= 1;
-	matData.diffuseColor.a	= 1;
-
-	matData.numMipmaps		= 1;
-	matData.width			= width;
-	matData.height			= height;
-
-	if (depth == 32)
-		matData.pixelSrcFormat	= GL_RGBA;
-	else
-	{
-		DoFatalAlert("MO_GetTextureFromFile: 16 bit textures not supported yet.");
-		//-------- TODO
-	}
-
-	matData.pixelDstFormat	= destPixelFormat;
-	matData.texturePixels[0]= nil;						// we're going to preload
-	matData.textureName[0] 	= OGL_TextureMap_Load(buffer, width, height,
-												 matData.pixelSrcFormat,
-												 destPixelFormat, GL_UNSIGNED_BYTE);
-
-	obj = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
-
-	SafeDisposePtr(buffer);									// dispose of our copy of the buffer
-
-	return(obj);
-}
 
 /*************** MO: GEOMETRY OFFSET UVS *********************/
 

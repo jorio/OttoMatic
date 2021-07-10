@@ -2,8 +2,7 @@
 // file.h
 //
 
-#ifndef FILE_H
-#define FILE_H
+#pragma once
 
 #include "input.h"
 
@@ -98,22 +97,8 @@ void SavePrefs(void);
 
 void LoadPlayfield(FSSpec *specPtr, OGLSetupOutputType *setupInfo);
 void LoadLevelArt(OGLSetupOutputType *setupInfo);
-OSErr DrawPictureIntoGWorld(FSSpec *myFSSpec, GWorldPtr *theGWorld, short depth);
 
 bool SaveGame(int saveSlot);
 bool LoadSaveGameStruct(int saveSlot, SaveGameType* saveData);
 bool LoadSavedGame(int saveSlot);
-
-
-#endif
-
-
-
-
-
-
-
-
-
-
 

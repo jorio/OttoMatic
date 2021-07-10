@@ -18,7 +18,7 @@ set(GAME_ICNS packaging/${PROJECT_NAME}.icns)
 set(POMME_NO_VIDEO TRUE)		# compile Pomme without QuickTime movie support
 set(POMME_NO_QD3D TRUE)			# compile Pomme without QuickDraw3D/3DMF support
 #set(POMME_NO_INPUT true)
-#set(POMME_NO_GRAPHICS true)
+set(POMME_NO_GRAPHICS true)
 
 #------------------------------------------------------------------------------
 # GLOBAL OPTIONS (BEFORE ADDING SUBDIRECTORIES)

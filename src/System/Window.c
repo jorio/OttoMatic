@@ -43,10 +43,6 @@ static void DrawFadePane(ObjNode* theNode, const OGLSetupOutputType* setupInfo);
 /*     VARIABLES      */
 /**********************/
 
-u_long			gDisplayVRAM = 0;
-u_long			gVRAMAfterBuffers = 0;
-
-
 float		gGammaFadePercent = 1.0;
 
 int				gGameWindowWidth, gGameWindowHeight;
@@ -298,19 +294,6 @@ void Exit2D(void)
 	SetFullscreenModeFromPrefs();
 #endif
 }
-
-
-/******************* DO LOCK PIXELS **************/
-
-void DoLockPixels(GWorldPtr world)
-{
-PixMapHandle pm;
-
-	pm = GetGWorldPixMap(world);
-	if (LockPixels(pm) == false)
-		DoFatalAlert("PixMap Went Bye,Bye?!");
-}
-
 
 
 /******************* SET FULLSCREEN MODE FROM PREFS **************/

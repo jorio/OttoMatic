@@ -2,8 +2,7 @@
 // metaobjects.h
 //
 
-#ifndef __METAOBJECTS_H_
-#define __METAOBJECTS_H_
+#pragma once
 
 #include "ogl_support.h"
 
@@ -239,7 +238,6 @@ void MO_DuplicateVertexArrayData(MOVertexArrayData *inData, MOVertexArrayData *o
 void MO_DeleteObjectInfo_Geometry_VertexArray(MOVertexArrayData *data);
 void MO_DisposeObject_Geometry_VertexArray(MOVertexArrayData *data);
 void MO_CalcBoundingBox(MetaObjectPtr object, OGLBoundingBox *bBox);
-MOMaterialObject *MO_GetTextureFromFile(FSSpec *spec, OGLSetupOutputType *setupInfo, int destPixelFormat);
 void MO_SetPictureObjectCoordsToMouse(OGLSetupOutputType *info, MOPictureObject *obj);
 
 void MO_DrawSprite(const MOSpriteObject *spriteObj, const OGLSetupOutputType *setupInfo);
@@ -248,6 +246,3 @@ void MO_Object_OffsetUVs(MetaObjectPtr object, float du, float dv);
 void MO_Geometry_OffserUVs(short group, short type, short geometryNum, float du, float dv);
 
 MOMaterialObject *GetTextureFromBG3DModel(int group, int type);
-
-
-#endif
