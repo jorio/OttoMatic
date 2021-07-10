@@ -2,8 +2,7 @@
 // structs.h
 //
 
-#ifndef STRUCTS_H
-#define STRUCTS_H
+#pragma once
 
 
 #include "globals.h"
@@ -331,9 +330,7 @@ struct ObjNode
 	float				ParticleTimer;
 	
 	MOSpriteObject		*SpriteMO;				// ref to sprite meta object for sprite genre.
-	
-	Byte				NumStringSprites;		// # sprites to build string (NOT SAME AS LENGTH OF STRING B/C SPACES ET.AL.)
-	MOSpriteObject		*StringCharacters[31];	// sprites for each character
+	short				TextQuadCapacity;
 
 	OGLColorRGBA		ColorFilter;
 	float				TextureTransformU, TextureTransformV;
@@ -356,11 +353,4 @@ typedef struct
 	float		rot,scale;
 	ObjNode		*autoChain;
 }NewObjectDefinitionType;
-
-
-
-#endif
-
-
-
 

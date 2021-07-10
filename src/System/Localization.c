@@ -1,4 +1,4 @@
-// LANGUAGESTRINGS.C
+// LOCALIZATION.C
 // (C) 2021 Iliyas Jorio
 // This file is part of Otto Matic. https://github.com/jorio/ottomatic
 
@@ -22,7 +22,7 @@ static const char kLanguageCodesISO639_1[MAX_LANGUAGES][3] =
 	[LANGUAGE_SWEDISH	] = "sv",
 };
 
-void LoadLanguageStrings(int languageID)
+void LoadLocalizedStrings(int languageID)
 {
 	// Don't bother reloading strings if we've already loaded this language
 	if (languageID == gCurrentStringsLanguage)
@@ -88,7 +88,7 @@ void LoadLanguageStrings(int languageID)
 //		printf("String #%d: %s\n", i, gStringsTable[i]);
 }
 
-const char* GetLanguageString(int stringID)
+const char* Localize(int stringID)
 {
 	if (!gStringsBuffer)
 		return "STRINGS NOT LOADED!!";

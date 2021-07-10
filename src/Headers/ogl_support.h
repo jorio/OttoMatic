@@ -2,9 +2,7 @@
 // ogl_support.h
 //
 
-#ifndef OGL_SUP
-#define OGL_SUP
-
+#pragma once
 
 #define	MAX_FILL_LIGHTS		4
 #define	MAX_TEXTURES		300
@@ -230,6 +228,12 @@ typedef struct
 }OGLSetupOutputType;
 
 
+enum
+{
+	kLoadTextureFlags_GrayscaleIsAlpha = 1 << 0,
+	kLoadTextureFlags_KeepOriginalAlpha = 1 << 1,
+};
+
 
 extern	float					gAnaglyphFocallength;
 extern	float					gAnaglyphEyeSeparation;
@@ -251,6 +255,7 @@ void OGL_UpdateCameraFromTo(OGLSetupOutputType *setupInfo, const OGLPoint3D *fro
 void OGL_Texture_SetOpenGLTexture(GLuint textureName);
 GLuint OGL_TextureMap_Load(void *imageMemory, int width, int height,
 							GLint srcFormat,  GLint destFormat, GLint dataType);
+GLuint OGL_TextureMap_LoadTGA(const char* path, int flags);
 GLenum _OGL_CheckError(const char* file, int line);
 #define OGL_CheckError() _OGL_CheckError(__FILE__, __LINE__)
 
@@ -261,13 +266,3 @@ void OGL_PopState(void);
 
 void OGL_EnableLighting(void);
 void OGL_DisableLighting(void);
-
-void OGL_DrawString(Str255 s, GLint x, GLint y);
-void OGL_DrawFloat(float f, GLint x, GLint y);
-void OGL_DrawInt(int f, GLint x, GLint y);
-
-
-
-
-
-#endif

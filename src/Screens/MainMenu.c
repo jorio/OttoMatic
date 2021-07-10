@@ -138,9 +138,8 @@ static	Boolean	gCanSpawnSaucers = false;
 
 static	Boolean	gDoCompanyLogos = true;
 
-static	float	gMenuLogoFadeAlpha,gScoreFadeAlpha;
+static	float	gMenuLogoFadeAlpha;
 
-static	Boolean	gDrawHighScores;
 static 	Boolean	gFadeInText,gTextDone,gFadeInIconString,gHideIconString;
 
 
@@ -213,12 +212,6 @@ void DrawMainMenuCallback(OGLSetupOutputType *info)
 			/* DRAW LOGO */
 
 	DrawOttoLogo(info);
-
-
-			/* DRAW HIGH SCORES */
-
-	if (gDrawHighScores)
-		DrawHighScores(info);
 }
 
 
@@ -258,90 +251,6 @@ SDL_GLContext agl_ctx = gAGLContext;
 }
 
 
-/****************** DRAW HIGH SCORES ***********************/
-
-static void DrawHighScores(OGLSetupOutputType *info)
-{
-SDL_GLContext agl_ctx = gAGLContext;
-float	y;
-int		i,j,n;
-Str32	s;
-
-			/* SET STATE */
-
-	OGL_PushState();
-
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	OGL_DisableLighting();
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, g2DLogicalWidth, g2DLogicalHeight, 0, 0, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
-
-	gGlobalTransparency = gScoreFadeAlpha;
-
-			/*****************/
-			/* DRAW THE TEXT */
-			/*****************/
-
-	y = 120;
-	for (i = 0; i < NUM_SCORES; i++)
-	{
-				/* DRAW NAME */
-
-		DrawScoreText(gHighScores[i].name, g2DLogicalWidth*.5f - 170, y, info);
-
-				/* DRAW SCORE */
-
-		NumToString(gHighScores[i].score, s);	// convert score to a text string
-		if (s[0] < SCORE_DIGITS)				// pad 0's
-		{
-			n = SCORE_DIGITS-s[0];
-			BlockMove(&s[1],&s[1+n], 20);		// shift existing data over
-
-			for (j = 0; j < n; j++)				// pad with 0's
-				s[1+j] = '0';
-
-			s[0] = SCORE_DIGITS;
-		}
-		DrawScoreText(s, g2DLogicalWidth*.5f + 30, y, info);
-
-		y += SCORE_TEXT_SPACING * 1.3f;
-	}
-
-			/***********/
-			/* CLEANUP */
-			/***********/
-
-	gGlobalTransparency = 1;
-	OGL_PopState();
-}
-
-
-/***************** DRAW SCORE TEXT ***********************/
-
-void DrawScoreText(const char *s, float x, float y, OGLSetupOutputType *info)
-{
-int	n,i,texNum;
-
-	n = s[0];										// get str len
-
-	for (i = 1; i <= n; i++)
-	{
-		texNum = CharToSprite(s[i]);				// get texture #
-		if (texNum != -1)
-			DrawInfobarSprite2(x, y, SCORE_TEXT_SPACING * 1.9f, SPRITE_GROUP_FONT, texNum, info);
-		x += SCORE_TEXT_SPACING;
-	}
-}
-
-
-
 /********************* SETUP MAINMENU SCREEN **********************/
 
 static void SetupMainMenuScreen(void)
@@ -361,7 +270,6 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 	gSaturn = nil;
 	gLogoAmbience = -1;
 	gMenuLogoFadeAlpha = -1;
-	gDrawHighScores = false;
 	gHideIconString = false;
 
 			/**************/
@@ -432,10 +340,6 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
 	InitParticleSystem(gGameViewInfoPtr);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:helpfont.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_FONT, gGameViewInfoPtr);
-	BlendAllSpritesInGroup(SPRITE_GROUP_FONT);
 
 
 			/* LOAD SKELETONS */
@@ -712,16 +616,13 @@ ObjNode	*newObj;
 
 			/* BUILD NEW TEXT STRINGS */
 
-	gNewObjectDefinition.coord.x 	= 0;		// FONTSTRING_GENRE objects are centered
-	gNewObjectDefinition.coord.y 	= 180;
-	gNewObjectDefinition.coord.z 	= 0;
+	gNewObjectDefinition.coord		= (OGLPoint3D) {0, 180, 0};
 	gNewObjectDefinition.flags 		= 0;
 	gNewObjectDefinition.moveCall 	= MoveIconString;
 	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 	    = 25.0;
+	gNewObjectDefinition.scale 	    = 1;
 	gNewObjectDefinition.slot 		= SPRITE_SLOT;
-
-	newObj = MakeFontStringObject(GetLanguageString(STR_NEW_GAME + gSelection), &gNewObjectDefinition, gGameViewInfoPtr, true);		// title
+	newObj = TextMesh_New(Localize(STR_NEW_GAME + gSelection), 1, &gNewObjectDefinition);		// title
 	newObj->ColorFilter.a = 0;
 
 	gFadeInIconString = true;
@@ -1678,15 +1579,17 @@ static void DoHighScores(void)
 {
 ObjNode	*pane;
 
+	gHideIconString = true;
+
 	PlaySong(SONG_HIGHSCORE, true);
 
 			/* LOAD HIGH SCORES */
 
 	LoadHighScores();
 
+
 	gFadeInText = true;
-	gDrawHighScores = true;
-	gScoreFadeAlpha = 0;
+	float gScoreFadeAlpha = 0;
 
 
 		/* MAKE DARKEN PANE */
@@ -1694,14 +1597,13 @@ ObjNode	*pane;
 	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOTEXTUREWRAP|
 										STATUS_BIT_KEEPBACKFACES;
-	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+100;
+	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+100-1;
 	gNewObjectDefinition.moveCall 	= nil;
 	pane = MakeNewObject(&gNewObjectDefinition);
 	pane->CustomDrawFunction = DrawDarkenPane;
-	pane->ColorFilter.r = 0;
-	pane->ColorFilter.g = 0;
-	pane->ColorFilter.b = 0;
-	pane->ColorFilter.a = 0;
+	pane->ColorFilter = (OGLColorRGBA){0,0,0,0};
+
+	SetupHighScoreTableObjNodes(pane, 0);
 
 
 		/*************************/
@@ -1742,6 +1644,12 @@ ObjNode	*pane;
 			}
 		}
 
+
+		for (ObjNode* text = pane->ChainNode; text; text = text->ChainNode)
+		{
+			text->ColorFilter.a = gScoreFadeAlpha;
+		}
+
 			/* DRAW STUFF */
 
 		CalcFramesPerSecond();
@@ -1753,8 +1661,9 @@ ObjNode	*pane;
 		/* CLEANUP */
 	DeleteObject(pane);
 	UpdateInput();
-	gDrawHighScores = false;
 	PlaySong(SONG_THEME, true);
+
+	gHideIconString = false;
 }
 
 
@@ -1770,7 +1679,7 @@ ObjNode	*pane;
 
 static void DoCredits(void)
 {
-ObjNode	*pane, *glow, *text;
+ObjNode	*pane, *glow, *text, *subtext1, *subtext2, *subtext3;
 
 	gHideIconString = true;
 
@@ -1791,10 +1700,7 @@ ObjNode	*pane, *glow, *text;
 	gNewObjectDefinition.moveCall 	= MoveCredits;
 	pane = MakeNewObject(&gNewObjectDefinition);
 	pane->CustomDrawFunction = DrawDarkenPane;
-	pane->ColorFilter.r = 0;
-	pane->ColorFilter.g = 0;
-	pane->ColorFilter.b = 0;
-	pane->ColorFilter.a = 0;
+	pane->ColorFilter = (OGLColorRGBA) {0,0,0,0};
 
 	gNewObjectDefinition.autoChain = pane;
 
@@ -1827,6 +1733,17 @@ ObjNode	*pane, *glow, *text;
 
 	text->ColorFilter.a = 0;
 
+
+	gNewObjectDefinition.scale 	    = .6;
+	gNewObjectDefinition.coord.y 	= 180;
+	gNewObjectDefinition.coord.z 	= 0.0f;
+	subtext1 = TextMesh_New("Ported by Iliyas Jorio", 1, &gNewObjectDefinition);
+	gNewObjectDefinition.coord.y 	+= 14.0f;
+	gNewObjectDefinition.scale 	    = .4f;
+	subtext2 = TextMesh_New("https://github.com/jorio/ottomatic", 1, &gNewObjectDefinition);
+	gNewObjectDefinition.coord.y 	+= 28.0f;
+	subtext3 = TextMesh_New("OTTO MATIC\xAA \xA9 2001 Pangea Software, Inc. Otto Matic is a trademark of Pangea Software, Inc.", 1, &gNewObjectDefinition);
+	subtext1->ColorFilter = subtext2->ColorFilter = subtext3->ColorFilter = (OGLColorRGBA){.67,.84,.1,0};
 
 
 		/* STOP AUTO-CHAINING NEW NODES */
@@ -1864,34 +1781,38 @@ ObjNode	*pane, *glow, *text;
 void MoveCredits(ObjNode *pane)
 {
 ObjNode	*glow = pane->ChainNode;
-ObjNode *text = glow->ChainNode;
+ObjNode *mainText = glow->ChainNode;
 
 			/* FADE IN */
 
 	if (gFadeInText)
 	{
-		text->ColorFilter.a += gFramesPerSecondFrac * 1.4f;
-		if (text->ColorFilter.a > 1)
-			text->ColorFilter.a = 1;
-
+		for (ObjNode* text = glow->ChainNode; text; text = text->ChainNode)
+		{
+			text->ColorFilter.a += gFramesPerSecondFrac * 1.4f;
+			if (text->ColorFilter.a > 1)
+				text->ColorFilter.a = 1;
+		}
 	}
 
 		/* FADE OUT */
 
 	else
 	{
-		text->ColorFilter.a -= gFramesPerSecondFrac * 1.4f;
-		if (text->ColorFilter.a <= 0.0f)
+		for (ObjNode* text = glow->ChainNode; text; text = text->ChainNode)
 		{
-			text->ColorFilter.a = 0.0f;
-			gTextDone = true;
+			text->ColorFilter.a -= gFramesPerSecondFrac * 1.4f;
+			if (text->ColorFilter.a <= 0.0f)
+			{
+				text->ColorFilter.a = 0.0f;
+				gTextDone = true;
+			}
 		}
-
 	}
 
 
-	glow->ColorFilter.a = (.8f + RandomFloat() * .2f) * (text->ColorFilter.a * .7f);
-	pane->ColorFilter.a = text->ColorFilter.a * .8f;
+	glow->ColorFilter.a = (.8f + RandomFloat() * .2f) * (mainText->ColorFilter.a * .7f);
+	pane->ColorFilter.a = mainText->ColorFilter.a * .8f;
 }
 
 

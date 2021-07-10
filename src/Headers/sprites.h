@@ -2,8 +2,7 @@
 // sprites.h
 //
 
-#ifndef SPRITES_H
-#define SPRITES_H
+#pragma once
 
 
 enum
@@ -30,8 +29,3 @@ void BlendAllSpritesInGroup(short group);
 void ModifySpriteObjectFrame(ObjNode *theNode, short type, OGLSetupOutputType *setupInfo);
 void DrawSprite(int	group, int type, float x, float y, float scale, float rot, u_long flags, const OGLSetupOutputType *setupInfo);
 void BlendASprite(int group, int type);
-
-ObjNode *MakeFontStringObject(const char* cstr, NewObjectDefinitionType *newObjDef, OGLSetupOutputType *setupInfo, Boolean center);
-
-
-#endif

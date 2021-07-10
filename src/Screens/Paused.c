@@ -36,7 +36,7 @@ static void FreePausedMenu(void);
 /*    CONSTANTS             */
 /****************************/
 
-#define	PAUSED_TEXT_SIZE	30.0f
+#define	PAUSED_TEXT_SIZE	1.0f//30.0f
 
 
 /*********************/
@@ -132,11 +132,11 @@ short	i;
 
 	for (i = 0; i < 3; i++)
 	{
-		const char* cstr = GetLanguageString(i + STR_RESUME_GAME);
+		const char* cstr = Localize(i + STR_RESUME_GAME);
 
-		gPausedIcons[i] = MakeFontStringObject(cstr, &gNewObjectDefinition, gGameViewInfoPtr, true);
+		gPausedIcons[i] = TextMesh_New(cstr, 1, &gNewObjectDefinition);
 		gPausedIcons[i]->ColorFilter.a = 0;
-		gNewObjectDefinition.coord.y 	+= PAUSED_TEXT_SIZE * .7f;
+		gNewObjectDefinition.coord.y 	+= PAUSED_TEXT_SIZE * 32 * .7f;
 	}
 }
 

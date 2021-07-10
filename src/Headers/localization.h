@@ -79,8 +79,8 @@ enum
 	STR_KEYBINDING_DESCRIPTION_0,
 };
 
-void LoadLanguageStrings(int languageID);
+void LoadLocalizedStrings(int languageID);
 
-const char* GetLanguageString(int stringID);
+const char* Localize(int stringID);
 
 int GetBestLanguageIDFromSystemLocale(void);

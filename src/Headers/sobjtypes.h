@@ -2,8 +2,7 @@
 // sobjtypes.h
 //
 
-#ifndef SOBJ_H
-#define SOBJ_H
+#pragma once
 
 enum
 {
@@ -111,71 +110,6 @@ enum
 	PARTICLE_SObjType_RocketFlame7
 };
 
-/******************* HELPTEXT SOBJTYPES *************************/
-
-enum
-{
-	HELPTEXT_SObjType_Comma,
-	HELPTEXT_SObjType_Dash,
-	HELPTEXT_SObjType_Period,
-	HELPTEXT_SObjType_QuestionMark,
-	HELPTEXT_SObjType_ExclamationMark,
-	HELPTEXT_SObjType_Apostrophe,
-	
-	HELPTEXT_SObjType_UU,
-	HELPTEXT_SObjType_OO,
-	HELPTEXT_SObjType_AA,
-	HELPTEXT_SObjType_AO,
-	HELPTEXT_SObjType_NN,
-	HELPTEXT_SObjType_EE,
-	HELPTEXT_SObjType_Ax,
-	HELPTEXT_SObjType_Ox,
-	HELPTEXT_SObjType_Oa,
-	
-	HELPTEXT_SObjType_0,
-	HELPTEXT_SObjType_1,
-	HELPTEXT_SObjType_2,
-	HELPTEXT_SObjType_3,
-	HELPTEXT_SObjType_4,
-	HELPTEXT_SObjType_5,
-	HELPTEXT_SObjType_6,
-	HELPTEXT_SObjType_7,
-	HELPTEXT_SObjType_8,
-	HELPTEXT_SObjType_9,
-	HELPTEXT_SObjType_A,
-	HELPTEXT_SObjType_B,
-	HELPTEXT_SObjType_C,
-	HELPTEXT_SObjType_D,
-	HELPTEXT_SObjType_E,
-	HELPTEXT_SObjType_F,
-	HELPTEXT_SObjType_G,
-	HELPTEXT_SObjType_H,
-	HELPTEXT_SObjType_I,
-	HELPTEXT_SObjType_J,
-	HELPTEXT_SObjType_K,
-	HELPTEXT_SObjType_L,
-	HELPTEXT_SObjType_M,
-	HELPTEXT_SObjType_N,
-	HELPTEXT_SObjType_O,
-	HELPTEXT_SObjType_P,
-	HELPTEXT_SObjType_Q,
-	HELPTEXT_SObjType_R,
-	HELPTEXT_SObjType_S,
-	HELPTEXT_SObjType_T,
-	HELPTEXT_SObjType_U,
-	HELPTEXT_SObjType_V,
-	HELPTEXT_SObjType_W,
-	HELPTEXT_SObjType_X,
-	HELPTEXT_SObjType_Y,
-	HELPTEXT_SObjType_Z,
-	
-	HELPTEXT_SObjType_Cursor
-
-};
-
-
-
-
 /******************* FARM LEVEL *************************/
 
 enum
@@ -247,19 +181,4 @@ enum
 	
 	BRAINBOSS_SObjType_RedZap
 };
-
-
-#endif
-
-
-
-
-
-
-
-
-
-
-
-
 

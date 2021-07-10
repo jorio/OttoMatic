@@ -36,6 +36,13 @@ static void cb_SetLanguage(void);
 static void cb_ConfigureControls(void);
 static void cb_Back(void);
 
+static void LayOutMainSettingsScreen(void);
+static void LayOutKeybindingScreen(void);
+
+#define		SpecialHighlightType	Special[0]
+#define		SpecialHighlightRow		Special[1]
+#define		SpecialHighlightColumn	Special[2]
+
 
 /****************************/
 /*    CONSTANTS            */
@@ -51,7 +58,8 @@ enum
 	SETTINGS_STATE_FADE_OUT,
 };
 
-const static OGLColorRGB kTitleColor = {1.0, 1.0, 0.7};
+static const OGLColorRGBA kTitleColor = {1.0f, 1.0f, 0.7f, 1.0f};
+static const OGLColorRGBA kInactiveColor = {.3f, .5f, .2f, 1.0f};
 
 static SettingEntry gSettingEntries[] =
 {
@@ -71,15 +79,6 @@ static SettingEntry gSettingEntries[] =
 		0,
 		false,
 	},
-	/*
-	{
-		&gGamePrefs.antialiasing,
-		STR_ANTIALIASING,
-		NULL,
-		2, {STR_OFF, STR_ON},
-		0,
-	},
-	*/
 	{
 		&gGamePrefs.anaglyph,
 		STR_ANAGLYPH,
@@ -88,7 +87,6 @@ static SettingEntry gSettingEntries[] =
 		0,
 		false,
 	},
-	// Configure controls
 	{
 		NULL,
 		STR_CONFIGURE_CONTROLS,
@@ -97,7 +95,6 @@ static SettingEntry gSettingEntries[] =
 		0,
 		true,
 	},
-	// BACK
 	{
 		NULL,
 		STR_BACK,
@@ -124,6 +121,8 @@ static int gNumKeybindingRows = NUM_CONTROL_NEEDS + 2;		// 2 extra row for reset
 static float gSettingsFadeAlpha = 0;
 static int gSettingsState = SETTINGS_STATE_OFF;
 
+static ObjNode* gChainHead = nil;
+
 #pragma mark -
 
 /***************************************************************/
@@ -132,12 +131,14 @@ static int gSettingsState = SETTINGS_STATE_OFF;
 
 static void cb_SetLanguage(void)
 {
-	LoadLanguageStrings(gGamePrefs.language);
+	LoadLocalizedStrings(gGamePrefs.language);
 }
 
 static void cb_ConfigureControls(void)
 {
 	gSettingsState = SETTINGS_STATE_CONTROLS_READY;
+	PlayEffect(EFFECT_MENUCHANGE);
+	LayOutKeybindingScreen();
 }
 
 static void cb_Back(void)
@@ -150,6 +151,8 @@ static void cb_Back(void)
 
 		case SETTINGS_STATE_CONTROLS_READY:
 			gSettingsState = SETTINGS_STATE_READY;
+			PlayEffect(EFFECT_MENUCHANGE);
+			LayOutMainSettingsScreen();
 			break;
 
 		default:
@@ -206,7 +209,6 @@ static void NavigateSettings(void)
 
 	if (valueDelta != 0)
 	{
-
 		if (entry->valuePtr)
 		{
 			PlayEffect(EFFECT_MENUCHANGE);
@@ -218,6 +220,11 @@ static void NavigateSettings(void)
 		if (entry->callback)
 		{
 			entry->callback();
+		}
+
+		if (gSettingsState == SETTINGS_STATE_READY)
+		{
+			LayOutMainSettingsScreen();
 		}
 	}
 
@@ -270,6 +277,7 @@ static void NavigateKeybindings(void)
 			{
 				PlayEffect(EFFECT_FLAREEXPLODE);
 				*entryKey = 0;
+				LayOutKeybindingScreen();
 			}
 		}
 
@@ -278,6 +286,7 @@ static void NavigateKeybindings(void)
 			MyFlushEvents();
 			PlayEffect(EFFECT_MENUCHANGE);
 			gSettingsState = SETTINGS_STATE_CONTROLS_AWAITING_PRESS;
+			LayOutKeybindingScreen();
 		}
 	}
 	else if (valueActivated && gHighlightedKeybindingRow == NUM_CONTROL_NEEDS + 0)		// reset
@@ -286,6 +295,7 @@ static void NavigateKeybindings(void)
 		PlayEffect(EFFECT_FLAREEXPLODE);
 		memcpy(gGamePrefs.keys, gDefaultKeyBindings, sizeof(gDefaultKeyBindings));
 		_Static_assert(sizeof(gDefaultKeyBindings) == sizeof(gGamePrefs.keys), "size mismatch: default keybindings / prefs keybindings");
+		LayOutKeybindingScreen();
 	}
 	else if (valueActivated && gHighlightedKeybindingRow == NUM_CONTROL_NEEDS + 1)		// back
 	{
@@ -305,6 +315,7 @@ static void NavigateKeybinding_AwaitNewKey(void)
 	{
 		gSettingsState = SETTINGS_STATE_CONTROLS_READY;
 		MyFlushEvents();
+		LayOutKeybindingScreen();
 	}
 	else
 	{
@@ -318,6 +329,7 @@ static void NavigateKeybinding_AwaitNewKey(void)
 				*entryKey = i;
 				gSettingsState = SETTINGS_STATE_CONTROLS_READY;
 				MyFlushEvents();
+				LayOutKeybindingScreen();
 				break;
 			}
 		}
@@ -327,69 +339,85 @@ static void NavigateKeybinding_AwaitNewKey(void)
 #pragma mark -
 
 /***************************************************************/
-/*                       RENDERING                             */
+/*                          LAYOUT                             */
 /***************************************************************/
 
-static void DrawText(
-		const char* s,
-		float x,
-		float y,
-		float xs,
-		float ys,
-		OGLSetupOutputType *info)
+static void NukeTextNodes()
 {
-	const float cw = SCORE_TEXT_SPACING * xs /* * gs*/;
-
-	for (const char* c = s; *c; c++)
+	if (gChainHead)
 	{
-		if (*c == ' ')
-		{
-			x += cw * .5f;
-			continue;
-		}
-
-		int texNum = CharToSprite(toupper(*c));				// get texture #
-		if (texNum == -1)
-		{
-			texNum = CharToSprite('?');
-		}
-		if (texNum != -1)
-		{
-			DrawInfobarSprite2_Scaled(
-					x,
-					y,
-					SCORE_TEXT_SPACING * xs * 2.0f,
-					SCORE_TEXT_SPACING * ys * 2.0f,
-					SPRITE_GROUP_FONT,
-					texNum,
-					info);
-		}
-
-		x += cw;
+		DeleteObject(gChainHead);
+		gChainHead = nil;
 	}
 }
 
-static void SetSettingColor(bool highlight)
+static void MoveText(ObjNode* node)
 {
-	if (highlight)											// highlight
+	if (gSettingsState == SETTINGS_STATE_OFF)
+	{
+		DeleteObject(node);
+		return;
+	}
+
+	int effect = 0;
+	float intensity = 1;
+
+	if (node->SpecialHighlightType == 1)						// it's a selectable node
+	{
+		if (node->SpecialHighlightRow == gHighlightedSettingRow)
+			effect = 2;
+		else
+			effect = 1;
+	}
+	else if (node->SpecialHighlightType == 2)
+	{
+		if (node->SpecialHighlightRow == gHighlightedKeybindingRow &&
+			(node->SpecialHighlightColumn < 0 || node->SpecialHighlightColumn == gHighlightedKeybindingColumn))
+		{
+			if (gSettingsState == SETTINGS_STATE_CONTROLS_AWAITING_PRESS)
+				effect = 3;
+			else
+				effect = 2;
+		}
+		else
+			effect = 1;
+	}
+
+	if (effect == 1)
+		node->ColorFilter = kInactiveColor;
+	else if (effect == 2)
 	{
 		float rf = .7f + RandomFloat() * .29f;
-		gGlobalColorFilter = (OGLColorRGB){rf, rf, rf};
+		node->ColorFilter = (OGLColorRGBA){rf, rf, rf, 1};
 	}
-	else													// no highlight
+	else if (effect == 3)
 	{
-		gGlobalColorFilter = (OGLColorRGB){.3, .5, .2};
+		node->SpecialF[0] += gFramesPerSecondFrac * 10.0f;
+		intensity = (1.0f + sinf(node->SpecialF[0])) * 0.5f;
+		//node->ColorFilter = (OGLColorRGBA){1,1,1,intensity};
 	}
+
+	node->ColorFilter.a = gSettingsFadeAlpha * intensity;
 }
 
-static void DrawMainSettingsScreen(OGLSetupOutputType* info)
+static void LayOutMainSettingsScreen(void)
 {
-	float y = 70.0f;
+	NukeTextNodes();
 
-	// Draw title
-	gGlobalColorFilter = kTitleColor;
-	DrawText(GetLanguageString(STR_SETTINGS), 150, y, 1.33f, 2.0f, info);
-	y += SCORE_TEXT_SPACING * 5.0f;
+	gNewObjectDefinition.coord		= (OGLPoint3D){-170, -160, 0};
+	gNewObjectDefinition.flags 		= 0;
+	gNewObjectDefinition.moveCall 	= MoveText;
+	gNewObjectDefinition.rot 		= 0;
+	gNewObjectDefinition.scale 	    = 2.0f;
+	gNewObjectDefinition.slot 		= SPRITE_SLOT;
+	ObjNode* title = TextMesh_New(Localize(STR_SETTINGS), 0, &gNewObjectDefinition);
+	title->ColorFilter = kTitleColor;
+
+	gChainHead = title;
+	gNewObjectDefinition.autoChain = gChainHead;
+
+	gNewObjectDefinition.coord.y += SCORE_TEXT_SPACING * 5.0f;
+	gNewObjectDefinition.scale		= .75f;
 
 	// Draw setting rows
 	for (int settingID = 0; settingID < gNumSettingRows; settingID++)
@@ -398,12 +426,14 @@ static void DrawMainSettingsScreen(OGLSetupOutputType* info)
 
 		if (entry->extraPadding)								// add extra padding above if needed
 		{
-			y += SCORE_TEXT_SPACING * 1.5f;
+			gNewObjectDefinition.coord.y += SCORE_TEXT_SPACING * 1.5f;
 		}
 
-		SetSettingColor(gHighlightedSettingRow == settingID);
+		gNewObjectDefinition.coord.x = -170;
+		ObjNode* captionNode = TextMesh_New(Localize(entry->labelStrID), 0, &gNewObjectDefinition);
 
-		DrawText(GetLanguageString(entry->labelStrID), 150, y, .66f, 1.0f, info);
+		captionNode->SpecialHighlightType = 1;
+		captionNode->SpecialHighlightRow = settingID;
 
 		if (entry->valuePtr)
 		{
@@ -412,29 +442,42 @@ static void DrawMainSettingsScreen(OGLSetupOutputType* info)
 				valueStrID = STR_LANGUAGE_NAME;
 			else
 				valueStrID = entry->choiceStrID[*entry->valuePtr];
-			DrawText(GetLanguageString(valueStrID), 350, y, .66f, 1.0f, info);
+
+			gNewObjectDefinition.coord.x = 30;
+			ObjNode* valueNode = TextMesh_New(Localize(valueStrID), 0, &gNewObjectDefinition);
+			valueNode->SpecialHighlightType = 1;
+			valueNode->SpecialHighlightRow = settingID;
 		}
 
-		y += SCORE_TEXT_SPACING * 1.5f;
+		gNewObjectDefinition.coord.y += SCORE_TEXT_SPACING * 1.5f;
 	}
+
+	gNewObjectDefinition.autoChain = nil;
 }
 
-static void DrawKeybindingScreen(OGLSetupOutputType *info)
+static void LayOutKeybindingScreen(void)
 {
-	float y = 70.0f;
-	bool blinkFlux = SDL_GetTicks() % 500 < 300;
+	NukeTextNodes();
 
-	// Draw title
-	gGlobalColorFilter = kTitleColor;
-	DrawText(GetLanguageString(STR_CONFIGURE_CONTROLS), 150, y, 1.33f, 2.0f, info);
-	y += SCORE_TEXT_SPACING * 5.0f;
+	gNewObjectDefinition.coord		= (OGLPoint3D){-170, -160, 0};
+	gNewObjectDefinition.flags		= 0;
+	gNewObjectDefinition.moveCall	= MoveText;
+	gNewObjectDefinition.rot		= 0;
+	gNewObjectDefinition.scale		= 2.0f;
+	gNewObjectDefinition.slot		= SPRITE_SLOT;
+	ObjNode* title = TextMesh_New(Localize(STR_CONFIGURE_CONTROLS), 0, &gNewObjectDefinition);
+	title->ColorFilter = kTitleColor;
+
+	gChainHead = title;
+	gNewObjectDefinition.autoChain = gChainHead;
+
+	gNewObjectDefinition.coord.y += SCORE_TEXT_SPACING * 5.0f;
+	gNewObjectDefinition.scale		= .6f;
 
 	// Draw binding text
 	for (int bindingID = 0; bindingID < NUM_CONTROL_NEEDS; bindingID++)
 	{
-		bool isRowHighlighted = gHighlightedKeybindingRow == bindingID;
-
-		const char* caption = GetLanguageString(STR_KEYBINDING_DESCRIPTION_0 + bindingID);
+		const char* caption = Localize(STR_KEYBINDING_DESCRIPTION_0 + bindingID);
 		const char* value1 = "---";
 		const char* value2 = "---";
 
@@ -444,85 +487,51 @@ static void DrawKeybindingScreen(OGLSetupOutputType *info)
 		if (gGamePrefs.keys[bindingID].key2 != 0)
 			value2 = SDL_GetScancodeName(gGamePrefs.keys[bindingID].key2);
 
-		if (isRowHighlighted && gSettingsState == SETTINGS_STATE_CONTROLS_AWAITING_PRESS)
+		if (gHighlightedKeybindingRow == bindingID && gSettingsState == SETTINGS_STATE_CONTROLS_AWAITING_PRESS)
 		{
 			if (gHighlightedKeybindingColumn == 0)
-			{
-				value1 = blinkFlux ? GetLanguageString(STR_PRESS) : "";
-			}
+				value1 = Localize(STR_PRESS);
 			else
-			{
-				value2 = blinkFlux ? GetLanguageString(STR_PRESS) : "";
-			}
+				value2 = Localize(STR_PRESS);
 		}
 
-		SetSettingColor(isRowHighlighted);
-		DrawText(caption, 150, y, .5f, 1.0f, info);
-		SetSettingColor(isRowHighlighted && gHighlightedKeybindingColumn == 0);
-		DrawText(value1, 320, y, .5f, 1.0f, info);
-		SetSettingColor(isRowHighlighted && gHighlightedKeybindingColumn == 1);
-		DrawText(value2, 400, y, .5f, 1.0f, info);
+		gNewObjectDefinition.coord.x = -170;
+		ObjNode* captionNode = TextMesh_New(caption, 0, &gNewObjectDefinition);
+		captionNode->ColorFilter = kInactiveColor;
 
-		y += SCORE_TEXT_SPACING * 1.5f;
+		gNewObjectDefinition.coord.x = 0;
+		ObjNode* valueNode1 = TextMesh_NewEmpty(256, &gNewObjectDefinition);
+		TextMesh_Update(value1, 0, valueNode1);
+		valueNode1->SpecialHighlightType	= 2;
+		valueNode1->SpecialHighlightRow		= bindingID;
+		valueNode1->SpecialHighlightColumn	= 0;
+
+		gNewObjectDefinition.coord.x = 120;
+		ObjNode* valueNode2 = TextMesh_NewEmpty(256, &gNewObjectDefinition);
+		TextMesh_Update(value2, 0, valueNode2);
+		valueNode2->SpecialHighlightType	= 2;
+		valueNode2->SpecialHighlightRow		= bindingID;
+		valueNode2->SpecialHighlightColumn	= 1;
+
+		gNewObjectDefinition.coord.y += SCORE_TEXT_SPACING * 1.5f;
 	}
 
-	// Draw reset button
-	y += SCORE_TEXT_SPACING * 1.5f;
-	SetSettingColor(gHighlightedKeybindingRow == gNumKeybindingRows - 2);
-	DrawText(GetLanguageString(STR_RESET_KEYBINDINGS), 150, y, .66f, 1.0f, info);
+	// Reset button
+	gNewObjectDefinition.coord.x = -170;
+	gNewObjectDefinition.coord.y += SCORE_TEXT_SPACING * 1.5f;
+	ObjNode* resetButton = TextMesh_New(Localize(STR_RESET_KEYBINDINGS), 0, &gNewObjectDefinition);
+	resetButton->SpecialHighlightType	= 2;
+	resetButton->SpecialHighlightRow	= gNumKeybindingRows - 2;
+	resetButton->SpecialHighlightColumn	= -1;	// ignore column to highlight
 
-	// Draw back button
-	y += SCORE_TEXT_SPACING * 1.5f;
-	SetSettingColor(gHighlightedKeybindingRow == gNumKeybindingRows - 1);
-	DrawText(GetLanguageString(STR_BACK), 150, y, .66f, 1.0f, info);
-}
+	// Back button
+	gNewObjectDefinition.coord.y += SCORE_TEXT_SPACING * 1.5f;
+	ObjNode* backButton = TextMesh_New(Localize(STR_BACK), 0, &gNewObjectDefinition);
+	backButton->SpecialHighlightType	= 2;
+	backButton->SpecialHighlightRow		= gNumKeybindingRows - 1;
+	backButton->SpecialHighlightColumn	= -1;	// ignore column to highlight
 
-static void DrawSettings(OGLSetupOutputType *info)
-{
-	/* SET STATE */
-
-	OGL_PushState();
-
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	OGL_DisableLighting();
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, 640, 480, 0, 0, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
-
-	gGlobalTransparency = gSettingsFadeAlpha;
-
-	/*****************/
-	/* DRAW THE TEXT */
-	/*****************/
-
-	if (gSettingsState == SETTINGS_STATE_CONTROLS_READY || gSettingsState == SETTINGS_STATE_CONTROLS_AWAITING_PRESS)
-	{
-		DrawKeybindingScreen(info);
-	}
-	else
-	{
-		DrawMainSettingsScreen(info);
-	}
-
-	/***********/
-	/* CLEANUP */
-	/***********/
-
-	gGlobalTransparency = 1;
-	OGL_PopState();
-}
-
-
-static void MenuBackgroundDrawRoutineWrapper(OGLSetupOutputType *info)
-{
-	DrawMainMenuCallback(info);
-	DrawSettings(info);
+	gNewObjectDefinition.autoChain = nil;
 }
 
 #pragma mark -
@@ -546,7 +555,7 @@ void DoSettingsOverlay(void)
 	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOTEXTUREWRAP|
 										STATUS_BIT_KEEPBACKFACES;
-	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+100;
+	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+100-1;
 	gNewObjectDefinition.moveCall 	= nil;
 	ObjNode* pane = MakeNewObject(&gNewObjectDefinition);
 	pane->CustomDrawFunction = DrawDarkenPane;
@@ -554,6 +563,9 @@ void DoSettingsOverlay(void)
 	pane->ColorFilter.g = 0;
 	pane->ColorFilter.b = 0;
 	pane->ColorFilter.a = 0;
+
+
+	LayOutMainSettingsScreen();
 
 
 	/*************************/
@@ -610,7 +622,7 @@ void DoSettingsOverlay(void)
 
 		CalcFramesPerSecond();
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, MenuBackgroundDrawRoutineWrapper);
+		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);
 	}
 
 
@@ -624,4 +636,5 @@ void DoSettingsOverlay(void)
 	MyFlushEvents();
 
 	gAllowAudioKeys = true;
+	gChainHead = nil;
 }

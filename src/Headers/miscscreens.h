@@ -41,6 +41,7 @@ void DoBonusScreen(void);
 void DoGameSettingsDialog(void);
 
 void NewScore(void);
+ObjNode* SetupHighScoreTableObjNodes(ObjNode* chainTail, int returnNth);
 void LoadHighScores(void);
 void ClearHighScores(void);
 

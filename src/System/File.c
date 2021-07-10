@@ -555,7 +555,7 @@ char		header[PREFS_HEADER_LENGTH + 1];
 
 //	RestoreHIDControlSettings(&gGamePrefs.controlSettings);
 
-	LoadLanguageStrings(gGamePrefs.language);
+	LoadLocalizedStrings(gGamePrefs.language);
 
 	return(noErr);
 }
@@ -1092,9 +1092,6 @@ const char*	levelSoundFiles[NUM_LEVELS] =
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, setupInfo);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:helpfont.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_FONT, setupInfo);
 
 
 			/* LOAD TERRAIN */

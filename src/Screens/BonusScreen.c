@@ -37,8 +37,6 @@ static void FreeBonusScreen(void);
 static void DrawBonusCallback(OGLSetupOutputType *info);
 static void DrawHumanBonus(OGLSetupOutputType *info);
 static void DrawInventoryBonus(OGLSetupOutputType *info);
-static void DrawBonus(OGLSetupOutputType *info);
-static void DrawInventoryQuantity(OGLSetupOutputType *info);
 static void MoveBonusHuman(ObjNode *theNode);
 static void MoveBonusHuman_WalkOff(ObjNode *theNode);
 static void CreateBonusHumans(void);
@@ -53,7 +51,6 @@ static void DoBonusShipDissolve(void);
 static void MoveBonusInventoryIcon(ObjNode *theNode);
 static void DoTotalBonusTally(void);
 static void DrawBonusToScore(OGLSetupOutputType *info);
-static void DrawScore(OGLSetupOutputType *info);
 static int DoSaveGamePrompt(void);
 static int NavigateSaveMenu(void);
 static void DoTractorBeam(void);
@@ -67,7 +64,7 @@ static void MoveGlowDisc(ObjNode *theNode);
 /*    CONSTANTS             */
 /****************************/
 
-#define	SAVE_TEXT_SIZE		30.0f
+#define	SAVE_TEXT_SIZE		1.0f//30.0f
 
 #define	POINTS_HUMAN		4000
 #define	POINTS_INVENTORY	150
@@ -355,10 +352,6 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:helpfont.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_FONT, gGameViewInfoPtr);
-	BlendAllSpritesInGroup(SPRITE_GROUP_FONT);
-
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:bonus.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_BONUS, gGameViewInfoPtr);
 
@@ -504,6 +497,64 @@ static void DoBonusShipDissolve(void)
 }
 
 
+#pragma mark -
+
+/**************** MOVE TALLY TEXT ********************/
+
+static void MoveTallyText(ObjNode* theNode)
+{
+	theNode->ColorFilter.a = (.9f + RandomFloat()*.099f) * gScoreAlpha;
+
+	int targetTally;
+	switch (theNode->Special[0])
+	{
+		case 0:
+			targetTally = gBonus;
+			break;
+		case 1:
+			targetTally = gScore;
+			break;
+		default:
+			targetTally = gInventoryQuantity;
+			theNode->ColorFilter.a *= gInventoryQuantityAlpha;
+			break;
+	}
+
+	if (targetTally != theNode->Special[1])
+	{
+		theNode->Special[1] = targetTally;
+
+		Str255 s;
+		NumToStringC(targetTally, s);
+		TextMesh_Update(s, kTextMeshAlignCenter, theNode);
+	}
+}
+
+
+/**************** CREATE TALLY TEXT ********************/
+//
+// type 0: text contents will track gBonus
+// type 1: text contents will track gScore
+// type 2: text contents will track gInventoryQuantity
+//
+
+static ObjNode* CreateTallyText(int type, float y)
+{
+	gNewObjectDefinition.coord		= (OGLPoint3D){0, y, 0};
+	gNewObjectDefinition.flags 		= 0;
+	gNewObjectDefinition.moveCall 	= MoveTallyText;
+	gNewObjectDefinition.rot 		= 0;
+	gNewObjectDefinition.scale 	    = 1.5f;
+	gNewObjectDefinition.slot 		= SPRITE_SLOT;
+	ObjNode* tallyText = TextMesh_NewEmpty(16, &gNewObjectDefinition);
+	tallyText->Special[0] = type;
+	tallyText->Special[1] = -1;		// Special[1]: currently displaying number
+
+	return tallyText;
+}
+
+
+#pragma mark -
 
 /**************** DO HUMANS BONUS TALLY ********************/
 
@@ -513,6 +564,7 @@ static void DoHumansBonusTally(void)
 	gShowScoreMode = SHOW_SCORE_MODE_HUMANBONUS;
 
 	CreateBonusHumans();
+	ObjNode* tallyText = CreateTallyText(0, 150);
 
 	CalcFramesPerSecond();
 	UpdateInput();
@@ -549,6 +601,7 @@ static void DoHumansBonusTally(void)
 		}
 	}
 
+	DeleteObject(tallyText);
 }
 
 
@@ -557,6 +610,8 @@ static void DoHumansBonusTally(void)
 static void DoInventoryBonusTally(void)
 {
 	CreateInventoryIcons();
+	ObjNode* tallyTextQuantity = CreateTallyText(2, -10);
+	ObjNode* tallyTextBonus = CreateTallyText(0, 150);
 
 	gBonus = 0;
 
@@ -597,6 +652,8 @@ static void DoInventoryBonusTally(void)
 		}
 	}
 
+	DeleteObject(tallyTextQuantity);
+	DeleteObject(tallyTextBonus);
 }
 
 
@@ -615,6 +672,9 @@ float	tick;
 
 	tick = 1.0f;
 	gBonusTimer = 2.0;										// used as delay when done counting bonus
+
+	ObjNode* tallyTextBonus = CreateTallyText(0, 150);
+	ObjNode* tallyTextTotal = CreateTallyText(1, 20);
 
 	CalcFramesPerSecond();
 	UpdateInput();
@@ -690,6 +750,10 @@ float	tick;
 		}
 	}
 
+
+	DeleteObject(tallyTextBonus);
+	DeleteObject(tallyTextTotal);
+
 }
 
 
@@ -716,11 +780,11 @@ short	i;
 
 	for (i = 0; i < 2; i++)
 	{
-		const char* cstr = GetLanguageString(i + STR_SAVE_GAME);
+		const char* cstr = Localize(i + STR_SAVE_GAME);
 
-		gSaveIcons[i] = MakeFontStringObject(cstr, &gNewObjectDefinition, gGameViewInfoPtr, true);
+		gSaveIcons[i] = TextMesh_New(cstr, 1, &gNewObjectDefinition);
 		gSaveIcons[i]->ColorFilter.a = 0;
-		gNewObjectDefinition.coord.y 	+= SAVE_TEXT_SIZE * .7f;
+		gNewObjectDefinition.coord.y += SAVE_TEXT_SIZE * 32.0f * .7f;
 	}
 
 				/*************/
@@ -780,14 +844,18 @@ static const OGLColorRGBA noHiliteColor = {.3,.5,.2,1};
 
 		/* SEE IF CHANGE SELECTION */
 
+	// TODO: gamepad-friendly input here
 	if (GetNewKeyState(SDL_SCANCODE_UP) && (gSaveMenuSelection > 0))
 	{
 		gSaveMenuSelection--;
+		PlayEffect(EFFECT_WEAPONCLICK);
 	}
 	else
+	// TODO: gamepad-friendly input here
 	if (GetNewKeyState(SDL_SCANCODE_DOWN) && (gSaveMenuSelection < 1))
 	{
 		gSaveMenuSelection++;
+		PlayEffect(EFFECT_WEAPONCLICK);
 	}
 
 		/* SET APPROPRIATE FRAMES FOR ICONS */
@@ -813,6 +881,7 @@ static const OGLColorRGBA noHiliteColor = {.3,.5,.2,1};
 			/* SEE IF MAKE A SELECTION */
 			/***************************/
 
+	// TODO: gamepad-friendly input here
 	if (GetNewKeyState(SDL_SCANCODE_RETURN) || GetNewKeyState(SDL_SCANCODE_SPACE))
 	{
 		switch(gSaveMenuSelection)
@@ -1050,6 +1119,9 @@ static void DrawHumanBonus(OGLSetupOutputType *info)
 			/**********************/
 			/* DRAW BONUS VERBAGE */
 			/**********************/
+			//
+			// Note: actual tally is drawn as a text ObjNode
+			//
 
 			/* DRAW GLOW */
 
@@ -1062,13 +1134,6 @@ static void DrawHumanBonus(OGLSetupOutputType *info)
 
 	gGlobalTransparency = gScoreAlpha;
 	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_BonusText, info);
-
-
-			/************************/
-			/* DRAW THE BONUS VALUE */
-			/************************/
-
-	DrawBonus(info);
 
 
 
@@ -1117,24 +1182,6 @@ static void DrawInventoryBonus(OGLSetupOutputType *info)
 	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_InventoryText, info);
 
 
-			/************************/
-			/* DRAW THE BONUS VALUE */
-			/************************/
-
-	DrawBonus(info);
-
-
-
-			/************************/
-			/* DRAW WEAPON QUANTITY */
-			/************************/
-
-	if (gInventoryQuantityAlpha != 0.0f)
-	{
-		DrawInventoryQuantity(info);
-	}
-
-
 			/***********/
 			/* CLEANUP */
 			/***********/
@@ -1143,37 +1190,6 @@ static void DrawInventoryBonus(OGLSetupOutputType *info)
 	gGlobalMaterialFlags = 0;
 	gGlobalTransparency = 1.0;
 
-}
-
-
-
-/********************* DRAW INVENTORY QUANTITY ****************************/
-
-static void DrawInventoryQuantity(OGLSetupOutputType *info)
-{
-Str32	s;
-int		texNum,n,i;
-float	x;
-
-	gGlobalTransparency = gInventoryQuantityAlpha;
-
-	NumToString(gInventoryQuantity, s);
-	n = s[0];										// get str len
-
-	x = - ((float)n / 2.0f) * DIGIT_SPACING_Q - (DIGIT_SPACING_Q/2);	// calc starting x
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	for (i = 1; i <= n; i++)
-	{
-		texNum = CharToSprite(s[i]);				// get texture #
-
-		gGlobalTransparency = (.9f + RandomFloat()*.099f) * gScoreAlpha;
-		DrawInfobarSprite2(x, -10, DIGIT_SPACING_Q * 1.9f, SPRITE_GROUP_FONT, texNum, info);
-		x += DIGIT_SPACING_Q;
-	}
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	gGlobalTransparency = 1.0f;
 }
 
 
@@ -1201,20 +1217,13 @@ static void DrawBonusToScore(OGLSetupOutputType *info)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
-	DrawInfobarSprite2(-150, 100, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusGlow, info);
+	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gScoreAlpha;
-	DrawInfobarSprite2(-150, 100, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusText, info);
-
-
-			/************************/
-			/* DRAW THE BONUS VALUE */
-			/************************/
-
-	DrawBonus(info);
+	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusText, info);
 
 
 
@@ -1226,17 +1235,13 @@ static void DrawBonusToScore(OGLSetupOutputType *info)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
-	DrawInfobarSprite2(-150, -30, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreGlow, info);
+	DrawInfobarSprite2(-150, -35, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreGlow, info);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gScoreAlpha;
-	DrawInfobarSprite2(-150, -30, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreText, info);
-
-			/* DRAW VALUE */
-
-	DrawScore(info);
+	DrawInfobarSprite2(-150, -35, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreText, info);
 
 
 
@@ -1247,61 +1252,6 @@ static void DrawBonusToScore(OGLSetupOutputType *info)
 	OGL_PopState();
 	gGlobalMaterialFlags = 0;
 	gGlobalTransparency = 1.0;
-
-}
-
-
-
-
-/********************* DRAW BONUS ****************************/
-
-static void DrawBonus(OGLSetupOutputType *info)
-{
-Str32	s;
-int		texNum,n,i;
-float	x;
-
-	NumToString(gBonus, s);
-	n = s[0];										// get str len
-
-	x = - ((float)n / 2.0f) * DIGIT_SPACING - (DIGIT_SPACING/2);	// calc starting x
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	for (i = 1; i <= n; i++)
-	{
-		texNum = CharToSprite(s[i]);				// get texture #
-
-		gGlobalTransparency = (.9f + RandomFloat()*.099f) * gScoreAlpha;
-		DrawInfobarSprite2(x, 150, DIGIT_SPACING * 1.9f, SPRITE_GROUP_FONT, texNum, info);
-		x += DIGIT_SPACING;
-	}
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
-
-
-/********************* DRAW SCORE ****************************/
-
-static void DrawScore(OGLSetupOutputType *info)
-{
-Str32	s;
-int		texNum,n,i;
-float	x;
-
-	NumToString(gScore, s);
-	n = s[0];										// get str len
-
-	x = - ((float)n / 2.0f) * DIGIT_SPACING - (DIGIT_SPACING/2);	// calc starting x
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	for (i = 1; i <= n; i++)
-	{
-		texNum = CharToSprite(s[i]);				// get texture #
-
-		gGlobalTransparency = (.9f + RandomFloat()*.099f) * gScoreAlpha;
-		DrawInfobarSprite2(x, 20, DIGIT_SPACING * 1.9f, SPRITE_GROUP_FONT, texNum, info);
-		x += DIGIT_SPACING;
-	}
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 
@@ -1791,17 +1741,5 @@ u_long	vol;
 static void MoveGlowDisc(ObjNode *theNode)
 {
 	theNode->ColorFilter.a = (.5f + RandomFloat() * .3f) * gInteriorObj->ColorFilter.a;
-
-
 }
-
-
-
-
-
-
-
-
-
-
 

@@ -754,7 +754,6 @@ short			skelType;
 					}
 					break;
 
-
 			case	SPRITE_GENRE:
 					if (theNode->SpriteMO)
 					{
@@ -771,24 +770,15 @@ short			skelType;
 					}
 					break;
 
-
-			case	FONTSTRING_GENRE:
-					OGL_PushState();								// keep state
-
-					for (i = 0; i < theNode->NumStringSprites; i++)
+			case	TEXTMESH_GENRE:
+					if (theNode->BaseGroup)
 					{
-						glMatrixMode(GL_PROJECTION);					// clear projection matrix
-						glLoadIdentity();
-						glOrtho(-g2DLogicalWidth*.5f, g2DLogicalWidth*.5f, g2DLogicalHeight*.5f, -g2DLogicalHeight*.5f, 0, 1);
-						glMatrixMode(GL_MODELVIEW);
-						glLoadIdentity();
-
-						MO_DrawObject(theNode->StringCharacters[i], setupInfo);
+						OGL_PushState();								// keep state
+						SetInfobarSpriteState(true);
+						MO_DrawObject(theNode->BaseGroup, setupInfo);
+						OGL_PopState();									// restore state
 					}
-
-					OGL_PopState();									// restore state
 					break;
-
 
 			case	CUSTOM_GENRE:
 custom_draw:
@@ -1233,10 +1223,6 @@ int		i;
 		   		theNode->SpriteMO = nil;
 				break;
 
-		case	FONTSTRING_GENRE:
-				for (i = 0; i < theNode->NumStringSprites; i++)
-					MO_DisposeObjectReference(theNode->StringCharacters[i]);	// dispose reference to sprite meta objects
-				break;
 	}
 
 	for (i = 0; i < MAX_NODE_SPARKLES; i++)				// free sparkles

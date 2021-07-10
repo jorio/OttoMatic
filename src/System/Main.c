@@ -178,7 +178,7 @@ void InitDefaultPrefs(void)
 	memcpy(gGamePrefs.keys, gDefaultKeyBindings, sizeof(gGamePrefs.keys));
 	_Static_assert(sizeof(gDefaultKeyBindings) == sizeof(gGamePrefs.keys), "size mismatch: default keybindings / prefs keybindings");
 
-	LoadLanguageStrings(gGamePrefs.language);
+	LoadLocalizedStrings(gGamePrefs.language);
 }
 
 
@@ -918,13 +918,13 @@ static void CleanupLevel(void)
 {
 	StopAllEffectChannels();
  	EmptySplineObjectList();
+	DisposeInfobar();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
 	DisposeSuperTileMemoryList();
 	DisposeTerrain();
 	DisposeSky();
 	DeleteAllParticleGroups();
-	DisposeInfobar();
 	DisposeParticleSystem();
 	DisposeAllSpriteGroups();
 	DisposeFences();

@@ -24,18 +24,20 @@ extern	PrefsType			gGamePrefs;
 extern	int				gGameWindowWidth,gGameWindowHeight,gScratch,gNumSparkles;
 
 extern	SDL_Window		*gSDLWindow;
+extern	FSSpec			gDataSpec;
+
+extern	OGLSetupOutputType		*gGameViewInfoPtr;
 
 
 /****************************/
 /*    PROTOTYPES            */
 /****************************/
 
+static void OGL_InitFont(void);
 
 static void OGL_CreateDrawContext(OGLViewDefType *viewDefPtr);
 static void OGL_SetStyles(OGLSetupInputType *setupDefPtr);
 static void OGL_CreateLights(OGLLightDefType *lightDefPtr);
-static void OGL_InitFont(void);
-static void OGL_FreeFont(void);
 
 static void ColorBalanceRGBForAnaglyph(uint32_t *rr, uint32_t *gg, uint32_t *bb);
 static void	ConvertTextureToGrey(void *imageMemory, short width, short height, GLint srcFormat, GLint dataType);
@@ -60,10 +62,7 @@ Byte					gAnaglyphPass;
 u_char					gAnaglyphGreyTable[255];
 
 
-//AGLDrawable		gAGLWin;
 SDL_GLContext	gAGLContext = nil;
-
-static GLuint 			gFontList;
 
 
 OGLMatrix4x4	gViewToFrustumMatrix,gWorldToViewMatrix,gWorldToFrustumMatrix;
@@ -93,6 +92,8 @@ int			gVRAMUsedThisFrame = 0;
 static int			gMinRAM = 100000000;
 
 Boolean		gMyState_Lighting;
+
+static ObjNode* gDebugText;
 
 
 /******************** OGL BOOT *****************/
@@ -199,6 +200,7 @@ OGLSetupOutputType	*outputPtr;
 	OGL_CheckError();
 
 
+
 				/* PASS BACK INFO */
 
 	outputPtr->drawContext 		= gAGLContext;
@@ -216,6 +218,10 @@ OGLSetupOutputType	*outputPtr;
 	OGL_UpdateCameraFromTo(outputPtr, &setupDefPtr->camera.from, &setupDefPtr->camera.to);
 
 	*outputHandle = outputPtr;											// return value to caller
+
+
+	TextMesh_Init(outputPtr);
+	OGL_InitFont();
 }
 
 
@@ -232,9 +238,11 @@ OGLSetupOutputType	*data;
 	if (data == nil)												// see if this setup exists
 		DoFatalAlert("OGL_DisposeWindowSetup: data == nil");
 
-			/* KILL DEBUG FONT */
+			/* KILL FONT MATERIAL */
 
-	OGL_FreeFont();
+	TextMesh_Shutdown();
+
+			/* KILL GL CONTEXT */
 
 	SDL_GL_MakeCurrent(gSDLWindow, NULL);					// make context not current
 	SDL_GL_DeleteContext(data->drawContext);						// nuke the AGL context
@@ -332,11 +340,6 @@ static char			*s;
 
 	s = (char *)glGetString(GL_EXTENSIONS);					// get extensions list
 
-
-
-			/* INIT DEBUG FONT */
-
-	OGL_InitFont();
 
 
 			/* SEE IF SUPPORT 1024x1024 TEXTURES */
@@ -628,104 +631,54 @@ do_anaglyph:
 			glPolygonMode(GL_FRONT_AND_BACK ,GL_FILL);
 	}
 
-
 				/* SHOW BASIC DEBUG INFO */
 
 	if (gDebugMode > 0)
 	{
-		int		y = 100;
-		int		mem = 1 << 30; //FreeMem();   // TODO: maybe Pomme could monitor how much memory has been allocated
-
-		if (mem < gMinRAM)		// poll for lowest RAM free
-			gMinRAM = mem;
-
-		OGL_DrawString("input x:", 20,y);
-		OGL_DrawFloat(gPlayerInfo.analogControlX, 100,y);
-		y += 15;
-		OGL_DrawString("input y:", 20,y);
-		OGL_DrawFloat(gPlayerInfo.analogControlZ, 100,y);
-		y += 15;
-
-		OGL_DrawString("fps:", 20,y);
-		OGL_DrawInt(gFramesPerSecond+.5f, 100,y);
-		y += 15;
-
-		OGL_DrawString("#tri:", 20,y);
-		OGL_DrawInt(gPolysThisFrame, 100,y);
-		y += 15;
-
-		OGL_DrawString("#scratchI:", 20,y);
-		OGL_DrawInt(gScratch, 100,y);
-		y += 15;
-
-#if 0
-		OGL_DrawString("enemies:", 20,y);
-		OGL_DrawInt(gNumEnemies, 100,y);
-		y += 15;
-
-		OGL_DrawString("player Y:", 20,y);
-		OGL_DrawInt(gPlayerInfo.coord.y, 100,y);
-		y += 15;
-
-
-		OGL_DrawString("#free RAM:", 20,y);
-		OGL_DrawInt(mem, 100,y);
-		y += 15;
-
-		OGL_DrawString("min RAM:", 20,y);
-		OGL_DrawInt(gMinRAM, 100,y);
-		y += 15;
-
-		OGL_DrawString("used VRAM:", 20,y);
-		OGL_DrawInt(gVRAMUsedThisFrame, 100,y);
-		y += 15;
-
-		OGL_DrawString("OGL Mem:", 20,y);
-		OGL_DrawInt(glmGetInteger(GLM_CURRENT_MEMORY), 100,y);
-		y += 15;
-
-
-		OGL_DrawString("#scratchF:", 20,y);
-		OGL_DrawFloat(gScratchF, 100,y);
-		y += 15;
-
-		OGL_DrawString("#t-defs:", 20,y);
-		OGL_DrawInt(gNumTerrainDeformations, 100,y);
-		y += 15;
-
-		OGL_DrawString("#sparkles:", 20,y);
-		OGL_DrawInt(gNumSparkles, 100,y);
-		y += 15;
-
-		if (gPlayerInfo.objNode)
-		{
-			OGL_DrawString("ground?:", 20,y);
-			if (gPlayerInfo.objNode->StatusBits & STATUS_BIT_ONGROUND)
-				OGL_DrawString("Y", 100,y);
-			else
-				OGL_DrawString("N", 100,y);
-			y += 15;
-		}
-
-
-		OGL_DrawString("#H2O:", 20,y);
-		OGL_DrawInt(gNumWaterDrawn, 100,y);
-		y += 15;
-
-		OGL_DrawString("#scratchI:", 20,y);
-		OGL_DrawInt(gScratch, 100,y);
-		y += 15;
-
-
-
-
-
-//		OGL_DrawString("# pointers:", 20,y);
-//		OGL_DrawInt(gNumPointers, 100,y);
-//		y += 15;
-
-#endif
-
+		char debugString[1024];
+		snprintf(
+			debugString,
+			sizeof(debugString),
+			"fps:\t\t%d\n"
+			"tris:\t\t%d\n"
+			"\n"
+			"input x:\t%.3f\n"
+			"input y:\t%.3f\n"
+			"\n"
+			"player x:\t%.0f\n"
+			"player z:\t%.0f\n"
+			"\n"
+			"enemies:\t%d\n"
+			"t-defs:\t%d\n"
+			"sparkles:\t%d\n"
+			"h2o:\t\t%d\n"
+			"ground?\t%c\n"
+			"\n"
+			"vram:\t\t%dK\n"
+			"ptrs:\t\t%d\n"
+			"nodes:\t%d\n"
+			,
+			(int)(gFramesPerSecond+.5f),
+			gPolysThisFrame,
+			gPlayerInfo.analogControlX,
+			gPlayerInfo.analogControlZ,
+			gPlayerInfo.coord.x,
+			gPlayerInfo.coord.z,
+			gNumEnemies,
+			gNumTerrainDeformations,
+			gNumSparkles,
+			gNumWaterDrawn,
+			gPlayerInfo.objNode && (gPlayerInfo.objNode->StatusBits & STATUS_BIT_ONGROUND)? 'Y': 'N',
+			gVRAMUsedThisFrame/1024,
+			gNumPointers,
+			gNumObjectNodes
+		);
+		TextMesh_Update(debugString, 0, gDebugText);
+		gDebugText->StatusBits &= ~STATUS_BIT_HIDDEN;
+	}
+	else
+	{
+		gDebugText->StatusBits |= STATUS_BIT_HIDDEN;
 	}
 
 
@@ -822,6 +775,68 @@ GLuint	textureName;
 	OGL_Texture_SetOpenGLTexture(textureName);
 
 	return(textureName);
+}
+
+/***************** OGL TEXTUREMAP LOAD FROM TGA **********************/
+
+GLuint OGL_TextureMap_LoadTGA(const char* path, int flags)
+{
+FSSpec					spec;
+uint8_t*				pixelData = nil;
+TGAHeader				header;
+OSErr					err;
+
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, path, &spec);
+
+			/* LOAD RAW ARGB DATA FROM TGA FILE */
+
+	err = ReadTGA(&spec, &pixelData, &header, true);
+	GAME_ASSERT(err == noErr);
+
+	GAME_ASSERT(header.bpp == 32);
+	GAME_ASSERT(header.imageType == TGA_IMAGETYPE_CONVERTED_ARGB);
+
+			/* PRE-PROCESS IMAGE */
+
+	int internalFormat = GL_RGB;
+
+	if (flags & kLoadTextureFlags_GrayscaleIsAlpha)
+	{
+		for (int p = 0; p < 4 * header.width * header.height; p += 4)
+		{
+			// put Blue into Alpha & leave map white
+			pixelData[p+0] = pixelData[p+3];	// put blue into alpha
+			pixelData[p+1] = 255;
+			pixelData[p+2] = 255;
+			pixelData[p+3] = 255;
+		}
+		internalFormat = GL_RGBA;
+	}
+	else if (flags & kLoadTextureFlags_KeepOriginalAlpha)
+	{
+		internalFormat = GL_RGBA;
+	}
+	else
+	{
+		internalFormat = GL_RGB;
+	}
+
+			/* LOAD TEXTURE */
+
+	GLuint glTextureName = OGL_TextureMap_Load(
+			pixelData,
+			header.width,
+			header.height,
+			GL_BGRA,
+			internalFormat,
+			GL_UNSIGNED_INT_8_8_8_8
+			);
+
+			/* CLEAN UP */
+
+	DisposePtr((Ptr) pixelData);
+
+	return glTextureName;
 }
 
 /******************** CONVERT TEXTURE TO GREY **********************/
@@ -1441,72 +1456,11 @@ void OGL_DisableLighting(void)
 
 static void OGL_InitFont(void)
 {
-	gFontList = glGenLists(256);
-
-#if 1
-	SOURCE_PORT_MINOR_PLACEHOLDER();
-#else
-    if (!aglUseFont(gAGLContext, kFontIDMonaco, bold, 9, 0, 256, gFontList))
-		DoFatalAlert("OGL_InitFont: aglUseFont failed");
-#endif
-}
-
-
-/******************* OGL_FREE FONT ***********************/
-
-static void OGL_FreeFont(void)
-{
-	glDeleteLists(gFontList, 256);
-}
-
-/**************** OGL_DRAW STRING ********************/
-
-void OGL_DrawString(Str255 s, GLint x, GLint y)
-{
-SOURCE_PORT_MINOR_PLACEHOLDER(); return; // TODO: We need OGL_InitFont to work first
-
-
-	OGL_PushState();
-
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity();
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, 640, 0, 480, -10.0, 10.0);
-
-	glDisable(GL_LIGHTING);
-
-	glRasterPos2i(x, 480-y);
-
-	glListBase(gFontList);
-	glCallLists(s[0], GL_UNSIGNED_BYTE, &s[1]);
-
-	OGL_PopState();
-
-}
-
-/**************** OGL_DRAW FLOAT ********************/
-
-void OGL_DrawFloat(float f, GLint x, GLint y)
-{
-
-Str255	s;
-
-	snprintf(s, 256, "%f", f);
-	OGL_DrawString(s,x,y);
-
-}
-
-
-
-/**************** OGL_DRAW INT ********************/
-
-void OGL_DrawInt(int f, GLint x, GLint y)
-{
-
-Str255	s;
-
-	NumToString(f,s);
-	OGL_DrawString(s,x,y);
-
+	NewObjectDefinitionType newObjDef;
+	memset(&newObjDef, 0, sizeof(newObjDef));
+	newObjDef.flags = STATUS_BIT_HIDDEN;
+	newObjDef.slot = DEBUGOVERLAY_SLOT;
+	newObjDef.scale = 0.33f;
+	newObjDef.coord = (OGLPoint3D) { -320, -100, 0 };
+	gDebugText = TextMesh_NewEmpty(2048, &newObjDef);
 }

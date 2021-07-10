@@ -38,7 +38,8 @@ enum
 	FILE_SCREEN_STATE_FADE_OUT,
 };
 
-const static OGLColorRGB kTitleColor = {1.0, 1.0, 0.7};
+static const OGLColorRGBA kTitleColor = {1.0f, 1.0f, 0.7f, 1.0f};
+static const OGLColorRGBA kInactiveColor = {0.3f, 0.5f, 0.2f, 1.0f};
 
 
 /****************************/
@@ -49,12 +50,9 @@ static float gSettingsFadeAlpha = 0;
 static int gSettingsState = FILE_SCREEN_STATE_OFF;
 
 static int gFileScreenType = FILE_SCREEN_TYPE_LOAD;
-static void (*gFileScreenBackgroundDrawRoutine)(OGLSetupOutputType *) = nil;
 static int gFileScreenHighlightedRow = 0;
 static int gFileScreenNumRows = NUM_SAVE_SLOTS;
 static bool gFileScreenExitedWithLegalSlot = false;
-
-static char gFileScreenLabels[NUM_SAVE_SLOTS][64];
 
 #pragma mark -
 
@@ -74,6 +72,30 @@ static void cb_Back(void)
 			gSettingsState = FILE_SCREEN_STATE_FADE_OUT;
 			break;
 	}
+}
+
+static void MoveFileScreenText(ObjNode* node)
+{
+	if (gSettingsState == FILE_SCREEN_STATE_OFF)
+	{
+		DeleteObject(node);
+		return;
+	}
+
+	if (node->Flag[0])										// it's a selectable node
+	{
+		if (node->Special[0] == gFileScreenHighlightedRow)
+		{
+			float rf = .7f + RandomFloat() * .29f;
+			node->ColorFilter = (OGLColorRGBA){rf, rf, rf, 1};
+		}
+		else													// no highlight
+		{
+			node->ColorFilter = kInactiveColor;
+		}
+	}
+
+	node->ColorFilter.a = gSettingsFadeAlpha;
 }
 
 #pragma mark -
@@ -133,149 +155,56 @@ static void NavigateFileMenu(void)
 #pragma mark -
 
 /***************************************************************/
-/*                       RENDERING                             */
-/***************************************************************/
-
-static void DrawText(
-		const char* s,
-		float x,
-		float y,
-		float xs,
-		float ys,
-		OGLSetupOutputType *info)
-{
-	const float cw = SCORE_TEXT_SPACING * xs /* * gs*/;
-
-	for (const char* c = s; *c; c++)
-	{
-		if (*c == ' ')
-		{
-			x += cw * .5f;
-			continue;
-		}
-
-		int texNum = CharToSprite(toupper(*c));				// get texture #
-		if (texNum == -1)
-		{
-			texNum = CharToSprite('?');
-		}
-		if (texNum != -1)
-		{
-			DrawInfobarSprite2_Scaled(
-					x,
-					y,
-					SCORE_TEXT_SPACING * xs * 2.0f,
-					SCORE_TEXT_SPACING * ys * 2.0f,
-					SPRITE_GROUP_FONT,
-					texNum,
-					info);
-		}
-
-		x += cw;
-	}
-}
-
-static void SetSettingColor(bool highlight)
-{
-	if (highlight)											// highlight
-	{
-		float rf = .7f + RandomFloat() * .29f;
-		gGlobalColorFilter = (OGLColorRGB){rf, rf, rf};
-	}
-	else													// no highlight
-	{
-		gGlobalColorFilter = (OGLColorRGB){.3, .5, .2};
-	}
-}
-
-static void DrawFileScreen(OGLSetupOutputType *info)
-{
-	gFileScreenBackgroundDrawRoutine(info);
-
-	/* SET STATE */
-
-	OGL_PushState();
-
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	OGL_DisableLighting();
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, g2DLogicalWidth, g2DLogicalHeight, 0, 0, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
-
-	gGlobalTransparency = gSettingsFadeAlpha;
-
-	/*****************/
-	/* DRAW THE TEXT */
-	/*****************/
-
-	{
-		float y = 70.0f;
-
-		// Draw title
-		gGlobalColorFilter = kTitleColor;
-		int titleStringID = gFileScreenType == FILE_SCREEN_TYPE_LOAD ? STR_LOAD_GAME : STR_SAVE_GAME;
-		DrawText(GetLanguageString(titleStringID), g2DLogicalWidth*.5f - 170, y, 1.33f, 2.0f, info);
-		y += SCORE_TEXT_SPACING * 5.0f;
-
-		// Draw rows
-		for (int saveID = 0; saveID < gFileScreenNumRows; saveID++)
-		{
-			SetSettingColor(gFileScreenHighlightedRow == saveID);
-
-			DrawText(gFileScreenLabels[saveID], g2DLogicalWidth*.5f - 170, y, .66f, 1.0f, info);
-
-			y += SCORE_TEXT_SPACING * 1.5f;
-		}
-	}
-
-	/***********/
-	/* CLEANUP */
-	/***********/
-
-	gGlobalTransparency = 1;
-	OGL_PopState();
-}
-
-#pragma mark -
-
-/***************************************************************/
 /*                       MAIN LOOP                             */
 /***************************************************************/
 
 bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(OGLSetupOutputType *))
 {
+Str255 label;
+
 	gFileScreenType = fileScreenType;
-	gFileScreenBackgroundDrawRoutine = backgroundDrawRoutine;
 	gFileScreenExitedWithLegalSlot = false;
 
+	gNewObjectDefinition.coord		= (OGLPoint3D){-170, -160, 0};
+	gNewObjectDefinition.flags 		= 0;
+	gNewObjectDefinition.moveCall 	= MoveFileScreenText;
+	gNewObjectDefinition.rot 		= 0;
+	gNewObjectDefinition.scale 	    = 2.0f;
+	gNewObjectDefinition.slot 		= SPRITE_SLOT;
+	ObjNode* title = TextMesh_New(
+			Localize(fileScreenType == FILE_SCREEN_TYPE_LOAD ? STR_LOAD_GAME : STR_SAVE_GAME), 0,
+			&gNewObjectDefinition);
+	title->ColorFilter = kTitleColor;
+	gNewObjectDefinition.coord.y 	+= 64;
+
+	gNewObjectDefinition.scale 	    = .66f;
 	for (int i = 0; i < NUM_SAVE_SLOTS; i++)
 	{
 		SaveGameType saveData;
+
 		if (!LoadSaveGameStruct(i, &saveData))
 		{
-			snprintf(gFileScreenLabels[i], sizeof(gFileScreenLabels[i]), "%s", GetLanguageString(STR_EMPTY_SLOT));
-			continue;
+			snprintf(label, sizeof(label), "%s", Localize(STR_EMPTY_SLOT));
+		}
+		else
+		{
+			time_t timestamp = (time_t) saveData.timestamp;
+			struct tm *timeinfo = localtime(&timestamp);
+
+			snprintf(label, sizeof(label),
+					"%s %d (%d %s %d)",
+					Localize(STR_LEVEL),
+					saveData.realLevel+1,
+					timeinfo->tm_mday,
+					Localize(timeinfo->tm_mon + STR_JANUARY),
+					1900 + timeinfo->tm_year);
 		}
 
-		time_t timestamp = (time_t) saveData.timestamp;
-		struct tm *timeinfo = localtime(&timestamp);
+		ObjNode* item = TextMesh_New(label, 0, &gNewObjectDefinition);
+		item->Flag[0] = true;	// mark it as selectable
+		item->Special[0] = i;
 
-		snprintf(gFileScreenLabels[i], sizeof(gFileScreenLabels[i]),
-			"%d %s %d  -  %s %d  -  %s %d",
-			timeinfo->tm_mday,
-			GetLanguageString(timeinfo->tm_mon + STR_JANUARY),
-			1900 + timeinfo->tm_year,
-			GetLanguageString(STR_LEVEL),
-			saveData.realLevel+1,
-			GetLanguageString(STR_SCORE),
-			saveData.score
-			);
+		gNewObjectDefinition.coord.y 	+= 20;
 	}
 
 	gAllowAudioKeys = false;					// dont interfere with keyboard binding
@@ -291,7 +220,7 @@ bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(OGLSetupOutp
 	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOTEXTUREWRAP|
 										STATUS_BIT_KEEPBACKFACES;
-	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+100;
+	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+100-1;
 	gNewObjectDefinition.moveCall 	= nil;
 	ObjNode* pane = MakeNewObject(&gNewObjectDefinition);
 	pane->CustomDrawFunction = DrawDarkenPane;
@@ -347,7 +276,7 @@ bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(OGLSetupOutp
 
 		CalcFramesPerSecond();
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawFileScreen);
+		OGL_DrawScene(gGameViewInfoPtr, backgroundDrawRoutine);
 	}
 
 
@@ -361,8 +290,6 @@ bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(OGLSetupOutp
 	MyFlushEvents();
 
 	gAllowAudioKeys = true;
-
-	gFileScreenBackgroundDrawRoutine = nil;
 
 	return gFileScreenExitedWithLegalSlot;
 }

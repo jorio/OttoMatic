@@ -124,7 +124,7 @@ static OGLVector3D				*gSuperTileNormals = nil;
 
 		/* TERRAIN DEFORMATIONS */
 
-static short	gNumTerrainDeformations = 0;
+short	gNumTerrainDeformations = 0;
 static Boolean	gCleanupDeformation = false;
 
 static DeformationType	gDeformationList[MAX_DEFORMATIONS];

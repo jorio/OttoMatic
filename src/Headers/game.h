@@ -63,7 +63,9 @@
 #include "lzss.h"
 #include "3dmath.h"
 #include "ogl_functions.h"
-#include "languagestrings.h"
+#include "localization.h"
+#include "textmesh.h"
+#include "tga.h"
 
 
 #define GAME_ASSERT(condition) do { if (!(condition)) DoAssert(#condition, __func__, __LINE__); } while(0)

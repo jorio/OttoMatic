@@ -36,6 +36,7 @@ static void DrawHighScoresAndCursor(OGLSetupOutputType *info);
 static void SetHighScoresSpriteState(void);
 static void StartEnterName(void);
 static void MoveHighScoresCyc(ObjNode *theNode);
+static void MoveScoreVerbageTally(ObjNode* theNode);
 static Boolean IsThisScoreInList(uint32_t score);
 static short AddNewScore(uint32_t newScore);
 static void SaveHighScores(void);
@@ -59,14 +60,17 @@ enum
 };
 
 
-#define MYSCORE_DIGIT_SPACING 	30.0f
+#define kHSTableYStart		(-140)
+#define kHSTableScale		.7f
+#define kHSTableXSpread		150
+#define kHSTableLineHeight	20
 
 
 /***************************/
 /*    VARIABLES            */
 /***************************/
 
-static Str32	gHighScoresFileName = ":OttoMatic:HighScores";
+static const char*	gHighScoresFileName = ":OttoMatic:HighScores2";
 
 HighScoreType	gHighScores[NUM_SCORES];
 
@@ -76,8 +80,36 @@ static	short	gNewScoreSlot,gCursorIndex;
 
 static	Boolean	gDrawScoreVerbage,gExitHighScores;
 
+static	ObjNode	*gNewScoreNameMesh = nil;
+static	ObjNode	*gCursorMesh = nil;
+
 
 /*********************** NEW SCORE ***********************************/
+
+static void UpdateNewNameMesh(void)
+{
+	GAME_ASSERT(gNewScoreNameMesh);
+	DeleteObject(gNewScoreNameMesh);
+
+	memset(&gNewObjectDefinition, 0, sizeof(gNewObjectDefinition));
+	gNewObjectDefinition.slot		= SLOT_OF_DUMB+100;
+	gNewObjectDefinition.moveCall	= nil;
+	gNewObjectDefinition.flags		= 0;
+	gNewObjectDefinition.scale		= kHSTableScale;
+	gNewObjectDefinition.coord.x 	= -kHSTableXSpread;
+	gNewObjectDefinition.coord.y 	= kHSTableYStart + kHSTableLineHeight * gNewScoreSlot;
+	gNewObjectDefinition.coord.z 	= 0;
+
+	gNewScoreNameMesh = TextMesh_New(gHighScores[gNewScoreSlot].name, 0, &gNewObjectDefinition);
+}
+
+static void UpdateCursorPos(void)
+{
+	GAME_ASSERT(gCursorMesh);
+
+	gCursorMesh->Coord.x = -kHSTableXSpread + kHSTableScale * .5f * TextMesh_GetCharX(gHighScores[gNewScoreSlot].name, gCursorIndex) - 2.5;
+	UpdateObjectTransforms(gCursorMesh);
+}
 
 void NewScore(void)
 {
@@ -99,6 +131,8 @@ void NewScore(void)
 	CalcFramesPerSecond();
 	UpdateInput();
 
+	char* myName = gHighScores[gNewScoreSlot].name;
+
 	while(!gExitHighScores)
 	{
 
@@ -113,8 +147,7 @@ void NewScore(void)
 
 		if (!gDrawScoreVerbage)
 		{
-			if (GetNewKeyState(SDL_SCANCODE_RETURN)
-				|| GetNewKeyState(SDL_SCANCODE_KP_ENTER))
+			if (GetNewKeyState(SDL_SCANCODE_RETURN) || GetNewKeyState(SDL_SCANCODE_KP_ENTER))
 			{
 				gExitHighScores = true;
 			}
@@ -122,22 +155,50 @@ void NewScore(void)
 			{
 				if (gCursorIndex > 0)
 					gCursorIndex--;
+
+				UpdateCursorPos();
 			}
 			else if (GetNewKeyState(SDL_SCANCODE_RIGHT))
 			{
-				if (gCursorIndex < (MAX_NAME_LENGTH - 1))
+				short myLength = strlen(myName);
+				if (gCursorIndex < myLength)
 					gCursorIndex++;
 				else
-					gCursorIndex = MAX_NAME_LENGTH - 1;
+					gCursorIndex = myLength;
+
+				UpdateCursorPos();
+			}
+			else if (GetNewKeyState(SDL_SCANCODE_HOME))
+			{
+				gCursorIndex = 0;
+				UpdateCursorPos();
+			}
+			else if (GetNewKeyState(SDL_SCANCODE_END))
+			{
+				gCursorIndex = strlen(myName);
+				UpdateCursorPos();
 			}
 			else if (GetNewKeyState(SDL_SCANCODE_BACKSPACE))
 			{
 				if (gCursorIndex > 0)
 				{
 					gCursorIndex--;
-					for (int i = gCursorIndex+1; i < MAX_NAME_LENGTH; i++)
-						gHighScores[gNewScoreSlot].name[i] = gHighScores[gNewScoreSlot].name[i+1];
-					gHighScores[gNewScoreSlot].name[MAX_NAME_LENGTH] = ' ';
+
+					for (int i = gCursorIndex; i < MAX_NAME_LENGTH; i++)
+						myName[i] = myName[i+1];
+
+					UpdateNewNameMesh();
+					UpdateCursorPos();
+				}
+			}
+			else if (GetNewKeyState(SDL_SCANCODE_DELETE))
+			{
+				if (gCursorIndex < MAX_NAME_LENGTH)
+				{
+					for (int i = gCursorIndex; i < MAX_NAME_LENGTH; i++)
+						myName[i] = myName[i+1];
+					UpdateNewNameMesh();
+					UpdateCursorPos();
 				}
 			}
 			else if (gTextInput[0] && gTextInput[0] >= ' ' && gTextInput[0] < '~')
@@ -148,10 +209,19 @@ void NewScore(void)
 				{
 					if ((theChar >= 'a') && (theChar <= 'z'))					// see if convert lower case to upper case a..z
 						theChar = 'A' + (theChar-'a');
-					gHighScores[gNewScoreSlot].name[gCursorIndex+1] = theChar;
+
+					for (int i = MAX_NAME_LENGTH-1; i > gCursorIndex; i--)
+						myName[i] = myName[i-1];
+
+					myName[gCursorIndex] = theChar;
 					gCursorIndex++;
+
+					UpdateNewNameMesh();
+					UpdateCursorPos();
 				}
 			}
+
+			GAME_ASSERT(myName[MAX_NAME_LENGTH] == '\0');
 		}
 	}
 
@@ -170,6 +240,56 @@ void NewScore(void)
 }
 
 
+
+ObjNode* SetupHighScoreTableObjNodes(ObjNode* chainTail, int returnNth)
+{
+	ObjNode* toReturn = nil;
+
+		/* MAKE TEXT NODES */
+
+	gNewObjectDefinition.slot		= SLOT_OF_DUMB+100;
+	gNewObjectDefinition.moveCall	= nil;
+	gNewObjectDefinition.flags		= 0;
+	gNewObjectDefinition.scale		= kHSTableScale;
+	gNewObjectDefinition.coord.x 	= 0;
+	gNewObjectDefinition.coord.y 	= kHSTableYStart;
+	gNewObjectDefinition.coord.z 	= 0;
+
+	for (int i = 0; i < NUM_SCORES; i++)
+	{
+		Str255 scratch;
+
+			/* DRAW NAME */
+
+		gNewObjectDefinition.coord.x = -kHSTableXSpread;
+		ObjNode* text1 = TextMesh_New(gHighScores[i].name, 0, &gNewObjectDefinition);
+
+		if (returnNth == i)
+			toReturn = text1;
+
+			/* DRAW SCORE */
+
+		NumToStringC(gHighScores[i].score, scratch);	// convert score to a text string
+
+		gNewObjectDefinition.coord.x = kHSTableXSpread;
+		ObjNode* text2 = TextMesh_New(scratch, 2, &gNewObjectDefinition);
+
+		gNewObjectDefinition.coord.y += kHSTableLineHeight;
+
+			/* CHAIN */
+
+		if (chainTail)
+		{
+			chainTail->ChainNode = text1;
+			text1->ChainNode = text2;
+			chainTail = text2;
+		}
+	}
+
+	return toReturn;
+}
+
+
 /********************* SETUP SCORE SCREEN **********************/
 
 static void SetupScoreScreen(void)
@@ -177,6 +297,7 @@ static void SetupScoreScreen(void)
 FSSpec				spec;
 OGLSetupInputType	viewDef;
 ObjNode				*newObj;
+Str255				scoreString;
 
 	PlaySong(SONG_HIGHSCORE, true);
 
@@ -263,10 +384,6 @@ ObjNode				*newObj;
 	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:helpfont.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_FONT, gGameViewInfoPtr);
-	BlendAllSpritesInGroup(SPRITE_GROUP_FONT);
-
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:highscores.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_HIGHSCORES, gGameViewInfoPtr);
 
@@ -295,6 +412,14 @@ ObjNode				*newObj;
 
 
 
+	NumToStringC(gScore, scoreString);
+	gNewObjectDefinition.flags		= 0;
+	gNewObjectDefinition.scale		= 2.0f;
+	gNewObjectDefinition.coord.x	= -4;
+	gNewObjectDefinition.coord.y	= -10;
+	gNewObjectDefinition.coord.z	= 0;
+	gNewObjectDefinition.moveCall	= MoveScoreVerbageTally;
+	TextMesh_New(scoreString, 1, &gNewObjectDefinition);
 }
 
 
@@ -306,6 +431,8 @@ static void FreeScoreScreen(void)
 {
 	MyFlushEvents();
 	DeleteAllObjects();
+	gNewScoreNameMesh = nil;
+	gCursorMesh = nil;
 	FreeAllSkeletonFiles(-1);
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
@@ -367,11 +494,6 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 static void DrawScoreVerbage(OGLSetupOutputType *info)
 {
-Str32	s;
-int		texNum,n,i;
-float	x;
-SDL_GLContext agl_ctx = gAGLContext;
-
 				/* SEE IF DONE */
 
 	gFinalScoreTimer -= gFramesPerSecondFrac;
@@ -392,6 +514,9 @@ SDL_GLContext agl_ctx = gAGLContext;
 			/****************************/
 			/* DRAW BONUS TOTAL VERBAGE */
 			/****************************/
+			//
+			// Note: the score itself is an ObjNode so it isn't drawn here.
+			//
 
 			/* DRAW GLOW */
 
@@ -405,27 +530,7 @@ SDL_GLContext agl_ctx = gAGLContext;
 	gGlobalTransparency = gFinalScoreAlpha;
 	DrawInfobarSprite2(-150, -70, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreText, info);
 
-
-			/**************/
-			/* DRAW SCORE */
-			/**************/
-
-	NumToString(gScore, s);
-	n = s[0];										// get str len
-
-	x = - ((float)n / 2.0f) * MYSCORE_DIGIT_SPACING - (MYSCORE_DIGIT_SPACING/2);	// calc starting x
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	for (i = 1; i <= n; i++)
-	{
-		texNum = CharToSprite(s[i]);				// get texture #
-
-		gGlobalTransparency = (.9f + RandomFloat()*.099f) * gFinalScoreAlpha;
-		DrawInfobarSprite2(x, -10, MYSCORE_DIGIT_SPACING * 1.9f, SPRITE_GROUP_FONT, texNum, info);
-		x += MYSCORE_DIGIT_SPACING;
-	}
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+			/* RESTORE GLOBAL TRANSPARENCY */
 
 	gGlobalTransparency = 1.0f;
 }
@@ -465,54 +570,17 @@ Str32	s;
 	DrawInfobarSprite2(-250, -240+10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameText, info);
 
 
-	gGlobalTransparency = gFinalScoreAlpha;
-
-
-			/*****************/
-			/* DRAW THE TEXT */
-			/*****************/
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
-
-	y = -120;
-	for (i = 0; i < NUM_SCORES; i++)
-	{
-		if (i == gNewScoreSlot)								// see if cursor will go on this line
-		{
-			cursorY = y;
-			cursorX = -170 + (SCORE_TEXT_SPACING * gCursorIndex);
-		}
-
-				/* DRAW NAME */
-
-		DrawScoreText(gHighScores[i].name, -170, y, info);
-
-				/* DRAW SCORE */
-
-		NumToString(gHighScores[i].score, s);	// convert score to a text string
-		if (s[0] < SCORE_DIGITS)				// pad 0's
-		{
-			n = SCORE_DIGITS-s[0];
-			BlockMove(&s[1],&s[1+n], 20);		// shift existing data over
-
-			for (j = 0; j < n; j++)				// pad with 0's
-				s[1+j] = '0';
-
-			s[0] = SCORE_DIGITS;
-		}
-		DrawScoreText(s, 30, y, info);
-
-		y += SCORE_TEXT_SPACING * 1.3f;
-	}
-
 		/*******************/
 		/* DRAW THE CURSOR */
 		/*******************/
 
 	if (gCursorIndex < MAX_NAME_LENGTH)						// dont draw if off the right side
 	{
-		gGlobalTransparency = (.3f + ((sin(gCursorFlux) + 1.0f) * .5f) * .699f) * gFinalScoreAlpha;
-		DrawInfobarSprite2(cursorX, cursorY, SCORE_TEXT_SPACING * 1.9f, SPRITE_GROUP_FONT, HELPTEXT_SObjType_Cursor, info);
+		gCursorMesh->ColorFilter.a = (.3f + ((sinf(gCursorFlux) + 1.0f) * .5f) * .699f) * gFinalScoreAlpha;
+	}
+	else
+	{
+		gCursorMesh->ColorFilter.a = 0;
 	}
 
 
@@ -534,6 +602,21 @@ static void StartEnterName(void)
 	gDrawScoreVerbage = false;
 	gCursorIndex = 0;
 	MyFlushEvents();
+
+
+	gNewScoreNameMesh = SetupHighScoreTableObjNodes(nil, gNewScoreSlot);
+
+
+	memset(&gNewObjectDefinition, 0, sizeof(gNewObjectDefinition));
+	gNewObjectDefinition.slot		= SLOT_OF_DUMB+100;
+	gNewObjectDefinition.moveCall	= nil;
+	gNewObjectDefinition.flags		= 0;
+	gNewObjectDefinition.scale		= kHSTableScale;
+	gNewObjectDefinition.coord.x 	= -kHSTableXSpread;
+	gNewObjectDefinition.coord.y 	= kHSTableYStart + kHSTableLineHeight * gNewScoreSlot;
+	gNewObjectDefinition.coord.z 	= 0;
+
+	gCursorMesh = TextMesh_New("|", 0, &gNewObjectDefinition);
 }
 
 
@@ -546,6 +629,18 @@ static void MoveHighScoresCyc(ObjNode *theNode)
 	theNode->Rot.z += gFramesPerSecondFrac * .05f;
 
 	UpdateObjectTransforms(theNode);
+}
+
+
+static void MoveScoreVerbageTally(ObjNode* theNode)
+{
+	if (!gDrawScoreVerbage)
+	{
+		DeleteObject(theNode);
+		return;
+	}
+
+	theNode->ColorFilter.a = (.9f + RandomFloat()*.099f) * gFinalScoreAlpha;
 }
 
 
@@ -581,6 +676,12 @@ long				count;
 			return;
 		}
 		FSClose(refNum);
+	}
+
+	// Sanitize scores
+	for (int i = 0; i < NUM_SCORES; i++)
+	{
+		gHighScores[i].name[MAX_NAME_LENGTH] = '\0';
 	}
 }
 
@@ -670,9 +771,7 @@ got_slot:
 	for (i = NUM_SCORES-1; i > slot; i--)						// make hole
 		gHighScores[i] = gHighScores[i-1];
 	gHighScores[slot].score = newScore;							// set score in structure
-	gHighScores[slot].name[0] = MAX_NAME_LENGTH;				// clear name
-	for (i = 1; i <= MAX_NAME_LENGTH; i++)
-		gHighScores[slot].name[i] = ' ';						// clear to all spaces
+	memset(gHighScores[slot].name, 0, sizeof(gHighScores[slot].name));
 	return(slot);
 }
 

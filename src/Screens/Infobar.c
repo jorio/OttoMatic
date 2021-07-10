@@ -89,10 +89,7 @@ static void MoveHelpBeacon(ObjNode *theNode);
 #define	HUMAN_Y				150.0f
 #define	HUMAN_SPACING		(HUMAN_SCALE * 2.8f)
 
-#define	LETTER_SPACING		9.0f
-
-#define	HELP_Y				440.0f
-#define	BLANK_LETTER_SPACER	.6f
+#define	HELP_Y				420.0f
 
 
 /******************* INFOBAR SOBJTYPES *************************/
@@ -167,9 +164,9 @@ static float	gHealthMeterRot = 0, gFuelMeterRot = 0, gJumpJetMeterRot=0;
 static float	gWeaponY[MAX_INVENTORY_SLOTS];
 
 short	gDisplayedHelpMessage;
-static const char*	gHelpStringC;
-static float	gHelpMessageAlpha,gHelpMessageX;
+static float	gHelpMessageAlpha;
 static float	gHelpMessageTimer;
+static ObjNode	*gHelpMessageObject;
 
 #define	MessageNum	Special[0]
 
@@ -226,7 +223,12 @@ int	i;
 
 void DisposeInfobar(void)
 {
-
+	gDisplayedHelpMessage = HELP_MESSAGE_NONE;
+	if (gHelpMessageObject)
+	{
+		DeleteObject(gHelpMessageObject);
+		gHelpMessageObject = NULL;
+	}
 }
 
 
@@ -474,66 +476,7 @@ float				aspect;
 }
 
 
-void DrawInfobarSprite2_Scaled(float x, float y, float scaleX, float scaleY, short group, short texNum, const OGLSetupOutputType *setupInfo)
-{
-	SDL_GLContext agl_ctx = gAGLContext;
-	MOMaterialObject	*mo;
-	float				aspect;
-
-	/* ACTIVATE THE MATERIAL */
-
-	mo = gSpriteGroupList[group][texNum].materialObject;
-	MO_DrawMaterial(mo, setupInfo);
-
-//	scaleY = scaleX;
-
-	aspect = (float)mo->objectData.height / (float)mo->objectData.width;
-//	aspect *= 4.0f / 3.0f;
-
-	/* DRAW IT */
-
-	glBegin(GL_QUADS);
-	glTexCoord2f(0,1);	glVertex2f(x, 			y);
-	glTexCoord2f(1,1);	glVertex2f(x+scaleX, 	y);
-	glTexCoord2f(1,0);	glVertex2f(x+scaleX, 	y+(scaleY*aspect));
-	glTexCoord2f(0,0);	glVertex2f(x,			y+(scaleY*aspect));
-	glEnd();
-}
-
-
 #pragma mark -
-
-#if 0
-/********************** DRAW ATOMS *************************/
-
-static void Infobar_DrawAtoms(const OGLSetupOutputType *setupInfo)
-{
-SDL_GLContext agl_ctx = gAGLContext;
-Str32	s;
-int		q,n;
-float	x;
-
-				/* DRAW ATOM ICON */
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);								// make glow
-	DrawInfobarSprite(ATOM_X, ATOM_Y, ATOM_SIZE, INFOBAR_SObjType_Atom, setupInfo);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-
-		/* DRAW QUANTITY NUMBER */
-
-	q = gPlayerInfo.numAtoms;
-	NumToString(q, s);
-
-	x = ATOM_X + ATOM_SIZE;
-	for (n = 1; n <= s[0]; n++)
-	{
-		DrawSprite(SPRITE_GROUP_FONT, s[n]-'0',x, ATOM_Y + 10.0f, 20.0f, 0, 0, setupInfo);
-		x += 17.0f;
-	}
-
-}
-#endif
 
 
 /********************** DRAW WEAPON INVENTORY *************************/
@@ -966,6 +909,12 @@ void DisplayHelpMessage(short messNum, float timer, Boolean overrideCurrent)
 	if ((!overrideCurrent) && (gDisplayedHelpMessage != HELP_MESSAGE_NONE))	// if can't override current then bail
 		return;
 
+	if (gDisplayedHelpMessage != HELP_MESSAGE_NONE && gHelpMessageObject)
+	{
+		DeleteObject(gHelpMessageObject);
+		gHelpMessageObject = NULL;
+	}
+
 	gDisplayedHelpMessage = messNum;
 	gHelpMessageAlpha = 0;
 	gHelpMessageTimer = timer;								// set timer
@@ -973,22 +922,19 @@ void DisplayHelpMessage(short messNum, float timer, Boolean overrideCurrent)
 
 			/* GET THE STRING TEXT TO DISPLAY */
 
-	gHelpStringC = GetLanguageString(messNum + STR_IN_GAME_HELP_0);
+	const char* helpString = Localize(messNum + STR_IN_GAME_HELP_0);
 
 
 			/* CALC STRING PARAMETERS */
 
-	float size = 0;
-	for (const char* c = gHelpStringC; *c; c++)
-	{
-		short s = CharToSprite(*c);
-		if (s == -1)
-			size += LETTER_SPACING * BLANK_LETTER_SPACER;		// blank spaces are shorter
-		else
-			size += LETTER_SPACING;		// some day do proportional spacing here
-	}
-
-	gHelpMessageX = (g2DLogicalWidth - size) * .5f;	// center the message
+	gNewObjectDefinition.coord		= (OGLPoint3D) {g2DLogicalWidth * .5f, HELP_Y, 0};
+	gNewObjectDefinition.flags		= STATUS_BIT_HIDDEN;		// hidden because we'll draw it ourselves
+	gNewObjectDefinition.moveCall	= nil;
+	gNewObjectDefinition.rot		= 0;
+	gNewObjectDefinition.scale		= 1;
+	gNewObjectDefinition.slot		= SPRITE_SLOT;
+	gHelpMessageObject = TextMesh_New(helpString, 1, &gNewObjectDefinition);
+	gHelpMessageObject->ColorFilter.a = 0;
 }
 
 
@@ -1020,6 +966,8 @@ SDL_GLContext agl_ctx = gAGLContext;
 		if (gHelpMessageAlpha <= 0.0f)
 		{
 			gDisplayedHelpMessage = HELP_MESSAGE_NONE;
+			DeleteObject(gHelpMessageObject);
+			gHelpMessageObject = NULL;
 			return;
 		}
 	}
@@ -1032,10 +980,10 @@ SDL_GLContext agl_ctx = gAGLContext;
 	glEnable(GL_BLEND);
 	SetColor4f(.2,.2,.2,gHelpMessageAlpha * .5f);
 	glBegin(GL_QUADS);
-	glVertex2f(0, 	HELP_Y + 16);
-	glVertex2f(g2DLogicalWidth, HELP_Y + 16);
-	glVertex2f(g2DLogicalWidth, HELP_Y);
-	glVertex2f(0,	HELP_Y);
+	glVertex2f(0, 				HELP_Y + 24);
+	glVertex2f(g2DLogicalWidth, HELP_Y + 24);
+	glVertex2f(g2DLogicalWidth, HELP_Y - 2);
+	glVertex2f(0,				HELP_Y - 2);
 	glEnd();
 	SetColor4f(1,1,1,1);
 
@@ -1044,164 +992,16 @@ SDL_GLContext agl_ctx = gAGLContext;
 			/* DRAW THE STRING */
 			/*******************/
 
-	x = gHelpMessageX;
-	y = HELP_Y;
-
+	gHelpMessageObject->ColorFilter.a = gHelpMessageAlpha;
 	gGlobalTransparency = gHelpMessageAlpha;
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);						// make glow
-
-	for (const char* c = gHelpStringC; *c; c++)
-	{
-				/* CONVERT LETTER INTO SPRITE # */
-
-		texNum = CharToSprite(*c);
-		if (texNum == -1)
-		{
-			x += LETTER_SPACING * BLANK_LETTER_SPACER;
-			continue;
-		}
-
-			/* DRAW THE LETTER */
-
-		DrawInfobarSprite2(x, y, LETTER_SPACING * 1.8f, SPRITE_GROUP_FONT, texNum, setupInfo);
-		x += LETTER_SPACING;
-	}
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	MO_DrawObject(gHelpMessageObject->BaseGroup, setupInfo);
 
 
 			/* CLEANUP */
 
 	gGlobalTransparency = 1.0f;
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
-
-
-/***************** CHAR TO SPRITE **********************/
-
-enum
-{
-	MACROMAN_AUML	= '\x80',
-	MACROMAN_ARING	= '\x81',
-	MACROMAN_CCEDIL	= '\x82',
-	MACROMAN_EACUTE	= '\x83',
-	MACROMAN_NTILDE	= '\x84',
-	MACROMAN_OUML	= '\x85',
-	MACROMAN_UUML	= '\x86',
-	MACROMAN_AGRAVE	= '\xCB',
-	MACROMAN_ACIRC	= '\xE5',
-	MACROMAN_ECIRC	= '\xE6',
-	MACROMAN_AACUTE	= '\xE7',
-	MACROMAN_EUML	= '\xE8',
-	MACROMAN_EGRAVE	= '\xE9',
-	MACROMAN_IACUTE	= '\xEA',
-	MACROMAN_ICIRC	= '\xEB',
-	MACROMAN_IUML	= '\xEC',
-	MACROMAN_IGRAVE	= '\xED',
-	MACROMAN_OACUTE	= '\xEE',
-	MACROMAN_OCIRC	= '\xEF',
-};
-
-short CharToSprite(char c)
-{
-short	s;
-
-	if ((c >= 'A') && (c <= 'Z'))
-		s = HELPTEXT_SObjType_A + (c - 'A');
-	else
-	if ((c >= '0') && (c <= '9'))
-		s = HELPTEXT_SObjType_0 + (c - '0');
-	else
-	switch(c)
-	{
-		case	'.':
-				s = HELPTEXT_SObjType_Period;
-				break;
-
-		case	',':
-				s = HELPTEXT_SObjType_Comma;
-				break;
-
-		case	'-':
-				s = HELPTEXT_SObjType_Dash;
-				break;
-
-		case	'?':
-				s = HELPTEXT_SObjType_QuestionMark;
-				break;
-
-		case	'!':
-				s = HELPTEXT_SObjType_ExclamationMark;
-				break;
-
-		case	MACROMAN_UUML:
-				s = HELPTEXT_SObjType_UU;
-				break;
-
-		case	MACROMAN_OUML:
-				s = HELPTEXT_SObjType_OO;
-				break;
-
-		case	MACROMAN_AUML:
-				s = HELPTEXT_SObjType_AA;
-				break;
-
-		case	MACROMAN_ARING:
-				s = HELPTEXT_SObjType_AO;
-				break;
-
-		case	MACROMAN_NTILDE:
-				s = HELPTEXT_SObjType_NN;
-				break;
-
-		case	MACROMAN_EACUTE:
-				s = HELPTEXT_SObjType_EE;
-				break;
-
-		case	MACROMAN_EGRAVE:
-		case	MACROMAN_ECIRC:
-				s = HELPTEXT_SObjType_E;
-				break;
-
-		case	MACROMAN_AGRAVE:
-				s = HELPTEXT_SObjType_Ax;
-				break;
-
-		case	MACROMAN_ACIRC:
-				s = HELPTEXT_SObjType_A;
-				break;
-
-		case	MACROMAN_OCIRC:
-				s = HELPTEXT_SObjType_Ox;
-				break;
-
-		case	MACROMAN_OACUTE:
-				s = HELPTEXT_SObjType_Oa;
-				break;
-
-		case	MACROMAN_CCEDIL:
-				s = HELPTEXT_SObjType_C;
-				break;
-
-		case	MACROMAN_AACUTE:
-				s = HELPTEXT_SObjType_A;
-				break;
-
-		case	MACROMAN_IACUTE:
-		case	MACROMAN_IGRAVE:
-				s = HELPTEXT_SObjType_I;
-				break;
-
-		case	'\'':
-				s = HELPTEXT_SObjType_Apostrophe;
-				break;
-
-
-		default:
-				s = -1;
-
-	}
-
-
-	return(s);
 }
 
 
