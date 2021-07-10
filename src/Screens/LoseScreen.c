@@ -59,7 +59,7 @@ enum
 
 
 
-#define	MAX_HUMANS_ON_BELT		13
+#define	MAX_HUMANS_ON_BELT		20
 
 enum
 {
@@ -70,7 +70,7 @@ enum
 
 #define	HUMAN_SPACING	220.0f
 
-#define	HUMANS_IN_LINE	7
+#define	HUMANS_IN_LINE	10
 
 
 #define	LOSE_TEXT_SIZE		30.0f
@@ -187,6 +187,10 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 
 	viewDef.lights.fillDirection[0] = fillDirection1;
 
+	viewDef.styles.fogStart = 1200;
+	viewDef.styles.fogEnd = 1450;
+	viewDef.styles.useFog = true;
+
 
 			/*********************/
 			/* SET ANAGLYPH INFO */
@@ -262,7 +266,7 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 	gNewObjectDefinition.coord.x 	= 0;
 	gNewObjectDefinition.coord.y 	= 0;
 	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= 0;
+	gNewObjectDefinition.flags 		= STATUS_BIT_NOFOG;
 	gNewObjectDefinition.slot 		= 50;
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.rot 		= 0;
