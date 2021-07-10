@@ -523,6 +523,7 @@ MetaObjectPtr		newObj;
 
 		default:
 				DoFatalAlert("ReadNewGeometry: unknown geo type");
+				return nil;
 	}
 
 	return(newObj);

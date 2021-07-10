@@ -285,7 +285,7 @@ static void NavigateKeybindings(void)
 		MyFlushEvents();
 		PlayEffect(EFFECT_FLAREEXPLODE);
 		memcpy(gGamePrefs.keys, gDefaultKeyBindings, sizeof(gDefaultKeyBindings));
-		_Static_assert(sizeof(gDefaultKeyBindings) == sizeof(gGamePrefs.keys));
+		_Static_assert(sizeof(gDefaultKeyBindings) == sizeof(gGamePrefs.keys), "size mismatch: default keybindings / prefs keybindings");
 	}
 	else if (valueActivated && gHighlightedKeybindingRow == NUM_CONTROL_NEEDS + 1)		// back
 	{

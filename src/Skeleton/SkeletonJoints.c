@@ -131,6 +131,8 @@ OGLMatrix4x4	matrix;
 short			time,oldTime;
 SkeletonObjDataType	*skeleton;
 Byte			i,numEvents;
+	
+	time = 0;
 
 			/* GET THE TIME OF THE 1ST FLAG EVENT */
 
@@ -173,6 +175,8 @@ void FindJointMatrixAtFlagEvent(ObjNode *theNode, long jointNum, OGLMatrix4x4 *m
 short			time,oldTime;
 SkeletonObjDataType	*skeleton;
 Byte			i,numEvents;
+	
+	time = 0;
 
 			/* GET THE TIME OF THE 1ST FLAG EVENT */
 

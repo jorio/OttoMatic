@@ -379,6 +379,7 @@ ObjNode	*human;
 
 				default:
 						DoFatalAlert("MovePlayer_Saucer_BeamDownHumans: who?");
+						return;
 			}
 
 				/* SET HUMAN INFO */

@@ -234,6 +234,7 @@ int					size;
 
 					default:
 							DoFatalAlert("AllocateEmptyMetaObject: object subtype not recognized");
+							return nil;
 				}
 				break;
 
@@ -255,6 +256,7 @@ int					size;
 
 		default:
 				DoFatalAlert("AllocateEmptyMetaObject: object type not recognized");
+				return nil;
 	}
 
 
@@ -523,6 +525,7 @@ MOMaterialData	matData;
 
 		default:
 				DoFatalAlert("SetMetaObjectToPicture: this height not implemented yet");
+				return;
 	}
 
 
