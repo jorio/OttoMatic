@@ -478,7 +478,7 @@ float	x,y,fps = gFramesPerSecondFrac;
 float	tx;
 int		i,n;
 short	type;
-Str32	s;
+Str255	s;
 
 	x = WEAPON_X;
 
@@ -587,7 +587,7 @@ short	i;
 
 static void Infobar_DrawHumans(const OGLSetupOutputType *setupInfo)
 {
-Str15	s;
+Str255	s;
 int		i,n;
 float	tx,y,x;
 static const float scales[NUM_HUMAN_TYPES] =
