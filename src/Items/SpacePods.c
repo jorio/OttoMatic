@@ -477,7 +477,7 @@ SkeletonObjDataType	*skeleton = worm->Skeleton;
 	{
 		OGLPoint3D		coord,toCoord;
 		OGLMatrix4x4	*jointMatrix,m,m2;
-		const static	OGLVector3D up = {0,1,0};
+		static const	OGLVector3D up = {0,1,0};
 
 		q = p;
 		if (q < 0)

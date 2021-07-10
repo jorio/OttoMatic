@@ -543,8 +543,8 @@ static void UpdateCornSparkles(ObjNode *theNode)
 {
 short			i;
 float			r,aimX,aimZ;
-const static OGLPoint3D	leftEye = {-27,10,-60};
-const static OGLPoint3D	rightEye = {27,10,-60};
+static const OGLPoint3D	leftEye = {-27,10,-60};
+static const OGLPoint3D	rightEye = {27,10,-60};
 
 	r = theNode->Rot.y;
 	aimX = -sin(r);

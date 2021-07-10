@@ -547,7 +547,7 @@ void AlignPlayerInRocketSled(ObjNode *player)
 {
 OGLMatrix4x4	m,m2,m3;
 float		scale;
-const static OGLPoint3D zero = {0,0,0};
+static const OGLPoint3D zero = {0,0,0};
 
 	if (gPlayerRocketSled == nil)
 		DoFatalAlert("AlignPlayerInRocketSled: nil");

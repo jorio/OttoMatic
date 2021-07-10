@@ -364,7 +364,7 @@ float			fps = gFramesPerSecondFrac;
 	i = theNode->Sparkles[PLAYER_SPARKLE_CHEST];								// get sparkle index
 	if (i != -1)
 	{
-		const static OGLPoint3D	p = {0,0,0};
+		static const OGLPoint3D	p = {0,0,0};
 
 				/* GET MATRIX FOR JOINT */
 
@@ -391,7 +391,7 @@ float			fps = gFramesPerSecondFrac;
 	i = theNode->Sparkles[PLAYER_SPARKLE_LEFTFOOT];								// get sparkle index
 	if (i != -1)
 	{
-		const static OGLPoint3D	p = {0,-30,-20};
+		static const OGLPoint3D	p = {0,-30,-20};
 
 
 		FindJointFullMatrix(theNode, PLAYER_JOINT_LEFTFOOT, &m);
@@ -411,7 +411,7 @@ float			fps = gFramesPerSecondFrac;
 	i = theNode->Sparkles[PLAYER_SPARKLE_RIGHTFOOT];								// get sparkle index
 	if (i != -1)
 	{
-		const static OGLPoint3D	p = {0,-30,-20};
+		static const OGLPoint3D	p = {0,-30,-20};
 
 		FindJointFullMatrix(theNode, PLAYER_JOINT_RIGHTFOOT, &m);
 		OGLPoint3D_Transform(&p, &m, &gSparkles[i].where);

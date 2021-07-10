@@ -269,7 +269,7 @@ static void SetupWinScreen(void)
 FSSpec				spec;
 OGLSetupInputType	viewDef;
 ObjNode			*newObj;
-const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
+static const OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 int				i;
 static const short	skels[8] =
 {

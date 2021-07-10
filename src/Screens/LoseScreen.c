@@ -152,7 +152,7 @@ FSSpec				spec;
 OGLSetupInputType	viewDef;
 ObjNode			*newObj;
 int				i,j;
-const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
+static const OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 
 	PlaySong(SONG_LOSESONG, false);
 

@@ -439,7 +439,7 @@ int					i,p,t;
 float				u;
 
 OGLVector3D			v1;
-const static OGLVector3D	up = {0,1,0};
+static const OGLVector3D	up = {0,1,0};
 
 			/* INIT MESH BASICS */
 

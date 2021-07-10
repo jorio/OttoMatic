@@ -889,8 +889,8 @@ static void UpdateIceCubeSparkles(ObjNode *theNode)
 {
 short			i;
 float			r,aimX,aimZ;
-const static OGLPoint3D	leftEye = {-12,6,-40};
-const static OGLPoint3D	rightEye = {12,6,-40};
+static const OGLPoint3D	leftEye = {-12,6,-40};
+static const OGLPoint3D	rightEye = {12,6,-40};
 
 	r = theNode->Rot.y;
 	aimX = -sin(r);

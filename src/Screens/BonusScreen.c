@@ -265,7 +265,7 @@ FSSpec				spec;
 OGLSetupInputType	viewDef;
 ObjNode				*newObj;
 int					i;
-const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
+static const OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 
 
 	gShowScoreMode = SHOW_SCORE_MODE_OFF;

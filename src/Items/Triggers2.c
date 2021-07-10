@@ -691,7 +691,7 @@ Boolean DoTrig_DebrisGate(ObjNode *theNode, ObjNode *whoNode, Byte sideBits)
 int		i;
 ObjNode	*newObj;
 
-const static short type[] =
+static const short type[] =
 {
 	APOCALYPSE_ObjType_DebrisGate_Debris0,
 	APOCALYPSE_ObjType_DebrisGate_Debris1,
@@ -700,7 +700,7 @@ const static short type[] =
 	APOCALYPSE_ObjType_DebrisGate_Debris4
 };
 
-const static OGLPoint3D coord[] =
+static const OGLPoint3D coord[] =
 {
 	{263, 101, 0},
 	{120, 41, 0},

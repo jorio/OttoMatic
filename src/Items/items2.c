@@ -237,7 +237,7 @@ float	x,y,z;
 OGLMatrix4x4	m;
 int			i;
 float	s;
-const static float	scale[4] = {.5, .7, .9, .6};
+static const float	scale[4] = {.5, .7, .9, .6};
 
 	x = theNode->Coord.x;
 	y = theNode->Coord.y - 30.0f;

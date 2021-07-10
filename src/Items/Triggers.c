@@ -306,7 +306,7 @@ static Boolean DoTrig_WoodenGate(ObjNode *theNode, ObjNode *whoNode, Byte sideBi
 {
 ObjNode	*newObj;
 int		i;
-const static short type[] =
+static const short type[] =
 {
 	FARM_ObjType_WoodGateChunk_Post,
 	FARM_ObjType_WoodGateChunk_Post,
@@ -319,7 +319,7 @@ const static short type[] =
 	FARM_ObjType_WoodGateChunk_Slat,
 };
 
-const static OGLPoint3D coord[] =
+static const OGLPoint3D coord[] =
 {
 	{-393, 60, 0},
 	{-45, 60, 0},
@@ -545,7 +545,7 @@ static Boolean DoTrig_MetalGate(ObjNode *theNode, ObjNode *whoNode, Byte sideBit
 {
 ObjNode	*newObj;
 int		i;
-const static short type[] =
+static const short type[] =
 {
 	FARM_ObjType_MetalGateChunk_V,
 	FARM_ObjType_MetalGateChunk_V,
@@ -558,7 +558,7 @@ const static short type[] =
 	FARM_ObjType_MetalGateChunk_H,
 };
 
-const static OGLPoint3D coord[] =
+static const OGLPoint3D coord[] =
 {
 	{-393, 60, 0},
 	{-45, 60, 0},
