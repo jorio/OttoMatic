@@ -114,6 +114,11 @@ enum
 
 #define	DO_ASPYR		0
 
+#define	SAUCER_LIFE				8.0f
+#define	SAUCER_FADE				1.0f
+
+#define	SpecialSaucerLife		SpecialF[0]
+
 /*********************/
 /*    VARIABLES      */
 /*********************/
@@ -463,7 +468,7 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 			/* MAKE STARS */
 			/**************/
 
-	for (i = 0; i < 60; i++)
+	for (i = 0; i < 60*2; i++)
 	{
 		static OGLColorRGBA colors[] =
 		{
@@ -476,7 +481,7 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 
 		gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
 		gNewObjectDefinition.type 		= MAINMENU_ObjType_Star;
-		gNewObjectDefinition.coord.x 	= RandomFloat2() * 800.0f;
+		gNewObjectDefinition.coord.x 	= RandomFloat2() * 800.0f * 2;
 		gNewObjectDefinition.coord.y 	= RandomFloat2() * 600.0f;
 		gNewObjectDefinition.coord.z 	= -500;
 		gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_GLOW | STATUS_BIT_NOTEXTUREWRAP |
@@ -1396,8 +1401,8 @@ float	fps = gFramesPerSecondFrac;
 	theNode->ColorFilter.a = .3f + (sin(theNode->SpecialF[0]) + 1.0f) * .5f;
 
 	theNode->Coord.x += theNode->Delta.x * fps;
-	if (theNode->Coord.x > 850.0f)
-		theNode->Coord.x = -850.0f;
+	if (theNode->Coord.x > 1600.0f)
+		theNode->Coord.x -= 2*1600.0f;
 
 	UpdateObjectTransforms(theNode);
 }
@@ -1436,7 +1441,7 @@ float	dx;
 
 	newObj->Delta.x = dx;
 
-	newObj->SpecialF[0] = 6;
+	newObj->SpecialSaucerLife = SAUCER_LIFE;
 }
 
 
@@ -1446,11 +1451,21 @@ static void MoveMenuSaucer(ObjNode *theNode)
 {
 float	fps = gFramesPerSecondFrac;
 
-	if ((theNode->SpecialF[0] -= fps) <= 0.0f)
+	float life = theNode->SpecialSaucerLife -= fps;
+
+	if (life <= 0.0f)
 	{
 		DeleteObject(theNode);
 		return;
 	}
+
+	float alpha = 1.0f;
+	if (life < SAUCER_FADE)								// fade out
+		theNode->ColorFilter.a = life / SAUCER_FADE;
+	else if (life > SAUCER_LIFE - SAUCER_FADE)			// fade in
+		theNode->ColorFilter.a = 1.0f - (life - (SAUCER_LIFE - SAUCER_FADE)) / SAUCER_FADE;
+	else
+		theNode->ColorFilter.a = 1.0f;
 
 	GetObjectInfo(theNode);
 
