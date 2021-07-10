@@ -86,6 +86,11 @@ void InitObjectManager(void)
 	gFirstNodePtr = nil;									// no node yet
 
 	gNumObjectNodes = 0;
+
+				/* INIT NEW OBJ DEF */
+
+	memset(&gNewObjectDefinition, 0, sizeof(gNewObjectDefinition));
+	gNewObjectDefinition.scale = 1;
 }
 
 
@@ -184,6 +189,15 @@ unsigned long flags = newObjDef->flags;
 	AttachObject(newNodePtr, false);
 
 	gNumObjectNodes++;
+
+
+				/* AUTO CHAIN */
+
+	if (newObjDef->autoChain)
+	{
+		newObjDef->autoChain->ChainNode = newNodePtr;
+		newObjDef->autoChain = newNodePtr;
+	}
 
 
 				/* CLEANUP */

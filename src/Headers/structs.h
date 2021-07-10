@@ -354,6 +354,7 @@ typedef struct
 	short		slot;
 	void		(*moveCall)(ObjNode *);
 	float		rot,scale;
+	ObjNode		*autoChain;
 }NewObjectDefinitionType;
 
 

@@ -1781,6 +1781,8 @@ ObjNode	*pane, *glow, *text;
 	pane->ColorFilter.b = 0;
 	pane->ColorFilter.a = 0;
 
+	gNewObjectDefinition.autoChain = pane;
+
 
 			/* CREDIT GLOW */
 
@@ -1798,7 +1800,6 @@ ObjNode	*pane, *glow, *text;
 	glow = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	glow->ColorFilter.a = 0;
-	pane->ChainNode = glow;
 
 
 			/* TEXT */
@@ -1811,10 +1812,11 @@ ObjNode	*pane, *glow, *text;
 
 	text->ColorFilter.a = 0;
 
-	glow->ChainNode = text;
 
 
+		/* STOP AUTO-CHAINING NEW NODES */
 
+	gNewObjectDefinition.autoChain = nil;
 
 		/*************************/
 		/* SHOW IN ANIMATED LOOP */
