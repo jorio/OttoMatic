@@ -394,8 +394,7 @@ u_short		effect;
 static void MakeRocketSledSmoke(ObjNode *theNode)
 {
 float						fps = gFramesPerSecondFrac;
-const static OGLPoint3D		engineOffs[2] = {-63,24,153,
-											63,24,153};
+static const OGLPoint3D		engineOffs[2] = {{-63,24,153}, {63,24,153}};
 OGLPoint3D					nozzles[2];
 float						x,y,z;
 int							particleGroup,magicNum,i;

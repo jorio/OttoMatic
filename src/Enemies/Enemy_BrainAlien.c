@@ -1200,23 +1200,23 @@ void UpdateBrainAlienGlow(ObjNode *alien)
 int	numJoints,i,s;
 static const OGLPoint3D off[] =
 {
-	0,0,0,
-	0,0,0,		// chest
-	0,0,-10,		// neck 1
-	0,13,-13,		// neck 2
-	0,23,-20,		// head
-	0,0,0,
-	0,-10,0,		// left elbow
-	0,-15,0,		// left hand
-	0,0,0,		// rt hip
-	0,0,0,		// rt knee
-	0,0,0,		// left hip
-	0,0,0,		// left knee
-	0,-5,-15,		// rt foot
-	0,-5,-15,			// left foot
-	0,0,0,
-	0,-10,0,			// rt elbow
-	0,-15,0,		// rt hand
+	{0,		0,		0	},
+	{0,		0,		0	},		// chest
+	{0,		0,		-10	},		// neck 1
+	{0,		13,		-13	},		// neck 2
+	{0,		23,		-20	},		// head
+	{0,		0,		0	},
+	{0,		-10,	0	},		// left elbow
+	{0,		-15,	0	},		// left hand
+	{0,		0,		0	},		// rt hip
+	{0,		0,		0	},		// rt knee
+	{0,		0,		0	},		// left hip
+	{0,		0,		0	},		// left knee
+	{0,		-5,		-15	},		// rt foot
+	{0,		-5,		-15	},		// left foot
+	{0,		0,		0	},
+	{0,		-10,	0	},		// rt elbow
+	{0,		-15,	0	},		// rt hand
 };
 
 static const float scale[] =

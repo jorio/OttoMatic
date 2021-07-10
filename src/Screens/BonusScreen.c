@@ -373,13 +373,12 @@ const static OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 
 		for (i = 0; i < 60; i++)
 		{
-			static OGLColorRGBA colors[] =
+			static const OGLColorRGBA colors[] =
 			{
-				1,1,1,1,			// white
-				1,.6,.6,1,			// red
-				.6,.6,1,1,			// blue
-				.7,.7,8,1,			// grey
-
+				{1,1,1,1},			// white
+				{1,.6,.6,1},		// red
+				{.6,.6,1,1},		// blue
+				{.7,.7,8,1},		// grey
 			};
 
 			gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;

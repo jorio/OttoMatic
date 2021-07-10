@@ -694,10 +694,10 @@ float		x,y,z,r,s;
 OGLMatrix4x4	m;
 const static OGLPoint3D vOff[4] =
 {
-	-100, -800, 0,
-	100, -800, 0,
-	100, 0, 0,
-	-100, 0, 0
+	{-100, -800, 0},
+	{100, -800, 0},
+	{100, 0, 0},
+	{-100, 0, 0},
 };
 OGLPoint3D		verts[4];
 ObjNode			*rocket;
@@ -1374,12 +1374,12 @@ ObjNode	*door = rocket->ChainNode;
 		{
 			float r = rocket->Rot.y;
 			OGLMatrix3x3	m;
-			const OGLPoint2D inArea[4] =
+			static const OGLPoint2D inArea[4] =
 			{
-				-40, ROCKET_SCALE * 370.0f,
-				40, ROCKET_SCALE * 370.0f,
-				50, ROCKET_SCALE * 490.0f,
-				-50, ROCKET_SCALE * 490.0f
+				{-40, ROCKET_SCALE * 370.0f},
+				{40, ROCKET_SCALE * 370.0f},
+				{50, ROCKET_SCALE * 490.0f},
+				{-50, ROCKET_SCALE * 490.0f},
 			};
 			OGLPoint2D	area[4];
 
@@ -1434,12 +1434,12 @@ float	r = rocket->Rot.y;
 static void CheckIfPlayerSuckedIntoBlobWell(ObjNode *player, ObjNode *rocket)
 {
 OGLMatrix3x3	m;
-const OGLPoint2D inArea[4] =
+static const OGLPoint2D inArea[4] =
 {
-	-200, ROCKET_SCALE * 360.0f,
-	200, ROCKET_SCALE * 360.0f,
-	350, ROCKET_SCALE * 750.0f,
-	-350, ROCKET_SCALE * 750.0f
+	{-200, ROCKET_SCALE * 360.0f},
+	{200, ROCKET_SCALE * 360.0f},
+	{350, ROCKET_SCALE * 750.0f},
+	{-350, ROCKET_SCALE * 750.0f},
 };
 OGLPoint2D	area[4];
 DeformationType		defData;

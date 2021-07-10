@@ -64,8 +64,8 @@ static void ShootTurret(ObjNode *turret);
 
 static const OGLPoint3D 	gMuzzleTipOff[2] =
 {
-	-57.0 * TURRET_SCALE, 0, -236.0f * TURRET_SCALE,
-	57.0 * TURRET_SCALE, 0, -236.0f * TURRET_SCALE,
+	{-57.0 * TURRET_SCALE, 0, -236.0f * TURRET_SCALE},
+	{57.0 * TURRET_SCALE, 0, -236.0f * TURRET_SCALE},
 };
 static const OGLVector3D	gMuzzleTipAim = {0,0,-1};
 

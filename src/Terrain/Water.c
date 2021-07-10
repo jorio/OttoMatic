@@ -79,14 +79,14 @@ static const Boolean gWaterGlow[NUM_WATER_TYPES] =
 
 static const OGLTextureCoord	gWaterScrollUVDeltas[NUM_WATER_TYPES][2] =
 {
-	.05,.07,		.03, .06,			// blue water
-	.05,.07,		.03, .06,			// soap
-	.05,.07,		.03, .06,			// green water
-	.05,.07,		.03, .06,			// oil
-	.05,.07,		.03, .06,			// jungle water
-	.05,.07,		.03, .06,			// mud
-	.05,.07,		.03, .06,			// RADIOACTIVE
-	.02,.03,		.01, .03,			// lava
+	{ {.05f, .07f},		{.03f, .06f} },			// blue water
+	{ {.05f, .07f},		{.03f, .06f} },			// soap
+	{ {.05f, .07f},		{.03f, .06f} },			// green water
+	{ {.05f, .07f},		{.03f, .06f} },			// oil
+	{ {.05f, .07f},		{.03f, .06f} },			// jungle water
+	{ {.05f, .07f},		{.03f, .06f} },			// mud
+	{ {.05f, .07f},		{.03f, .06f} },			// RADIOACTIVE
+	{ {.02f, .03f},		{.01f, .03f} },			// lava
 };
 
 

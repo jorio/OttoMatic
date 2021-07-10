@@ -336,9 +336,9 @@ OGLMatrix4x4	m;
 int				i;
 static const OGLPoint3D wheelOffs[3] =
 {
-	0,3,-6,
-	0,3,0,
-	0,3,6
+	{0,3,-6},
+	{0,3,0},
+	{0,3,6},
 };
 static const OGLPoint3D jawOff = {0,4.4,-10.0};
 
@@ -628,28 +628,17 @@ int		i;
 ObjNode	*newObj;
 static const OGLPoint3D	wheelOff[4] =
 {
-	-10.8,				// front left wheel
-	0.0,
-	-8.3,
-
-	10.8,				// front right wheel
-	.0 ,
-	-8.3,
-
-	-10.8,				// back left wheel
-	.0,
-	8.3,
-
-	10.0,				// back rightwheel
-	.0,
-	8.3,
+	{-10.8f,	0.0f,	-8.3f},			// front left wheel
+	{10.8f,		0.0f,	-8.3f},			// front right wheel
+	{-10.8f,	0.0f,	8.3f},			// back left wheel
+	{10.0f,		0.0f,	8.3f},			// back right wheel
 };
 OGLPoint3D	wheelPts[4];
 
 static const OGLPoint3D	jawOffs[2] =
 {
-	0, 12, -17.1,
-	0, 4.2, 19
+	{0.0f, 12.0f, -17.1f},
+	{0.0f, 4.2f, 19.0f},
 };
 
 

@@ -126,10 +126,10 @@ static const OGLVector3D 	up = {0,1,0};
 OGLPoint3D					tc[4], *cameraLocation;
 static OGLPoint3D		frame[4] =
 {
-	-130,130,0,
-	130,130,0,
-	130,-130,0,
-	-130,-130,0
+	{-130,	130,	0},
+	{130,	130,	0},
+	{130,	-130,	0},
+	{-130,	-130,	0},
 };
 
 

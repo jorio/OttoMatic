@@ -202,7 +202,7 @@ float	q;
 
 	for (j = 0; j < 2; j++)
 	{
-		const OGLPoint3D	sparkles[2] = {-77,112,-40,  77,112,-40};
+		const OGLPoint3D	sparkles[2] = { {-77,112,-40},  {77,112,-40} };
 
 		i = body->Sparkles[j] = GetFreeSparkle(body);				// get free sparkle slot
 		if (i != -1)
@@ -438,8 +438,8 @@ OGLMatrix4x4	m;
 int				i;
 static const OGLPoint3D wheelOffs[2] =
 {
-	0,32,-45,
-	0,32,45,
+	{0,32,-45},
+	{0,32,45},
 };
 
 	speed = theNode->Speed2D = CalcVectorLength(&theNode->Delta);			// calc 2D speed
@@ -737,21 +737,10 @@ int		i;
 ObjNode	*newObj;
 static const OGLPoint3D	wheelOff[4] =
 {
-	-104.0,				// front left wheel
-	32.0,
-	-47.0,
-
-	104.0,				// front right wheel
-	32.0 ,
-	-47.0,
-
-	-104.0,				// back left wheel
-	32.0,
-	47.0,
-
-	104.0,				// back rightwheel
-	32.0,
-	47.0,
+	{-104,	32,	-47},		// front left wheel
+	{104,	32,	-47},		// front right wheel
+	{-104,	32,	47},		// back left wheel
+	{104,	32,	47},		// back right wheel
 };
 OGLPoint3D	wheelPts[4];
 
@@ -848,8 +837,8 @@ ObjNode	*player = gPlayerInfo.objNode;
 ObjNode	*drill = body->ChainNode;
 static const OGLPoint3D drillPtOffs[2] =
 {
-	0,0,-471,							// tip
-	0,0,-141							// base
+	{0,0,-471},						// tip
+	{0,0,-141},						// base
 };
 OGLPoint3D	drillPts[2];
 float		f,oneMinusF;

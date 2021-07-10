@@ -280,8 +280,8 @@ const static OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 	{
 		static const OGLPoint3D	where[2] =
 		{
-			0,175.0f * 2.0f, 65.0f * 2.0f,
-			0,175.0f * 2.0f, -65.0f * 2.0f,
+			{0, 175.0f * 2.0f, 65.0f * 2.0f},
+			{0, 175.0f * 2.0f, -65.0f * 2.0f},
 		};
 
 		i = newObj->Sparkles[j] = GetFreeSparkle(newObj);

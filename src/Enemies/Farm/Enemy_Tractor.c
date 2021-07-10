@@ -378,10 +378,10 @@ OGLMatrix4x4	m1,m2,m3;
 float			dr;
 static const OGLPoint3D	wheelOffsets[4] =
 {
-	-84,-51,135,					// back left
-	88,-51,135,						// back right
-	-72,-113,-135,					// front left
-	72,-113,-135					// front right
+	{-84,	-51,	135	},			// back left
+	{88,	-51,	135	},			// back right
+	{-72,	-113,	-135},			// front left
+	{72,	-113,	-135},			// front right
 };
 
 			/* GET THE WHEELS */

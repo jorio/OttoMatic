@@ -86,10 +86,10 @@ static MOTriangleIndecies gBeamTriangles[NUM_BEAM_TRIANGLES];
 
 static const OGLPoint3D gBeamEndPointOffsets[4] =
 {
-	0,0,-BEAM_RADIUS,
-	BEAM_RADIUS,0,0,
-	0,0,BEAM_RADIUS,
-	-BEAM_RADIUS,0,0,
+	{0,0,-BEAM_RADIUS},
+	{BEAM_RADIUS,0,0},
+	{0,0,BEAM_RADIUS},
+	{-BEAM_RADIUS,0,0},
 };
 
 static 	float	gBeamDisruptionTimer[4];

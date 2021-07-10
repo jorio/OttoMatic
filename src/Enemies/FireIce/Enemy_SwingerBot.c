@@ -744,26 +744,21 @@ int		i;
 ObjNode	*newObj;
 static const OGLPoint3D	treadOffs[2] =
 {
-	-92,				// left wheel
-	0.0,
-	-30,
-
-	92,					// right wheel
-	.0 ,
-	30,
+	{-92,0,-30},		// left wheel
+	{92,0,30},			// right wheel
 };
 OGLPoint3D	pts[2];
 
 static const OGLPoint3D	gearOffs[2] =
 {
-	0, 74, 0,			// big gear
-	0, 74, -78			// small gear
+	{0, 74, 0},			// big gear
+	{0, 74, -78},		// small gear
 };
 
 static const OGLPoint3D	maceOffs[2] =
 {
-	-140, 110, 0,
-	140, 110, 0
+	{-140, 110, 0},
+	{140, 110, 0},
 };
 
 

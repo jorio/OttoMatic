@@ -794,9 +794,9 @@ ObjNode	*beam, *spiral;
 int		i;
 static const OGLColorRGBA beamColors[3] =
 {
-	1,1,1, 1,							// teleport
-	1,.1,.2,1,							// destructo
-	1,1,1,1,							// dropzone
+	{1,1,1,1},							// teleport
+	{1,.1,.2,1},						// destructo
+	{1,1,1,1},							// dropzone
 };
 
 

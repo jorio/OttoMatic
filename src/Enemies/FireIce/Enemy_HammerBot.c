@@ -795,13 +795,8 @@ int		i;
 ObjNode	*newObj;
 static const OGLPoint3D	wheelOff[2] =
 {
-	-40.0,				// left wheel
-	.0,
-	.0,
-
-	40.0,				// right wheel
-	.0,
-	.0,
+	{-40,0,0},			// left wheel
+	{40,0,0},			// right wheel
 };
 OGLPoint3D	wheelPts[2];
 

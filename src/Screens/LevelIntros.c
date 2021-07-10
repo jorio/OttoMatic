@@ -300,18 +300,18 @@ OGLSetupInputType	viewDef;
 ObjNode	*planet,*glow,*newObj,*clouds;
 int		i;
 
-const OGLColorRGBA glowColor[] =
+static const OGLColorRGBA glowColor[] =
 {
-	.7,.7,1,.99,						// earth
-	.7,.3,1,.99,						// slime
-	.7,.7,1,.99,						// slime boss
-	.7,.7,.7,.8,						// apoc
-	.7,.2,1,.99,						// cloud
-	.9,.7,.6,.99,						// jungle
-	.7,.7,1,.99,						// jungle boss
-	.7,.7,.1,.99,						// fire & ice
-	.5,.7,1,.99,						// saucer
-	1,1,.9,.99,							// brain boss
+	{.7,.7,1.,.99},						// earth
+	{.7,.3,1.,.99},						// slime
+	{.7,.7,1.,.99},						// slime boss
+	{.7,.7,.7,.80},						// apoc
+	{.7,.2,1.,.99},						// cloud
+	{.9,.7,.6,.99},						// jungle
+	{.7,.7,1.,.99},						// jungle boss
+	{.7,.7,.1,.99},						// fire & ice
+	{.5,.7,1.,.99},						// saucer
+	{1.,1.,.9,.99},						// brain boss
 };
 
 static OGLColorRGBA			ambientColor = { .03, .03, .03, 1 };
@@ -417,13 +417,12 @@ const Byte	cloud[] =
 	{
 		OGLMatrix4x4	m;
 		OGLPoint3D		p;
-		static OGLColorRGBA colors[] =
+		static const OGLColorRGBA colors[] =
 		{
-			1,1,1,1,			// white
-			1,.6,.6,1,			// red
-			.6,.6,1,1,			// blue
-			.7,.7,8,1,			// grey
-
+			{1,1,1,1},			// white
+			{1,.6,.6,1},		// red
+			{.6,.6,1,1},		// blue
+			{.7,.7,8,1},		// grey
 		};
 
 		OGLMatrix4x4_SetRotateAboutPoint(&m, &viewDef.camera.from, RandomFloat()*PI2,RandomFloat()*PI2,RandomFloat()*PI2);
