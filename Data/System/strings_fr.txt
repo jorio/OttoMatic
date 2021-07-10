@@ -1,75 +1,75 @@
-FRANÇAIS
-NOUVELLE PARTIE
-CHARGER UNE PARTIE
-AIDE
-QUITTER
-CRÉDITS
-MEILLEURS SCORES
-OPTIONS
-REPRENDRE
-ABANDONNER
-QUITTER
-ENREGISTRER LA PARTIE
-CONTINUER SANS ENREGISTRER
-NIVEAU
-SCORE
+Français
+Nouvelle partie
+Charger une partie
+Aide
+Quitter
+Crédits
+Meilleurs scores
+Options
+Reprendre
+Abandonner
+Quitter
+Enregistrer la partie
+Continuer sans enregistrer
+Niveau
+Score
 VIDE-----------
-JANV.
-FÉVR.
-MARS
-AVR.
-MAI
-JUIN
-JUIL.
-AOUT
-SEPT.
-OCT.
-NOV.
-DÉC.
-FRAPPE LA CAPSULE POUR L'OUVRIR
-POUR PRENDRE LE BONUS, APPUIE SUR RAMASSER
-POUR TE PROPULSER, APPUIE DEUX FOIS SUR SAUT
-PROPULSE-TOI À TRAVERS LA BARRIÈRE
-TROUVE DES ATOMES VERTS POUR TE PROPULSER
-LES ATOMES ROUGES RÉGÉNÈRENT TA SANTÉ
-LES ATOMES VERTS RECHARGENT TON SAUT PROPULSÉ
-LES ATOMES BLEUS SONT DU CARBURANT POUR TA FUSÉE
-MARCHE VERS LA RAMPE ET MONTE DANS LA FUSÉE
-TOUCHE UN HUMAIN POUR LE SAUVER
-TOUCHE LE POINT DE CONTRÔLE POUR L'ACTIVER
-REVIENS ICI LORSQUE TU AURAS SAUVÉ QUELQUES HUMAINS
-POUR LÂCHER L'AIMANT, APPUIE SUR SAUT
-ENVOIE UN RAYON BLANC SUR LES HUMAINS
-CHAQUE HUMAIN SAUVÉ TE DONNE DU CARBURANT DE FUSÉE
-LA SOUCOUPE EST PLEINE, DÉPOSE LES HUMAINS À LA FUSÉE
-LE PLEIN EST ACHEVÉ. APPUIE SUR SAUT POUR REPARTIR
-PAS ASSEZ DE CARBURANT POUR PARTIR
-LES BOULES GLUANTES CONGELÉES SONT DES BONUS À RAMASSER
-CES DISPOSITIFS MÉCANIQUES ONT BESOIN D'ÉLECTRICITÉ
-LA PORTE NE PEUT PAS ÊTRE ACTIVÉE DE CE CÔTÉ
-POUR GRIMPER DANS LE CANON, APPUIE SUR SAUT
-LANGUE
-PLEIN ÉCRAN
-ANTICRÉNELAGE
-3D ANAGLYPHE
-CONTRÔLES RELATIFS AU JOUEUR
-CONFIGURER LES TOUCHES
-RETOUR
-OUI
-NON
-OUI, MONOCHROME
-OUI, COULEUR
-APPUIE!
-RESTAURER LA CONFIGURATION PAR DÉFAUT
-AVANCER
-RECULER
-ALLER À GAUCHE
-ALLER À DROITE
-ARME PRÉCÉDENTE
-ARME SUIVANTE
-TIRER
-FRAPPER, RAMASSER
-SAUTER
-MODE CAMÉRA
-PIVOT CAMÉRA GAUCHE
-PIVOT CAMÉRA DROITE
+janv.
+févr.
+mars
+avr.
+mai
+juin
+juil.
+aout
+sept.
+oct.
+nov.
+déc.
+Frappe la capsule pour l'ouvrir
+Pour prendre le bonus, appuie sur ramasser
+Pour te propulser, appuie deux fois sur saut
+Propulse-toi à travers la barrière
+Trouve des atomes verts pour te propulser
+Les atomes rouges régénèrent ta santé
+Les atomes verts rechargent ton saut propulsé
+Les atomes bleus sont du carburant pour ta fusée
+Marche vers la rampe et monte dans la fusée
+Touche un humain pour le sauver
+Touche le point de contrôle pour l'activer
+Reviens ici lorsque tu auras sauvé quelques humains
+Pour lâcher l'aimant, appuie sur saut
+Envoie un rayon blanc sur les humains
+Chaque humain sauvé te donne du carburant de fusée
+La soucoupe est pleine, dépose les humains à la fusée
+Le plein est achevé. Appuie sur saut pour repartir
+Pas assez de carburant pour partir
+Les boules gluantes congelées sont des bonus à ramasser
+Ces dispositifs mécaniques ont besoin d'électricité
+La porte ne peut pas être activée de ce côté
+Pour grimper dans le canon, appuie sur saut
+Langue
+Plein écran
+Anticrénelage
+3D anaglyphe
+Contrôles relatifs au joueur
+Configurer les touches
+Retour
+Oui
+Non
+Oui, monochrome
+Oui, couleur
+Appuie!
+Restaurer la configuration par défaut
+Avancer
+Reculer
+Aller à gauche
+Aller à droite
+Arme précédente
+Arme suivante
+Tirer
+Frapper, ramasser
+Sauter
+Mode caméra
+Pivot caméra gauche
+Pivot caméra droite

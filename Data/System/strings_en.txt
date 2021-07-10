@@ -1,75 +1,75 @@
-ENGLISH
-PLAY GAME
-LOAD SAVED GAME
-HELP
-QUIT
-CREDITS
-HIGH SCORES
-SETTINGS
-RESUME GAME
-RETIRE GAME
-QUIT APPLICATION
-SAVE GAME
-CONTINUE
-LEVEL
-SCORE
+English
+Play Game
+Load Saved Game
+Help
+Quit
+Credits
+High Scores
+Settings
+Resume game
+Retire game
+Quit application
+Save game
+Continue
+Level
+Score
 EMPTY----------
-JAN.
-FEB.
-MAR.
-APR.
-MAY
-JUNE
-JULY
-AUG.
-SEPT.
-OCT.
-NOV.
-DEC.
-PRESS THE PUNCH BUTTON TO KNOCK OPEN POWERUP PODS
-TO PICK UP A POWERUP, PRESS THE PICKUP BUTTON
-ACTIVATE YOUR JUMP-JET BY PRESSING JUMP TWICE
-SMASH THROUGH GATES BY USING YOUR JUMP-JET
-YOU NEED GREEN JUMPJET ATOMS TO USE YOUR JUMP-JET
-RED ATOMS GIVE YOU HEALTH
-GREEN ATOMS GIVE YOU JUMP-JET FUEL
-BLUE ATOMS ARE ROCKET FUEL FOR YOUR SPACE SHIP
-ENTER THE ROCKET BY WALKING TO THE RAMP
-RESCUE THE HUMANS BY TOUCHING THEM
-TOUCH THE CHECKPOINT TO ACTIVATE IT
-COME BACK HERE WHEN YOU HAVE RESCUED SOME HUMANS
-PRESS JUMP TO LET GO OF THE MAGNET
-BEAM UP THE HUMANS WITH THE WHITE BEAM
-EACH RESCUED HUMAN GIVES YOU ROCKET FUEL
-THE SAUCER IS FULL, TAKE THE HUMANS TO THE ROCKET SHIP
-ROCKET IS NOW FUELED.  PRESS JUMP WHEN READY TO LEAVE
-YOU DON'T HAVE ENOUGH FUEL TO LEAVE YET
-FROZEN SLIME BALLS CAN BE PICKED UP AND USED AS POWERUPS
-MECHANICAL DEVICES HERE NEED ELECTRICITY
-DOOR CANNOT BE ACTIVATED FROM THIS SIDE
-PRESS JUMP TO CLIMB INTO THE CANNON
-LANGUAGE
-FULLSCREEN
-ANTIALIASING
-ANAGLYPH 3D
-PLAYER-RELATIVE CONTROLS
-CONFIGURE KEYS
-BACK
-YES
-NO
-YES, MONOCHROME
-YES, COLOR
-PRESS!
-RESTORE DEFAULT CONFIGURATION
-GO FORWARD
-GO BACKWARDS
-GO LEFT
-GO RIGHT
-PREVIOUS WEAPON
-NEXT WEAPON
-SHOOT
-PUNCH, PICKUP
-JUMP
-CAMERA MODE
-CAMERA SWING LEFT
-CAMERA SWING RIGHT
+Jan.
+Feb.
+Mar.
+Apr.
+May
+June
+July
+Aug.
+Sept.
+Oct.
+Nov.
+Dec.
+Press the punch button to knock open powerup pods
+To pick up a powerup, press the pickup button
+Activate your jump-jet by pressing jump twice
+Smash through gates by using your jump-jet
+You need green atoms to use your jump-jet
+Red atoms give you health
+Green atoms give you jump-jet fuel
+Blue atoms are rocket fuel for your space ship
+Enter the rocket by walking to the ramp
+Rescue the humans by touching them
+Touch the checkpoint to activate it
+Come back here when you have rescued some humans
+Press jump to let go of the magnet
+Beam up the humans with the white beam
+Each rescued human gives you rocket fuel
+The saucer is full, take the humans to the rocket ship
+Rocket is now fueled.  Press jump when ready to leave
+You don't have enough fuel to leave yet
+Frozen slime balls can be picked up and used as powerups
+Mechanical devices here need electricity
+Door cannot be activated from this side
+Press jump to climb into the cannon
+Language
+Fullscreen
+Antialiasing
+Anaglyph 3D
+Player-relative controls
+Configure keys
+Back
+Yes
+No
+Yes, monochrome
+Yes, color
+Press!
+Restore default configuration
+Go forward
+Go backwards
+Go left
+Go right
+Previous weapon
+Next weapon
+Shoot
+Punch, pickup
+Jump
+Camera mode
+Camera swing left
+Camera swing right

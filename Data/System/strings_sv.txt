@@ -1,75 +1,75 @@
-SVENSKA
-NYTT SPEL
-LADDA SPEL
-HJÄLP
-AVSLUTA
-KREDITER
-TOPPLISTAN
-INSTÄLLNINGAR
-ÅTERUPPTA SPELET
-DRA DIG UR SPELET
-AVSLUTA PROGRAMMET
-SPARA SPELET
-FORTSÄTTA
-NIVÅ
-POÄNG
-TOMT-----------
-JAN.
-FEBR.
-MARS
-APRIL
-MAJ
-JUNI
-JULI
-AUG.
-SEPT.
-OKT.
-NOV.
-DEC.
-ÖPPNA UPP BONUSGÖMMOR GENOM ATT TRYCKA PÅ KNAPPEN FÖR ATT SLÅ
-TA UPP BONUSAR GENOM ATT TRYCKA PÅ KNAPPEN FÖR ATT PLOCKA UPP
-AKTIVERA JETHOPP GENOM ATT TRYCKA TVÅ GÅNGER PÅ HOPPKNAPPEN
-ANVÄND JETHOPP FÖR ATT KRASCHA GENOM DÖRRAR
-DU BEHÖVER GRÖNA JETHOPPSATOMER FÖR ATT ANVÄNDA JETHOPP
-AV RÖDA ATOMER FÅR DU HÄLSA
-GRÖNA ATOMER GER DIG JETHOPPSBRÄNSLE
-BLÅ ATOMER ÄR RAKETBRÄNSLE TILL DITT RYMDSKEPP
-GÅ IN I SKEPPET GENOM ATT GÅ FRAM TILL RAMPEN
-RÄDDA MÄNNISKOR GENOM ATT NUDDA DEM
-RÖR KONTROLLSTATIONERNA FÖR ATT AKTIVERA DEM
-GÅ TILLBAKA HIT NÄR DU RÄDDAT NÅGRA MÄNNISKOR
-TRYCK PÅ HOPPKNAPPEN FÖR ATT SLÄPPA MAGNETEN
-TELEPORTERA MÄNNISKOR MED DEN VITA STRÅLEN
-VARJE MÄNNISKA DU RÄDDAR GER DIG RAKETBRÄNSLE
-TEFATET ÄR FULLT, FÖR MÄNNISKORNA TILL RYMDSKEPPET
-RYMDSKEPPET ÄR TANKAT. TRYCK PÅ HOPPKNAPPEN NÄR DU VILL ÅKA
-ÄN HAR DU INTE TILLRÄCKLIGT MED BRÄNSLE FÖR ATT ÅKA I VÄG
-FRUSNA SLEMBOLLAR KAN PLOCKAS UPP OCH ANVÄNDAS SOM BONUSAR
-DE MEKANISKA APPARATERNA HÄR BEHÖVER EL FÖR ATT FUNGERA
-DÖRREN KAN INTE AKTIVERAS FRÅN DETTA HÅLLET
-TRYCK PÅ HOPPKNAPPEN FÖR ATT GÅ IN I KANONEN
-SPRÅK
-FULLSKÄRM
-KANTUTJÄMNING
-ANAGLYF-3D
-SPELARSTYRDA KONTROLLER
-KONFIGURERA TANGENTER
-TILLBAKA
-JA
-NEJ
-JA, MONOCHROME
-JA, FÄRG
-TRYCK!
-ÅTERSTÄLL STANDARDKONFIGURATION
-GÅ FRAMÅT
-GÅ BAKÅT
-GÅ ÅT VÄNSTER
-GÅ ÅT HÖGER
-FÖREGÅENDE VAPEN
-NÄSTA VAPEN
-SKJUTA
-SLÅ, PLOCKA UPP
-HOPPA
-KAMERALÄGE
-SVÄNG KAMERA ÅT VÄNSTER
-SVÄNG KAMERA ÅT HÖGER
+Svenska
+Nytt spel
+Ladda spel
+Hjälp
+Avsluta
+Krediter
+Topplistan
+Inställningar
+Återuppta spelet
+Dra dig ur spelet
+Avsluta programmet
+Spara spelet
+Fortsätta
+Nivå
+Poäng
+Tomt-----------
+jan.
+febr.
+mars
+april
+maj
+juni
+juli
+aug.
+sept.
+okt.
+nov.
+dec.
+Öppna upp bonusgömmor genom att trycka på knappen för att slå
+Ta upp bonusar genom att trycka på knappen för att plocka upp
+Aktivera jethopp genom att trycka två gånger på hoppknappen
+Använd jethopp för att krascha genom dörrar
+Du behöver gröna jethoppsatomer för att använda jethopp
+Av röda atomer får du hälsa
+Gröna atomer ger dig jethoppsbränsle
+Blå atomer är raketbränsle till ditt rymdskepp
+Gå in i skeppet genom att gå fram till rampen
+Rädda människor genom att nudda dem
+Rör kontrollstationerna för att aktivera dem
+Gå tillbaka hit när du räddat några människor
+Tryck på hoppknappen för att släppa magneten
+Teleportera människor med den vita strålen
+Varje människa du räddar ger dig raketbränsle
+Tefatet är fullt, för människorna till rymdskeppet
+Rymdskeppet är tankat. Tryck på hoppknappen när du vill åka
+Än har du inte tillräckligt med bränsle för att åka i väg
+Frusna slembollar kan plockas upp och användas som bonusar
+De mekaniska apparaterna här behöver el för att fungera
+Dörren kan inte aktiveras från detta hållet
+Tryck på hoppknappen för att gå in i kanonen
+Språk
+Fullskärm
+Kantutjämning
+Anaglyf-3D
+Spelarstyrda kontroller
+Konfigurera tangenter
+Tillbaka
+Ja
+Nej
+Ja, monochrome
+Ja, färg
+Tryck!
+Återställ standardkonfiguration
+Gå framåt
+Gå bakåt
+Gå åt vänster
+Gå åt höger
+Föregående vapen
+Nästa vapen
+Skjuta
+Slå, plocka upp
+Hoppa
+Kameraläge
+Sväng kamera åt vänster
+Sväng kamera åt höger

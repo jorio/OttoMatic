@@ -1,75 +1,75 @@
-ESPAÑOL
-PLAY GAME
-LOAD SAVED GAME
-HELP
-QUIT
-CREDITS
-HIGH SCORES
-SETTINGS
-REANUDAR EL JUEGO
-RETIRARSE
-CERRAR EL JUEGO
-GUARDAR EL JUEGO
-CONTINUAR
-LEVEL
-SCORE
-EMPTY----------
-ENERO
-FEB.
-MARZO
-ABR.
-MAYO
-JUN.
-JUL.
-AGOSTO
-SET.
-OCT.
-NOV.
-DIC.
-PRESIONE EL BOTÓN PUNCH PARA GOLPAR LOS POWERUP PODS
-PARA RECOGER UN POWERUP, PRESIONE EL BOTÓN PICKUP
-ACTIVE SU JUMP-JET PRESIONANDO EL BOTÓN JUMP DOS VECES
-NAVEGUE A TRAVÉS DE LAS PUERTAS UTILIZANDO EL JUMP-JET
-NECESITARÁ JUMPJET ATOMS VERDES PARA UTILIZAR SU JUMP-JET
-LOS ATOMS ROJOS LE OTORGAN SALUD
-LOS ATOMS VERDES LE OTORGAN COMBUSTIBLE PARA SU JUMP-JET
-LOS ATOMS AZULES LE OTORGAN COMBUSTIBLE PARA SU NAVE
-PARA INGRESAR A LA NAVE CAMINE SOBRE LA RAMPA
-RESCATE A LOS HUMANOS CON SÓLO TOCARLOS
-TOQUE LOS PUNTOS DE VERIFICACIÓN PARA ACTIVARLOS
-REGRESE A ESTE SITIO CUANDO HAYA RESCATADO HUMANOS
-PRESIONE JUMP PARA SALIR DEL MAGNETO
-LEVANTE A LOS HUMANOS CON LA BARRA BLANCA
-CADA HUMANO RESCATADO LE OTORGA MÁS COMBUSTIBLE
-EL PLATO VOLADOR ESTÁ LLENO, LLEVE A LOS HUMANOS A LA NAVE
-LA NAVE TIENE COMBUSTIBLE.  PRESIONE JUMP CUANDO ESTÉ LISTO PARA PARTIR
-NO TIENE SUFICIENTE COMBUSTIBLE PARA PARTIR
-LAS PELOTAS CONGELADAS PUEDEN UTILIZARSE COMO POWERUPS
-LOS DISPOSITIVOS ELÉCTRICOS NECESITAN ELECTRICIDAD EN ESTE SITIO
-LA PUERTA NO PUEDE ACTIVARSE DESDE ESTE LUGAR
-PRESS JUMP TO CLIMB INTO THE CANNON
-IDIOMA
-PANTALLA COMPLETA
-ANTIALIASING
-ANAGLYPH 3D
-CONTROLES RELATIVOS AL JUGADOR
-CONFIGURAR TECLAS
-ATRÁS
-SI
-NO
-SI, MONOCHROME
-SI, COLOR
-PRESS!
-RESTORE DEFAULT CONFIGURATION
-GO FORWARD
-GO BACKWARDS
-GO LEFT
-GO RIGHT
-PREVIOUS WEAPON
-NEXT WEAPON
-SHOOT
-PUNCH, PICKUP
-JUMP
-CAMERA MODE
-CAMERA SWING LEFT
-CAMERA SWING RIGHT
+Español
+Nueva partida
+Cargar una partida
+Ayuda
+Salir
+Créditos
+High scores
+Ajustes
+Reanudar el juego
+Retirarse
+Cerrar el juego
+Guardar el juego
+Continuar
+Level
+Score
+Empty----------
+enero
+feb.
+marzo
+abr.
+mayo
+jun.
+jul.
+agosto
+set.
+oct.
+nov.
+dic.
+Presione el botón punch para golpar los powerup pods
+Para recoger un powerup, presione el botón pickup
+Active su jump-jet presionando el botón jump dos veces
+Navegue a través de las puertas utilizando el jump-jet
+Necesitará jumpjet atoms verdes para utilizar su jump-jet
+Los atoms rojos le otorgan salud
+Los atoms verdes le otorgan combustible para su jump-jet
+Los atoms azules le otorgan combustible para su nave
+Para ingresar a la nave camine sobre la rampa
+Rescate a los humanos con sólo tocarlos
+Toque los puntos de verificación para activarlos
+Regrese a este sitio cuando haya rescatado humanos
+Presione jump para salir del magneto
+Levante a los humanos con la barra blanca
+Cada humano rescatado le otorga más combustible
+El plato volador está lleno, lleve a los humanos a la nave
+La nave tiene combustible. Presione jump cuando esté listo para partir
+No tiene suficiente combustible para partir
+Las pelotas congeladas pueden utilizarse como powerups
+Los dispositivos eléctricos necesitan electricidad en este sitio
+La puerta no puede activarse desde este lugar
+Press jump to climb into the cannon
+Idioma
+Pantalla completa
+Antialiasing
+Anaglyph 3D
+Controles relativos al jugador
+Configurar teclas
+Atrás
+Sí
+No
+Sí, monochrome
+Sí, color
+Press!
+Restore default configuration
+Go forward
+Go backwards
+Go left
+Go right
+Previous weapon
+Next weapon
+Shoot
+Punch, pickup
+Jump
+Camera mode
+Camera swing left
+Camera swing right

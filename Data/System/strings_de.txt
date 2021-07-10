@@ -1,75 +1,75 @@
-DEUTSCH
-SPIEL STARTEN
-SPIEL LADEN
-HILFE
-BEENDEN
-CREDITS
-HIGH SCORES
-EINSTELLUNGEN
-SPIEL FORTSETZEN
-SPIEL ABBRECHEN
-PROGRAMM BEENDEN
-SPIEL SPEICHERN
-FORTFAHREN
-LEVEL
-SCORE
+Deutsch
+Spiel starten
+Spiel laden
+Hilfe
+Beenden
+Credits
+High Scores
+Einstellungen
+Spiel fortsetzen
+Spiel abbrechen
+Programm beenden
+Spiel speichern
+Fortfahren
+Level
+Score
 LEER-----------
-JAN
-FEB
-MAR
-APR
-MAI
-JUN
-JUL
-AUG
-SEP
-OKT
-NOV
-DEZ
-DRÜCKE DEN SCHLAGEN-KNOPF, UM POWERUP-BEHÄLTER ZU ÖFFNEN
-DRÜCKEN SIE DEN AUFHEBEN-KNOPF, UM EIN POWERUP AUFZUHEBEN
-ZWEIMAL SPRINGEN DRÜCKEN, UM DAS JETPACK ZU AKTIVIEREN
-RASEN SIE DURCH SPERREN, INDEM SIE DAS JETPACK EINSETZEN
-FÜR DIE VERWENDUNG DES JETPACKS BENÖTIGEN SIE GRÜNE ATOME
-ROTE ATOME BRINGEN LEBENSENERGIE
-GRÜNE ATOME BRINGEN JETPACK-TREIBSTOFF
-BLAUE ATOME SIND RAKETEN-TREIBSTOFF FÜR IHR RAUMSCHIFF
-BETRETEN SIE DIE RAKETE, INDEM SIE AUF DIE RAMPE LAUFEN
-RETTEN SIE DIE MENSCHEN, INDEM SIE DIESE BERÜHREN
-BERÜHREN SIE DEN KONTROLLPUNKT, UM IHN ZU AKTIVIEREN
-KOMMEN SIE HIERHER ZURÜCK, WENN SIE MENSCHEN GERETTET HABEN
-DRÜCKEN SIE SPRINGEN, UM DEN MAGNET LOSZULASSEN
-BEAMEN SIE DIE MENSCHEN MIT DEM WEISSEN STRAHL HOCH
-JEDER GERETTETE MENSCH BRINGT IHNEN RAKETEN-TREIBSTOFF
-DIE UNTERTASSE IST VOLL, BRINGE DIE MENSCHEN ZUM RAUMSCHIFF
-RAKETE IST IST NUN BETANKT. ZUM ABFLIEGEN SPRINGEN DRÜCKEN
-SIE HABEN NICHT GENUG TREIBSTOFF UM SCHON FORTZUFLIEGEN
-GEFRORENE BÄLLE KÖNNEN ALS POWERUPS VERWENDET WERDEN
-DIESE MECHANISCHEN EINRICHTUNGEN BENÖTIGEN STROM
-DIE TÜR KANN VON DIESER SEITE AUS NICHT AKTIVIERT WERDEN
-DRÜCKE SPRINGEN, UM IN DIE KANONE ZU KLETTERN
-SPRACHE
-VOLLBILDSCHIRM
-ANTIALIASING
-ANAGLYPH 3D
-SPIELER-BEZOGENE STEUERUNG
-TASTEN KONFIGURIEREN
-ZURÜCK
-JA
-NEIN
-JA, MONOCHROME
-JA, COLOR
-DRÜCK!
-STANDARDKONFIGURATION ZURÜCKSETZEN
-VORWÄRTS
-RÜCKWÄRTS
-NACH LINKS
-NACH RECHTS
-VORHERIGE WAFFE
-NÄCHSTE WAFFE
-SCHIESSEN
-SCHLAGEN, AUFHEBEN
-SPRINGEN
-KAMERAMODUS
-KAMERA NACH LINKS
-KAMERA NACH RECHTS
+Jan
+Feb
+Mar
+Apr
+Mai
+Jun
+Jul
+Aug
+Sep
+Okt
+Nov
+Dez
+Drücke den Schlagen-Knopf, um Powerup-Behälter zu öffnen
+Drücke den Aufheben-Knopf, um ein Powerup aufzuheben
+Zweimal Springen drücken, um das Jetpack zu aktivieren
+Rasen Sie durch Sperren, indem Sie das Jetpack einsetzen
+Für die Verwendung des Jetpacks benötigen Sie grüne Atome
+Rote Atome bringen Lebensenergie
+Grüne Atome bringen Jetpack-Treibstoff
+Blaue Atome sind Raketen-Treibstoff für Ihr Raumschiff
+Betreten Sie die Rakete, indem Sie auf die Rampe laufen
+Retten Sie die Menschen, indem Sie diese berühren
+Berühren Sie den Kontrollpunkt, um ihn zu aktivieren
+Kommen Sie hierher zurück, wenn Sie Menschen gerettet haben
+Drücken sie Springen, um den Magnet loszulassen
+Beamen Sie die Menschen mit dem weißen Strahl hoch
+Jeder gerettete Mensch bringt Ihnen Raketen-Treibstoff
+Die Untertasse ist voll, bringe die Menschen zum Raumschiff
+Rakete ist nun betankt. Zum abfliegen Springen drücken
+Sie haben nicht genug Treibstoff um schon fortzufliegen
+Gefrorene Bälle können als Powerups verwendet werden
+Diese mechanischen Einrichtungen benötigen Strom
+Die Tür kann von dieser Seite aus nicht aktiviert werden
+Drücke springen, um in die Kanone zu klettern
+Sprache
+Vollbildschirm
+Antialiasing
+Anaglyph 3D
+Spieler-bezogene Steuerung
+Tasten konfigurieren
+Zurück
+Ja
+Nein
+Ja, Monochrome
+Ja, Color
+Drück!
+Standardkonfiguration zurücksetzen
+Vorwärts
+Rückwärts
+Nach links
+Nach rechts
+Vorherige Waffe
+Nächste Waffe
+Schießen
+Schlagen, aufheben
+Springen
+Kameramodus
+Kamera nach links
+Kamera nach rechts

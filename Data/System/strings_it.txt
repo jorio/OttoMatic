@@ -1,75 +1,75 @@
-ITALIANO
-PLAY GAME
-LOAD SAVED GAME
-HELP
-QUIT
-CREDITS
-HIGH SCORES
-SETTINGS
-CONTINUA
-ANNULLA
-ESCI DAL GIOCO
-RISPARMI IL GIOCO
-CONTINUANO
-LEVEL
-SCORE
-EMPTY----------
-GENN.
-FEBBR.
-MAR.
-APR.
-MAGG.
-GIUGNO
-IUGLIO
-AG.
-SETT.
-OTT.
-NOV.
-DIC.
-PREMI IL PULSANTE PUGNO PER SPACCARE I BOZZOLI DI RICARICA
-PER RACCOGLIERE UNA RICARICA, PREMI IL PULSANTE RACCOGLI
-PER ATTIVARE IL SALTO-JET, PREMI DUE VOLTE IL PULSANTE SALTA
-USA SALTO-JET PER ATTRAVERSARE I CANCELLI
-PER USARE IL SALTO-JET SONO NECESSARI GLI ATOMI VERDI
-GLI ATOMI ROSSI OFFRONO FORZA
-GLI ATOMI VERDI OFFRONO CARBURANTE PER IL SALTO-JET
-GLI ATOMI BLU SONO CARBURANTE PER LA TUA ASTRONAVE
-PER ENTRARE NEL RAZZO, CAMMINA SULLA RAMPA
-PER SALVARE UN UMANO, TOCCALO
-PER ATTIVARE UN CHECKPOINT, TOCCALO
-RITORNA QUI DOPO AVERE SALVATO PIÙ UMANI POSSIBILE
-PREMI SALTA PER LASCIARE IL MAGNETE
-ILLUMINA GLI UMANI CON IL RAGGIO BIANCO
-OGNI UMANO SALVATO RAPPRESENTA CARBURANTE PER IL RAZZO
-IL DISCO VOLANTE È PIENO, CONDUCI GLI UMANI SUL RAZZO
-IL RAZZO È ORA RIFORNITO DI CARBURANTE. PREMI SALTA QUANDO SEI PRONTO PER PARTIRE
-CARBURANTE INSUFFICIENTE PER PARTIRE
-RACCOGLI E USA COME RICARICHE LE SFERE DI VISCIDUME GHIACCIATO
-I DISPOSITIVI MECCANICI HANNO BISOGNO DI ELETTRICITÀ
-IMPOSSIBILE ATTIVARE LA PORTA DA QUESTO LATO
-PREMI SALTA PER ARRAMPICARTI SUL CANNONE
-LINGUA
-SCHERMO INTERO
-ANTIALIASING
-ANAGLYPH 3D
-PLAYER-RELATIVE CONTROLS
-CONFIGURA TASTI
-INDIETRO
-SÌ
-NO
-SÌ, MONOCHROME
-SÌ, COLOR
-PRESS!
-RESTORE DEFAULT CONFIGURATION
-GO FORWARD
-GO BACKWARDS
-GO LEFT
-GO RIGHT
-PREVIOUS WEAPON
-NEXT WEAPON
-SHOOT
-PUNCH, PICKUP
-JUMP
-CAMERA MODE
-CAMERA SWING LEFT
-CAMERA SWING RIGHT
+Italiano
+Nuova partita
+Caricare una partita
+Aiuto
+Chiudere
+Credits
+High scores
+Impostazioni
+Continua
+Annulla
+Esci dal gioco
+Risparmi il gioco
+Continuano
+Level
+Score
+Empty----------
+genn.
+febbr.
+mar.
+apr.
+magg.
+giugno
+iuglio
+ag.
+sett.
+ott.
+nov.
+dic.
+Premi il pulsante pugno per spaccare i bozzoli di ricarica
+Per raccogliere una ricarica, premi il pulsante raccogli
+Per attivare il salto-jet, premi due volte il pulsante salta
+Usa salto-jet per attraversare i cancelli
+Per usare il salto-jet sono necessari gli atomi verdi
+Gli atomi rossi offrono forza
+Gli atomi verdi offrono carburante per il salto-jet
+Gli atomi blu sono carburante per la tua astronave
+Per entrare nel razzo, cammina sulla rampa
+Per salvare un umano, toccalo
+Per attivare un checkpoint, toccalo
+Ritorna qui dopo avere salvato più umani possibile
+Premi salta per lasciare il magnete
+Illumina gli umani con il raggio bianco
+Ogni umano salvato rappresenta carburante per il razzo
+Il disco volante è pieno, conduci gli umani sul razzo
+Il razzo è ora rifornito di carburante. Premi salta quando sei pronto per partire
+Carburante insufficiente per partire
+Raccogli e usa come ricariche le sfere di viscidume ghiacciato
+I dispositivi meccanici hanno bisogno di elettricità
+Impossibile attivare la porta da questo lato
+Premi salta per arrampicarti sul cannone
+Lingua
+Schermo intero
+Antialiasing
+Anaglyph 3D
+Player-relative controls
+Configura tasti
+Indietro
+Sì
+No
+Sì, monochrome
+Sì, color
+Press!
+Restore default configuration
+Go forward
+Go backwards
+Go left
+Go right
+Previous weapon
+Next weapon
+Shoot
+Punch, pickup
+Jump
+Camera mode
+Camera swing left
+Camera swing right
