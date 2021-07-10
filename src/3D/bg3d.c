@@ -191,7 +191,6 @@ long			count;
 static void ParseBG3DFile(short refNum)
 {
 uint32_t		tag;
-long			count;
 Boolean			done = false;
 MetaObjectPtr 	newObj;
 
@@ -273,7 +272,7 @@ MetaObjectPtr 	newObj;
 
 static void ReadMaterialFlags(short refNum)
 {
-long				count,i;
+long				i;
 MOMaterialData		data;
 uint32_t			flags;
 

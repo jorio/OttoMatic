@@ -220,7 +220,6 @@ float	oldTime,maxTime = 11.0f;
 
 static void DrawIntroCallback(OGLSetupOutputType *info)
 {
-SDL_GLContext agl_ctx = gAGLContext;
 const short textSprites[] =
 {
 	LEVELINTRO_SObjType_FarmText,

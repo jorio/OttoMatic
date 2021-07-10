@@ -119,7 +119,6 @@ u_long	flags;
 int		i;
 float	dot,separation;
 OGLMatrix4x4	m;
-SDL_GLContext agl_ctx = setupInfo->drawContext;
 OGLVector3D	v;
 OGLPoint3D	where;
 static const OGLVector3D 	up = {0,1,0};

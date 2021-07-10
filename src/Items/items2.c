@@ -232,7 +232,6 @@ float	fps = gFramesPerSecondFrac;
 
 static void DrawCloudPlatform(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = gAGLContext;
 float	x,y,z;
 OGLMatrix4x4	m;
 int			i;

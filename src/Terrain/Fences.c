@@ -479,7 +479,6 @@ int				i,numNubs;
 OGLPoint3D		*nubs;
 OGLVector2D		*normals;
 float			x,y,z,nx,nz;
-SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 	OGL_PushState();
 	glDisable(GL_TEXTURE_2D);

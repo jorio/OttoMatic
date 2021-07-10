@@ -1144,7 +1144,6 @@ short	area = theNode->AreaNum;
 static void DrawGeneratorBeams(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
 short	i,i2;
-SDL_GLContext agl_ctx = setupInfo->drawContext;
 float	x,y,z,x2,y2,z2,u,u2,yo;
 short	a;
 

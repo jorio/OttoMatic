@@ -652,7 +652,6 @@ MOVertexArrayData	*geoData;
 OGLPoint3D		v[4],*camCoords,*coord;
 static const OGLVector3D up = {0,1,0};
 OGLBoundingBox	bbox;
-SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 #pragma unused(theNode)
 
@@ -1506,7 +1505,6 @@ void StartDeathExit(float delay)
 
 void DrawDeathExit(OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = setupInfo->drawContext;
 float	s = 2.0;
 
 	if (!gDoDeathExit)

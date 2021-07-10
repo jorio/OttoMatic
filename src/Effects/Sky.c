@@ -245,7 +245,6 @@ static void DrawSky(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 OGLMatrix4x4	m;
 int					r,c;
 float			u,v;
-SDL_GLContext agl_ctx = setupInfo->drawContext;
 
 	if (!gIsSky)
 		return;

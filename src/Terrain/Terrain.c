@@ -906,7 +906,6 @@ static void DrawTerrain(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
 int				r,c;
 u_short			i,unique;
-SDL_GLContext agl_ctx = setupInfo->drawContext;
 Boolean			superTileVisible;
 
 #pragma unused(theNode)

@@ -386,9 +386,6 @@ MOMaterialObject	*m;
 
 void DrawSprite(int	group, int type, float x, float y, float scale, float rot, u_long flags, const OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = setupInfo->drawContext;
-
-
 			/* SET STATE */
 
 	OGL_PushState();								// keep state

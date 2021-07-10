@@ -90,10 +90,6 @@ static short				gMusicFileRefNum = 0x0ded;
 Boolean				gMuteMusicFlag = false;
 short				gCurrentSong = -1;
 
-//Movie				gSongMovie = nil;
-
-static CGrafPtr		gQTDummyPort = nil;
-
 
 		/*****************/
 		/* EFFECTS TABLE */
@@ -982,8 +978,6 @@ short			theChan;
 Byte			bankNum,soundNum;
 OSErr			myErr;
 u_long			lv2,rv2;
-static UInt32          loopStart, loopEnd;
-//SoundHeaderPtr   sndPtr;		// srcport rm
 
 
 			/* GET BANK & SOUND #'S FROM TABLE */

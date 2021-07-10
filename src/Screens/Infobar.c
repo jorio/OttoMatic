@@ -236,8 +236,6 @@ void DisposeInfobar(void)
 
 void SetInfobarSpriteState(bool centered)
 {
-SDL_GLContext agl_ctx = gAGLContext;
-
 	OGL_DisableLighting();
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);								// no z-buffer
@@ -262,8 +260,6 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 void DrawInfobar(OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = gAGLContext;
-
 	if (gHideInfobar)
 		return;
 
@@ -322,7 +318,6 @@ SDL_GLContext agl_ctx = gAGLContext;
 
 void DrawInfobarSprite(float x, float y, float size, short texNum, const OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = gAGLContext;
 MOMaterialObject	*mo;
 float				aspect;
 
@@ -350,7 +345,6 @@ float				aspect;
 
 static void DrawInfobarSprite_Centered(float x, float y, float size, short texNum, const OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = gAGLContext;
 MOMaterialObject	*mo;
 float				aspect;
 
@@ -383,7 +377,6 @@ float				aspect;
 
 void DrawInfobarSprite2(float x, float y, float size, short group, short texNum, const OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = gAGLContext;
 MOMaterialObject	*mo;
 float				aspect;
 
@@ -410,7 +403,6 @@ float				aspect;
 
 static void DrawInfobarSprite_Rotated(float x, float y, float size, short texNum, float rot, const OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = gAGLContext;
 MOMaterialObject	*mo;
 float				aspect, xoff, yoff;
 OGLPoint2D			p[4];
@@ -454,7 +446,6 @@ OGLMatrix3x3		m;
 
 static void DrawInfobarSprite_Scaled(float x, float y, float scaleX, float scaleY, short texNum, const OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = gAGLContext;
 MOMaterialObject	*mo;
 float				aspect;
 
@@ -483,7 +474,6 @@ float				aspect;
 
 static void Infobar_DrawWeaponInventory(const OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = gAGLContext;
 float	x,y,fps = gFramesPerSecondFrac;
 float	tx;
 int		i,n;
@@ -664,7 +654,6 @@ static const float scales[NUM_HUMAN_TYPES] =
 
 static void Infobar_DrawHealth(const OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = gAGLContext;
 float	x,y,size,xoff;
 float	n, fps = gFramesPerSecondFrac;
 Boolean	warningOn;
@@ -728,7 +717,6 @@ Boolean	warningOn;
 
 static void Infobar_DrawFuel(const OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = gAGLContext;
 float	x,y,size;
 float	n, fps = gFramesPerSecondFrac;
 float	FUEL_X = g2DLogicalWidth + FUEL_XFROMRIGHT;
@@ -765,7 +753,6 @@ float	FUEL_X = g2DLogicalWidth + FUEL_XFROMRIGHT;
 
 static void Infobar_DrawJumpJet(const OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = gAGLContext;
 float	x,y,size;
 float	n, fps = gFramesPerSecondFrac;
 
@@ -797,7 +784,6 @@ float	n, fps = gFramesPerSecondFrac;
 
 static void Infobar_DrawBeams(const OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = gAGLContext;
 float	q,q2,y;
 
 
@@ -942,14 +928,10 @@ void DisplayHelpMessage(short messNum, float timer, Boolean overrideCurrent)
 
 static void UpdateHelpMessage(const OGLSetupOutputType *setupInfo)
 {
-float	fps,x,y;
-short	texNum;
-SDL_GLContext agl_ctx = gAGLContext;
+const float	fps = gFramesPerSecondFrac;
 
 	if (gDisplayedHelpMessage == HELP_MESSAGE_NONE)
 		return;
-
-	fps = gFramesPerSecondFrac;
 
 		/* FADE THE TEXT */
 

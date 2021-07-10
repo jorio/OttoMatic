@@ -89,7 +89,6 @@ int			gStateStackIndex = 0;
 
 int			gPolysThisFrame;
 int			gVRAMUsedThisFrame = 0;
-static int			gMinRAM = 100000000;
 
 Boolean		gMyState_Lighting;
 

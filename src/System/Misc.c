@@ -138,8 +138,6 @@ void DoAlert(const char* s)
 
 void DoFatalAlert(const char* s)
 {
-OSErr	iErr;
-
 	GammaOn();
 
 	Enter2D();

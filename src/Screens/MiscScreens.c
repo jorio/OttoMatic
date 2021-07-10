@@ -46,8 +46,6 @@ MOPictureObject 	*gBackgoundPicture = nil;
 
 OGLSetupOutputType	*gScreenViewInfoPtr = nil;
 
-static	Boolean	gLanguageChanged = false;
-
 
 /********************** DISPLAY PICTURE **************************/
 //

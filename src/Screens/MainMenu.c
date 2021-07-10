@@ -55,7 +55,6 @@ static void MakeCreditsIcon(void);
 static void MakeSavedGameIcon(void);
 static void MakeExitIcon(void);
 static void DrawOttoLogo(OGLSetupOutputType *info);
-static void DrawHighScores(OGLSetupOutputType *info);
 static void MakeIconString(void);
 static void MoveIconString(ObjNode *theNode);
 
@@ -219,8 +218,6 @@ void DrawMainMenuCallback(OGLSetupOutputType *info)
 
 static void DrawOttoLogo(OGLSetupOutputType *info)
 {
-SDL_GLContext agl_ctx = gAGLContext;
-
 			/* SET STATE */
 
 	OGL_PushState();
@@ -1359,7 +1356,6 @@ float	fps = gFramesPerSecondFrac;
 		return;
 	}
 
-	float alpha = 1.0f;
 	if (life < SAUCER_FADE)								// fade out
 		theNode->ColorFilter.a = life / SAUCER_FADE;
 	else if (life > SAUCER_LIFE - SAUCER_FADE)			// fade in
@@ -1821,9 +1817,6 @@ ObjNode *mainText = glow->ChainNode;
 
 void DrawDarkenPane(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
-SDL_GLContext agl_ctx = setupInfo->drawContext;
-
-
 	glDisable(GL_TEXTURE_2D);
 	SetColor4fv((GLfloat *)&theNode->ColorFilter);
 	glEnable(GL_BLEND);

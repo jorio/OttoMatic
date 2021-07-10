@@ -472,8 +472,6 @@ static void DrawHighScoresCallback(OGLSetupOutputType *info)
 
 static void SetHighScoresSpriteState(void)
 {
-SDL_GLContext agl_ctx = gAGLContext;
-
 	OGL_DisableLighting();
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);								// no z-buffer
@@ -540,11 +538,6 @@ static void DrawScoreVerbage(OGLSetupOutputType *info)
 
 static void DrawHighScoresAndCursor(OGLSetupOutputType *info)
 {
-SDL_GLContext agl_ctx = gAGLContext;
-float	y,cursorY,cursorX;
-int		i,j,n;
-Str32	s;
-
 	gFinalScoreAlpha += gFramesPerSecondFrac;						// fade in
 	if (gFinalScoreAlpha > .99f)
 		gFinalScoreAlpha = .99f;

@@ -114,8 +114,6 @@ typedef struct
 
 float	g3DTileSize, g3DMinY, g3DMaxY;
 
-static	FSSpec	gApplicationFSSpec;								// spec of this application
-
 
 
 /******************* LOAD SKELETON *******************/
@@ -1395,8 +1393,6 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	{
 		long	width,height;
 		MOMaterialData	matData;
-		int		x,y;
-		u_short	*src,*dest;
 
 
 				/* READ THE SIZE OF THE NEXT COMPRESSED SUPERTILE TEXTURE */
