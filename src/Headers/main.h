@@ -2,20 +2,9 @@
 // main.h
 //
 
-#ifndef __MAIN
-#define __MAIN
+#pragma once
   
 #define	GAME_FOV		1.2f
-  
-#define	TRACK_COMPLETE_COOLDOWN_TIME	5.0				// n seconds
-  
-  
-
-
-#define	AGE_MASK_AGE	0x0f			// lower 4 bits are age
-#define	AGE_MASK_STAGE	0xf0			// upper 4 bits are stage within age
-
-//#include <ppc_intrinsics.h>
 
 
 enum
@@ -34,20 +23,9 @@ enum
 	NUM_LEVELS
 };
 
-
-
-
-  
 //=================================================
-
-#if 0 // srcport rm
-extern	IBNibRef 			gNibs;
-extern	CFBundleRef 		gBundle;
-#endif
 
 extern	void ToolBoxInit(void);
 void MoveEverything(void);
 void InitDefaultPrefs(void);
 void DrawArea(OGLSetupOutputType *setupInfo);
-
-#endif

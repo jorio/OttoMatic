@@ -91,9 +91,6 @@ short				gBestCheckpointNum;
 OGLPoint2D			gBestCheckpointCoord;
 float				gBestCheckpointAim;
 
-int					gScratch = 0;
-float				gScratchF = 0;
-
 u_long	gScore,gLoadedScore;
 
 

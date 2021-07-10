@@ -20,7 +20,7 @@ extern	float					**gMapYCoords, **gMapYCoordsOriginal;
 extern	Byte					**gMapSplitMode, gDebugMode, gAnaglyphPass;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	SuperTileItemIndexType	**gSuperTileItemIndexGrid;
-extern	int						gLevelNum,gScratch;
+extern	int						gLevelNum;
 extern	PlayerInfoType			gPlayerInfo;
 extern	FenceDefType			*gFenceList;
 extern	u_long					gGameFrameNum;

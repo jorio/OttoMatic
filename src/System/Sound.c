@@ -14,7 +14,7 @@
 extern	short		gMainAppRezFile;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	FSSpec				gDataSpec;
-extern	float		gFramesPerSecondFrac,gGameWindowShrink;
+extern	float		gFramesPerSecondFrac;
 extern	PrefsType			gGamePrefs;
 extern	Boolean				gOSX;
 
@@ -26,24 +26,15 @@ extern	Boolean				gOSX;
 static short FindSilentChannel(void);
 static void Calc3DEffectVolume(short effectNum, OGLPoint3D *where, float volAdjust, u_long *leftVolOut, u_long *rightVolOut);
 static void UpdateGlobalVolume(void);
-//static pascal void CallBackFn (SndChannelPtr chan, SndCommand *cmd);		// srcport rm
 
 
 /****************************/
 /*    CONSTANTS             */
 /****************************/
 
-#define	ANNOUNCER_VOLUME	(FULL_CHANNEL_VOLUME * 4)
-#define	SONG_VOLUME		3.0f
-
-#define FloatToFixed16(a)      ((Fixed)((float)(a) * 0x000100L))		// convert float to 16bit fixed pt
-
-
 #define		MAX_CHANNELS			40
 
 #define		MAX_EFFECTS				70
-
-#define     kNumBogusConverters     200000
 
 typedef struct
 {
@@ -58,8 +49,6 @@ typedef struct
 /**********************/
 /*     VARIABLES      */
 /**********************/
-
-float						gMoviesTaskTimer = 0;
 
 float						gGlobalVolume = .3;
 
@@ -1171,19 +1160,6 @@ void DoSoundMaintenance(void)
 			UpdateGlobalVolume();
 		}
 	}
-
-
-
-		/* ALSO CHECK OPTIONS */
-
-
-	if (GetNewKeyState(SDL_SCANCODE_F1))
-	{
-		DoGameSettingsDialog();
-	}
-
-
-
 }
 
 
@@ -1222,20 +1198,4 @@ SCStatus	theStatus;
 	SndChannelStatus(gSndChannel[chanNum],sizeof(SCStatus),&theStatus);	// get channel info
 	return (theStatus.scChannelBusy);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

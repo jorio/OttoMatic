@@ -10,8 +10,6 @@
 
 #include <SDL.h>
 
-//#include "gamepatches.h"
-
 #include <iostream>
 #include <cstring>
 

@@ -31,7 +31,7 @@ enum
 
 extern	SDL_GLContext		gAGLContext;
 extern	SDL_Window		*gSDLWindow;
-extern	float			gFramesPerSecondFrac,gFramesPerSecond,gScratchF;
+extern	float			gFramesPerSecondFrac,gFramesPerSecond;
 extern	PrefsType			gGamePrefs;
 
 /**********************/

@@ -23,13 +23,13 @@ extern	OGLBoundingBox			gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GRO
 extern	OGLMatrix4x4			gWorldToWindowMatrix;
 extern	PlayerInfoType			gPlayerInfo;
 extern	Boolean					gLevelCompleted,gFreezeCameraFromXZ;
-extern	int						gLevelNum,gScratch;
+extern	int						gLevelNum;
 extern	ParticleGroupType		*gParticleGroups[];
 extern	SpriteType			*gSpriteGroupList[MAX_SPRITE_GROUPS];
 extern	float				gPlayerToCameraAngle,gTargetMaxSpeed,gDeathTimer,gCurrentMaxSpeed,gCameraUserRotY,gTimeSinceLastThrust;
 extern	Boolean					gPlayerHasLanded,gForceCameraAlignment,gPlayerIsDead,gPlayerFellIntoBottomlessPit;
 extern	Boolean					gBumperCarGateBlown[],gExplodePlayerAfterElectrocute;
-extern	float					gTimeSinceLastShoot,gScratchF;
+extern	float					gTimeSinceLastShoot;
 extern	SparkleType				gSparkles[MAX_SPARKLES];
 extern	ObjNode					*gExitRocket;
 extern	long					gTerrainUnitWidth,gTerrainUnitDepth;

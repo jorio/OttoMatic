@@ -70,6 +70,5 @@
 
 #define GAME_ASSERT(condition) do { if (!(condition)) DoAssert(#condition, __func__, __LINE__); } while(0)
 #define GAME_ASSERT_MESSAGE(condition, message) do { if (!(condition)) DoAssert(message, __func__, __LINE__); } while(0)
-#define SOURCE_PORT_PLACEHOLDER() DoAssert("Source port: this function is not implemented yet", __func__, __LINE__)
 #define SOURCE_PORT_MINOR_PLACEHOLDER() printf("Source port: TODO: %s:%d\n", __func__, __LINE__)
 

@@ -20,7 +20,7 @@ extern	short					gNumCollisions;
 extern	CollisionRec			gCollisionList[];
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	u_long 					gAutoFadeStatusBits,gScore;
-extern	int						gLevelNum,gScratch;
+extern	int						gLevelNum;
 extern	Boolean				gLevelCompleted,gFreezeCameraFromXZ,gFreezeCameraFromY,gPlayingFromSavedGame;
 extern	float				gLevelCompletedCoolDownTimer;
 extern	PrefsType			gGamePrefs;

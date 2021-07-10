@@ -38,7 +38,6 @@ void DoLegalScreen(void);
 Boolean DoLevelCheatDialog(void);
 void DoLevelIntro(void);
 void DoBonusScreen(void);
-void DoGameSettingsDialog(void);
 
 void NewScore(void);
 ObjNode* SetupHighScoreTableObjNodes(ObjNode* chainTail, int returnNth);

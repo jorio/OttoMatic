@@ -23,7 +23,6 @@ extern	PlayerInfoType			gPlayerInfo;
 extern	SpriteType				*gSpriteGroupList[];
 extern	OGLColorRGB			gGlobalColorFilter;
 extern	int						gLevelNum;
-extern	float					gScratchF;
 extern	Boolean					gPlayerHasLanded;
 extern	PrefsType			gGamePrefs;
 extern	OGLVector2D			gCameraControlDelta;
