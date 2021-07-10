@@ -11,24 +11,6 @@
 
 #include "game.h"
 
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	SplineDefType			**gSplineList;
-extern	OGLPoint3D				gCoord;
-extern	short					gNumEnemies,gNumTerrainItems;
-extern	float					gFramesPerSecondFrac,gGlobalTransparency;
-extern	OGLVector3D			gDelta;
-extern	u_long		gAutoFadeStatusBits;
-extern	PlayerInfoType	gPlayerInfo;
-extern	SparkleType	gSparkles[];
-extern	Boolean				gPlayerHasLanded;
-extern	SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
-extern	int					gLevelNum;
-extern	ChannelInfoType		gChannelInfo[];
-extern	TerrainItemEntryType 	**gMasterItemList;
-extern	signed char	gNumEnemyOfKind[];
-extern	Boolean				gG4;
-extern	NewParticleGroupDefType	gNewParticleGroupDef;
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

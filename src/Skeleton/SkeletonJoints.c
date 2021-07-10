@@ -11,9 +11,6 @@
 
 #include "game.h"
 
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/
@@ -23,9 +20,6 @@ extern	NewObjectDefinitionType	gNewObjectDefinition;
 /****************************/
 /*    CONSTANTS             */
 /****************************/
-
-
-#define	SIZE_OF_JOINT_NUB	1.0f
 
 
 /*********************/

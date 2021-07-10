@@ -11,8 +11,6 @@
 
 #include "game.h"
 
-extern	Boolean			gSongPlayingFlag,gMuteMusicFlag;
-
 
 /****************************/
 /*    PROTOTYPES            */

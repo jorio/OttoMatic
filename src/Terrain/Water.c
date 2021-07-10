@@ -9,16 +9,6 @@
 /* EXTERNALS   */
 /***************/
 
-extern	OGLPoint3D	gCoord;
-extern	OGLVector3D	gDelta;
-extern	float		gAutoFadeStartDist,gAutoFadeRange_Frac,gAutoFadeEndDist,gFramesPerSecondFrac,gGlobalTransparency;
-extern	FSSpec		gDataSpec;
-extern	SpriteType	*gSpriteGroupList[];
-extern	long		gNumSpritesInGroupList[];
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	u_long		gGlobalMaterialFlags;
-extern	Boolean		gG4;
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

@@ -11,21 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGammaFadePercent;
-extern	FSSpec		gDataSpec;
-extern	Boolean		gNetGameInProgress,gGameOver;
-extern	KeyMap gKeyMap,gNewKeys;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	Boolean		gSongPlayingFlag,gResetSong,gDisableAnimSounds;
-extern	PrefsType	gGamePrefs;
-extern	OGLPoint3D	gCoord;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	SparkleType	gSparkles[];
-extern	int			gLevelNum;
-extern	SDL_GLContext		gAGLContext;
-extern	u_long				gGlobalMaterialFlags;
-extern	float				gGlobalTransparency;
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

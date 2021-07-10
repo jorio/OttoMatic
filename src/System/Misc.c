@@ -11,20 +11,9 @@
 
 #include "game.h"
 
-extern	short		gMainAppRezFile;
-extern	Boolean		gOSX,gG4;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	int			gPolysThisFrame;
-extern	SDL_GLContext		gAGLContext;
-extern	SDL_Window			*gSDLWindow;
-extern	FSSpec				gDataSpec;
-
-
 /****************************/
 /*    CONSTANTS             */
 /****************************/
-
-#define		ERROR_ALERT_ID		401
 
 #define	DEFAULT_FPS			10
 

@@ -11,24 +11,6 @@
 
 #include "game.h"
 
-extern	Boolean			gDrawLensFlare,gDisableHiccupTimer,gDoDeathExit;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	float			gFramesPerSecond,gFramesPerSecondFrac,gAutoFadeStartDist,gAutoFadeEndDist,gAutoFadeRange_Frac,gStartingLightTimer;
-extern	float			gTileSlipperyFactor,gSpinningPlatformRot;
-extern	OGLPoint3D	gCoord;
-extern	ObjNode				*gFirstNodePtr, *gAlienSaucer;
-extern	short		gNumSuperTilesDrawn;
-extern	float		gGlobalTransparency;
-extern	int			gMaxItemsAllocatedInAPass,gNumObjectNodes,gNumHumansRescuedTotal;
-extern	PrefsType	gGamePrefs;
-extern	short	gNumTerrainDeformations;
-extern	DeformationType	gDeformationList[];
-extern	long			gTerrainUnitWidth,gTerrainUnitDepth;
-extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	short	gPrefsFolderVRefNum;
-extern	long	gPrefsFolderDirID;
-extern	SDL_Window	*gSDLWindow;
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

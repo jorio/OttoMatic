@@ -8,29 +8,7 @@
 /* EXTERNALS   */
 /***************/
 
-
 #include "game.h"
-
-extern	OGLMatrix4x4			gViewToFrustumMatrix,gWorldToViewMatrix;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	TerrainItemEntryType 	**gMasterItemList;
-extern	long					gNumSplines,gNumFences, gNumWaterPatches;
-extern	SplineDefType			**gSplineList;
-extern	float					**gMapYCoords, **gMapYCoordsOriginal;
-extern	Byte					**gMapSplitMode, gDebugMode, gAnaglyphPass;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	SuperTileItemIndexType	**gSuperTileItemIndexGrid;
-extern	int						gLevelNum;
-extern	PlayerInfoType			gPlayerInfo;
-extern	FenceDefType			*gFenceList;
-extern	u_long					gGameFrameNum;
-extern	SDL_GLContext		gAGLContext;
-extern	OGLBoundingBox			gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	float					gFramesPerSecond, gFramesPerSecondFrac;
-extern	WaterDefType	**gWaterListHandle;
-extern	WaterDefType	*gWaterList;
-extern	PrefsType			gGamePrefs;
-
 
 /****************************/
 /*  PROTOTYPES             */
@@ -87,9 +65,6 @@ static long		gPreviousSuperTileCol,gPreviousSuperTileRow;
 
 short			gNumFreeSupertiles = 0;
 SuperTileMemoryType	gSuperTileMemoryList[MAX_SUPERTILES];
-
-
-const float 	gOneOver_TERRAIN_POLYGON_SIZE = (1.0f / TERRAIN_POLYGON_SIZE);
 
 
 

@@ -9,17 +9,6 @@
 /*    EXTERNALS            */
 /****************************/
 
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	float					gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
-extern	float					g2DLogicalWidth;
-extern	float					g2DLogicalHeight;
-extern	OGLColorRGB				gGlobalColorFilter;
-extern	SDL_Window				*gSDLWindow;
-extern	Boolean					gAllowAudioKeys;
-extern	short	gPrefsFolderVRefNum;
-extern	long	gPrefsFolderDirID;
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

@@ -11,23 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
-extern	FSSpec		gDataSpec;
-extern	Boolean		gNetGameInProgress,gGameOver, gNoCarControls;
-extern	KeyMap gKeyMap,gNewKeys;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	Boolean		gSongPlayingFlag,gOSX,gDisableAnimSounds;
-extern	PrefsType	gGamePrefs;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	PlayerInfoType	gPlayerInfo;
-extern	int				gNumHumansRescuedTotal,gLevelNum;
-extern	SparkleType	gSparkles[MAX_SPARKLES];
-extern	OGLPoint3D	gCoord;
-extern	OGLVector3D	gDelta;
-extern	u_long			gScore,gGlobalMaterialFlags;
-extern	short	gNumHumansRescuedOfType[NUM_HUMAN_TYPES];
-extern	float			gRocketScaleAdjust,gGammaFadePercent;
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

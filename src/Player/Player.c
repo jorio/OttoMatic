@@ -11,27 +11,6 @@
 
 #include "game.h"
 
-extern	OGLPoint2D				gBestCheckpointCoord;
-extern	OGLPoint3D				gCoord;
-extern	OGLVector3D				gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	float					gFramesPerSecondFrac,gDischargeTimer,gBestCheckpointAim;
-extern	short					gNumCollisions;
-extern	CollisionRec			gCollisionList[];
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	u_long 					gAutoFadeStatusBits,gScore;
-extern	int						gLevelNum;
-extern	Boolean				gLevelCompleted,gFreezeCameraFromXZ,gFreezeCameraFromY,gPlayingFromSavedGame;
-extern	float				gLevelCompletedCoolDownTimer;
-extern	PrefsType			gGamePrefs;
-extern	SparkleType			gSparkles[];
-extern	SpriteType			*gSpriteGroupList[];
-extern	Boolean				gAutoRotateCamera;
-extern	float				gAutoRotateCameraSpeed,gCameraDistFromMe;
-extern	OGLBoundingBox		gWaterBBox[];
-extern	ObjNode				*gSoapBubble,*gTargetPickup,*gTractorBeamObj;
-extern	Boolean				gHelpMessageDisabled[NUM_HELP_MESSAGES],gBrainBossDead,gDoDeathExit;
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

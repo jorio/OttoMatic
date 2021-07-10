@@ -11,23 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
-extern	float					g2DLogicalWidth;
-extern	float					g2DLogicalHeight;
-extern	FSSpec		gDataSpec;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	Boolean		gSongPlayingFlag,gDisableAnimSounds;
-extern	PrefsType	gGamePrefs;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	PlayerInfoType	gPlayerInfo;
-extern	int				gNumHumansRescuedTotal;
-extern	SparkleType	gSparkles[MAX_SPARKLES];
-extern	OGLPoint3D	gCoord;
-extern	OGLVector3D	gDelta;
-extern	u_long			gScore,gGlobalMaterialFlags;
-extern	short	gNumHumansRescuedOfType[NUM_HUMAN_TYPES];
-
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

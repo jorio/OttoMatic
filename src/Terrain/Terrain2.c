@@ -9,19 +9,6 @@
 /* EXTERNALS   */
 /***************/
 
-extern	long	gTerrainTileWidth,gTerrainTileDepth;
-extern	long	gNumSuperTilesDeep,gNumSuperTilesWide;
-extern	long	gTerrainUnitWidth,gTerrainUnitDepth,gNumUniqueSuperTiles;
-extern	OGLPoint3D	gCoord;
-extern	PlayerInfoType	gPlayerInfo;
-extern	const float	gOneOver_TERRAIN_POLYGON_SIZE;
-extern	OGLVector3D				gRecentTerrainNormal;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	SuperTileStatus			**gSuperTileStatusGrid;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	float					gFramesPerSecondFrac;
-extern	SuperTileMemoryType	gSuperTileMemoryList[];
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

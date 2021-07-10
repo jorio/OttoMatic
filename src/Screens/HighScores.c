@@ -11,19 +11,6 @@
 
 #include "game.h"
 
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	float			gFramesPerSecond,gFramesPerSecondFrac,gGlobalTransparency;
-extern	float					g2DLogicalWidth;
-extern	float					g2DLogicalHeight;
-extern	short	gPrefsFolderVRefNum;
-extern	long	gPrefsFolderDirID;
-extern	FSSpec	gDataSpec;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	u_long			gScore,gGlobalMaterialFlags,gLoadedScore;
-extern	Boolean			gPlayingFromSavedGame,gAllowAudioKeys;
-extern	SDL_GLContext		gAGLContext;
-extern	char				gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

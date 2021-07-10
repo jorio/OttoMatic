@@ -9,12 +9,6 @@
 /* EXTERNALS   */
 /***************/
 
-extern	u_char	gTerrainScrollBuffer[MAX_SUPERTILES_DEEP][MAX_SUPERTILES_WIDE];
-extern	float	gFramesPerSecondFrac,gFramesPerSecond;
-extern	SuperTileStatus	**gSuperTileStatusGrid;
-extern	long		gTerrainTileDepth, gTerrainTileWidth, gNumSuperTilesDeep, gNumSuperTilesWide;
-
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

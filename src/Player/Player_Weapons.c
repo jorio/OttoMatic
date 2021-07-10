@@ -11,25 +11,6 @@
 
 #include "game.h"
 
-extern	float			gFramesPerSecondFrac,gFramesPerSecond,gPlayerToCameraAngle,gGlobalTransparency;
-extern	OGLPoint3D		gCoord;
-extern	OGLVector3D		gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	OGLVector3D		gRecentTerrainNormal;
-extern	short			gPlayerMultiPassCount;
-extern	PlayerInfoType	gPlayerInfo;
-extern	u_long			gAutoFadeStatusBits;
-extern	NewParticleGroupDefType	gNewParticleGroupDef;
-extern	SparkleType	gSparkles[];
-extern	CollisionRec	gCollisionList[];
-extern	short			gNumCollisions;
-extern	ObjNode			*gFirstNodePtr,*gTargetPickup;
-extern	SpriteType	*gSpriteGroupList[];
-extern	float			gTimeSinceLastShoot,gGravity,gCameraUserRotY;
-extern	Boolean			gForceCameraAlignment;
-
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

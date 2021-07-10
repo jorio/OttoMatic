@@ -11,18 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond;
-extern	OGLPoint3D			gCoord;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLVector3D			gDelta;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	FSSpec		gDataSpec;
-extern	SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
-extern	PlayerInfoType	gPlayerInfo;
-extern	int				gLevelNum;
-extern	u_long			gGlobalMaterialFlags;
-
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

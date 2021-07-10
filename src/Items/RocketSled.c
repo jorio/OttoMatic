@@ -9,31 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-
 #include "game.h"
-
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gCurrentAspectRatio,gGravity,gGlobalTransparency;
-extern	OGLPoint3D			gCoord;
-extern	OGLVector3D			gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLBoundingBox 		gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	OGLSetupOutputType	*gGameViewInfoPtr;
-extern	u_long				gAutoFadeStatusBits,gGlobalMaterialFlags;
-extern	Boolean				gAreaCompleted,gDoJumpJetAtApex;
-extern	PlayerInfoType		gPlayerInfo;
-extern	const float gWaterHeights[NUM_LEVELS][6];
-extern	int					gLevelNum;
-extern	SplineDefType	**gSplineList;
-extern	SparkleType	gSparkles[MAX_SPARKLES];
-extern	short				gNumEnemies,gNumTerrainItems;
-extern	SpriteType	*gSpriteGroupList[];
-extern	SDL_GLContext		gAGLContext;
-extern	TerrainItemEntryType 	**gMasterItemList;
-extern	float			gCameraUserRotY,gTimeSinceLastThrust,gDischargeTimer,gCurrentMaxSpeed;
-extern	ObjNode			*gFirstNodePtr;
-extern	Boolean			gForceCameraAlignment;
-extern	SparkleType	gSparkles[MAX_SPARKLES];
-extern	OGLVector3D		gRecentTerrainNormal;
 
 /****************************/
 /*    PROTOTYPES            */

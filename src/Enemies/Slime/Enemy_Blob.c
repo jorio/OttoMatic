@@ -11,22 +11,6 @@
 
 #include "game.h"
 
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	SplineDefType			**gSplineList;
-extern	OGLPoint3D				gCoord;
-extern	short					gNumEnemies,gNumCollisions;
-extern	float					gFramesPerSecondFrac;
-extern	OGLVector3D			gDelta;
-extern	signed char			gNumEnemyOfKind[];
-extern	u_long		gAutoFadeStatusBits;
-extern	PlayerInfoType	gPlayerInfo;
-extern	SparkleType	gSparkles[];
-extern	CollisionRec	gCollisionList[];
-extern	MOVertexArrayData	**gLocalTriMeshesOfSkelType;
-extern	Boolean				gPlayerHasLanded,gPlayerIsDead;
-extern	Boolean	gHelpMessageDisabled[NUM_HELP_MESSAGES];
-
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

@@ -9,30 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-
 #include "game.h"
-
-extern	float					gFramesPerSecondFrac,gFramesPerSecond;
-extern	OGLPoint3D				gCoord;
-extern	OGLVector3D				gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	short					gNumCollisions;
-extern	CollisionRec			gCollisionList[];
-extern	OGLBoundingBox			gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	OGLMatrix4x4			gWorldToWindowMatrix;
-extern	PlayerInfoType			gPlayerInfo;
-extern	Boolean					gLevelCompleted,gFreezeCameraFromXZ;
-extern	int						gLevelNum;
-extern	ParticleGroupType		*gParticleGroups[];
-extern	SpriteType			*gSpriteGroupList[MAX_SPRITE_GROUPS];
-extern	float				gPlayerToCameraAngle,gTargetMaxSpeed,gDeathTimer,gCurrentMaxSpeed,gCameraUserRotY,gTimeSinceLastThrust;
-extern	Boolean					gPlayerHasLanded,gForceCameraAlignment,gPlayerIsDead,gPlayerFellIntoBottomlessPit;
-extern	Boolean					gBumperCarGateBlown[],gExplodePlayerAfterElectrocute;
-extern	float					gTimeSinceLastShoot;
-extern	SparkleType				gSparkles[MAX_SPARKLES];
-extern	ObjNode					*gExitRocket;
-extern	long					gTerrainUnitWidth,gTerrainUnitDepth;
 
 /****************************/
 /*    PROTOTYPES            */

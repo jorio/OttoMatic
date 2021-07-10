@@ -9,8 +9,6 @@
 #include "game.h"
 #include <stdio.h>
 
-extern	FSSpec		gDataSpec;
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

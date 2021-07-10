@@ -11,20 +11,6 @@
 
 #include "game.h"
 
-extern	OGLBoundingBox	gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	float		gFramesPerSecondFrac,gGlobalTransparency;
-extern	ObjNode		*gFirstNodePtr;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	OGLPoint3D	gCoord;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	u_long		gAutoFadeStatusBits;
-extern	PrefsType	gGamePrefs;
-extern	FSSpec		gDataSpec;
-extern	OGLMatrix4x4			gViewToFrustumMatrix,gWorldToViewMatrix,gWorldToFrustumMatrix;
-extern	SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
-extern	OGLColorRGB			gGlobalColorFilter;
-
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

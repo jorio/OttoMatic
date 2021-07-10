@@ -9,26 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-
 #include "game.h"
-
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gCurrentAspectRatio,gSpinningPlatformRot;
-extern	OGLPoint3D			gCoord;
-extern	OGLVector3D			gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLBoundingBox 		gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	OGLSetupOutputType	*gGameViewInfoPtr;
-extern	u_long				gAutoFadeStatusBits,gGlobalMaterialFlags;
-extern	Boolean				gForceCameraAlignment;
-extern	PlayerInfoType		gPlayerInfo;
-extern	int					gLevelNum;
-extern	SplineDefType	**gSplineList;
-extern	SparkleType	gSparkles[MAX_SPARKLES];
-extern	short				gNumEnemies,gNumPods,gNumTerrainItems;
-extern	SpriteType	*gSpriteGroupList[];
-extern	SDL_GLContext		gAGLContext;
-extern	TerrainItemEntryType 	**gMasterItemList;
-extern	float				gCameraUserRotY;
 
 /****************************/
 /*    PROTOTYPES            */

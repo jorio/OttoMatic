@@ -11,24 +11,6 @@
 
 #include "game.h"
 
-extern	float					gCurrentAspectRatio,gGlobalTransparency,gFramesPerSecondFrac;
-extern	float					g2DLogicalWidth;
-extern	float					g2DLogicalHeight;
-extern	PlayerInfoType			gPlayerInfo;
-extern	int						gLevelNum;
-extern	FSSpec					gDataSpec;
-extern	long					gTerrainUnitWidth,gTerrainUnitDepth;
-extern	OGLColorRGB				gGlobalColorFilter;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	PrefsType			gGamePrefs;
-extern	u_long					gGlobalMaterialFlags;
-extern	SpriteType	*gSpriteGroupList[];
-extern	SDL_GLContext		gAGLContext;
-extern	short					gBeamModeSelected,gBeamMode;
-extern	float					gBeamCharge;
-extern	short	gNumHumansRescuedOfType[NUM_HUMAN_TYPES];
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

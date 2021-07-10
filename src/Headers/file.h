@@ -68,8 +68,6 @@ typedef struct
 	KeyBinding	keys[NUM_CONTROL_NEEDS];
 }PrefsType;
 
-extern	PrefsType			gGamePrefs;
-
 
 
 

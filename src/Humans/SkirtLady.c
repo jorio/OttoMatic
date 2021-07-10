@@ -9,25 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-
 #include "game.h"
-
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gHumanScaleRatio;
-extern	OGLPoint3D			gCoord;
-extern	PlayerInfoType	gPlayerInfo;
-extern	OGLVector3D			gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLVector3D			gRecentTerrainNormal;
-extern	SplineDefType		**gSplineList;
-extern	u_long		gAutoFadeStatusBits;
-extern	short				gNumCollisions;
-extern	SuperTileStatus	**gSuperTileStatusGrid;
-extern	NewParticleGroupDefType	gNewParticleGroupDef;
-extern	PrefsType			gGamePrefs;
-extern	int					gLevelNum;
-extern	ObjNode				*gFirstNodePtr,*gSaucerTarget;
-extern	SparkleType	gSparkles[];
-extern	OGLBoundingBox			gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 
 /****************************/
 /*    PROTOTYPES            */

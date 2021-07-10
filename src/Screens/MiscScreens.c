@@ -11,18 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond;
-extern	FSSpec		gDataSpec;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	Boolean		gSongPlayingFlag,gDisableAnimSounds,gOSX;
-extern	PrefsType	gGamePrefs;
-extern	OGLPoint3D	gCoord;
-extern	int			gLevelNum;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	OGLVector3D	gDelta;
-extern	short		gMainAppRezFile;
-extern	SDL_Window	*gSDLWindow;
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

@@ -11,24 +11,6 @@
 
 #include "game.h"
 
-extern	SparkleType	gSparkles[];
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLPoint3D				gCoord;
-extern	float					gFramesPerSecondFrac,gGravity,gBestCheckpointAim;
-extern	OGLVector3D				gDelta;
-extern	OGLVector3D			gRecentTerrainNormal;
-extern	u_long				gAutoFadeStatusBits;
-extern	float				gAutoFadeStartDist,gFramesPerSecond,gCurrentMaxSpeed;
-extern	PlayerInfoType		gPlayerInfo;
-extern	OGLBoundingBox			gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	NewParticleGroupDefType	gNewParticleGroupDef;
-extern	SuperTileStatus	**gSuperTileStatusGrid;
-extern	int					gLevelNum;
-extern	SpriteType			*gSpriteGroupList[];
-extern	short				gBestCheckpointNum;
-extern	OGLPoint2D			gBestCheckpointCoord;
-extern	Boolean	gHelpMessageDisabled[NUM_HELP_MESSAGES];
-
 /*******************/
 /*   PROTOTYPES    */
 /*******************/

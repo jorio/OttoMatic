@@ -11,19 +11,6 @@
 
 #include "game.h"
 
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	ObjNode	*gCurrentNode,*gFirstNodePtr;
-extern	float	gFramesPerSecondFrac;
-extern	float					g2DLogicalWidth;
-extern	float					g2DLogicalHeight;
-extern	short	gPrefsFolderVRefNum,gCurrentSong;
-extern	long	gPrefsFolderDirID;
-extern	Boolean				gMuteMusicFlag;
-extern	PrefsType			gGamePrefs;
-extern	Boolean			gSongPlayingFlag;
-extern	SDL_GLContext		gAGLContext;
-extern	SDL_Window			*gSDLWindow;
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

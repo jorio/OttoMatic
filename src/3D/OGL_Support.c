@@ -11,24 +11,6 @@
 
 #include "game.h"
 
-
-extern int				gNumObjectNodes,gNumPointers;
-extern	MOMaterialObject	*gMostRecentMaterial;
-extern	short			gNumSuperTilesDrawn,gNumActiveParticleGroups,gNumFencesDrawn,gNumTerrainDeformations,gNumWaterDrawn,gNumEnemies;
-extern	PlayerInfoType	gPlayerInfo;
-extern	float			gFramesPerSecond;
-extern	Byte			gDebugMode;
-extern	Boolean			gOSX;
-extern	u_long			gGlobalMaterialFlags;
-extern	PrefsType			gGamePrefs;
-extern	int				gGameWindowWidth,gGameWindowHeight,gNumSparkles;
-
-extern	SDL_Window		*gSDLWindow;
-extern	FSSpec			gDataSpec;
-
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

@@ -11,9 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac;
-extern	OGLPoint3D	gCoord;
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

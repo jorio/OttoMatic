@@ -9,21 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-
 #include "game.h"
-
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	ObjNode					*gCurrentNode,*gFirstNodePtr;
-extern	float				gFramesPerSecondFrac,gFramesPerSecond;
-extern	OGLPoint3D			gCoord;
-extern	OGLVector3D			gDelta;
-extern	short				gNumItems,gNumCollisions;
-extern	CollisionRec		gCollisionList[];
-extern	u_long		gAutoFadeStatusBits;
-extern	OGLVector3D		gRecentTerrainNormal;
-extern	int					gLevelNum;
-extern	Boolean				gG4;
-
 
 /****************************/
 /*    PROTOTYPES            */

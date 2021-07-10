@@ -11,22 +11,6 @@
 
 #include "game.h"
 
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
-extern	float				g2DLogicalWidth;
-extern	float				g2DLogicalHeight;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	FSSpec				gDataSpec;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLPoint3D	gCoord;
-extern	OGLVector3D	gDelta;
-extern	Boolean				gSongPlayingFlag,gOSX,gPlayingFromSavedGame;
-extern	PlayerInfoType	gPlayerInfo;
-extern	SparkleType	gSparkles[];
-extern	SDL_GLContext		gAGLContext;
-extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	PrefsType			gGamePrefs;
-extern	HighScoreType	gHighScores[];
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

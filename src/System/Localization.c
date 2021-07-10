@@ -6,8 +6,6 @@
 
 #define MAX_STRINGS 128
 
-extern	FSSpec		gDataSpec;
-
 static int				gCurrentStringsLanguage = -1;
 static Ptr				gStringsBuffer = nil;
 static const char*		gStringsTable[MAX_STRINGS];

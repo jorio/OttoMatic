@@ -13,35 +13,6 @@
 /* EXTERNALS   */
 /***************/
 
-
-extern	short			gMainAppRezFile,gCurrentSong;
-extern	short			gNumTerrainItems;
-extern	short			gPrefsFolderVRefNum;
-extern	long			gPrefsFolderDirID,gNumPaths;
-extern	long			gTerrainTileWidth,gTerrainTileDepth,gTerrainUnitWidth,gTerrainUnitDepth,gNumUniqueSuperTiles;
-extern	long			gNumSuperTilesDeep,gNumSuperTilesWide;
-extern	FSSpec			gDataSpec;
-extern	u_long			gScore,gLoadedScore;
-extern  u_short			**gTileDataHandle;
-extern	float			**gMapYCoords,**gMapYCoordsOriginal;
-extern	Byte			**gMapSplitMode;
-extern	TerrainItemEntryType 	**gMasterItemList;
-extern	SuperTileGridType **gSuperTileTextureGrid;
-extern	FenceDefType	*gFenceList;
-extern	long			gNumFences,gNumSplines,gNumWaterPatches;
-extern	SplineDefType	**gSplineList;
-extern	int				gLevelNum;
-extern	TileAttribType	**gTileAttribList;
-extern	u_short			**gTileGrid;
-extern	MOMaterialObject	*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];
-extern	PrefsType			gGamePrefs;
-extern	SDL_GLContext		gAGLContext;
-extern	Boolean			gSongPlayingFlag,gMuteMusicFlag,gMuteMusicFlag,gOSX;
-extern	WaterDefType	**gWaterListHandle, *gWaterList;
-extern	PlayerInfoType	gPlayerInfo;
-extern	Boolean			gPlayingFromSavedGame,gG4;
-
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

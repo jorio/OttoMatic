@@ -11,11 +11,6 @@
 
 #include "game.h"
 
-extern	float	gCurrentAspectRatio,gGlobalTransparency;
-extern	int		gPolysThisFrame;
-extern	Boolean			gSongPlayingFlag,gMuteMusicFlag;
-extern	u_long			gGlobalMaterialFlags;
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

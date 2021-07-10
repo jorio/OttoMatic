@@ -11,20 +11,6 @@
 
 #include "game.h"
 
-extern	Byte					gDebugMode;
-extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	int						gNumObjectsInBG3DGroupList[MAX_BG3D_GROUPS];
-extern	int						gNumObjectsInBG3DGroupList[MAX_BG3D_GROUPS];
-extern	float					gFramesPerSecondFrac,gGlobalTransparency;
-extern	float					g2DLogicalWidth;
-extern	float					g2DLogicalHeight;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	MOVertexArrayData		**gLocalTriMeshesOfSkelType;
-extern	OGLColorRGB				gGlobalColorFilter;
-extern	u_long					gGlobalMaterialFlags;
-extern	PlayerInfoType			gPlayerInfo;
-extern	OGLBoundingBox			gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

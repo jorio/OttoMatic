@@ -8,14 +8,6 @@
 
 #include "game.h"
 
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	float					gFramesPerSecondFrac,gFramesPerSecond,gGlobalTransparency;
-extern	OGLColorRGB				gGlobalColorFilter;
-extern	SDL_Window				*gSDLWindow;
-extern	Boolean					gAllowAudioKeys;
-extern const KeyBinding			gDefaultKeyBindings[NUM_CONTROL_NEEDS];
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

@@ -11,10 +11,6 @@
 
 #include "game.h"
 
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

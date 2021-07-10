@@ -9,27 +9,7 @@
 /*    EXTERNALS             */
 /****************************/
 
-
 #include "game.h"
-
-extern	float				gFramesPerSecondFrac,gFramesPerSecond,gCurrentAspectRatio,gGlobalTransparency;
-extern	OGLPoint3D			gCoord;
-extern	OGLVector3D			gDelta;
-extern	NewObjectDefinitionType	gNewObjectDefinition;
-extern	OGLBoundingBox 		gObjectGroupBBoxList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
-extern	OGLSetupOutputType	*gGameViewInfoPtr;
-extern	u_long				gAutoFadeStatusBits,gGlobalMaterialFlags;
-extern	Boolean				gAreaCompleted;
-extern	PlayerInfoType		gPlayerInfo;
-extern	const float gWaterHeights[NUM_LEVELS][6];
-extern	int					gLevelNum;
-extern	SplineDefType	**gSplineList;
-extern	short				gNumEnemies;
-extern	SpriteType	*gSpriteGroupList[];
-extern	SDL_GLContext		gAGLContext;
-extern	SparkleType	gSparkles[MAX_SPARKLES];
-
-
 
 /****************************/
 /*    PROTOTYPES            */

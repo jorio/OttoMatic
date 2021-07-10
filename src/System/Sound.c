@@ -11,14 +11,6 @@
 
 #include "game.h"
 
-extern	short		gMainAppRezFile;
-extern	OGLSetupOutputType		*gGameViewInfoPtr;
-extern	FSSpec				gDataSpec;
-extern	float		gFramesPerSecondFrac;
-extern	PrefsType			gGamePrefs;
-extern	Boolean				gOSX;
-
-
 /****************************/
 /*    PROTOTYPES            */
 /****************************/

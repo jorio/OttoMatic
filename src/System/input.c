@@ -29,11 +29,6 @@ enum
 /* EXTERNALS   */
 /***************/
 
-extern	SDL_GLContext		gAGLContext;
-extern	SDL_Window		*gSDLWindow;
-extern	float			gFramesPerSecondFrac,gFramesPerSecond;
-extern	PrefsType			gGamePrefs;
-
 /**********************/
 /*     PROTOTYPES     */
 /**********************/
