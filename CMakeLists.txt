@@ -5,6 +5,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
+set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Target macOS architectures")
 
 project(OttoMatic
 	VERSION 4.0.0
@@ -12,10 +13,12 @@ project(OttoMatic
 )
 
 set(GAME_TARGET ${PROJECT_NAME})
-set(GAME_ICNS cmake/${PROJECT_NAME}.icns)
+set(GAME_ICNS packaging/${PROJECT_NAME}.icns)
 
 set(POMME_NO_VIDEO TRUE)		# compile Pomme without QuickTime movie support
 set(POMME_NO_QD3D TRUE)			# compile Pomme without QuickDraw3D/3DMF support
+#set(POMME_NO_INPUT true)
+#set(POMME_NO_GRAPHICS true)
 
 #------------------------------------------------------------------------------
 # GLOBAL OPTIONS (BEFORE ADDING SUBDIRECTORIES)
@@ -51,29 +54,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.in ${GAME_SRCDIR}/Hea
 file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS ${GAME_SRCDIR}/*.c ${GAME_SRCDIR}/*.cpp)
 
 file(GLOB_RECURSE GAME_HEADERS CONFIGURE_DEPENDS ${GAME_SRCDIR}/*.h)
-set(GAME_GLUE_SOURCES
-	# ${GAME_SRCDIR}/Main.cpp
-	# ${GAME_SRCDIR}/Glue/DrawPicture.cpp
-	# ${GAME_SRCDIR}/Glue/EdgePadding.cpp
-	# ${GAME_SRCDIR}/Glue/FrustumCulling.c
-	# ${GAME_SRCDIR}/Glue/GLFunctions.cpp
-	# ${GAME_SRCDIR}/Glue/GLOverlay.cpp
-	# ${GAME_SRCDIR}/Glue/GLOverlayFade.cpp
-	# ${GAME_SRCDIR}/Glue/KillMacMouseAcceleration.c
-	# ${GAME_SRCDIR}/Glue/MouseSmoothing.c
-	# ${GAME_SRCDIR}/Glue/Overlay.cpp
-	# ${GAME_SRCDIR}/Glue/Patch3DMFModels.c
-	# ${GAME_SRCDIR}/Glue/PickableQuads.cpp
-	# ${GAME_SRCDIR}/Glue/QuesaExtras.c
-	# ${GAME_SRCDIR}/Glue/SDLMaintenance.c
-	# ${GAME_SRCDIR}/Glue/TextMesh.c
-	# ${GAME_SRCDIR}/Glue/TGA.c
-	# ${GAME_SRCDIR}/Glue/Tween.c
-	# ${GAME_SRCDIR}/Glue/UIRoutines.c
-)
 
 set(GAME_ALL_SOURCES
-	${GAME_GLUE_SOURCES}
 	${GAME_SOURCES}
 	${GAME_HEADERS}
 )
@@ -88,18 +70,31 @@ source_group(TREE ${GAME_SRCDIR} PREFIX "" FILES ${GAME_ALL_SOURCES})
 # EXECUTABLE TARGET
 #------------------------------------------------------------------------------
 
+set(GAME_LIBRARIES
+	Pomme
+	${SDL2_LIBRARIES}
+	${OPENGL_LIBRARIES}
+)
+
 if(WIN32)
 	# "WIN32" here is equivalent to /SUBSYSTEM:WINDOWS for MSVC
 	add_executable(${GAME_TARGET} WIN32
 		${GAME_ALL_SOURCES}
+		"${CMAKE_CURRENT_SOURCE_DIR}/packaging/OttoMatic.exe.rc"
 	)
 elseif(APPLE)
+	# Add required frameworks for KillMacMouseAcceleration
+	list(APPEND GAME_LIBRARIES "-framework Foundation" "-framework IOKit")
+
 	add_executable(${GAME_TARGET} MACOSX_BUNDLE
 		${GAME_ALL_SOURCES}
 		${GAME_ICNS}
 		${SDL2_LIBRARIES}
 	)
 else()
+	# Math lib, explicitly required on some Linux systems
+	list(APPEND GAME_LIBRARIES m)
+
 	add_executable(${GAME_TARGET}
 		${GAME_ALL_SOURCES}
 	)
@@ -107,22 +102,13 @@ endif()
 
 target_include_directories(${GAME_TARGET} PRIVATE
 	${SDL2_INCLUDE_DIRS}
-	${OPENGL_INCLUDE_DIRS}
+	${OPENGL_INCLUDE_DIR}
 	extern/Pomme/src
 	${GAME_SRCDIR}
 	${GAME_SRCDIR}/Headers
-	${GAME_SRCDIR}/Headers/Glue
-	#${GAME_SRCDIR}/Headers/QD3DCompat
 )
 
-target_link_libraries(${GAME_TARGET}
-	Pomme
-	${SDL2_LIBRARIES}
-	${OPENGL_LIBRARIES}
-	"$<$<BOOL:${APPLE}>:-framework Foundation>"		# Required for KillMacMouseAcceleration
-	"$<$<BOOL:${APPLE}>:-framework IOKit>"			# Required for KillMacMouseAcceleration
-#	"$<$<BOOL:${APPLE}>:-framework AppKit>"			# Required for nativefiledialog
-)
+target_link_libraries(${GAME_TARGET} ${GAME_LIBRARIES})
 
 #------------------------------------------------------------------------------
 # DEFINES
@@ -135,7 +121,12 @@ add_compile_definitions(
 if(WIN32)
 	# On Win32, we need NOGDI and NOUSER to be able to define some Mac functions
 	# whose names are otherwise taken by Windows APIs.
-	target_compile_definitions(${GAME_TARGET} PRIVATE WIN32_LEAN_AND_MEAN NOGDI NOUSER)
+	target_compile_definitions(${GAME_TARGET} PRIVATE
+		WIN32_LEAN_AND_MEAN
+		NOGDI
+		NOUSER
+		_CRT_SECURE_NO_WARNINGS  # quit whining about snprintf_s
+	)
 endif()
 
 #------------------------------------------------------------------------------
@@ -150,18 +141,23 @@ if(NOT MSVC)
 		-Wshadow
 		-Wno-multichar
 		-Wno-unknown-pragmas
+		$<$<CXX_COMPILER_ID:GNU>:-Wno-unused-but-set-variable>
+		-Werror=return-type
 		-Wno-unused-parameter
 		-Werror=implicit-function-declaration
 		-Werror=return-type
-		-Wno-missing-braces			# TEMP for first phase of porting
-		-Wno-unused-variable		# TEMP for first phase of porting
-		-Wno-old-style-declaration	# TEMP for first phase of porting
-
-		"$<$<CXX_COMPILER_ID:GNU>:-Wno-unused-but-set-variable>"
 	)
 else()
+	# By default, MSVC may add /EHsc to CMAKE_CXX_FLAGS, which we don't want (we use /EHs below)
+	string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+
+	# By default, MSVC may add /W3 to CMAKE_CXX_FLAGS, which we don't want (we use /W4 below)
+	# Note that this is not required with "cmake_minimum_required(VERSION 3.15)" or later
+	string(REPLACE "/W3" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+	string(REPLACE "/W3" "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+
 	target_compile_options(${GAME_TARGET} PRIVATE
-		/EHa    # C++ may throw exceptions from extern "C" functions
+		/EHs	# synchronous exceptions; also, extern "C" functions may throw exceptions
 		/W4
 		/wd4068 # ignore unrecognized pragmas
 		/wd4100 # unreferenced formal parameters
@@ -226,7 +222,7 @@ if(WIN32)
 endif()
 
 # Copy documentation to output folder
-#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ReadMe.txt.in ${CMAKE_CURRENT_BINARY_DIR}/ReadMe.txt)
+#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/packaging/ReadMe.txt.in ${CMAKE_CURRENT_BINARY_DIR}/ReadMe.txt)
 #add_custom_command(TARGET ${GAME_TARGET} POST_BUILD
 #	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/ReadMe.txt ${APP_PARENT_DIR}/ReadMe.txt
 #	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md ${APP_PARENT_DIR}/License.txt

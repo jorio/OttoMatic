@@ -117,9 +117,9 @@ int CommonMain(int argc, const char** argv)
 	}
 
 	fs::path dataPath = FindGameData();
-#if !(__APPLE__)
-	Pomme::Graphics::SetWindowIconFromIcl8Resource(gSDLWindow, 500);
-#endif
+//#if !(__APPLE__)
+//	Pomme::Graphics::SetWindowIconFromIcl8Resource(gSDLWindow, 500);
+//#endif
 
 	// Init joystick subsystem
 	{
