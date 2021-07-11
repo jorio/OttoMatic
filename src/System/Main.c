@@ -116,6 +116,7 @@ void ToolBoxInit(void)
 
 	InitDefaultPrefs();
 	LoadPrefs(&gGamePrefs);
+	LoadLocalizedStrings(gGamePrefs.language);
 
 	if (gSDLWindow)
 	{
@@ -123,14 +124,6 @@ void ToolBoxInit(void)
 				gSDLWindow,
 				gGamePrefs.fullscreen? SDL_WINDOW_FULLSCREEN_DESKTOP: 0);
 	}
-
-
-			/*********************************/
-			/* DO BOOT CHECK FOR SCREEN MODE */
-			/*********************************/
-
-//	DoScreenModeDialog();
-
 
 	MyFlushEvents();
 }

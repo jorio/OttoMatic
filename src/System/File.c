@@ -445,6 +445,7 @@ short		refNum;
 FSSpec		file;
 long		count;
 char		header[PREFS_HEADER_LENGTH + 1];
+PrefsType	prefBuffer;
 
 				/*************/
 				/* READ FILE */
@@ -455,6 +456,16 @@ char		header[PREFS_HEADER_LENGTH + 1];
 	if (iErr)
 		return(iErr);
 
+				/* CHECK FILE LENGTH */
+
+	long eof = 0;
+	GetEOF(refNum, &eof);
+
+	if (eof != sizeof(PrefsType) + PREFS_HEADER_LENGTH)
+	{
+		goto fileIsCorrupt;
+	}
+
 				/* READ HEADER */
 
 	count = PREFS_HEADER_LENGTH;
@@ -464,34 +475,35 @@ char		header[PREFS_HEADER_LENGTH + 1];
 		|| count != PREFS_HEADER_LENGTH
 		|| 0 != strncmp(header, PREFS_HEADER_STRING, PREFS_HEADER_LENGTH))
 	{
-		FSClose(refNum);
-		return badFileFormat;
+		goto fileIsCorrupt;
 	}
 
 			/* READ PREFS STRUCT */
 
 	count = sizeof(PrefsType);
-	iErr = FSRead(refNum, &count,  (Ptr)prefBlock);		// read data from file
-	if (iErr)
+	iErr = FSRead(refNum, &count, (Ptr)&prefBuffer);		// read data from file
+	if (iErr || count != sizeof(PrefsType))
 	{
-		FSClose(refNum);
-		InitDefaultPrefs();
-		return(iErr);
+		goto fileIsCorrupt;
 	}
 
 	FSClose(refNum);
 
-			/****************/
-			/* VERIFY PREFS */
-			/****************/
+			/* NUKE NON-REMAPPABLE KEYBINDINGS TO DEFAULTS */
 
-		/* THEY'RE GOOD, SO ALSO RESTORE THE HID CONTROL SETTINGS */
+	for (int i = NUM_REMAPPABLE_NEEDS; i < NUM_CONTROL_NEEDS; i++)
+	{
+		prefBuffer.keys[i] = kDefaultKeyBindings[i];
+	}
 
-//	RestoreHIDControlSettings(&gGamePrefs.controlSettings);
+			/* PREFS ARE OK */
 
-	LoadLocalizedStrings(gGamePrefs.language);
+	*prefBlock = prefBuffer;
+	return noErr;
 
-	return(noErr);
+fileIsCorrupt:
+	FSClose(refNum);
+	return badFileFormat;
 }
 
 
