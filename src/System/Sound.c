@@ -629,9 +629,7 @@ float	volumeTweaks[]=
 
 	if (gMuteMusicFlag)
 	{
-//		if (gSongMovie)
-//			StopMovie(gSongMovie);
-
+		SndPauseFilePlay(gMusicChannel);			// pause it
 	}
 }
 

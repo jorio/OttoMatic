@@ -45,11 +45,8 @@ static const OGLColorRGBA gPausedMenuNoHiliteColor = {1,1,.3,1};
 void DoPaused(void)
 {
 short	i;
-Boolean	oldMute = gMuteMusicFlag;
 
-
-	if (!gMuteMusicFlag)							// see if pause music
-		ToggleMusic();
+	Pomme_PauseAllChannels(true);
 
 	BuildPausedMenu();
 
@@ -91,9 +88,7 @@ Boolean	oldMute = gMuteMusicFlag;
 	FreePausedMenu();
 
 
-	if (!oldMute)									// see if restart music
-		ToggleMusic();
-
+	Pomme_PauseAllChannels(false);
 }
 
 
