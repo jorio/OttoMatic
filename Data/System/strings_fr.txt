@@ -26,6 +26,16 @@ sept.
 oct.
 nov.
 déc.
+Planète Terre: La ferme des Bentley
+Planète Snoth: Zone J-3110
+Planète Snoth: Le boss visqueux
+Planète Knarr: Ruines de Yoth City
+Planète Rennie: Le 7ème ciel
+Planète Sulak: La jungle méridionale
+Planète Sulak: La plante carnivore
+Planète Deniz: La vallée de feu et de glace
+Planète Shebanek: Le camp de prisonniers
+Planète X: Le cerveau géant
 Frappe la capsule pour l'ouvrir
 Pour prendre le bonus, appuie sur ramasser
 Pour te propulser, appuie deux fois sur saut

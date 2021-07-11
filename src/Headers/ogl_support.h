@@ -179,7 +179,7 @@ typedef	struct
 	float			fogEnd;
 	float			fogDensity;
 	short			fogMode;
-	
+	Boolean			redFont;
 }OGLStyleDefType;
 
 

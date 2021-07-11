@@ -70,27 +70,12 @@ enum
 };
 
 
-enum
-{
-	LEVELINTRO_SObjType_FarmText,
-	LEVELINTRO_SObjType_SlimeText,
-	LEVELINTRO_SObjType_ApocalypseText,
-	LEVELINTRO_SObjType_CloudText,
-	LEVELINTRO_SObjType_JungleText,
-	LEVELINTRO_SObjType_FireIceText,
-	LEVELINTRO_SObjType_SaucerText,
-	LEVELINTRO_SObjType_BrainBossText
-
-};
-
-
-
 /*********************/
 /*    VARIABLES      */
 /*********************/
 
 
-static float	gIntroTimer,gLevelNameTransparency;
+static float	gIntroTimer;
 
 
 /******************* DO LEVEL INTRO **************************/
@@ -149,7 +134,6 @@ float	oldTime,maxTime = 11.0f;
 
 
 	gIntroTimer = 0;
-	gLevelNameTransparency = 0;
 
 			/* SETUP */
 
@@ -205,73 +189,32 @@ float	oldTime,maxTime = 11.0f;
 
 static void DrawIntroCallback(OGLSetupOutputType *info)
 {
-const short textSprites[] =
-{
-	LEVELINTRO_SObjType_FarmText,
-	LEVELINTRO_SObjType_SlimeText,
-	0,
-	LEVELINTRO_SObjType_ApocalypseText,
-	LEVELINTRO_SObjType_CloudText,
-	LEVELINTRO_SObjType_JungleText,
-	0,
-	LEVELINTRO_SObjType_FireIceText,
-	LEVELINTRO_SObjType_SaucerText,
-	LEVELINTRO_SObjType_BrainBossText,
-};
-
-
 			/* DRAW OBJECTS */
 
 	DrawObjects(info);
 	DrawSparkles(info);
+}
 
 
-		/************************/
-		/* DRAW SPRITE OVERLAYS */
-		/************************/
-
-	OGL_PushState();
-
-	if (info->useFog)
-		glDisable(GL_FOG);
-
-	SetInfobarSpriteState(false);
-
-
-			/* DRAW LEVEL TEXT */
+static void MoveLevelName(ObjNode* theNode)
+{
+	float alpha = theNode->ColorFilter.a;
 
 	if (gLevelNum == LEVEL_NUM_BRAINBOSS)							// comes in sooner on Brain Boss level
 	{
 		if (gIntroTimer > 1.0f)
-		{
-			gLevelNameTransparency += gFramesPerSecondFrac *.6f;
-			if (gLevelNameTransparency > 1.0f)
-				gLevelNameTransparency = 1.0f;
-		}
+			alpha += gFramesPerSecondFrac *.6f;
 	}
 	else
 	{
 		if (gIntroTimer > 3.0f)
-		{
-			gLevelNameTransparency += gFramesPerSecondFrac *.6f;
-			if (gLevelNameTransparency > 1.0f)
-				gLevelNameTransparency = 1.0f;
-		}
+			alpha += gFramesPerSecondFrac *.6f;
 	}
 
-	gGlobalTransparency = gLevelNameTransparency;
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);								// make glow
-	DrawInfobarSprite(0,440, 300, textSprites[gLevelNum], info);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	gGlobalTransparency = 1.0;
+	if (alpha > 1.0f)
+		alpha = 1.0f;
 
-			/***********/
-			/* CLEANUP */
-			/***********/
-
-	OGL_PopState();
-	gGlobalMaterialFlags = 0;
-
+	theNode->ColorFilter.a = alpha;
 }
 
 
@@ -343,6 +286,7 @@ const Byte	cloud[] =
 	viewDef.camera.hither 	= 400;
 	viewDef.camera.yon 		= 15000;
 
+	viewDef.styles.redFont = true;
 
 			/*********************/
 			/* SET ANAGLYPH INFO */
@@ -376,10 +320,6 @@ const Byte	cloud[] =
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:levelIntro.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_LEVELINTRO, gGameViewInfoPtr);
-	BlendASprite(SPRITE_GROUP_LEVELINTRO, LEVELINTRO_SObjType_FarmText);
-
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:LevelIntro.bg3d", &spec);
@@ -391,6 +331,19 @@ const Byte	cloud[] =
 
 	InitSparkles();
 	InitParticleSystem(gGameViewInfoPtr);
+
+
+			/**************/
+			/* MAKE TITLE */
+			/**************/
+
+	gNewObjectDefinition.scale 	    = 1.00f;
+	gNewObjectDefinition.coord.x 	= -310;
+	gNewObjectDefinition.coord.y 	= 200;
+	gNewObjectDefinition.coord.z 	= 0.0f;
+	gNewObjectDefinition.moveCall	= MoveLevelName;
+	ObjNode* levelName = TextMesh_New(Localize(STR_LEVEL_1 + gLevelNum), 0, &gNewObjectDefinition);
+	levelName->ColorFilter.a = 0;
 
 
 			/**************/

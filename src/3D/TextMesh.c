@@ -153,7 +153,7 @@ static void ParseSFL(const char* data)
 /*                       INIT/SHUTDOWN                         */
 /***************************************************************/
 
-void TextMesh_Init(OGLSetupOutputType* setupInfo)
+void TextMesh_Init(OGLSetupOutputType* setupInfo, bool redFont)
 {
 	OSErr err;
 	FSSpec spec;
@@ -170,7 +170,7 @@ void TextMesh_Init(OGLSetupOutputType* setupInfo)
 	matData.numMipmaps		= 1;
 	matData.width			= (u_long) ATLAS_WIDTH;
 	matData.height			= (u_long) ATLAS_HEIGHT;
-	matData.textureName[0]	= OGL_TextureMap_LoadTGA(":system:font.tga", 0);
+	matData.textureName[0]	= OGL_TextureMap_LoadTGA(redFont? ":system:font2.tga": ":system:font1.tga", 0);
 	gFontMaterial = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
 
 		/* LOAD METRICS FILE */

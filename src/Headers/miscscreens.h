@@ -35,7 +35,7 @@ void DisplayPicture(FSSpec *spec);
 void DoPaused(void);
 
 void DoLegalScreen(void);
-Boolean DoLevelCheatDialog(void);
+int DoLevelCheatDialog(void (*backgroundDrawRoutine)(OGLSetupOutputType *));
 void DoLevelIntro(void);
 void DoBonusScreen(void);
 

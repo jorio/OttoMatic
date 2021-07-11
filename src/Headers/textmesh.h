@@ -7,7 +7,7 @@ enum
 	kTextMeshAlignRight,
 };
 
-void TextMesh_Init(OGLSetupOutputType* setupInfo);
+void TextMesh_Init(OGLSetupOutputType* setupInfo, bool redFont);
 void TextMesh_Shutdown(void);
 ObjNode* TextMesh_NewEmpty(int capacity, NewObjectDefinitionType *newObjDef);
 ObjNode* TextMesh_New(const char *text, int align, NewObjectDefinitionType *newObjDef);

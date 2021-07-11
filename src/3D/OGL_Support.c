@@ -145,6 +145,8 @@ static OGLVector3D			fillDirection2 = { -1, -.3, -.3 };
 	viewDef->styles.fogDensity		= 1.0;
 	viewDef->styles.fogMode			= GL_LINEAR;
 
+	viewDef->styles.redFont			= false;
+
 	viewDef->lights.ambientColor 	= ambientColor;
 	viewDef->lights.numFillLights 	= 1;
 	viewDef->lights.fillDirection[0] = fillDirection1;
@@ -201,7 +203,7 @@ OGLSetupOutputType	*outputPtr;
 	*outputHandle = outputPtr;											// return value to caller
 
 
-	TextMesh_Init(outputPtr);
+	TextMesh_Init(outputPtr, setupDefPtr->styles.redFont);
 	OGL_InitFont();
 }
 
