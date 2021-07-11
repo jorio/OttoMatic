@@ -1131,10 +1131,29 @@ static Boolean DoMainMenuControl(void)
 		else
 		if (GetNewKeyState(SDL_SCANCODE_RETURN) || GetNewKeyState(SDL_SCANCODE_SPACE))
 		{
+			gHideIconString = true;
 
 			switch(gSelection)
 			{
 				case	SELECT_PLAY:
+						gLevelNum = 0;							// start on Level 0 if not loading from saved game
+
+						if (GetKeyState(SDL_SCANCODE_F10))		// see if do Level cheat
+						{
+							int cheatLevel = DoLevelCheatDialog(DrawMainMenuCallback);
+							if (cheatLevel < 0)
+								break;
+							gLevelNum = cheatLevel;
+						}
+						else
+						{
+							for (int i = 0; i < 10; i++)		// see if do level cheat by holding down number key
+							{
+								if (GetKeyState(SDL_SCANCODE_1 + i))	// scancodes 1,2,...,9,0 are contiguous
+									gLevelNum = i;
+							}
+						}
+
 						gPlayingFromSavedGame = false;
 						return(true);
 
@@ -1147,9 +1166,7 @@ static Boolean DoMainMenuControl(void)
 						break;
 
 				case	SELECT_OPTIONS:
-						gHideIconString = true;
 						DoSettingsOverlay();
-						gHideIconString = false;
 						break;
 
 				case	SELECT_CREDITS:
@@ -1157,20 +1174,19 @@ static Boolean DoMainMenuControl(void)
 						break;
 
 				case	SELECT_LOADSAVEDGAME:
-						gHideIconString = true;
 						if (DoFileScreen(FILE_SCREEN_TYPE_LOAD, DrawMainMenuCallback))
 						{
-							gHideIconString = false;
 							gPlayingFromSavedGame = true;
 							return true;
 						}
-						gHideIconString = false;
 						break;
 
 				case	SELECT_QUIT:
 						CleanQuit();
 						break;
 			}
+
+			gHideIconString = false;
 		}
 	}
 		/***************/
@@ -1470,8 +1486,6 @@ static void DoHelp(void)
 {
 ObjNode	*glow, *text, *pane;
 
-	gHideIconString = true;
-
 	if (MyRandomLong()&1)
 		PlayEffect(EFFECT_ACCENTDRONE1);
 	else
@@ -1548,7 +1562,6 @@ ObjNode	*glow, *text, *pane;
 		/* CLEANUP */
 	DeleteObject(pane);
 	UpdateInput();
-	gHideIconString = false;
 }
 
 
@@ -1557,8 +1570,6 @@ ObjNode	*glow, *text, *pane;
 static void DoHighScores(void)
 {
 ObjNode	*pane;
-
-	gHideIconString = true;
 
 	PlaySong(SONG_HIGHSCORE, true);
 
@@ -1641,8 +1652,6 @@ ObjNode	*pane;
 	DeleteObject(pane);
 	UpdateInput();
 	PlaySong(SONG_THEME, true);
-
-	gHideIconString = false;
 }
 
 
@@ -1659,8 +1668,6 @@ ObjNode	*pane;
 static void DoCredits(void)
 {
 ObjNode	*pane, *glow, *text, *subtext1, *subtext2, *subtext3;
-
-	gHideIconString = true;
 
 	if (MyRandomLong()&1)
 		PlayEffect(EFFECT_ACCENTDRONE1);
@@ -1750,7 +1757,6 @@ ObjNode	*pane, *glow, *text, *subtext1, *subtext2, *subtext3;
 		/* CLEANUP */
 	DeleteObject(pane);
 	UpdateInput();
-	gHideIconString = false;
 }
 
 

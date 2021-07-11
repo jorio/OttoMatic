@@ -26,6 +26,7 @@ sept.
 oct.
 nov.
 déc.
+Choisir un niveau
 Planète Terre: La ferme des Bentley
 Planète Snoth: Zone J-3110
 Planète Snoth: Le boss visqueux

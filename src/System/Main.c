@@ -67,7 +67,7 @@ Boolean				gGameOver = false;
 Boolean				gLevelCompleted = false;
 float				gLevelCompletedCoolDownTimer = 0;
 
-int					gLevelNum;
+int					gLevelNum = 0;
 
 short				gBestCheckpointNum;
 OGLPoint2D			gBestCheckpointCoord;
@@ -184,25 +184,6 @@ static void PlayGame(void)
 			/*********************************/
 			/* PLAY THRU LEVELS SEQUENTIALLY */
 			/*********************************/
-
-	if (!gPlayingFromSavedGame)				// start on Level 0 if not loading from saved game
-	{
-		gLevelNum = 0;
-
-		if (GetKeyState(SDL_SCANCODE_F10))		// see if do Level cheat
-		{
-			if (DoLevelCheatDialog())
-				CleanQuit();
-		}
-		else
-		{
-			for (int i = 0; i < 10; i++)		// see if do level cheat by holding down number key
-			{
-				if (GetKeyState(SDL_SCANCODE_1 + i))	// scancodes 1,2,...,9,0 are contiguous
-					gLevelNum = i;
-			}
-		}
-	}
 
 	for (;gLevelNum < 10; gLevelNum++)
 	{
