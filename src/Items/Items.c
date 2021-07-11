@@ -21,7 +21,6 @@ static void MoveSprout(ObjNode *theNode);
 static void MoveWindmill(ObjNode *base);
 
 static void DrawCyclorama(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
-static void DrawSaturnRing(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
 
 static void MoveSlimeMech_Boiler(ObjNode *theNode);
 static void MoveSlimePipe_Valve(ObjNode *theNode);
@@ -84,56 +83,6 @@ ObjNode	*newObj;
 		case	LEVEL_NUM_BRAINBOSS:
 				break;
 
-
-		case	100:
-						/* MAKE RINGS */
-
-				gNewObjectDefinition.group	= MODEL_GROUP_LEVELSPECIFIC;
-				gNewObjectDefinition.type 	= 1;
-				gNewObjectDefinition.scale 	= 300;
-				gNewObjectDefinition.coord.x = 0;
-				gNewObjectDefinition.coord.y = 0;
-				gNewObjectDefinition.coord.z = 0;
-				gNewObjectDefinition.flags 	= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOZBUFFER|STATUS_BIT_NOZBUFFER|STATUS_BIT_KEEPBACKFACES|STATUS_BIT_ROTYZX;
-				gNewObjectDefinition.slot 	= TERRAIN_SLOT-1;					// draw before terrain!!
-				gNewObjectDefinition.rot 	= 0;
-
-				newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-
-				newObj->CustomDrawFunction = DrawSaturnRing;
-				newObj->DeltaRot.z = .04;
-				newObj->Rot.x = PI/2.5;
-
-				gNewObjectDefinition.scale 	+= 300;
-				newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-				newObj->CustomDrawFunction = DrawSaturnRing;
-				newObj->DeltaRot.z = .04;
-				newObj->Rot.x = PI/2.5;
-
-				gNewObjectDefinition.scale 	+= 700;
-				newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-				newObj->CustomDrawFunction = DrawSaturnRing;
-				newObj->DeltaRot.z = .04;
-				newObj->Rot.x = PI/2.5;
-
-
-					/* MAKE BASIC CYC */
-
-				gNewObjectDefinition.group	= MODEL_GROUP_LEVELSPECIFIC;
-				gNewObjectDefinition.type 	= 0;						// cyc is always 1st model in level bg3d files
-				gNewObjectDefinition.coord.x = 0;
-				gNewObjectDefinition.coord.y = 0;
-				gNewObjectDefinition.coord.z = 0;
-				gNewObjectDefinition.flags 	= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOZBUFFER;
-				gNewObjectDefinition.moveCall = nil;
-				gNewObjectDefinition.rot 	= 0;
-				gNewObjectDefinition.scale 	= gGameViewInfoPtr->yon * .995f / 100.0f;
-				newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-				newObj->CustomDrawFunction = DrawCyclorama;
-				newObj->ColorFilter.a = .9f;	//------
-
-				break;
-
 		default:
 				gNewObjectDefinition.group	= MODEL_GROUP_LEVELSPECIFIC;
 				gNewObjectDefinition.type 	= 0;						// cyc is always 1st model in level bg3d files
@@ -170,53 +119,6 @@ OGLPoint3D cameraCoord = setupInfo->cameraPlacement.cameraLocation;
 
 	MO_DrawObject(theNode->BaseGroup, setupInfo);
 }
-
-
-/********************** DRAW SATURN RING *************************/
-
-static void DrawSaturnRing(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
-{
-OGLPoint3D cameraCoord = setupInfo->cameraPlacement.cameraLocation;
-
-
-		/* UPDATE CYCLORAMA COORD INFO */
-
-	theNode->Coord.x = cameraCoord.x;
-	theNode->Coord.y = cameraCoord.y;
-	theNode->Coord.z = cameraCoord.z + 8000.0f;
-	theNode->Rot.z += gFramesPerSecondFrac * theNode->DeltaRot.z;
-
-//	theNode->Rot.x += gFramesPerSecondFrac * .5f;
-
-	UpdateObjectTransforms(theNode);
-
-
-			/* SET MODIFIED PROJECTION MATRIX FOR INFINITE YON */
-
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();														// keep matrix
-	glLoadIdentity();
-	gluPerspective (OGLMath_RadiansToDegrees(setupInfo->fov),		// fov
-					gCurrentAspectRatio,							// aspect
-					.1,												// hither
-					200000);										// yon
-
-	glMatrixMode(GL_MODELVIEW);
-
-
-
-			/* DRAW THE OBJECT */
-
-	MO_DrawObject(theNode->BaseGroup, setupInfo);
-
-
-			/* RESTORE MATRIX */
-
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-}
-
 
 #pragma mark -
 
