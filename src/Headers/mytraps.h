@@ -3,9 +3,12 @@
 //
 
 
+#define	MAX_MAGNET_MONSTERS				5
+
 #define	MagnetMonsterID					Special[0]
 #define	MagnetMonsterMoving				Flag[0]
 #define	MagnetMonsterResetToStart		Flag[1]
+#define	MagnetMonsterWatchPlayerRespawn	Flag[2]
 #define	MagnetMonsterSpeed				SpecialF[0]
 #define	MagnetMonsterInitialPlacement	SpecialF[1]
 

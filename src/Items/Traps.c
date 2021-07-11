@@ -90,7 +90,7 @@ enum
 
 ObjNode	*gSoapBubble;
 
-ObjNode	*gMagnetMonsterList[5];
+ObjNode	*gMagnetMonsterList[MAX_MAGNET_MONSTERS];
 
 #define	PlungerMode			Special[0]
 #define	SoapBubbleFree		Flag[0]
@@ -843,9 +843,13 @@ float			x,z,placement;
 			/* SET SOME CUSTOM STUFF */
 
 	newObj->MagnetMonsterID = itemPtr->parm[0];					// remember ID#
+
+	GAME_ASSERT_MESSAGE(newObj->MagnetMonsterID < MAX_MAGNET_MONSTERS, "Too many magnet monsters!");
 	gMagnetMonsterList[newObj->MagnetMonsterID] = newObj;		// keep in a list
+
 	newObj->MagnetMonsterMoving = false;
 	newObj->MagnetMonsterResetToStart = false;
+	newObj->MagnetMonsterWatchPlayerRespawn = false;
 	newObj->MagnetMonsterSpeed = 0;
 	newObj->MagnetMonsterInitialPlacement = placement;			// remember where started
 
@@ -882,6 +886,24 @@ float			x,z,placement;
 }
 
 
+/************** RESET MAGNET MONSTER TO INITIAL POSITION ON SPLINE **************/
+
+static void ResetMagnetMonsterPosition(ObjNode* theNode)
+{
+	theNode->SplinePlacement = theNode->MagnetMonsterInitialPlacement;
+	theNode->MagnetMonsterMoving = false;
+	theNode->MagnetMonsterResetToStart = false;
+	theNode->MagnetMonsterWatchPlayerRespawn = false;
+	theNode->MagnetMonsterSpeed = 0;
+	GetObjectCoordOnSpline(theNode);
+	SetSplineAim(theNode);
+	UpdateObjectTransforms(theNode);																// update transforms
+
+	if (theNode->EffectChannel != -1)
+		StopAChannelIfEffectNum(&theNode->EffectChannel, EFFECT_SLIMEBOAT);
+}
+
+
 /******************** MOVE MAGNET MONSTER ON SPLINE ***************************/
 
 static void MoveMagnetMonsterOnSpline(ObjNode *theNode)
@@ -897,6 +919,19 @@ float	fps = gFramesPerSecondFrac;
 
 	if (theNode->MagnetMonsterMoving)
 	{
+				/* ALWAYS RESET MY POSITION AFTER PLAYER DIES & RESPAWNS */
+
+		if (gPlayerIsDead)
+		{
+			theNode->MagnetMonsterWatchPlayerRespawn = true;	// wait on player to respawn before resetting position
+		}
+		else if (theNode->MagnetMonsterWatchPlayerRespawn)		// if player just respawned, reset position
+		{
+			ResetMagnetMonsterPosition(theNode);
+			return;
+		}
+
+
 				/* UPDATE SOUND */
 
 		if (theNode->EffectChannel == -1)
@@ -909,25 +944,22 @@ float	fps = gFramesPerSecondFrac;
 		if (theNode->MagnetMonsterSpeed > 460.0f)				// see if @ max speed
 			theNode->MagnetMonsterSpeed = 460.0f;
 
-				/* MOVE ONLY TO STARTING POSITION */
-
 		if (theNode->MagnetMonsterResetToStart)					// see if want to stop when back @ start index
 		{
 			float	oldPlacement = theNode->SplinePlacement;
 			IncreaseSplineIndex(theNode, theNode->MagnetMonsterSpeed);
 
+			// TODO: this condition seems buggy -- first magnet monster in level 2 seems to loop around placement 0.5?
 			if ((theNode->SplinePlacement >= theNode->MagnetMonsterInitialPlacement) && (oldPlacement < theNode->MagnetMonsterInitialPlacement))
 			{
-				theNode->MagnetMonsterMoving = false;
-				theNode->MagnetMonsterResetToStart = false;
-				theNode->MagnetMonsterSpeed = 0;
+				ResetMagnetMonsterPosition(theNode);
+				return;
 			}
 		}
-
-				/* JUST KEEP MOVING NORMALLY */
-
-		else
+		else													// just keep moving normally
+		{
 			IncreaseSplineIndex(theNode, theNode->MagnetMonsterSpeed);
+		}
 
 		GetObjectCoordOnSpline(theNode);
 	}
@@ -983,13 +1015,7 @@ float	fps = gFramesPerSecondFrac;
 	{
 		if (theNode->MagnetMonsterResetToStart)					// see if want to stop when back @ start index
 		{
-			theNode->SplinePlacement = theNode->MagnetMonsterInitialPlacement;
-			theNode->MagnetMonsterMoving = false;
-			theNode->MagnetMonsterResetToStart = false;
-			theNode->MagnetMonsterSpeed = 0;
-			GetObjectCoordOnSpline(theNode);
-			SetSplineAim(theNode);
-			UpdateObjectTransforms(theNode);																// update transforms
+			ResetMagnetMonsterPosition(theNode);
 		}
 	}
 }

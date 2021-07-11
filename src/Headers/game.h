@@ -122,7 +122,7 @@ extern	ObjNode					*gCurrentNode;
 extern	ObjNode					*gCurrentZip;
 extern	ObjNode					*gExitRocket;
 extern	ObjNode					*gFirstNodePtr;
-extern	ObjNode					*gMagnetMonsterList[];
+extern	ObjNode					*gMagnetMonsterList[MAX_MAGNET_MONSTERS];
 extern	ObjNode					*gPlayerRocketSled;
 extern	ObjNode					*gPlayerSaucer;
 extern	ObjNode					*gSaucerTarget;
