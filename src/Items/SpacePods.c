@@ -208,7 +208,7 @@ static OGLColorRGBA		vaporColor = {1,1,1, 1.1};
 
 				/* SEE IF BREAK ATMOSPHERE */
 
-		if ((theNode->OldCoord.y > gSkyY[gLevelNum]) && (gCoord.y <= gSkyY[gLevelNum]))
+		if ((theNode->OldCoord.y > gSkyAltitudeY) && (gCoord.y <= gSkyAltitudeY))
 		{
 			ObjNode	*newObj;
 
@@ -216,7 +216,7 @@ static OGLColorRGBA		vaporColor = {1,1,1, 1.1};
 			gNewObjectDefinition.type 		= GLOBAL_ObjType_Ripple;
 			gNewObjectDefinition.coord.x 	= gCoord.x;
 			gNewObjectDefinition.coord.z 	= gCoord.z;
-			gNewObjectDefinition.coord.y 	= gSkyY[gLevelNum];
+			gNewObjectDefinition.coord.y 	= gSkyAltitudeY;
 			gNewObjectDefinition.flags 		= gAutoFadeStatusBits|STATUS_BIT_KEEPBACKFACES|
 											STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING;
 			gNewObjectDefinition.slot 		= SLOT_OF_DUMB;

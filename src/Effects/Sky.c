@@ -32,85 +32,38 @@ static void DrawSky(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
 /*    VARIABLES      */
 /*********************/
 
-static Boolean				gIsSky = false;
 static OGLPoint3D			gSkyPoints[SKY_GRID_SIZE][SKY_GRID_SIZE];
 static OGLTextureCoord		gSkyUVs1[SKY_GRID_SIZE][SKY_GRID_SIZE];
 static OGLColorRGBA			gSkyColors[SKY_GRID_SIZE][SKY_GRID_SIZE];
 static MOTriangleIndecies	gSkyTriangles[NUM_SKY_TRIANGLES];
 static float				gSkyScrollX,gSkyScrollZ;
 
-const	Boolean gIsSkyTable[NUM_LEVELS] =
+float						gSkyAltitudeY;
+
+typedef struct
 {
-	true,				// farm
-	true,				// slime
-	false,				// slime boss
-	true,				// apocalypse
-	true,				// cloud
-	true,				// jungle
-	true,				// jungleboss
-	true,				// fireice
-	false,				// saucer
-	true,				// brain boss
-};
+	bool		hasSky;
+	float		altitude;
+	float		dip;
+	float		warp;
+	bool		fadeEdges;
+	bool		drawFirst;		// draw before terrain?
+} SkyStyle;
 
-
-const float gSkyY[NUM_LEVELS] =
+const SkyStyle kSkyTable[NUM_LEVELS] =
 {
-	4000.0f,		// farm
-	3500.0f,		// slime
-	4000.0f,		// slime boss
-	4000.0f,		// apocalypse
-	-1100.0f,		// cloud
-	3500.0f,		// jungle
-	3000.0f,		// jungle boss
-	4000.0f,		// fire ice
-	3000.0f,
-	3000.0f,		// brain boss
+//	Has?		Alt			Dip			Warp		FadeEdge	Draw1st
+	{ true,		4000,		.1f,		.15f,		true,		false,	}, // farm
+	{ true,		3500,		.4f,		0,			true,		true,	}, // slime
+	{ false,	0,			0,			0,			0,			0,		}, // slime boss
+	{ true,		4000,		.3f,		.1f,		true,		false,	}, // apocalypse
+	{ true,		-1100,		-.1f,		.2f,		false,		false,	}, // cloud
+	{ true,		3500,		0,			0,			true,		false,	}, // jungle
+	{ true,		3000,		0,			0,			true,		false,	}, // jungleboss
+	{ true,		4000,		.1f,		0,			true,		false,	}, // fireice
+	{ false,	0,			0,			0,			0,			0,		}, // saucer
+	{ true,		3000,		.2f,		0,			true,		false,	}, // brain boss
 };
-
-const float gSkyDip[NUM_LEVELS] =
-{
-	.1,					// farm
-	.4,					// slime
-	.3,					// slime boss
-	.3,					// apocalypse
-	-.1,				// cloud
-	0,					// jungle
-	0,					// jungle boss
-	.1,					// fire ice
-	0,
-	.2					// brain boss
-};
-
-const float gSkyWarp[NUM_LEVELS] =
-{
-	.15,			// farm
-	0,				// slime
-	0,				// slime boss
-	.1,				// apocalypse
-	.2,				// cloud
-	0,
-	0,
-	0,
-	0,
-	0,				// brain boss
-};
-
-
-const float gFadeEdges[NUM_LEVELS] =
-{
-	true,			// farm
-	true,				// slime
-	true,				// slime boss
-	true,				// apocalypse
-	false,				// cloud
-	true,
-	true,
-	true,
-	true,
-	true,				// brain boss
-};
-
 
 
 
@@ -124,14 +77,14 @@ void InitSky(OGLSetupOutputType *setupInfo)
 int					r,c;
 float				cornerX,cornerZ,dist,alpha;
 MOTriangleIndecies	*triPtr;
-Boolean				fadeEdges;
 ObjNode				*obj;
 
-	gIsSky = gIsSkyTable[gLevelNum];								// sky on this level?
-	if (!gIsSky)
-		return;
+	const SkyStyle* mySky = &kSkyTable[gLevelNum];
 
-	fadeEdges = gFadeEdges[gLevelNum];
+	gSkyAltitudeY = mySky->altitude;
+
+	if (!mySky->hasSky)								// sky on this level?
+		return;
 
 			/* BUILD BASE GRID */
 
@@ -142,12 +95,12 @@ ObjNode				*obj;
 	{
 		for (c = 0; c < SKY_GRID_SIZE; c++)
 		{
-			gSkyPoints[r][c].x = cornerX + c * SKY_GRID_SCALE + (RandomFloat2() * (SKY_GRID_SCALE * gSkyWarp[gLevelNum]));
-			gSkyPoints[r][c].z = cornerZ + r * SKY_GRID_SCALE + (RandomFloat2() * (SKY_GRID_SCALE * gSkyWarp[gLevelNum]));
+			gSkyPoints[r][c].x = cornerX + c * SKY_GRID_SCALE + (RandomFloat2() * (SKY_GRID_SCALE * mySky->warp));
+			gSkyPoints[r][c].z = cornerZ + r * SKY_GRID_SCALE + (RandomFloat2() * (SKY_GRID_SCALE * mySky->warp));
 			gSkyPoints[r][c].y = RandomFloat2() * 100.0f;
 
 			dist = CalcDistance3D(0,0,0, gSkyPoints[r][c].x,gSkyPoints[r][c].y, gSkyPoints[r][c].z);
-			if (fadeEdges)
+			if (mySky->fadeEdges)
 			{
 				alpha = 1.0f - (dist / (setupInfo->yon * .7f));
 				if (alpha < 0.0f)
@@ -159,7 +112,7 @@ ObjNode				*obj;
 			else
 				alpha = 1.0;
 
-			gSkyPoints[r][c].y -= dist * gSkyDip[gLevelNum];	// dip down as it goes away
+			gSkyPoints[r][c].y -= dist * mySky->dip;	// dip down as it goes away
 
 
 			gSkyColors[r][c].r = 1;
@@ -192,15 +145,13 @@ ObjNode				*obj;
 	gSkyScrollX = 0;
 	gSkyScrollZ = 0;
 
-	gIsSky = true;
-
 
 			/**********************/
 			/* CREATE DRAW OBJECT */
 			/**********************/
 
 	gNewObjectDefinition.genre		= CUSTOM_GENRE;
-	gNewObjectDefinition.slot 		= TERRAIN_SLOT+1;
+	gNewObjectDefinition.slot 		= TERRAIN_SLOT + (mySky->drawFirst? -1: +1);
 	gNewObjectDefinition.moveCall 	= nil;
 	gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_NOZWRITES | STATUS_BIT_NOLIGHTING;
 
@@ -219,7 +170,6 @@ ObjNode				*obj;
 
 void DisposeSky(void)
 {
-	gIsSky = false;
 }
 
 
@@ -234,7 +184,7 @@ OGLMatrix4x4	m;
 int					r,c;
 float			u,v;
 
-	if (!gIsSky)
+	if (!kSkyTable->hasSky)
 		return;
 
 
@@ -287,7 +237,7 @@ float			u,v;
 
 			/* SETUP VERTEX COLORS */
 
-	if (gFadeEdges[gLevelNum])
+	if (kSkyTable[gLevelNum].fadeEdges)
 	{
 		glColorPointer(4, GL_FLOAT, 0, (GLfloat *)&gSkyColors[0][0]);
 		glEnableClientState(GL_COLOR_ARRAY);								// enable color arrays
@@ -299,7 +249,7 @@ float			u,v;
 			/* SET TRANSLATION TRANSFORM */
 
 	OGLMatrix4x4_SetTranslate(&m, gPlayerInfo.camera.cameraLocation.x,
-								gSkyY[gLevelNum],
+								kSkyTable[gLevelNum].altitude,
 								gPlayerInfo.camera.cameraLocation.z);
 	glMultMatrixf((GLfloat *)&m);
 
