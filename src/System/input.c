@@ -22,8 +22,10 @@ enum
 	KEYSTATE_ACTIVE_BIT	= 0b10,
 };
 
-#define JOYSTICK_DEAD_ZONE .1f
-#define JOYSTICK_DEAD_ZONE_SQUARED (JOYSTICK_DEAD_ZONE*JOYSTICK_DEAD_ZONE)
+const int16_t	kJoystickDeadZone				= (33 * 32767 / 100);
+const int16_t	kJoystickDeadZone_UI			= (66 * 32767 / 100);
+const float		kJoystickDeadZoneFrac			= kJoystickDeadZone / 32767.0f;
+const float		kJoystickDeadZoneFracSquared	= kJoystickDeadZoneFrac * kJoystickDeadZoneFrac;
 
 /***************/
 /* EXTERNALS   */
@@ -49,44 +51,6 @@ OGLVector2D			gCameraControlDelta;
 
 static OGLVector2D GetThumbStickVector(bool rightStick);
 
-
-			/**************/
-			/* NEEDS LIST */
-			/**************/
-
-#if __APPLE__
-	#define DEFAULT_SHOOT_SC1 SDL_SCANCODE_LGUI
-	#define DEFAULT_SHOOT_SC2 SDL_SCANCODE_RGUI
-#else
-	#define DEFAULT_SHOOT_SC1 SDL_SCANCODE_LCTRL
-	#define DEFAULT_SHOOT_SC2 SDL_SCANCODE_RCTRL
-#endif
-
-const KeyBinding gDefaultKeyBindings[NUM_CONTROL_NEEDS] =
-{
-[kNeed_Forward		] = {SDL_SCANCODE_UP,		SDL_SCANCODE_W,			0,					SDL_CONTROLLER_BUTTON_DPAD_UP, },
-[kNeed_Backward		] = {SDL_SCANCODE_DOWN,		SDL_SCANCODE_S,			0,					SDL_CONTROLLER_BUTTON_DPAD_DOWN, },
-[kNeed_TurnLeft		] = {SDL_SCANCODE_LEFT,		SDL_SCANCODE_A,			0,					SDL_CONTROLLER_BUTTON_DPAD_LEFT, },
-[kNeed_TurnRight	] = {SDL_SCANCODE_RIGHT,	SDL_SCANCODE_D,			0,					SDL_CONTROLLER_BUTTON_DPAD_RIGHT, },
-[kNeed_PrevWeapon	] = {0,						0,						0,					SDL_CONTROLLER_BUTTON_LEFTSHOULDER, },
-[kNeed_NextWeapon	] = {SDL_SCANCODE_LSHIFT,	SDL_SCANCODE_RSHIFT,	SDL_BUTTON_MIDDLE,	SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, },
-[kNeed_Shoot		] = {DEFAULT_SHOOT_SC1,		DEFAULT_SHOOT_SC2,		SDL_BUTTON_LEFT,	SDL_CONTROLLER_BUTTON_X, },
-[kNeed_PunchPickup	] = {SDL_SCANCODE_LALT,		SDL_SCANCODE_RALT,		SDL_BUTTON_RIGHT,	SDL_CONTROLLER_BUTTON_B, },
-[kNeed_Jump			] = {SDL_SCANCODE_SPACE,	0,						0,					SDL_CONTROLLER_BUTTON_A, },
-[kNeed_CameraMode	] = {SDL_SCANCODE_TAB,		0,						0,					SDL_CONTROLLER_BUTTON_RIGHTSTICK, },
-[kNeed_CameraLeft	] = {SDL_SCANCODE_COMMA,	0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
-[kNeed_CameraRight	] = {SDL_SCANCODE_PERIOD,	0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
-//[kNeed_Pause			] = { "Pause",				SDL_SCANCODE_ESCAPE,	0,						0,					SDL_CONTROLLER_BUTTON_START, },
-//[kKey_ToggleMusic		] = { "Toggle Music",		SDL_SCANCODE_M,			0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
-//[kKey_ToggleFullscreen	] = { "Toggle Fullscreen",	SDL_SCANCODE_F11,		0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
-//[kKey_RaiseVolume		] = { "Raise Volume",		SDL_SCANCODE_EQUALS,	0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
-//[kKey_LowerVolume		] = { "Lower Volume",		SDL_SCANCODE_MINUS,		0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
-//[kKey_ZoomIn			] = { "Zoom In",			SDL_SCANCODE_2,			0,						0,					SDL_CONTROLLER_BUTTON_LEFTSHOULDER, },
-//[kKey_ZoomOut			] = { "Zoom Out",			SDL_SCANCODE_1,			0,						0,					SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, },
-//[kKey_UI_Confirm		] = { "DO_NOT_REBIND",		SDL_SCANCODE_RETURN,	SDL_SCANCODE_KP_ENTER,	0,					SDL_CONTROLLER_BUTTON_INVALID, },
-//[kKey_UI_Cancel			] = { "DO_NOT_REBIND",		SDL_SCANCODE_ESCAPE,	0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
-//[kKey_UI_Skip			] = { "DO_NOT_REBIND",		SDL_SCANCODE_SPACE,		0,						0,					SDL_CONTROLLER_BUTTON_INVALID, },
-};
 
 /**********************/
 /* STATIC FUNCTIONS   */
@@ -115,20 +79,19 @@ static inline void UpdateKeyState(Byte* state, bool downNow)
 
 void InitInput(void)
 {
-	SOURCE_PORT_MINOR_PLACEHOLDER();
 }
 
 void UpdateInput(void)
 {
-
 	gTextInput[0] = '\0';
-
 
 			/**********************/
 			/* DO SDL MAINTENANCE */
 			/**********************/
 
 	MouseSmoothing_StartFrame();
+
+	int mouseWheelDelta = 0;
 
 	SDL_PumpEvents();
 	SDL_Event event;
@@ -182,6 +145,14 @@ void UpdateInput(void)
 					}
 					break;
 
+				case SDL_MOUSEWHEEL:
+					if (!gEatMouse)
+					{
+						mouseWheelDelta += event.wheel.y;
+						mouseWheelDelta += event.wheel.x;
+					}
+					break;
+
 				case SDL_JOYDEVICEADDED:	 // event.jdevice.which is the joy's INDEX (not an instance id!)
 					TryOpenController(false);
 					break;
@@ -222,17 +193,55 @@ void UpdateInput(void)
 
 		bool downNow = false;
 
-		if (kb->key1 && kb->key1 < numkeys)
-			downNow |= 0 != keystate[kb->key1];
+		for (int j = 0; j < KEYBINDING_MAX_KEYS; j++)
+			if (kb->key[j] && kb->key[j] < numkeys)
+				downNow |= 0 != keystate[kb->key[j]];
 
-		if (kb->key2 && kb->key2 < numkeys)
-			downNow |= 0 != keystate[kb->key2];
+		switch (kb->mouse.type)
+		{
+			case kButton:
+				downNow |= 0 != (mouseButtons & SDL_BUTTON(kb->mouse.id));
+				break;
 
-		if (kb->mouseButton)
-			downNow |= 0 != (mouseButtons & SDL_BUTTON(kb->mouseButton));
+			case kAxisPlus:
+				downNow |= mouseWheelDelta > 0;
+				break;
 
-		if (gSDLController && kb->gamepadButton != SDL_CONTROLLER_BUTTON_INVALID)
-			downNow |= 0 != SDL_GameControllerGetButton(gSDLController, kb->gamepadButton);
+			case kAxisMinus:
+				downNow |= mouseWheelDelta < 0;
+				break;
+
+			default:
+				break;
+		}
+
+		if (gSDLController)
+		{
+			int16_t deadZone = i >= NUM_REMAPPABLE_NEEDS
+							   ? kJoystickDeadZone_UI
+							   : kJoystickDeadZone;
+
+			for (int j = 0; j < KEYBINDING_MAX_GAMEPAD_BUTTONS; j++)
+			{
+				switch (kb->gamepad[j].type)
+				{
+					case kButton:
+						downNow |= 0 != SDL_GameControllerGetButton(gSDLController, kb->gamepad[j].id);
+						break;
+
+					case kAxisPlus:
+						downNow |= SDL_GameControllerGetAxis(gSDLController, kb->gamepad[j].id) > deadZone;
+						break;
+
+					case kAxisMinus:
+						downNow |= SDL_GameControllerGetAxis(gSDLController, kb->gamepad[j].id) < -deadZone;
+						break;
+
+					default:
+						break;
+				}
+			}
+		}
 
 		UpdateKeyState(&gNeedStates[i], downNow);
 	}
@@ -447,7 +456,7 @@ static OGLVector2D GetThumbStickVector(bool rightStick)
 	float dy = dyRaw / 32767.0f;
 
 	float magnitudeSquared = dx*dx + dy*dy;
-	if (magnitudeSquared < JOYSTICK_DEAD_ZONE_SQUARED)
+	if (magnitudeSquared < kJoystickDeadZoneFracSquared)
 		return (OGLVector2D) { 0, 0 };
 	else
 		return (OGLVector2D) { dx, dy };

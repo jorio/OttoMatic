@@ -145,7 +145,7 @@ extern	TileAttribType			**gTileAttribList;
 extern	WaterDefType			**gWaterListHandle;
 extern	WaterDefType			*gWaterList;
 extern	char					gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
-extern	const KeyBinding		gDefaultKeyBindings[NUM_CONTROL_NEEDS];
+extern	const KeyBinding		kDefaultKeyBindings[NUM_CONTROL_NEEDS];
 extern	const OGLPoint3D		gPlayerMuzzleTipOff;
 extern	float					gSkyAltitudeY;
 extern	float					**gMapYCoords;

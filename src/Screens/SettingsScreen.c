@@ -108,7 +108,7 @@ static int gNumSettingRows = sizeof(gSettingEntries) / sizeof(gSettingEntries[0]
 // Keybindings menu
 static int gHighlightedKeybindingRow = 0;
 static int gHighlightedKeybindingColumn = 0;
-static int gNumKeybindingRows = NUM_CONTROL_NEEDS + 2;		// 2 extra row for reset & back buttons
+static int gNumKeybindingRows = NUM_REMAPPABLE_NEEDS + 2;		// 2 extra row for reset & back buttons
 
 static float gSettingsFadeAlpha = 0;
 static int gSettingsState = SETTINGS_STATE_OFF;
@@ -257,10 +257,13 @@ static void NavigateKeybindings(void)
 	bool valueActivated = GetNewKeyState(SDL_SCANCODE_SPACE) || GetNewKeyState(SDL_SCANCODE_RETURN);
 	bool valueNuked = GetNewKeyState(SDL_SCANCODE_DELETE) || GetNewKeyState(SDL_SCANCODE_BACKSPACE);
 
-	if (gHighlightedKeybindingRow < NUM_CONTROL_NEEDS)
+	if (gHighlightedKeybindingRow < NUM_REMAPPABLE_NEEDS)
 	{
+		GAME_ASSERT(gHighlightedKeybindingRow < NUM_REMAPPABLE_NEEDS);
+		GAME_ASSERT(gHighlightedKeybindingColumn < KEYBINDING_MAX_KEYS);
+
 		KeyBinding* entry = &gGamePrefs.keys[gHighlightedKeybindingRow];
-		int16_t* entryKey = gHighlightedKeybindingColumn == 0 ? &entry->key1 : &entry->key2;
+		int16_t* entryKey = &entry->key[gHighlightedKeybindingColumn];
 
 		if (valueNuked)
 		{
@@ -281,15 +284,15 @@ static void NavigateKeybindings(void)
 			LayOutKeybindingScreen();
 		}
 	}
-	else if (valueActivated && gHighlightedKeybindingRow == NUM_CONTROL_NEEDS + 0)		// reset
+	else if (valueActivated && gHighlightedKeybindingRow == gNumKeybindingRows - 2)		// reset
 	{
 		MyFlushEvents();
 		PlayEffect(EFFECT_FLAREEXPLODE);
-		memcpy(gGamePrefs.keys, gDefaultKeyBindings, sizeof(gDefaultKeyBindings));
-		_Static_assert(sizeof(gDefaultKeyBindings) == sizeof(gGamePrefs.keys), "size mismatch: default keybindings / prefs keybindings");
+		memcpy(gGamePrefs.keys, kDefaultKeyBindings, sizeof(kDefaultKeyBindings));
+		_Static_assert(sizeof(kDefaultKeyBindings) == sizeof(gGamePrefs.keys), "size mismatch: default keybindings / prefs keybindings");
 		LayOutKeybindingScreen();
 	}
-	else if (valueActivated && gHighlightedKeybindingRow == NUM_CONTROL_NEEDS + 1)		// back
+	else if (valueActivated && gHighlightedKeybindingRow == gNumKeybindingRows - 1)		// back
 	{
 		MyFlushEvents();
 		PlayEffect(EFFECT_WEAPONCLICK);
@@ -299,7 +302,8 @@ static void NavigateKeybindings(void)
 
 static void NavigateKeybinding_AwaitNewKey(void)
 {
-	GAME_ASSERT(gHighlightedKeybindingRow < NUM_CONTROL_NEEDS);
+	GAME_ASSERT(gHighlightedKeybindingRow < NUM_REMAPPABLE_NEEDS);
+	GAME_ASSERT(gHighlightedKeybindingColumn < KEYBINDING_MAX_KEYS);
 
 	UpdateInput();
 
@@ -317,7 +321,7 @@ static void NavigateKeybinding_AwaitNewKey(void)
 			{
 				PlayEffect(EFFECT_MENUCHANGE);
 				KeyBinding* entry = &gGamePrefs.keys[gHighlightedKeybindingRow];
-				int16_t* entryKey = gHighlightedKeybindingColumn == 0 ? &entry->key1 : &entry->key2;
+				int16_t* entryKey = &entry->key[gHighlightedKeybindingColumn];
 				*entryKey = i;
 				gSettingsState = SETTINGS_STATE_CONTROLS_READY;
 				MyFlushEvents();
@@ -467,43 +471,45 @@ static void LayOutKeybindingScreen(void)
 	gNewObjectDefinition.scale		= .6f;
 
 	// Draw binding text
-	for (int bindingID = 0; bindingID < NUM_CONTROL_NEEDS; bindingID++)
+	for (int bindingID = 0; bindingID < NUM_REMAPPABLE_NEEDS; bindingID++)
 	{
 		const char* caption = Localize(STR_KEYBINDING_DESCRIPTION_0 + bindingID);
-		const char* value1 = "---";
-		const char* value2 = "---";
-
-		if (gGamePrefs.keys[bindingID].key1 != 0)
-			value1 = SDL_GetScancodeName(gGamePrefs.keys[bindingID].key1);
-
-		if (gGamePrefs.keys[bindingID].key2 != 0)
-			value2 = SDL_GetScancodeName(gGamePrefs.keys[bindingID].key2);
-
-		if (gHighlightedKeybindingRow == bindingID && gSettingsState == SETTINGS_STATE_CONTROLS_AWAITING_PRESS)
-		{
-			if (gHighlightedKeybindingColumn == 0)
-				value1 = Localize(STR_PRESS);
-			else
-				value2 = Localize(STR_PRESS);
-		}
 
 		gNewObjectDefinition.coord.x = -170;
 		ObjNode* captionNode = TextMesh_New(caption, 0, &gNewObjectDefinition);
 		captionNode->ColorFilter = kInactiveColor;
 
-		gNewObjectDefinition.coord.x = 0;
-		ObjNode* valueNode1 = TextMesh_NewEmpty(256, &gNewObjectDefinition);
-		TextMesh_Update(value1, 0, valueNode1);
-		valueNode1->SpecialHighlightType	= 2;
-		valueNode1->SpecialHighlightRow		= bindingID;
-		valueNode1->SpecialHighlightColumn	= 0;
+		gNewObjectDefinition.coord.x += 170;
 
-		gNewObjectDefinition.coord.x = 120;
-		ObjNode* valueNode2 = TextMesh_NewEmpty(256, &gNewObjectDefinition);
-		TextMesh_Update(value2, 0, valueNode2);
-		valueNode2->SpecialHighlightType	= 2;
-		valueNode2->SpecialHighlightRow		= bindingID;
-		valueNode2->SpecialHighlightColumn	= 1;
+		for (int column = 0; column < KEYBINDING_MAX_KEYS; column++)
+		{
+			int16_t thisScancode = gGamePrefs.keys[bindingID].key[column];
+
+			const char* value1;
+
+			if (gHighlightedKeybindingRow == bindingID &&
+				gHighlightedKeybindingColumn == column &&
+				gSettingsState == SETTINGS_STATE_CONTROLS_AWAITING_PRESS)
+			{
+				value1 = Localize(STR_PRESS);
+			}
+			else if (thisScancode != 0)
+			{
+				value1 = SDL_GetScancodeName(thisScancode);
+			}
+			else
+			{
+				value1 = "---";
+			}
+
+			ObjNode* valueNode1 = TextMesh_NewEmpty(256, &gNewObjectDefinition);
+			TextMesh_Update(value1, 0, valueNode1);
+			valueNode1->SpecialHighlightType	= 2;
+			valueNode1->SpecialHighlightRow		= bindingID;
+			valueNode1->SpecialHighlightColumn	= column;
+
+			gNewObjectDefinition.coord.x += 120;
+		}
 
 		gNewObjectDefinition.coord.y += SCORE_TEXT_SPACING * 1.5f;
 	}

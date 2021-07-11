@@ -2,19 +2,37 @@
 // input.h
 //
 
-#ifndef __INPUT_H
-#define __INPUT_H
-
+#pragma once
 
 		/* NEEDS */
 
+#define KEYBINDING_MAX_KEYS					2
+#define KEYBINDING_MAX_GAMEPAD_BUTTONS		2
+
 typedef struct KeyBinding
 {
-	int16_t		key1;
-	int16_t		key2;
-	int16_t		mouseButton;
-	int16_t		gamepadButton;
+	int16_t			key[KEYBINDING_MAX_KEYS];
+
+	struct
+	{
+		int8_t		type;
+		int8_t		id;
+	} mouse;
+
+	struct
+	{
+		int8_t		type;
+		int8_t		id;
+	} gamepad[KEYBINDING_MAX_GAMEPAD_BUTTONS];
 } KeyBinding;
+
+enum
+{
+	kUnbound = 0,
+	kButton,
+	kAxisPlus,
+	kAxisMinus,
+};
 
 enum
 {
@@ -30,7 +48,23 @@ enum
 	kNeed_CameraMode,
 	kNeed_CameraLeft,
 	kNeed_CameraRight,
-	
+
+	NUM_REMAPPABLE_NEEDS,
+
+	// ^^^ REMAPPABLE
+	// --------------------------------------------------------
+	//              NON-REMAPPABLE vvv
+
+	kNeed_UIUp = NUM_REMAPPABLE_NEEDS,
+	kNeed_UIDown,
+	kNeed_UILeft,
+	kNeed_UIRight,
+	kNeed_UIPrev,
+	kNeed_UINext,
+	kNeed_UIConfirm,
+	kNeed_UIBack,
+	kNeed_UIPause,
+
 	NUM_CONTROL_NEEDS
 };
 
@@ -49,7 +83,3 @@ Boolean GetNeedState(int needID);
 
 SDL_GameController* TryOpenController(bool showMessageOnFailure);
 void OnJoystickRemoved(SDL_JoystickID which);
-
-
-
-#endif

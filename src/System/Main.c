@@ -130,7 +130,6 @@ void ToolBoxInit(void)
 
 
 /********** INIT DEFAULT PREFS ******************/
-extern const KeyBinding gDefaultKeyBindings[NUM_CONTROL_NEEDS];
 
 void InitDefaultPrefs(void)
 {
@@ -147,8 +146,8 @@ void InitDefaultPrefs(void)
 	gGamePrefs.anaglyphCalibrationBlue		= DEFAULT_ANAGLYPH_B;
 	gGamePrefs.doAnaglyphChannelBalancing	= true;
 
-	memcpy(gGamePrefs.keys, gDefaultKeyBindings, sizeof(gGamePrefs.keys));
-	_Static_assert(sizeof(gDefaultKeyBindings) == sizeof(gGamePrefs.keys), "size mismatch: default keybindings / prefs keybindings");
+	memcpy(gGamePrefs.keys, kDefaultKeyBindings, sizeof(gGamePrefs.keys));
+	_Static_assert(sizeof(kDefaultKeyBindings) == sizeof(gGamePrefs.keys), "size mismatch: default keybindings / prefs keybindings");
 
 	LoadLocalizedStrings(gGamePrefs.language);
 }
