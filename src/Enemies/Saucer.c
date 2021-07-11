@@ -41,6 +41,12 @@ static void MoveAlienSaucer_Radiating(ObjNode *topObj);
 
 #define	SAUCER_SCALE		2.5f
 
+#define SAUCER_FADEIN_TIME	1.0f
+
+#define	SAUCER_VANISH_DIST	9000.0f
+#define	SAUCER_FADEOUT_DIST	2500.0f
+#define	SAUCER_STARTFADEOUT_DIST	(SAUCER_VANISH_DIST - SAUCER_FADEOUT_DIST)
+
 
 enum
 {
@@ -56,6 +62,8 @@ enum
 /*********************/
 
 #define	Deformation		Special[1]
+#define	SpecialSaucerFade	SpecialF[0]
+#define	SpecialSaucerAge	SpecialF[1]
 
 ObjNode	*gAlienSaucer = nil;
 ObjNode *gSaucerTarget = nil;
@@ -154,6 +162,8 @@ DeformationType		defData;
 	gAlienSaucer = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	gAlienSaucer->Mode = SAUCER_MODE_TOTARGET;
+	gAlienSaucer->SpecialSaucerFade = 0.0f;
+	gAlienSaucer->SpecialSaucerAge = 0.0f;
 
 	CreateCollisionBoxFromBoundingBox(gAlienSaucer, 1.1,1.1);
 
@@ -165,6 +175,12 @@ DeformationType		defData;
 	bottom = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	gAlienSaucer->ChainNode = bottom;
+
+
+			/* INIT FADE COLOR */
+
+	gAlienSaucer->ColorFilter.a = 0;
+	bottom->ColorFilter.a = 0;
 
 
 
@@ -252,6 +268,11 @@ static void MoveAlienSaucer(ObjNode *topObj)
 {
 	GetObjectInfo(topObj);
 
+	topObj->SpecialSaucerAge += gFramesPerSecondFrac;
+	topObj->SpecialSaucerFade = 1.0f;		// reset fade
+
+			/* STATE UPDATE */
+
 	switch(topObj->Mode)
 	{
 		case	SAUCER_MODE_TOTARGET:
@@ -269,13 +290,12 @@ static void MoveAlienSaucer(ObjNode *topObj)
 		case	SAUCER_MODE_LEAVING:
 				MoveAlienSaucer_Leaving(topObj);
 				break;
-
-
-
 	}
 
 	if (gAlienSaucer)
+	{
 		UpdateSaucer(topObj);
+	}
 
 }
 
@@ -288,6 +308,14 @@ static void MoveAlienSaucer_TowardTarget(ObjNode *topObj)
 float	fps = gFramesPerSecondFrac;
 float	dist,speed,tx,ty,tz,gy;
 OGLVector3D	aim;
+
+
+			/* FADE IN IF APPEARED RECENTLY */
+
+	if (topObj->SpecialSaucerAge < SAUCER_FADEIN_TIME)
+	{
+		topObj->SpecialSaucerFade = topObj->SpecialSaucerAge/SAUCER_FADEIN_TIME;
+	}
 
 
 		/**********************/
@@ -492,10 +520,20 @@ float	fps = gFramesPerSecondFrac;
 
 	HandleCollisions(topObj, CTYPE_MISC, -1.0);
 
+		/* SEE HOW FAR */
+
+	float distance = CalcQuickDistance(gCoord.x, gCoord.z, gGameViewInfoPtr->cameraPlacement.cameraLocation.x, gGameViewInfoPtr->cameraPlacement.cameraLocation.z);
+
+		/* FADE OUT IF FAR ENOUGH */
+
+	if (distance > SAUCER_STARTFADEOUT_DIST)
+	{
+		topObj->SpecialSaucerFade = 1.0f - (distance - SAUCER_STARTFADEOUT_DIST) / (SAUCER_FADEOUT_DIST);
+	}
 
 		/* SEE IF GONE */
 
-	if (CalcQuickDistance(gCoord.x, gCoord.z, gGameViewInfoPtr->cameraPlacement.cameraLocation.x, gGameViewInfoPtr->cameraPlacement.cameraLocation.z) > 9000.0f)
+	if (distance > SAUCER_VANISH_DIST)
 	{
 		DeleteSaucer(topObj);
 		return;
@@ -529,6 +567,12 @@ int		i;
 	bottom->Coord = gCoord;
 	bottom->Coord.y += 5.0f;
 	UpdateObjectTransforms(bottom);
+
+
+			/* SET ALPHA BASED ON FADE COMPUTED IN MOVE CALL */
+
+	topObj->ColorFilter.a = topObj->SpecialSaucerFade;
+	bottom->ColorFilter.a = topObj->SpecialSaucerFade;
 
 
 			/*******************/
