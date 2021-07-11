@@ -1203,7 +1203,6 @@ void OGL_UpdateCameraFromToUp(OGLSetupOutputType *setupInfo, OGLPoint3D *from, O
 void OGL_Camera_SetPlacementAndUpdateMatrices(OGLSetupOutputType *setupInfo)
 {
 float	aspect;
-OGLCameraPlacement	*placement;
 int		temp, w, h, i;
 OGLLightDefType	*lights;
 
@@ -1213,8 +1212,6 @@ OGLLightDefType	*lights;
 			/* INIT PROJECTION MATRIX */
 
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
 
 			/* SETUP FOR ANAGLYPH STEREO 3D CAMERA */
 
@@ -1237,16 +1234,21 @@ OGLLightDefType	*lights;
 			right =   aspect * wd2 - 0.5f * gAnaglyphEyeSeparation * ndfl;
 		}
 
+		glLoadIdentity();
 		glFrustum(left, right, -wd2, wd2, setupInfo->hither, setupInfo->yon);
+		glGetFloatv(GL_PROJECTION_MATRIX, (GLfloat*) &gViewToFrustumMatrix.value[0]);
 	}
 
 			/* SETUP STANDARD PERSPECTIVE CAMERA */
 	else
 	{
-		gluPerspective (OGLMath_RadiansToDegrees(setupInfo->fov),	// fov
-						aspect,					// aspect
-						setupInfo->hither,		// hither
-						setupInfo->yon);		// yon
+		OGL_SetGluPerspectiveMatrix(
+				&gViewToFrustumMatrix,
+				setupInfo->fov,
+				aspect,
+				setupInfo->hither,
+				setupInfo->yon);
+		glLoadMatrixf((const GLfloat*) &gViewToFrustumMatrix.value[0]);
 	}
 
 
@@ -1254,11 +1256,13 @@ OGLLightDefType	*lights;
 			/* INIT MODELVIEW MATRIX */
 
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	placement = &setupInfo->cameraPlacement;
-	gluLookAt(placement->cameraLocation.x, placement->cameraLocation.y, placement->cameraLocation.z,
-			placement->pointOfInterest.x, placement->pointOfInterest.y, placement->pointOfInterest.z,
-			placement->upVector.x, placement->upVector.y, placement->upVector.z);
+	OGL_SetGluLookAtMatrix(
+			&gWorldToViewMatrix,
+			&setupInfo->cameraPlacement.cameraLocation,
+			&setupInfo->cameraPlacement.pointOfInterest,
+			&setupInfo->cameraPlacement.upVector);
+	glLoadMatrixf((const GLfloat*) &gWorldToViewMatrix.value[0]);
+
 
 
 		/* UPDATE LIGHT POSITIONS */
@@ -1278,8 +1282,6 @@ OGLLightDefType	*lights;
 
 			/* GET VARIOUS CAMERA MATRICES */
 
-	glGetFloatv(GL_MODELVIEW_MATRIX, (GLfloat *)&gWorldToViewMatrix);
-	glGetFloatv(GL_PROJECTION_MATRIX, (GLfloat *)&gViewToFrustumMatrix);
 	OGLMatrix4x4_Multiply(&gWorldToViewMatrix, &gViewToFrustumMatrix, &gWorldToFrustumMatrix);
 
 	OGLMatrix4x4_GetFrustumToWindow(setupInfo, &gFrustumToWindowMatrix);

@@ -11,12 +11,6 @@
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
 
-#if __APPLE__
-	#include <OpenGL/glu.h>		// gluPerspective
-#else
-	#include <GL/glu.h>			// gluPerspective
-#endif
-
 #include "Pomme.h"
 
 #include "globals.h"

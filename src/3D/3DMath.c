@@ -19,19 +19,6 @@
 #define Math_Max(x,y)             ((x) >= (y) ? (x) : (y))
 
 
-#define CROSS(dest,v1,v2){                 \
-          dest[0]=v1[1]*v2[2]-v1[2]*v2[1]; \
-          dest[1]=v1[2]*v2[0]-v1[0]*v2[2]; \
-          dest[2]=v1[0]*v2[1]-v1[1]*v2[0];}
-
-#define DOT(v1,v2) (v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2])
-
-#define SUB(dest,v1,v2){       \
-          dest[0]=v1[0]-v2[0]; \
-          dest[1]=v1[1]-v2[1]; \
-          dest[2]=v1[2]-v2[2];}
-
-
 /****************************/
 /*    CONSTANTS             */
 /****************************/
@@ -1756,9 +1743,7 @@ const OGLVector2D	*sPtr;
 
 float OGLVector3D_Dot(const OGLVector3D	*v1, const OGLVector3D	*v2)
 {
-float	dot;
-
-	dot = ((v1->x * v2->x) + (v1->y * v2->y) + (v1->z * v2->z));		// calc dot
+	float dot = OGLVector3D_RawDot(v1, v2);
 
 			/* CHECK FOR FLOATING POINT PRECISION PROBLEMS */
 			//
@@ -1774,7 +1759,6 @@ float	dot;
 
 	return(dot);
 }
-
 
 /************* VECTOR 2D DOT ****************/
 //
@@ -1865,35 +1849,14 @@ float length, oneOverLength;
 
 void OGLVector3D_Cross(const OGLVector3D *v1, const OGLVector3D	*v2, OGLVector3D *result)
 {
-OGLVector3D			s1, s2, temp;
-const OGLVector3D	*s1Ptr, *s2Ptr;
-
-	if (v1 == result)
-	{
-		s1 = *v1;
-		s1Ptr = &s1;
-	}
-	else
-	{
-		s1Ptr = v1;
-	}
-
-	if (v2 == result)
-	{
-		s2 = *v2;
-		s2Ptr = &s2;
-	}
-	else
-	{
-		s2Ptr = v2;
-	}
-
-	temp.x = s1Ptr->y * s2Ptr->z - s2Ptr->y * s1Ptr->z;
-	temp.y = s2Ptr->x * s1Ptr->z - s1Ptr->x * s2Ptr->z;
-	temp.z = s1Ptr->x * s2Ptr->y - s2Ptr->x * s1Ptr->y;
-
-	OGLVector3D_Normalize(&temp, result);
+	OGLVector3D_RawCross(v1, v2, result);
+	OGLVector3D_Normalize(result, result);
 }
+
+
+
+
+
 
 
 /*********************** VECTOR 3D TRANSFORM ****************************/
@@ -2715,22 +2678,66 @@ short			i;
 }
 
 
+#pragma mark -
 
+/********************** FILL PROJECTION MATRIX ************************/
+//
+// Result equivalent to matrix produced by gluPerspective
+//
 
+void OGL_SetGluPerspectiveMatrix(
+		OGLMatrix4x4* m,
+		float fov,
+		float aspect,
+		float hither,
+		float yon)
+{
+	float cotan = 1.0f / tanf(fov/2.0f);
+	float depth = hither - yon;
 
+#define M m->value
+	M[M00] = cotan/aspect;	M[M01] = 0;			M[M02] = 0;						M[M03] = 0;
+	M[M10] = 0;				M[M11] = cotan;		M[M12] = 0;						M[M13] = 0;
+	M[M20] = 0;				M[M21] = 0;			M[M22] = (yon+hither)/depth;	M[M23] = 2*yon*hither/depth;
+	M[M30] = 0;				M[M31] = 0;			M[M32] = -1;					M[M33] = 0;
+#undef M
+}
 
+/********************** FILL LOOKAT MATRIX ************************/
+//
+// Result equivalent to matrix produced by gluLookAt
+//
+void OGL_SetGluLookAtMatrix(
+		OGLMatrix4x4* m,
+		const OGLPoint3D* eye,
+		const OGLPoint3D* target,
+		const OGLVector3D* upDir)
+{
+	// Forward = target - eye
+	OGLVector3D fwd;
+	fwd.x = target->x - eye->x;
+	fwd.y = target->y - eye->y;
+	fwd.z = target->z - eye->z;
+	OGLVector3D_Normalize(&fwd, &fwd);
 
+	// Side = forward x up
+	OGLVector3D side;
+	OGLVector3D_RawCross(&fwd, upDir, &side);
+	OGLVector3D_Normalize(&side, &side);
 
+	// Recompute up as: up = side x forward
+	OGLVector3D up;
+	OGLVector3D_RawCross(&side, &fwd, &up);
 
+	// Premultiply by translation to eye position
+	float tx = OGLVector3D_RawDot(&side,	(OGLVector3D*)eye);
+	float ty = OGLVector3D_RawDot(&up,		(OGLVector3D*)eye);
+	float tz = OGLVector3D_RawDot(&fwd,		(OGLVector3D*)eye);
 
-
-
-
-
-
-
-
-
-
-
-
+#define M m->value
+	M[M00] = side.x;	M[M01] = side.y;	M[M02] = side.z;	M[M03] = -tx;
+	M[M10] = up.x;		M[M11] = up.y;		M[M12] = up.z;		M[M13] = -ty;
+	M[M20] = -fwd.x;	M[M21] = -fwd.y;	M[M22] = -fwd.z;	M[M23] = tz;
+	M[M30] = 0;			M[M31] = 0;			M[M32] = 0;			M[M33] = 1;
+#undef M
+}

@@ -28,6 +28,10 @@
 #endif
 
 		/* 4x4 MATRIX INDECIES */
+		//
+		// These are in (row,col) format (standard math notation).
+		// Example: M30 --> 4th row, 1st column.
+		//
 enum
 {
 	M00	= 0,

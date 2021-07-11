@@ -2,6 +2,7 @@
 // 3DMath.h
 //
 
+#pragma once
 
 #define OGLMath_RadiansToDegrees(x)	((float)((x) * 180.0f / PI))
 
@@ -102,6 +103,31 @@ void ApplyFrictionToRotation(float f,OGLVector3D *d);
 void ApplyFrictionToDeltasXZ(float f,OGLVector3D *d);
 
 void OGLBoundingBox_Transform(OGLBoundingBox *inBox, OGLMatrix4x4 *m, OGLBoundingBox *outBox);
+
+
+void OGL_SetGluPerspectiveMatrix(OGLMatrix4x4* m, float fov, float aspect, float hither, float yon);
+
+void OGL_SetGluLookAtMatrix(OGLMatrix4x4* m, const OGLPoint3D* eye, const OGLPoint3D* target, const OGLVector3D* upDir);
+
+
+
+
+static inline float OGLVector3D_RawDot(const OGLVector3D *v1, const OGLVector3D *v2)
+{
+	return (v1->x * v2->x) + (v1->y * v2->y) + (v1->z * v2->z);
+}
+
+
+static inline void OGLVector3D_RawCross(const OGLVector3D *v1, const OGLVector3D *v2, OGLVector3D *result)
+{
+	float rx = (v1->y * v2->z) - (v1->z * v2->y);
+	float ry = (v1->z * v2->x) - (v1->x * v2->z);
+	float rz = (v1->x * v2->y) - (v1->y * v2->x);
+
+	result->x = rx;
+	result->y = ry;
+	result->z = rz;
+}
 
 
 /*********** INTERSECTION OF Y AND PLANE ********************/
