@@ -77,9 +77,9 @@ void UpdateInput(void);
 void CaptureMouse(Boolean doCapture);
 Boolean GetNewKeyState(unsigned short sdlScanCode);
 Boolean GetKeyState(unsigned short sdlScanCode);
-Boolean AreAnyNewKeysPressed(void);
 Boolean GetNewNeedState(int needID);
 Boolean GetNeedState(int needID);
+Boolean UserWantsOut(void);
 
 SDL_GameController* TryOpenController(bool showMessageOnFailure);
 void OnJoystickRemoved(SDL_JoystickID which);

@@ -95,7 +95,7 @@ float	delayToTabloid = 6.0f;
 				StartTabloid();
 		}
 		else
-		if (AreAnyNewKeysPressed())
+		if (UserWantsOut())
 			break;
 
 	}
@@ -202,7 +202,7 @@ float	timer;
 	while((timer-=gFramesPerSecondFrac) > 0.0f)
 	{
 		UpdateInput();
-		if (AreAnyNewKeysPressed())
+		if (UserWantsOut())
 			break;
 
 			/* DRAW STUFF */

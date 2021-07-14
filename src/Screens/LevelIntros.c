@@ -156,7 +156,7 @@ float	oldTime,maxTime = 11.0f;
 		MoveObjects();
 		OGL_DrawScene(gGameViewInfoPtr, DrawIntroCallback);
 
-		if (AreAnyNewKeysPressed())
+		if (UserWantsOut())
 			break;
 
 

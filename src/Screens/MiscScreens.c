@@ -76,20 +76,18 @@ float	timeout = 40.0f;
 
 					/* MAIN LOOP */
 
-		while (true)
+		do
 		{
 			CalcFramesPerSecond();
 			MoveObjects();
 			OGL_DrawScene(gGameViewInfoPtr, DisplayPicture_Draw);
 
 			UpdateInput();
-			if (AreAnyNewKeysPressed())
-				break;
 
 			timeout -= gFramesPerSecondFrac;
 			if (timeout < 0.0f)
 				break;
-		}
+		} while (!UserWantsOut());
 
 
 			/* CLEANUP */

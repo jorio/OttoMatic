@@ -291,7 +291,7 @@ static void PlayArea(void)
 
 			/* SEE IF PAUSED */
 
-		if (GetNewKeyState(SDL_SCANCODE_ESCAPE))
+		if (GetNewNeedState(kNeed_UIPause))
 		{
 			CaptureMouse(false);
 			DoPaused();

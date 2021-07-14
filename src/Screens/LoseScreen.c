@@ -114,7 +114,7 @@ float	timer = 43.0f;
 		if (timer <= 0.0f)
 			break;
 
-	}while(!AreAnyNewKeysPressed());
+	} while (!UserWantsOut());
 
 
 			/* CLEANUP */

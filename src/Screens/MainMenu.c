@@ -1106,7 +1106,7 @@ static Boolean DoMainMenuControl(void)
 	{
 			/* SPIN LEFT */
 
-		if (GetNewKeyState(SDL_SCANCODE_LEFT))
+		if (GetNewNeedState(kNeed_UILeft) || GetNewNeedState(kNeed_UINext))
 		{
 			PlayEffect(EFFECT_MENUCHANGE);
 			gTargetRot -= PI2 / (float)NUM_SELECTIONS;
@@ -1118,7 +1118,7 @@ static Boolean DoMainMenuControl(void)
 				/* SPIN RIGHT */
 
 		else
-		if (GetNewKeyState(SDL_SCANCODE_RIGHT))
+		if (GetNewNeedState(kNeed_UIRight) || GetNewNeedState(kNeed_UIPrev))
 		{
 			PlayEffect(EFFECT_MENUCHANGE);
 			gTargetRot += PI2 / (float)NUM_SELECTIONS;
@@ -1130,7 +1130,7 @@ static Boolean DoMainMenuControl(void)
 
 				/* MAKE SELECTION */
 		else
-		if (GetNewKeyState(SDL_SCANCODE_RETURN) || GetNewKeyState(SDL_SCANCODE_SPACE))
+		if (GetNewNeedState(kNeed_UIConfirm))
 		{
 			gHideIconString = true;
 
@@ -1195,7 +1195,7 @@ static Boolean DoMainMenuControl(void)
 		/***************/
 	else
 	{
-		if (GetNewKeyState(SDL_SCANCODE_RETURN) || GetNewKeyState(SDL_SCANCODE_SPACE))
+		if (UserWantsOut())
 		{
 			DeleteObject(gLogoObj);
 			StopAChannel(&gLogoAmbience);
@@ -1549,7 +1549,7 @@ ObjNode	*glow, *text, *pane;
 	while(!gTextDone)
 	{
 		UpdateInput();
-		if (AreAnyNewKeysPressed())
+		if (UserWantsOut())
 			gFadeInText = false;
 
 			/* DRAW STUFF */
@@ -1604,7 +1604,7 @@ ObjNode	*pane;
 	while(true)
 	{
 		UpdateInput();
-		if (AreAnyNewKeysPressed())
+		if (UserWantsOut())
 			gFadeInText = false;
 
 			/*  FADE IN */
@@ -1744,7 +1744,7 @@ ObjNode	*pane, *glow, *text, *subtext1, *subtext2, *subtext3;
 	while(!gTextDone)
 	{
 		UpdateInput();
-		if (AreAnyNewKeysPressed())
+		if (UserWantsOut())
 			gFadeInText = false;
 
 			/* DRAW STUFF */

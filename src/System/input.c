@@ -39,7 +39,6 @@ SDL_GameController	*gSDLController = NULL;
 SDL_JoystickID		gSDLJoystickInstanceID = -1;		// ID of the joystick bound to gSDLController
 
 Byte				gRawKeyboardState[SDL_NUM_SCANCODES];
-bool				gAnyNewKeysPressed = false;
 char				gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
 
 Byte				gNeedStates[NUM_CONTROL_NEEDS];
@@ -167,17 +166,11 @@ void UpdateInput(void)
 	const UInt8* keystate = SDL_GetKeyboardState(&numkeys);
 	uint32_t mouseButtons = SDL_GetMouseState(NULL, NULL);
 
-	gAnyNewKeysPressed = false;
-
 	{
 		int minNumKeys = numkeys < SDL_NUM_SCANCODES ? numkeys : SDL_NUM_SCANCODES;
 
 		for (int i = 0; i < minNumKeys; i++)
-		{
 			UpdateKeyState(&gRawKeyboardState[i], keystate[i]);
-			if (gRawKeyboardState[i] == KEYSTATE_PRESSED)
-				gAnyNewKeysPressed = true;
-		}
 
 		// fill out the rest
 		for (int i = minNumKeys; i < SDL_NUM_SCANCODES; i++)
@@ -353,9 +346,9 @@ Boolean GetKeyState(unsigned short sdlScanCode)
 	return gRawKeyboardState[sdlScanCode] == KEYSTATE_PRESSED || gRawKeyboardState[sdlScanCode] == KEYSTATE_HELD;
 }
 
-Boolean AreAnyNewKeysPressed(void)
+Boolean UserWantsOut(void)
 {
-	return gAnyNewKeysPressed;
+	return GetNewNeedState(kNeed_UIConfirm) || GetNewNeedState(kNeed_UIBack);
 }
 
 Boolean GetNeedState(int needID)
