@@ -89,7 +89,6 @@ extern	Boolean					gPlayingFromSavedGame;
 extern	Boolean					gSongPlayingFlag;
 extern	Byte					**gMapSplitMode;
 extern	Byte					gDebugMode;
-extern	Byte					gMuteMusicFlag;
 extern	Byte					gHumansInSaucerList[];
 extern	ChannelInfoType			gChannelInfo[];
 extern	CollisionBoxType 		*gSaucerIceBounds;

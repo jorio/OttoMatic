@@ -17,7 +17,7 @@
 
 static short FindSilentChannel(void);
 static void Calc3DEffectVolume(short effectNum, OGLPoint3D *where, float volAdjust, u_long *leftVolOut, u_long *rightVolOut);
-static void UpdateGlobalVolume(void);
+//static void UpdateGlobalVolume(void);
 
 
 /****************************/
@@ -68,7 +68,6 @@ Boolean						gAllowAudioKeys = true;
 
 
 static short				gMusicFileRefNum = 0x0ded;
-Byte				gMuteMusicFlag = false;			// must be a Byte so the settings screen cycler can manipulate it
 short				gCurrentSong = -1;
 
 
@@ -631,7 +630,7 @@ float	volumeTweaks[]=
 
 			/* SEE IF WANT TO MUTE THE MUSIC */
 
-	if (gMuteMusicFlag)
+	if (!gGamePrefs.music)
 	{
 		SndPauseFilePlay(gMusicChannel);			// pause it
 	}
@@ -669,12 +668,18 @@ void KillSong(void)
 
 /******************** TOGGLE MUSIC *********************/
 
-void ToggleMusic(void)
+void EnforceMusicPausePref(void)
 {
-	gMuteMusicFlag = !gMuteMusicFlag;
-	SndPauseFilePlay(gMusicChannel);			// pause it
-}
+	if (gGamePaused)
+		return;
 
+	SCStatus	theStatus;
+
+	SndChannelStatus(gMusicChannel, sizeof(SCStatus), &theStatus);	// get channel info
+
+	if (gGamePrefs.music != theStatus.scChannelBusy)
+		SndPauseFilePlay(gMusicChannel);
+}
 
 
 #pragma mark -
@@ -1034,7 +1039,7 @@ u_long			lv2,rv2;
 
 #pragma mark -
 
-
+#if 0
 /****************** UPDATE GLOBAL VOLUME ************************/
 //
 // Call this whenever gGlobalVolume is changed.  This will update
@@ -1059,6 +1064,7 @@ int		c;
 		SOURCE_PORT_MINOR_PLACEHOLDER(); //SetMovieVolume(gSongMovie, FloatToFixed16(gGlobalVolume) * SONG_VOLUME);
 
 }
+#endif
 
 /*************** CHANGE CHANNEL VOLUME **************/
 //
@@ -1127,7 +1133,7 @@ static	SndChannelPtr	chanPtr;
 
 void DoSoundMaintenance(void)
 {
-
+#if 0	// disabled because we can turn off music in-game via settings now
 	if (gAllowAudioKeys)
 	{
 					/* SEE IF TOGGLE MUSIC */
@@ -1154,6 +1160,7 @@ void DoSoundMaintenance(void)
 			UpdateGlobalVolume();
 		}
 	}
+#endif
 }
 
 

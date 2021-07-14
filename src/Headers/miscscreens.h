@@ -50,6 +50,7 @@ void DoWinScreen(void);
 void DrawDarkenPane(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
 void MoveCredits(ObjNode *text);
 
-void DoSettingsOverlay(void);
+void DoSettingsOverlay(void (*updateRoutine)(void),
+					   void (*backgroundDrawRoutine)(OGLSetupOutputType *));
 
 bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(OGLSetupOutputType *));

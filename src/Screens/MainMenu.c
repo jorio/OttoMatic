@@ -1167,7 +1167,7 @@ static Boolean DoMainMenuControl(void)
 						break;
 
 				case	SELECT_OPTIONS:
-						DoSettingsOverlay();
+						DoSettingsOverlay(nil, DrawMainMenuCallback);
 						break;
 
 				case	SELECT_CREDITS:
@@ -1504,10 +1504,8 @@ ObjNode	*glow, *text, *pane;
 	gNewObjectDefinition.moveCall 	= MoveCredits;
 	pane = MakeNewObject(&gNewObjectDefinition);
 	pane->CustomDrawFunction = DrawDarkenPane;
-	pane->ColorFilter.r = 0;
-	pane->ColorFilter.g = 0;
-	pane->ColorFilter.b = 0;
-	pane->ColorFilter.a = 0;
+	pane->Scale.y = 480;
+	pane->ColorFilter = (OGLColorRGBA) {0, 0, 0, 0};
 
 
 			/* GLOW */
@@ -1592,6 +1590,7 @@ ObjNode	*pane;
 	gNewObjectDefinition.moveCall 	= nil;
 	pane = MakeNewObject(&gNewObjectDefinition);
 	pane->CustomDrawFunction = DrawDarkenPane;
+	pane->Scale.y = 480;
 	pane->ColorFilter = (OGLColorRGBA){0,0,0,0};
 
 	SetupHighScoreTableObjNodes(pane, 0);
@@ -1687,6 +1686,7 @@ ObjNode	*pane, *glow, *text, *subtext1, *subtext2, *subtext3;
 	gNewObjectDefinition.moveCall 	= MoveCredits;
 	pane = MakeNewObject(&gNewObjectDefinition);
 	pane->CustomDrawFunction = DrawDarkenPane;
+	pane->Scale.y = 480;
 	pane->ColorFilter = (OGLColorRGBA) {0,0,0,0};
 
 	gNewObjectDefinition.autoChain = pane;
@@ -1808,24 +1808,20 @@ ObjNode *mainText = glow->ChainNode;
 
 void DrawDarkenPane(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
 {
+	OGL_PushState();
+	SetInfobarSpriteState(true);
+
 	glDisable(GL_TEXTURE_2D);
 	SetColor4fv((GLfloat *)&theNode->ColorFilter);
 	glEnable(GL_BLEND);
 
 	glBegin(GL_QUADS);
-	glVertex3f(-1000,-1000,DARKEN_PANE_Z);
-	glVertex3f(1000,-1000,DARKEN_PANE_Z);
-	glVertex3f(1000,1000,DARKEN_PANE_Z);
-	glVertex3f(-1000,1000,DARKEN_PANE_Z);
+	glVertex3f(-g2DLogicalWidth,	-theNode->Scale.y,	0);
+	glVertex3f(g2DLogicalWidth,		-theNode->Scale.y,	0);
+	glVertex3f(g2DLogicalWidth,		theNode->Scale.y,	0);
+	glVertex3f(-g2DLogicalWidth,	theNode->Scale.y,	0);
 	glEnd();
 
-	glDisable(GL_BLEND);
+	OGL_PopState();
 }
-
-
-
-
-
-
-
 

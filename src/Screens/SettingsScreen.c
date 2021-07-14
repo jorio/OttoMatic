@@ -162,11 +162,10 @@ static const MenuItem gSettingsMenu[] =
 		.text = STR_MUSIC,
 		.cycler =
 		{
-			.callback = ToggleMusic,
-			.valuePtr = &gMuteMusicFlag,
+			.callback = EnforceMusicPausePref,
+			.valuePtr = &gGamePrefs.music,
 			.numChoices = 2,
-			.choices = {STR_ON, STR_OFF},
-			.callbackSetsValue = true,
+			.choices = {STR_OFF, STR_ON},
 		},
 	},
 
@@ -201,7 +200,8 @@ static const MenuItem gSettingsMenu[] =
 /*                          RUNNER                             */
 /***************************************************************/
 
-void DoSettingsOverlay(void)
+void DoSettingsOverlay(void (*updateRoutine)(void),
+					   void (*backgroundDrawRoutine)(OGLSetupOutputType *))
 {
 	gAllowAudioKeys = false;					// dont interfere with keyboard binding
 
@@ -209,7 +209,7 @@ void DoSettingsOverlay(void)
 
 	PrefsType gPreviousPrefs = gGamePrefs;
 
-	StartMenu(gSettingsMenu, nil, nil, DrawMainMenuCallback);
+	StartMenu(gSettingsMenu, nil, updateRoutine, backgroundDrawRoutine);
 
 	// Save prefs if any changes
 	if (0 != memcmp(&gGamePrefs, &gPreviousPrefs, sizeof(gGamePrefs)))

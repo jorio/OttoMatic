@@ -48,6 +48,8 @@ enum
 const MenuStyle kDefaultMenuStyle =
 {
 	.darkenPane			= true,
+	.darkenPaneScaleY	= 480,
+	.darkenPaneOpacity	= .7f,
 	.fadeInSpeed		= 3.0f,
 	.asyncFadeOut		= true,
 	.centeredText		= false,
@@ -178,7 +180,7 @@ static const char* GetPadBindingName(int row, int col)
 
 static void MoveDarkenPane(ObjNode* node)
 {
-	node->ColorFilter.a = gMenuFadeAlpha * .8f;
+	node->ColorFilter.a = gMenuFadeAlpha * gMenuStyle->darkenPaneOpacity;
 }
 
 static void MoveLabel(ObjNode* node)
@@ -326,8 +328,7 @@ static void NavigateCycler(const MenuItem* entry)
 
 	if (delta != 0)
 	{
-		OGLPoint3D zero = {0,0,0};
-		PlayEffect_Parms3D(kSfxCycle, &zero, NORMAL_CHANNEL_RATE + (RandomFloat2() * 0x3000), 1.5);
+		PlayEffect_Parms(kSfxCycle, FULL_CHANNEL_VOLUME, FULL_CHANNEL_VOLUME, NORMAL_CHANNEL_RATE + (RandomFloat2() * 0x3000));
 
 		if (entry->cycler.valuePtr && !entry->cycler.callbackSetsValue)
 		{
@@ -628,6 +629,7 @@ static ObjNode* MakeDarkenPane(void)
 	pane = MakeNewObject(&gNewObjectDefinition);
 	pane->CustomDrawFunction = DrawDarkenPane;
 	pane->ColorFilter = (OGLColorRGBA) {0, 0, 0, 0};
+	pane->Scale.y = gMenuStyle->darkenPaneScaleY;
 	pane->MoveCall = MoveDarkenPane;
 
 	return pane;

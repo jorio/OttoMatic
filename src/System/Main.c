@@ -138,6 +138,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.language						= GetBestLanguageIDFromSystemLocale();
 	gGamePrefs.fullscreen					= true;
 	gGamePrefs.antialiasing					= true;
+	gGamePrefs.music						= true;
 	gGamePrefs.playerRelControls			= false;
 	gGamePrefs.anaglyph						= false;
 	gGamePrefs.anaglyphColor				= true;

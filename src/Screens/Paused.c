@@ -18,6 +18,8 @@ static void PausedUpdateCallback(void)
 
 void DoPaused(void)
 {
+	int pick = 0;
+
 	GammaOn();
 
 	gGamePaused = true;
@@ -26,8 +28,9 @@ void DoPaused(void)
 	static const MenuItem pauseMenu[] =
 	{
 		{.type=kMenuItem_Pick,		.text=STR_RESUME_GAME,			.pick=0},
-		{.type=kMenuItem_Pick,		.text=STR_RETIRE_GAME,			.pick=1},
-		{.type=kMenuItem_Pick,		.text=STR_QUIT_APPLICATION,		.pick=2},
+		{.type=kMenuItem_Pick,		.text=STR_SETTINGS,				.pick=1},
+		{.type=kMenuItem_Pick,		.text=STR_RETIRE_GAME,			.pick=2},
+		{.type=kMenuItem_Pick,		.text=STR_QUIT_APPLICATION,		.pick=3},
 		{.type=kMenuItem_END_SENTINEL},
 	};
 
@@ -36,19 +39,39 @@ void DoPaused(void)
 	menuStyle.asyncFadeOut = true;
 	menuStyle.fadeInSpeed = 15;
 	menuStyle.inactiveColor = gPausedMenuNoHiliteColor;
-	menuStyle.startPosition = (OGLPoint3D) {0,-12,0};
+	menuStyle.startPosition = (OGLPoint3D) {0,-46,0};
 	menuStyle.standardScale = 1.0f;
 	menuStyle.rowHeight = 24;
-	menuStyle.darkenPane = false;
+	menuStyle.darkenPane = true;
+	menuStyle.darkenPaneScaleY = 64;
+	menuStyle.darkenPaneOpacity = .3f;
 	menuStyle.playMenuChangeSounds = false;
 
-	int pick = StartMenu(pauseMenu, &menuStyle, PausedUpdateCallback, DrawArea);
+again:
+	pick = StartMenu(pauseMenu, &menuStyle, PausedUpdateCallback, DrawArea);
 
-	Pomme_PauseAllChannels(false);
+
+	switch (pick)
+	{
+		case 1:
+			DoSettingsOverlay(PausedUpdateCallback, DrawArea);
+			goto again;
+			break;
+
+		case 2:
+			gGameOver = true;
+			break;
+
+		case 3:
+			CleanQuit();
+			break;
+
+		default:
+			break;
+	}
+
 	gGamePaused = false;
 
-	if (pick == 1)
-		gGameOver = true;
-	else if (pick == 2)
-		CleanQuit();
+	Pomme_PauseAllChannels(false);
+	EnforceMusicPausePref();
 }
