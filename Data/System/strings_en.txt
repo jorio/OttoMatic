@@ -10,7 +10,7 @@ Resume game
 Retire game
 Quit application
 Save game
-Continue
+Continue without saving
 Level
 Score
 EMPTY----------
@@ -64,7 +64,9 @@ Fullscreen
 Antialiasing
 Anaglyph 3D
 Player-relative controls
-Configure keys
+Music
+Configure keyboard
+Configure gamepad
 Back
 Yes
 No

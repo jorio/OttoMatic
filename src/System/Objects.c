@@ -369,6 +369,10 @@ ObjNode		*thisNodePtr;
 		gNextNode	 = thisNodePtr->NextNode;				// get next node now (cuz current node might get deleted)
 
 
+		if (gGamePaused && !(thisNodePtr->StatusBits & STATUS_BIT_MOVEINPAUSE))
+			goto next;
+
+
 				/* UPDATE ANIMATION */
 
 		UpdateSkeletonAnimation(thisNodePtr);
@@ -384,6 +388,8 @@ ObjNode		*thisNodePtr;
 				thisNodePtr->MoveCall(thisNodePtr);				// call object's move routine
 			}
 		}
+
+next:
 		thisNodePtr = gNextNode;							// next node
 	}
 	while (thisNodePtr != nil);

@@ -64,7 +64,9 @@ Schermo intero
 Antialiasing
 Anaglyph 3D
 Player-relative controls
-Configura tasti
+Musica
+Configura la tastiera
+Configura il gamepad
 Indietro
 S“
 No

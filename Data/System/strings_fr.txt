@@ -13,7 +13,7 @@ Enregistrer la partie
 Continuer sans enregistrer
 Niveau
 Score
-VIDE-----------
+[Vide]
 janv.
 févr.
 mars
@@ -64,7 +64,9 @@ Plein écran
 Anticrénelage
 3D anaglyphe
 Contrôles relatifs au joueur
-Configurer les touches
+Musique
+Configurer le clavier
+Configurer la manette
 Retour
 Oui
 Non

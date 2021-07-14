@@ -2,8 +2,7 @@
 // Sound2.h
 //
 
-#ifndef SOUND_H
-#define SOUND_H
+#pragma once
 
 typedef struct
 {
@@ -43,11 +42,11 @@ enum
 enum
 {
 	SOUND_BANK_MAIN 			= 0,
-	SOUND_BANK_MENU				= 1,
 	SOUND_BANK_BONUS			= 1,
 	SOUND_BANK_LOSE				= 1,
 	SOUND_BANK_LEVELSPECIFIC	= 2,
-	
+	SOUND_BANK_MENU				= 3,
+
 	MAX_SOUND_BANKS
 };
 
@@ -495,7 +494,6 @@ enum
 
 
 extern void	InitSoundTools(void);
-void   TurnOnHighQualityRateConverter (void);
 void ShutdownSound(void);
 
 void StopAChannel(short *channelNum);
@@ -509,7 +507,6 @@ extern void	DoSoundMaintenance(void);
 extern	void LoadSoundBank(FSSpec *spec, long bankNum);
 extern	void WaitEffectsSilent(void);
 extern	void DisposeSoundBank(short bankNum);
-extern	void DisposeAllSoundBanks(void);
 short PlayEffect_Parms(short effectNum, u_long leftVolume, u_long rightVolume, unsigned long rateMultiplier);
 void ChangeChannelVolume(short channel, u_long leftVol, u_long rightVol);
 short PlayEffect3D(short effectNum, OGLPoint3D *where);
@@ -518,11 +515,3 @@ Boolean IsEffectChannelPlaying(short chanNum);
 void UpdateListenerLocation(OGLSetupOutputType *setupInfo);
 void ChangeChannelRate(short channel, long rateMult);
 void StopAChannelIfEffectNum(short *channelNum, short effectNum);
-
-
-void PlayAnnouncerSound(short effectNum, Boolean override, float delay);
-
-
-#endif
-
-

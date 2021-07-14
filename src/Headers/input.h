@@ -28,10 +28,10 @@ typedef struct KeyBinding
 
 enum
 {
-	kUnbound = 0,
-	kButton,
-	kAxisPlus,
-	kAxisMinus,
+	kInputTypeUnbound = 0,
+	kInputTypeButton,
+	kInputTypeAxisPlus,
+	kInputTypeAxisMinus,
 };
 
 enum

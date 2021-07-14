@@ -35,7 +35,6 @@ static void MoveBonusInventoryIcon(ObjNode *theNode);
 static void DoTotalBonusTally(void);
 static void DrawBonusToScore(OGLSetupOutputType *info);
 static int DoSaveGamePrompt(void);
-static int NavigateSaveMenu(void);
 static void DoTractorBeam(void);
 static void InitBonusTractorBeam(void);
 static void MoveBonusTractorBeam(ObjNode *beam);
@@ -47,12 +46,9 @@ static void MoveGlowDisc(ObjNode *theNode);
 /*    CONSTANTS             */
 /****************************/
 
-#define	SAVE_TEXT_SIZE		1.0f//30.0f
-
 #define	POINTS_HUMAN		4000
 #define	POINTS_INVENTORY	150
 
-#define	HUMAN_MARGIN	700.0f
 #define	HUMAN_SPACING	160.0f
 
 enum
@@ -108,9 +104,6 @@ enum
 	SAVE_MENU_SELECTION_CONTINUE,
 };
 
-
-#define DIGIT_SPACING 	30.0f
-#define	DIGIT_SPACING_Q	20.0f						// for inventory quantity number
 
 #define	INVENTORY_COUNT_DELAY	.1f
 
@@ -171,9 +164,6 @@ static	Byte	gShowScoreMode;
 static	u_long	gBonusTotal, gBonus, gInventoryQuantity;
 
 static	float	gScoreAlpha,gInventoryQuantityAlpha,gInventoryCountTimer;
-
-static ObjNode	*gSaveIcons[2];
-static	short	gSaveMenuSelection;
 
 static	short	gPointBeepChannel;
 
@@ -743,142 +733,27 @@ float	tick;
 
 static int DoSaveGamePrompt(void)
 {
-short	i;
-
-	gSaveMenuSelection = 0;
-
-			/**********************/
-			/* BUILD TEXT STRINGS */
-			/**********************/
-
-	gNewObjectDefinition.coord.x 	= 0;		// FONTSTRING_GENRE objects are centered
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= 0;
-	gNewObjectDefinition.flags 		= 0;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 	    = SAVE_TEXT_SIZE;
-	gNewObjectDefinition.slot 		= SPRITE_SLOT;
-
-	for (i = 0; i < 2; i++)
-	{
-		const char* cstr = Localize(i + STR_SAVE_GAME);
-
-		gSaveIcons[i] = TextMesh_New(cstr, 1, &gNewObjectDefinition);
-		gSaveIcons[i]->ColorFilter.a = 0;
-		gNewObjectDefinition.coord.y += SAVE_TEXT_SIZE * 32.0f * .7f;
-	}
-
-				/*************/
-				/* MAIN LOOP */
-				/*************/
-
-	CalcFramesPerSecond();
-	UpdateInput();
-
-	int saveMenuOutcome = SAVE_MENU_SELECTION_NONE;
-
-	while(true)
-	{
-		DoSoundMaintenance();
-
-			/* SEE IF MAKE SELECTION */
-
-		saveMenuOutcome = NavigateSaveMenu();
-		if (saveMenuOutcome != SAVE_MENU_SELECTION_NONE)
-			break;
-
-			/* DRAW STUFF */
-
-		CalcFramesPerSecond();
-		UpdateInput();
-		OGL_DrawScene(gGameViewInfoPtr, DrawObjects);
-
-
-			/* FADE IN TEXT */
-
-		for (i = 0; i < 2; i++)
-		{
-			gSaveIcons[i]->ColorFilter.a += gFramesPerSecondFrac * 3.0f;
-			if (gSaveIcons[i]->ColorFilter.a > 1.0f)
-				gSaveIcons[i]->ColorFilter.a = 1.0;
-		}
-
-
-	}
-
-
-			/* CLEANUP */
-
-	for (i = 0; i < 2; i++)
-		DeleteObject(gSaveIcons[i]);
-
-
-	return saveMenuOutcome;
-}
-
-
-/*********************** NAVIGATE SAVE MENU **************************/
-
-static int NavigateSaveMenu(void)
-{
 static const OGLColorRGBA noHiliteColor = {.3,.5,.2,1};
 
-		/* SEE IF CHANGE SELECTION */
-
-	// TODO: gamepad-friendly input here
-	if (GetNewKeyState(SDL_SCANCODE_UP) && (gSaveMenuSelection > 0))
+	static const MenuItem savePrompt[] =
 	{
-		gSaveMenuSelection--;
-		PlayEffect(EFFECT_WEAPONCLICK);
-	}
-	else
-	// TODO: gamepad-friendly input here
-	if (GetNewKeyState(SDL_SCANCODE_DOWN) && (gSaveMenuSelection < 1))
-	{
-		gSaveMenuSelection++;
-		PlayEffect(EFFECT_WEAPONCLICK);
-	}
+		{.type=kMenuItem_Pick,		.text=STR_SAVE_GAME,				.pick=SAVE_MENU_SELECTION_SAVE},
+		{.type=kMenuItem_Pick,		.text=STR_CONTINUE_WITHOUT_SAVING,	.pick=SAVE_MENU_SELECTION_CONTINUE},
+		{.type=kMenuItem_END_SENTINEL},
+	};
 
-		/* SET APPROPRIATE FRAMES FOR ICONS */
+	MenuStyle menuStyle = kDefaultMenuStyle;
+	menuStyle.centeredText = true;
+	menuStyle.asyncFadeOut = false;
+	menuStyle.fadeInSpeed = 10;
+	menuStyle.inactiveColor = noHiliteColor;
+	menuStyle.startPosition = (OGLPoint3D) {0,-12,0};
+	menuStyle.standardScale = 1.0f;
+	menuStyle.rowHeight = 24;
+	menuStyle.darkenPane = false;
+	menuStyle.playMenuChangeSounds = false;
 
-	for (int i = 0; i < 2; i++)
-	{
-		if (i == gSaveMenuSelection)
-		{
-			gSaveIcons[i]->ColorFilter.r = 										// normal
-			gSaveIcons[i]->ColorFilter.g =
-			gSaveIcons[i]->ColorFilter.b =
-			gSaveIcons[i]->ColorFilter.a = .7f + RandomFloat() * .29f;
-		}
-		else
-		{
-			gSaveIcons[i]->ColorFilter = noHiliteColor;							// hilite
-		}
-
-	}
-
-
-			/***************************/
-			/* SEE IF MAKE A SELECTION */
-			/***************************/
-
-	// TODO: gamepad-friendly input here
-	if (GetNewKeyState(SDL_SCANCODE_RETURN) || GetNewKeyState(SDL_SCANCODE_SPACE))
-	{
-		switch(gSaveMenuSelection)
-		{
-			case	0:								// SAVE GAME
-					return SAVE_MENU_SELECTION_SAVE;
-
-			case	1:								// CONTINUE
-					return SAVE_MENU_SELECTION_CONTINUE;
-		}
-	}
-
-
-
-	return SAVE_MENU_SELECTION_NONE;
+	return StartMenu(savePrompt, &menuStyle, nil, DrawObjects);
 }
 
 

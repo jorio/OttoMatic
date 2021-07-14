@@ -330,7 +330,7 @@ struct ObjNode
 	float				ParticleTimer;
 	
 	MOSpriteObject		*SpriteMO;				// ref to sprite meta object for sprite genre.
-	short				TextQuadCapacity;
+	int					TextQuadCapacity;
 
 	OGLColorRGBA		ColorFilter;
 	float				TextureTransformU, TextureTransformV;

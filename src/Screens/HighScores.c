@@ -376,13 +376,6 @@ Str255				scoreString;
 
 
 
-				/* LOAD AUDIO */
-
-//	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:bonus.sounds", &spec);
-//	LoadSoundBank(&spec, SOUND_BANK_BONUS);
-
-
-
 			/************/
 			/* MAKE CYC */
 			/************/

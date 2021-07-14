@@ -214,21 +214,53 @@ void TextMesh_Shutdown(void)
 /*                MESH ALLOCATION/LAYOUT                       */
 /***************************************************************/
 
-static MOVertexArrayData TextMesh_AllocateMesh(int numQuads)
+static void TextMesh_ReallocateMesh(MOVertexArrayData* mesh, int numQuads)
 {
-	MOVertexArrayData mesh;
-	memset(&mesh, 0, sizeof(mesh));
-	mesh.numMaterials = 1;
-	mesh.materials[0] = MO_GetNewReference(gFontMaterial);
-	mesh.numTriangles = numQuads*2;
-	mesh.numPoints = numQuads*4;
-	mesh.points = (OGLPoint3D *)AllocPtr(sizeof(OGLPoint3D) * mesh.numPoints);
-	mesh.uvs[0] = (OGLTextureCoord *)AllocPtr(sizeof(OGLTextureCoord) * mesh.numPoints);
-	mesh.triangles = (MOTriangleIndecies *)AllocPtr(sizeof(MOTriangleIndecies) * mesh.numTriangles);
-	return mesh;
+	if (mesh->points)
+	{
+		SafeDisposePtr((Ptr) mesh->points);
+		mesh->points = nil;
+	}
+
+	if (mesh->uvs[0])
+	{
+		SafeDisposePtr((Ptr) mesh->uvs[0]);
+		mesh->uvs[0] = nil;
+	}
+
+	if (mesh->triangles)
+	{
+		SafeDisposePtr((Ptr) mesh->triangles);
+		mesh->triangles = nil;
+	}
+
+	int numPoints = numQuads * 4;
+	int numTriangles = numQuads * 2;
+
+	if (numQuads != 0)
+	{
+		mesh->points = (OGLPoint3D *) AllocPtr(sizeof(OGLPoint3D) * numPoints);
+		mesh->uvs[0] = (OGLTextureCoord *) AllocPtr(sizeof(OGLTextureCoord) * numPoints);
+		mesh->triangles = (MOTriangleIndecies *) AllocPtr(sizeof(MOTriangleIndecies) * numTriangles);
+	}
 }
 
-static MOVertexArrayData TextMesh_SetMesh(const char* text, int align, MOVertexArrayData* recycleMesh)
+static void TextMesh_InitMesh(MOVertexArrayData* mesh, int numQuads)
+{
+	memset(mesh, 0, sizeof(*mesh));
+	
+	GAME_ASSERT(gFontMaterial);
+	mesh->numMaterials = 1;
+	mesh->materials[0] = gFontMaterial;
+
+	TextMesh_ReallocateMesh(mesh, numQuads);
+}
+
+static void TextMesh_SetMesh(
+		const char* text,
+		int align,
+		MOVertexArrayData* mesh,
+		int* meshQuadCapacity)
 {
 	float S = .5f;
 	float x = 0;
@@ -266,23 +298,27 @@ static MOVertexArrayData TextMesh_SetMesh(const char* text, int align, MOVertexA
 	// Adjust y for ascender
 	y -= S*(gFontLineHeight * .3f);
 
-	// Create the mesh
-	MOVertexArrayData mesh;
-	if (recycleMesh)
+	// Ensure mesh has capacity for quads
+	if (*meshQuadCapacity < numQuads)
 	{
-		mesh = *recycleMesh;
-		GAME_ASSERT(mesh.numTriangles >= numQuads*2);
-		GAME_ASSERT(mesh.numPoints >= numQuads*4);
-		GAME_ASSERT(mesh.uvs);
-		GAME_ASSERT(mesh.triangles);
-		GAME_ASSERT(mesh.materials[0]);
-		mesh.numTriangles = numQuads*2;
-		mesh.numPoints = numQuads*4;
+		*meshQuadCapacity = numQuads * 2;			// avoid reallocating often if text keeps growing
+		TextMesh_ReallocateMesh(mesh, *meshQuadCapacity);
 	}
-	else
-	{
-		mesh = TextMesh_AllocateMesh(numQuads);
-	}
+
+	// Set # of triangles and points
+	mesh->numTriangles = numQuads*2;
+	mesh->numPoints = numQuads*4;
+
+	GAME_ASSERT(mesh->numTriangles >= numQuads*2);
+	GAME_ASSERT(mesh->numPoints >= numQuads*4);
+
+	if (numQuads == 0)
+		return;
+
+	GAME_ASSERT(mesh->uvs);
+	GAME_ASSERT(mesh->triangles);
+	GAME_ASSERT(mesh->numMaterials == 1);
+	GAME_ASSERT(mesh->materials[0]);
 
 	// Create a quad for each character
 	int t = 0;
@@ -313,29 +349,27 @@ static MOVertexArrayData TextMesh_SetMesh(const char* text, int align, MOVertexA
 		float qx = x + S*(g.xoff + g.w*.5f);
 		float qy = y + S*(g.yoff + g.h*.5f);
 
-		mesh.triangles[t + 0].vertexIndices[0] = p + 0;
-		mesh.triangles[t + 0].vertexIndices[1] = p + 1;
-		mesh.triangles[t + 0].vertexIndices[2] = p + 2;
-		mesh.triangles[t + 1].vertexIndices[0] = p + 0;
-		mesh.triangles[t + 1].vertexIndices[1] = p + 2;
-		mesh.triangles[t + 1].vertexIndices[2] = p + 3;
-		mesh.points[p + 0] = (OGLPoint3D) { qx - S*g.w*.5f, qy - S*g.h*.5f, z };
-		mesh.points[p + 1] = (OGLPoint3D) { qx + S*g.w*.5f, qy - S*g.h*.5f, z };
-		mesh.points[p + 2] = (OGLPoint3D) { qx + S*g.w*.5f, qy + S*g.h*.5f, z };
-		mesh.points[p + 3] = (OGLPoint3D) { qx - S*g.w*.5f, qy + S*g.h*.5f, z };
-		mesh.uvs[0][p + 0] = (OGLTextureCoord) { g.x/ATLAS_WIDTH,		g.y/ATLAS_HEIGHT };
-		mesh.uvs[0][p + 1] = (OGLTextureCoord) { (g.x+g.w)/ATLAS_WIDTH,	g.y/ATLAS_HEIGHT };
-		mesh.uvs[0][p + 2] = (OGLTextureCoord) { (g.x+g.w)/ATLAS_WIDTH,	(g.y+g.h)/ATLAS_HEIGHT };
-		mesh.uvs[0][p + 3] = (OGLTextureCoord) { g.x/ATLAS_WIDTH,		(g.y+g.h)/ATLAS_HEIGHT };
+		mesh->triangles[t + 0].vertexIndices[0] = p + 0;
+		mesh->triangles[t + 0].vertexIndices[1] = p + 1;
+		mesh->triangles[t + 0].vertexIndices[2] = p + 2;
+		mesh->triangles[t + 1].vertexIndices[0] = p + 0;
+		mesh->triangles[t + 1].vertexIndices[1] = p + 2;
+		mesh->triangles[t + 1].vertexIndices[2] = p + 3;
+		mesh->points[p + 0] = (OGLPoint3D) { qx - S*g.w*.5f, qy - S*g.h*.5f, z };
+		mesh->points[p + 1] = (OGLPoint3D) { qx + S*g.w*.5f, qy - S*g.h*.5f, z };
+		mesh->points[p + 2] = (OGLPoint3D) { qx + S*g.w*.5f, qy + S*g.h*.5f, z };
+		mesh->points[p + 3] = (OGLPoint3D) { qx - S*g.w*.5f, qy + S*g.h*.5f, z };
+		mesh->uvs[0][p + 0] = (OGLTextureCoord) { g.x/ATLAS_WIDTH,		g.y/ATLAS_HEIGHT };
+		mesh->uvs[0][p + 1] = (OGLTextureCoord) { (g.x+g.w)/ATLAS_WIDTH,	g.y/ATLAS_HEIGHT };
+		mesh->uvs[0][p + 2] = (OGLTextureCoord) { (g.x+g.w)/ATLAS_WIDTH,	(g.y+g.h)/ATLAS_HEIGHT };
+		mesh->uvs[0][p + 3] = (OGLTextureCoord) { g.x/ATLAS_WIDTH,		(g.y+g.h)/ATLAS_HEIGHT };
 
 		x += S*(g.xadv + spacing);
 		t += 2;
 		p += 4;
 	}
 
-	GAME_ASSERT(p == mesh.numPoints);
-
-	return mesh;
+	GAME_ASSERT(p == mesh->numPoints);
 }
 
 /***************************************************************/
@@ -344,9 +378,8 @@ static MOVertexArrayData TextMesh_SetMesh(const char* text, int align, MOVertexA
 
 ObjNode *TextMesh_NewEmpty(int capacity, NewObjectDefinitionType* newObjDef)
 {
-	MOVertexArrayData mesh = TextMesh_AllocateMesh(capacity);
-	mesh.numPoints = 0;
-	mesh.numTriangles = 0;
+	MOVertexArrayData mesh;
+	TextMesh_InitMesh(&mesh, capacity);
 
 	newObjDef->genre = TEXTMESH_GENRE;
 	newObjDef->flags = STATUS_BIT_KEEPBACKFACES | STATUS_BIT_NOFOG | STATUS_BIT_NOLIGHTING | STATUS_BIT_NOZWRITES | STATUS_BIT_NOZBUFFER | STATUS_BIT_GLOW;
@@ -388,11 +421,7 @@ void TextMesh_Update(const char* text, int align, ObjNode* textNode)
 	GAME_ASSERT(objHead->type == MO_TYPE_GEOMETRY);
 	GAME_ASSERT(objHead->subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
 
-	// Reset capacity
-	vObj->objectData.numPoints = 4 * textNode->TextQuadCapacity;
-	vObj->objectData.numTriangles = 2 * textNode->TextQuadCapacity;
-
-	vObj->objectData = TextMesh_SetMesh(text, align, &vObj->objectData);
+	TextMesh_SetMesh(text, align, &vObj->objectData, &textNode->TextQuadCapacity);
 }
 
 float TextMesh_GetCharX(const char* text, int n)

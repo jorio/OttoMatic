@@ -12,16 +12,16 @@
 #define SC(x)		SDL_SCANCODE_##x
 
 // Mouse button/wheel
-#define MB(x)		{kButton, SDL_BUTTON_##x}
-#define MWPLUS()	{kAxisPlus, 0}
-#define MWMINUS()	{kAxisMinus, 0}
-#define MBNULL()	{kUnbound, 0}
+#define MB(x)		{kInputTypeButton, SDL_BUTTON_##x}
+#define MWPLUS()	{kInputTypeAxisPlus, 0}
+#define MWMINUS()	{kInputTypeAxisMinus, 0}
+#define MBNULL()	{kInputTypeUnbound, 0}
 
 // Controller button/axis
-#define CB(x)		{kButton, SDL_CONTROLLER_BUTTON_##x}
-#define CAPLUS(x)	{kAxisPlus, SDL_CONTROLLER_AXIS_##x}
-#define CAMINUS(x)	{kAxisMinus, SDL_CONTROLLER_AXIS_##x}
-#define CBNULL()	{kUnbound, 0}
+#define CB(x)		{kInputTypeButton, SDL_CONTROLLER_BUTTON_##x}
+#define CAPLUS(x)	{kInputTypeAxisPlus, SDL_CONTROLLER_AXIS_##x}
+#define CAMINUS(x)	{kInputTypeAxisMinus, SDL_CONTROLLER_AXIS_##x}
+#define CBNULL()	{kInputTypeUnbound, 0}
 
 const KeyBinding kDefaultKeyBindings[NUM_CONTROL_NEEDS] =
 {

@@ -64,7 +64,9 @@ Vollbildschirm
 Antialiasing
 Anaglyph 3D
 Spieler-bezogene Steuerung
-Tasten konfigurieren
+Musik
+Tastatur konfigurieren
+Gamepad konfigurieren
 Zurück
 Ja
 Nein

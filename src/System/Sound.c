@@ -68,7 +68,7 @@ Boolean						gAllowAudioKeys = true;
 
 
 static short				gMusicFileRefNum = 0x0ded;
-Boolean				gMuteMusicFlag = false;
+Byte				gMuteMusicFlag = false;			// must be a Byte so the settings screen cycler can manipulate it
 short				gCurrentSong = -1;
 
 
@@ -263,6 +263,10 @@ void InitSoundTools(void)
 	FSSpec			spec;
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Main.sounds", &spec);
 	LoadSoundBank(&spec, SOUND_BANK_MAIN);
+
+
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Menu.sounds", &spec);
+	LoadSoundBank(&spec, SOUND_BANK_MENU);
 }
 
 

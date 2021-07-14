@@ -199,15 +199,15 @@ void UpdateInput(void)
 
 		switch (kb->mouse.type)
 		{
-			case kButton:
+			case kInputTypeButton:
 				downNow |= 0 != (mouseButtons & SDL_BUTTON(kb->mouse.id));
 				break;
 
-			case kAxisPlus:
+			case kInputTypeAxisPlus:
 				downNow |= mouseWheelDelta > 0;
 				break;
 
-			case kAxisMinus:
+			case kInputTypeAxisMinus:
 				downNow |= mouseWheelDelta < 0;
 				break;
 
@@ -225,15 +225,15 @@ void UpdateInput(void)
 			{
 				switch (kb->gamepad[j].type)
 				{
-					case kButton:
+					case kInputTypeButton:
 						downNow |= 0 != SDL_GameControllerGetButton(gSDLController, kb->gamepad[j].id);
 						break;
 
-					case kAxisPlus:
+					case kInputTypeAxisPlus:
 						downNow |= SDL_GameControllerGetAxis(gSDLController, kb->gamepad[j].id) > deadZone;
 						break;
 
-					case kAxisMinus:
+					case kInputTypeAxisMinus:
 						downNow |= SDL_GameControllerGetAxis(gSDLController, kb->gamepad[j].id) < -deadZone;
 						break;
 

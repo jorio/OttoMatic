@@ -64,7 +64,9 @@ Pantalla completa
 Antialiasing
 Anaglyph 3D
 Controles relativos al jugador
-Configurar teclas
+Mœsica
+Configurar el teclado
+Configurar el mando
 Atr‡s
 S’
 No

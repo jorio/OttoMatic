@@ -58,6 +58,7 @@
 #include "localization.h"
 #include "textmesh.h"
 #include "tga.h"
+#include "menu.h"
 
 extern	BG3DFileContainer		*gBG3DContainerList[];
 extern	Boolean					gAllowAudioKeys;
@@ -75,10 +76,10 @@ extern	Boolean					gFreezeCameraFromXZ;
 extern	Boolean					gFreezeCameraFromY;
 extern	Boolean					gG4;
 extern	Boolean					gGameOver;
+extern	Boolean					gGamePaused;
 extern	Boolean					gHelpMessageDisabled[NUM_HELP_MESSAGES];
 extern	Boolean					gIceCracked;
 extern	Boolean					gLevelCompleted;
-extern	Boolean					gMuteMusicFlag;
 extern	Boolean					gMyState_Lighting;
 extern	Boolean					gOSX;
 extern	Boolean					gPlayerFellIntoBottomlessPit;
@@ -88,6 +89,7 @@ extern	Boolean					gPlayingFromSavedGame;
 extern	Boolean					gSongPlayingFlag;
 extern	Byte					**gMapSplitMode;
 extern	Byte					gDebugMode;
+extern	Byte					gMuteMusicFlag;
 extern	Byte					gHumansInSaucerList[];
 extern	ChannelInfoType			gChannelInfo[];
 extern	CollisionBoxType 		*gSaucerIceBounds;
@@ -131,6 +133,7 @@ extern	ObjNode					*gTargetPickup;
 extern	ObjNode					*gTractorBeamObj;
 extern	ParticleGroupType		*gParticleGroups[];
 extern	PrefsType				gGamePrefs;
+extern	SDL_GameController		*gSDLController;
 extern	SDL_GLContext			gAGLContext;
 extern	SDL_Window				*gSDLWindow;
 extern	SparkleType				gSparkles[MAX_SPARKLES];
@@ -146,6 +149,7 @@ extern	WaterDefType			**gWaterListHandle;
 extern	WaterDefType			*gWaterList;
 extern	char					gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
 extern	const KeyBinding		kDefaultKeyBindings[NUM_CONTROL_NEEDS];
+extern	const MenuStyle			kDefaultMenuStyle;
 extern	const OGLPoint3D		gPlayerMuzzleTipOff;
 extern	float					gSkyAltitudeY;
 extern	float					**gMapYCoords;
