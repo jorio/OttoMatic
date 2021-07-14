@@ -473,8 +473,8 @@ float	x,z;
 			gNewObjectDefinition.coord.x 	= x + RandomFloat2() * 100.0f;
 			gNewObjectDefinition.coord.y 	= -2000;
 			gNewObjectDefinition.coord.z 	= z + RandomFloat2() * 100.0f;
-			gNewObjectDefinition.flags 		= 0;
-			gNewObjectDefinition.slot 		= 100;
+			gNewObjectDefinition.flags 		= STATUS_BIT_NOZBUFFER;		// don't let saucers clip into earth
+			gNewObjectDefinition.slot 		= 300;						// draw on top of stars b/c no zbuffer
 			gNewObjectDefinition.moveCall 	= MoveIntroSaucer;
 			gNewObjectDefinition.rot 		= RandomFloat()*PI2;
 			gNewObjectDefinition.scale 		= SAUCER_SCALE;
@@ -503,8 +503,8 @@ ObjNode	*newObj;
 	gNewObjectDefinition.coord.x 	= 130;
 	gNewObjectDefinition.coord.y 	= -2000;
 	gNewObjectDefinition.coord.z 	= 1000;
-	gNewObjectDefinition.flags 		= 0;
-	gNewObjectDefinition.slot 		= 100;
+	gNewObjectDefinition.flags 		= STATUS_BIT_NOZBUFFER;		// don't let saucers clip into earth
+	gNewObjectDefinition.slot 		= 300;						// draw on top of stars b/c no zbuffer
 	gNewObjectDefinition.moveCall 	= MoveIntroSaucer;
 	gNewObjectDefinition.rot 		= RandomFloat()*PI2;
 	gNewObjectDefinition.scale 		= ICESAUCER_SCALE;
