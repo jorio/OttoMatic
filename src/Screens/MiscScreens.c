@@ -76,7 +76,7 @@ float	timeout = 40.0f;
 
 					/* MAIN LOOP */
 
-		while(!Button())
+		while (true)
 		{
 			CalcFramesPerSecond();
 			MoveObjects();

@@ -471,18 +471,19 @@ MOSpriteData	*spriteData = &spriteObj->objectData;
 void MO_SetPictureObjectCoordsToMouse(OGLSetupOutputType *info, MOPictureObject *obj)
 {
 MOPictureData	*picData = &obj->objectData;				//  point to pic obj's data
-Point			pt;
+int				mx = 0;
+int				my = 0;
 int				x,y,w,h;
 
-	GetMouse(&pt);										// get mouse screen coords
+	SDL_GetMouseState(&mx, &my);							// get mouse screen coords
 
 			/* CONVERT SCREEN COORD TO OPENGL COORD */
 
 	OGL_GetCurrentViewport(info, &x, &y, &w, &h);
 
 
-	picData->drawCoord.x = -1.0f + (float)pt.h / (float)w * 2.0f;
-	picData->drawCoord.y = 1.0f - (float)pt.v / (float)h * 2.0f;
+	picData->drawCoord.x = -1.0f + (float)mx / (float)w * 2.0f;
+	picData->drawCoord.y = 1.0f - (float)my / (float)h * 2.0f;
 
 }
 
