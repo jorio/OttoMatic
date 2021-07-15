@@ -2,7 +2,7 @@
 // (C) 2020 Iliyas Jorio
 // This file is part of Bugdom. https://github.com/jorio/bugdom
 
-#include "mousesmoothing.h"
+#include "game.h"
 #include <stdbool.h>
 #include <assert.h>
 
@@ -70,6 +70,12 @@ void MouseSmoothing_StartFrame(void)
 
 void MouseSmoothing_OnMouseMotion(const SDL_MouseMotionEvent* motion)
 {
+	// ignore mouse input if user has alt-tabbed away from the game
+	if (!(SDL_GetWindowFlags(gSDLWindow) & SDL_WINDOW_INPUT_FOCUS))
+	{
+		return;
+	}
+
 	if (gState.ringLength == DELTA_MOUSE_MAX_SNAPSHOTS)
 	{
 //		printf("%s: buffer full!!\n", __func__);
