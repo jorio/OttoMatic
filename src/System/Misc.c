@@ -509,6 +509,15 @@ slow_down:
 	if (GetKeyState(SDL_SCANCODE_GRAVE) && GetKeyState(SDL_SCANCODE_KP_PLUS))		// debug speed-up with `+KP_PLUS
 		gFramesPerSecond = 10;
 
+#if _DEBUG
+	if (gSDLController)
+	{
+		float analogSpeedUp = SDL_GameControllerGetAxis(gSDLController, SDL_CONTROLLER_AXIS_TRIGGERLEFT) / 32767.0f;
+		if (analogSpeedUp > .25f)
+			gFramesPerSecond = 10;
+	}
+#endif
+
 	gFramesPerSecondFrac = 1.0f/gFramesPerSecond;		// calc fractional for multiplication
 
 //printf("FPS: %f\n", gFramesPerSecond);
