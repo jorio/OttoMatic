@@ -15,7 +15,6 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void MoveCamera(void);
 static void MoveCamera_Saucer(ObjNode *saucer);
 static void InitCamera_Saucer(ObjNode *saucer);
 
@@ -41,14 +40,13 @@ static void ResetCameraSettings(void);
 
 static OGLCameraPlacement	gAnaglyphCameraBackup;		// backup of original camera info before offsets applied
 
+Boolean				gFreeCameraControl = true;			// if false, vanilla momentum-y camera swinging
 
 Boolean				gAutoRotateCamera = false;
 float				gAutoRotateCameraSpeed = 0;
 
 Boolean				gDrawLensFlare = true, gFreezeCameraFromXZ = false, gFreezeCameraFromY = false;
 Boolean				gForceCameraAlignment = false;
-
-float				gCameraStartupTimer;
 
 float				gCameraUserRotY = 0;
 float				gPlayerToCameraAngle = 0.0f;
@@ -330,19 +328,6 @@ static void ResetCameraSettings(void)
 
 void UpdateCamera(void)
 {
-
-
-
-
-	MoveCamera();
-
-}
-
-
-/**************** MOVE CAMERA ********************/
-
-static void MoveCamera(void)
-{
 OGLPoint3D	from,to,target;
 float		distX,distZ,distY,dist;
 OGLVector2D	pToC;
@@ -392,7 +377,7 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 		/******************************************/
 		/* SEE IF THE USER WILL WANT SOME CONTROL */
 		/******************************************/
-
+gTimeSinceLastThrust = -999;	// TEMP free camera control
 	if (gAutoRotateCamera)
 	{
 		gCameraUserRotY += fps * gAutoRotateCameraSpeed;
@@ -400,7 +385,7 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 	else
 	if (skeleton->AnimNum != PLAYER_ANIM_BUBBLE)					// user can't swing camera if in bubble
 	{
-		if (gCameraControlDelta.x != 0)
+		if (!gFreeCameraControl && gCameraControlDelta.x != 0)
 		{
 			gCameraUserRotY += fps * PI * gCameraControlDelta.x;
 			gForceCameraAlignment = true;							// don't zero userRot out if the player isn't moving
@@ -620,6 +605,15 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 				/**********************/
 				/* UPDATE CAMERA INFO */
 				/**********************/
+
+	if (gFreeCameraControl && gCameraControlDelta.x != 0 && !gAutoRotateCamera)
+	{
+		OGLMatrix4x4	m;
+		float			r = gCameraControlDelta.x * fps * 2.5f;
+		OGLMatrix4x4_SetRotateAboutPoint(&m, &to, 0, r, 0);
+		OGLPoint3D_Transform(&from, &m, &from);
+	}
+
 
 	if (gAutoRotateCamera && gFreezeCameraFromXZ)				// special auto-rot for frozen xz condition
 	{

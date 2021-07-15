@@ -654,6 +654,12 @@ do_anaglyph:
 			"ptrs:\t\t%d\n"
 			"ptr mem:\t%ldK\n"
 			"nodes:\t%d\n"
+			"\n"
+			"time since last thrust:\t%.3f\n"
+			"force cam align?\t\t%c\n"
+			"auto rotate cam?\t\t%c\n"
+			"cam user rot:\t\t%.3f\n"
+			"cam ctrl dX:\t\t%.3f\n"
 			,
 			(int)(gFramesPerSecond+.5f),
 			gPolysThisFrame,
@@ -669,7 +675,12 @@ do_anaglyph:
 			gVRAMUsedThisFrame/1024,
 			gNumPointers,
 			gMemAllocatedInPtrs/1024,
-			gNumObjectNodes
+			gNumObjectNodes,
+			gTimeSinceLastThrust,
+			gForceCameraAlignment? 'Y': 'N',
+			gAutoRotateCamera? 'Y': 'N',
+			gCameraUserRotY,
+			gCameraControlDelta.x
 		);
 		TextMesh_Update(debugString, 0, gDebugText);
 		gDebugText->StatusBits &= ~STATUS_BIT_HIDDEN;
@@ -1465,7 +1476,7 @@ static void OGL_InitFont(void)
 	memset(&newObjDef, 0, sizeof(newObjDef));
 	newObjDef.flags = STATUS_BIT_HIDDEN;
 	newObjDef.slot = DEBUGOVERLAY_SLOT;
-	newObjDef.scale = 0.33f;
+	newObjDef.scale = 0.45f;
 	newObjDef.coord = (OGLPoint3D) { -320, -100, 0 };
 	gDebugText = TextMesh_NewEmpty(2048, &newObjDef);
 }

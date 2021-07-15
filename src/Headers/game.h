@@ -79,6 +79,7 @@ extern	Boolean					gDoJumpJetAtApex;
 extern	Boolean					gDrawLensFlare;
 extern	Boolean					gExplodePlayerAfterElectrocute;
 extern	Boolean					gForceCameraAlignment;
+extern	Boolean					gFreeCameraControl;
 extern	Boolean					gFreezeCameraFromXZ;
 extern	Boolean					gFreezeCameraFromY;
 extern	Boolean					gG4;
