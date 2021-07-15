@@ -2891,6 +2891,7 @@ static void StartJumpJet(ObjNode *theNode)
 	{
 		gDoJumpJetAtApex = false;
 		PlayEffect(EFFECT_NOJUMPJET);
+		gJumpJetWarningCooldown = .5f;
 		return;
 	}
 

@@ -139,6 +139,8 @@ enum
 static 	short			gHealthWarningChannel = -1;
 static	float			gHealthWarningWobble = 0;
 
+float			gJumpJetWarningCooldown = 0;
+
 Boolean			gHideInfobar = false;
 static float	gHealthOccilate = 0;
 static float	gHealthMeterRot = 0, gFuelMeterRot = 0, gJumpJetMeterRot=0;
@@ -735,25 +737,39 @@ float	FUEL_X = g2DLogicalWidth + FUEL_XFROMRIGHT;
 
 static void Infobar_DrawJumpJet(const OGLSetupOutputType *setupInfo)
 {
-float	x,y,size;
-float	n, fps = gFramesPerSecondFrac;
+float	fps = gFramesPerSecondFrac;
+float	x = JUMP_X;
+float	y = JUMP_Y;
+float	n = gPlayerInfo.jumpJet;								// get jj
+float	size;
 
-	n = gPlayerInfo.jumpJet;										// get jj
+
 
 			/* DRAW BACK */
 
 	if (n >= 1.0f)
 	{
 		gJumpJetMeterRot -= fps * 2.0f;
-		DrawInfobarSprite_Rotated(JUMP_X, JUMP_Y, JUMP_SIZE, INFOBAR_SObjType_MeterBack, gJumpJetMeterRot, setupInfo);
+		DrawInfobarSprite_Rotated(x, y, JUMP_SIZE, INFOBAR_SObjType_MeterBack, gJumpJetMeterRot, setupInfo);
 	}
 	else
-		DrawInfobarSprite(JUMP_X, JUMP_Y, JUMP_SIZE, INFOBAR_SObjType_MeterBack, setupInfo);
+	{
+		if (gJumpJetWarningCooldown > 0)
+		{
+			float amp = 4.0f * gJumpJetWarningCooldown / 0.5f;
+			x += sinf(gJumpJetWarningCooldown * 32.0f) * amp;
+			gJumpJetWarningCooldown -= fps;
+		}
+
+		DrawInfobarSprite(x, y, JUMP_SIZE, INFOBAR_SObjType_MeterBack, setupInfo);
+	}
 
 
 	size = JUMP_SIZE * (1.0f + cos(gHealthOccilate)*.04f) * n;
-	x = JUMP_X + (JUMP_SIZE - size) * .5f;
-	y = JUMP_Y + (JUMP_SIZE - size) * .5f;
+	x += (JUMP_SIZE - size) * .5f;
+	y += (JUMP_SIZE - size) * .5f;
+
+
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);								// make glow
 	DrawInfobarSprite(x, y, size, INFOBAR_SObjType_JumpJetMeter, setupInfo);

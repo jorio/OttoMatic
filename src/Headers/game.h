@@ -173,6 +173,7 @@ extern	float					gFramesPerSecondFrac;
 extern	float					gGlobalTransparency;
 extern	float					gGravity;
 extern	float					gHumanScaleRatio;
+extern	float					gJumpJetWarningCooldown;
 extern	float					gLevelCompletedCoolDownTimer;
 extern	float					gMinHeightOffGround;
 extern	float					gPlayerBottomOff;
