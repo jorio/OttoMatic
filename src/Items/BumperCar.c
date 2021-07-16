@@ -270,9 +270,11 @@ int	a,i;
 			}
 		}
 
-	gPlayerCar->CarBeingDriven = false;
-	gPlayerCar = nil;
-
+	if (gPlayerCar)
+	{
+		gPlayerCar->CarBeingDriven = false;
+		gPlayerCar = nil;
+	}
 }
 
 
@@ -424,7 +426,8 @@ float	fps = gFramesPerSecondFrac;
 
 	if (!car->CarBeingDriven)
 	{
-		gPlayerCar = nil;															// make sure this is nil if not driving
+		if (gPlayerCar == car)
+			gPlayerCar = nil;													// make sure this is nil if not driving
 
 		if (gBumperCarGateBlown[car->CarID])									// only make car go away if gate blown
 		{
@@ -736,6 +739,8 @@ short	area = theNode->AreaNum;
 
 void AlignPlayerInBumperCar(ObjNode *player)
 {
+	GAME_ASSERT(gPlayerCar);
+
 	gCoord.x = gPlayerCar->Coord.x;
 	gCoord.y = gPlayerCar->Coord.y + 90.0f;
 	gCoord.z = gPlayerCar->Coord.z;
