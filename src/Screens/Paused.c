@@ -46,6 +46,7 @@ void DoPaused(void)
 	menuStyle.darkenPaneScaleY = 64;
 	menuStyle.darkenPaneOpacity = .3f;
 	menuStyle.playMenuChangeSounds = false;
+	menuStyle.startButtonExits = true;
 
 again:
 	pick = StartMenu(pauseMenu, &menuStyle, PausedUpdateCallback, DrawArea);

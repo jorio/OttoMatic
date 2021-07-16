@@ -348,7 +348,7 @@ Boolean GetKeyState(unsigned short sdlScanCode)
 
 Boolean UserWantsOut(void)
 {
-	return GetNewNeedState(kNeed_UIConfirm) || GetNewNeedState(kNeed_UIBack);
+	return GetNewNeedState(kNeed_UIConfirm) || GetNewNeedState(kNeed_UIBack) || GetNewNeedState(kNeed_UIStart);
 }
 
 Boolean GetNeedState(int needID)

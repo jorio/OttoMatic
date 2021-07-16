@@ -49,7 +49,8 @@ const KeyBinding kDefaultKeyBindings[NUM_CONTROL_NEEDS] =
 [kNeed_UIRight			] = { { SC(RIGHT)	, 0				}, MBNULL()		, { CB(DPAD_RIGHT)		, CAPLUS(LEFTX)			} },
 [kNeed_UIPrev			] = { { 0			, 0				}, MBNULL()		, { CB(LEFTSHOULDER)	, CBNULL()				} },
 [kNeed_UINext			] = { { 0			, 0				}, MBNULL()		, { CB(RIGHTSHOULDER)	, CBNULL()				} },
-[kNeed_UIConfirm		] = { { SC(RETURN)	, SC(SPACE)		}, MBNULL()		, { CB(START)			, CB(A)					} },
-[kNeed_UIBack			] = { { SC(ESCAPE)	, 0				}, MBNULL()		, { CB(BACK)			, CB(B)					} },
+[kNeed_UIConfirm		] = { { SC(RETURN)	, SC(SPACE)		}, MBNULL()		, { CB(A)				, CBNULL()				} },
+[kNeed_UIStart			] = { { 0			, 0				}, MBNULL()		, { CB(START)			, CBNULL()				} },
+[kNeed_UIBack			] = { { SC(ESCAPE)	, 0				}, MBNULL()		, { CB(B)				, CB(BACK)				} },
 [kNeed_UIPause			] = { { SC(ESCAPE)	, 0				}, MBNULL()		, { CB(START)			, CBNULL()				} },
 };

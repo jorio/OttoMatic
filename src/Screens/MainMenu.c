@@ -1130,7 +1130,7 @@ static Boolean DoMainMenuControl(void)
 
 				/* MAKE SELECTION */
 		else
-		if (GetNewNeedState(kNeed_UIConfirm))
+		if (GetNewNeedState(kNeed_UIConfirm) || GetNewNeedState(kNeed_UIStart))
 		{
 			gHideIconString = true;
 
@@ -1139,7 +1139,8 @@ static Boolean DoMainMenuControl(void)
 				case	SELECT_PLAY:
 						gLevelNum = 0;							// start on Level 0 if not loading from saved game
 
-						if (GetKeyState(SDL_SCANCODE_F10))		// see if do Level cheat
+						if (GetKeyState(SDL_SCANCODE_F10) ||	// see if do Level cheat
+							(GetNeedState(kNeed_UIBack) && GetNeedState(kNeed_UIStart)))
 						{
 							int cheatLevel = DoLevelCheatDialog(DrawMainMenuCallback);
 							if (cheatLevel < 0)

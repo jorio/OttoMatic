@@ -61,6 +61,7 @@ const MenuStyle kDefaultMenuStyle =
 	.titleScale			= 1.25f,
 	.rowHeight			= 13*1.5f,
 	.playMenuChangeSounds	= true,
+	.startButtonExits	= false,
 };
 
 /*********************/
@@ -850,6 +851,9 @@ int StartMenu(
 	while (gMenuState != kMenuStateOff)
 	{
 		UpdateInput();
+
+		if (gMenuStyle->startButtonExits && GetNewNeedState(kNeed_UIStart))
+			gMenuState = kMenuStateFadeOut;
 
 		switch (gMenuState)
 		{

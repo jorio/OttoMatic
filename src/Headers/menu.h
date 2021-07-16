@@ -63,6 +63,7 @@ typedef struct MenuStyle
 	bool			playMenuChangeSounds;
 	float			darkenPaneScaleY;
 	float			darkenPaneOpacity;
+	bool			startButtonExits;
 } MenuStyle;
 
 int StartMenu(
