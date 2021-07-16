@@ -48,6 +48,8 @@ static void MoveBumperCarGate(ObjNode *posts);
 
 #define	MAX_AREAS			3
 
+const OGLColorRGBA kDimmedPowerPostFilter = { .4f, .4f, .4f, 1.0f };
+
 enum
 {
 	GENERATOR_MODE_ON,
@@ -963,9 +965,7 @@ short	id = itemPtr->parm[0];
 				/* IS BLOWN, SO DIM */
 	else
 	{
-		newObj->ColorFilter.r = 								// make dim
-		newObj->ColorFilter.g =
-		newObj->ColorFilter.b = .7f;
+		newObj->ColorFilter = kDimmedPowerPostFilter;					// make dim
 	}
 
 	if (gGeneratorBlownMode[area][id] == GENERATOR_MODE_ON)
@@ -1106,9 +1106,7 @@ short	area = theNode->AreaNum;
 
 		PlayEffect3D(EFFECT_BUMPERPOLEOFF, &theNode->Coord);	// player power down effect
 
-		theNode->ColorFilter.r = 								// make dim
-		theNode->ColorFilter.g =
-		theNode->ColorFilter.b = .7f;
+		theNode->ColorFilter = kDimmedPowerPostFilter;			 // make dim
 
 				/* SEE IF ALL BLOWN */
 
