@@ -14,6 +14,8 @@
 enum
 {
 	MAP_ITEM_MYSTARTCOORD		= 0,			// map item # for my start coords
+	MAP_ITEM_EXITROCKET			= 26,
+	MAP_ITEM_CHECKPOINT			= 27,
 	MAP_ITEM_BLOBBOSS			= 41,
 	MAP_ITEM_TELEPORTER			= 57,
 	MAP_ITEM_ZIPLINE			= 58,

@@ -302,12 +302,25 @@ static void PlayArea(void)
 
 		gGameFrameNum++;
 
+		if (GetKeyState(SDL_SCANCODE_GRAVE))							// cheat key
+		{
+			if (GetNewKeyState(SDL_SCANCODE_F1))						// full health, jumpjet and fuel
+			{
+				gPlayerInfo.health = 1;
+				gPlayerInfo.jumpJet = 1;
+				gPlayerInfo.fuel = 1;
+			}
+			else if (GetNewKeyState(SDL_SCANCODE_F2))					// goto next checkpoint
+			{
+				DoWarpCheat();
+			}
+			else if (GetNewKeyState(SDL_SCANCODE_F10))					// win level cheat
+			{
+				break;
+			}
+		}
 
 				/* SEE IF TRACK IS COMPLETED */
-
-		if (GetNewKeyState(SDL_SCANCODE_F10))			//------- win level cheat
-			if (GetKeyState(SDL_SCANCODE_GRAVE))
-				break;
 
 		if (gGameOver)													// if we need immediate abort, then bail now
 			break;

@@ -32,6 +32,7 @@ enum
 
 
 void DisplayPicture(FSSpec *spec);
+void PausedUpdateCallback(void);
 void DoPaused(void);
 
 void DoLegalScreen(void);
@@ -54,3 +55,6 @@ void DoSettingsOverlay(void (*updateRoutine)(void),
 					   void (*backgroundDrawRoutine)(OGLSetupOutputType *));
 
 bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(OGLSetupOutputType *));
+
+void DoWarpCheat(void);
+

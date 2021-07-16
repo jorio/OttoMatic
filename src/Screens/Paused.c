@@ -8,7 +8,7 @@ Boolean			gGamePaused = false;
 
 static const OGLColorRGBA gPausedMenuNoHiliteColor = {1,1,.3,1};
 
-static void PausedUpdateCallback(void)
+void PausedUpdateCallback(void)
 {
 	// need to call this to keep supertiles active
 	DoPlayerTerrainUpdate(gPlayerInfo.camera.cameraLocation.x, gPlayerInfo.camera.cameraLocation.z);
