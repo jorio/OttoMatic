@@ -39,7 +39,7 @@ static void PlayGame(void);
 /*    VARIABLES             */
 /****************************/
 
-Boolean				gOSX = false, gG4 = false;
+Boolean				gG4 = true;
 
 float				gGravity = NORMAL_GRAVITY;
 

@@ -412,16 +412,8 @@ float	size,dist;
 
 	w = (float)(gGameWindowHeight / 15) * size;
 
-	if (gOSX)					// check max line width differently since OS 9 Rage 128 drivers seem to crash when lines get too wide
-	{
-		if (w > 60)
-			w = 60;
-	}
-	else
-	{
-		if (w > 20)
-			w = 20;
-	}
+	if (w > 60)
+		w = 60;
 
 	if (w < 1)
 		w = 1;

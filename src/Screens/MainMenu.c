@@ -145,9 +145,6 @@ void DoMainMenuScreen(void)
 
 	while(true)
 	{
-		if (gOSX)								// do this to work around the 10.1 sound bug where no audio plays unless Event loop called at some time
-			MyFlushEvents();
-
 		/* CHECK USER CONTROL */
 
 		UpdateInput();

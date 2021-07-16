@@ -87,7 +87,6 @@ extern	Boolean					gHelpMessageDisabled[NUM_HELP_MESSAGES];
 extern	Boolean					gIceCracked;
 extern	Boolean					gLevelCompleted;
 extern	Boolean					gMyState_Lighting;
-extern	Boolean					gOSX;
 extern	Boolean					gPlayerFellIntoBottomlessPit;
 extern	Boolean					gPlayerHasLanded;
 extern	Boolean					gPlayerIsDead;
