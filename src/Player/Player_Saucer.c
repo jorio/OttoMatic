@@ -336,28 +336,7 @@ ObjNode	*human;
 
 					/* MAKE THE HUMAN */
 
-			switch(humanType)
-			{
-				case	HUMAN_TYPE_FARMER:
-						human = MakeFarmer(gCoord.x, gCoord.z);
-						break;
-
-				case	HUMAN_TYPE_BEEWOMAN:
-						human = MakeBeeWoman(gCoord.x, gCoord.z);
-						break;
-
-				case	HUMAN_TYPE_SCIENTIST:
-						human = MakeScientist(gCoord.x, gCoord.z);
-						break;
-
-				case	HUMAN_TYPE_SKIRTLADY:
-						human = MakeSkirtLady(gCoord.x, gCoord.z);
-						break;
-
-				default:
-						DoFatalAlert("MovePlayer_Saucer_BeamDownHumans: who?");
-						return;
-			}
+			human = MakeHuman(humanType, gCoord.x, gCoord.z);
 
 				/* SET HUMAN INFO */
 

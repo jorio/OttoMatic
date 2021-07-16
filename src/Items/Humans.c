@@ -1,5 +1,5 @@
 /****************************/
-/*   	FARMER.C		    */
+/*   	HUMANS.C		    */
 /* (c)2001 Pangea Software  */
 /* By Brian Greenstone      */
 /****************************/
@@ -15,20 +15,32 @@
 /*    PROTOTYPES            */
 /****************************/
 
-
-
 static Boolean HumanIceHitByWeapon(ObjNode *weapon, ObjNode *ice, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta);
 static Boolean BlowUpPeopleHut(ObjNode *hut, float unused);
+static void MoveHuman(ObjNode* theNode);
+static void MoveHumanOnSpline(ObjNode* theNode);
+static void MoveHuman_Standing(ObjNode* theNode);
+static void MoveHuman_Walking(ObjNode* theNode);
+static void MoveHuman_Teleport(ObjNode* theNode);
 static void MoveHuman_ToRocketRamp(ObjNode *human);
 static void MoveHuman_UpRocketRamp(ObjNode *human);
 static void UpdateHumanFromSaucer(ObjNode *theNode);
+static void AbductHuman(ObjNode* theNode);
 
 
 /****************************/
 /*    CONSTANTS             */
 /****************************/
 
+#define	HUMAN_SCALE			(2.0f * gHumanScaleRatio)
 
+enum
+{
+	HUMAN_ANIM_STAND,
+	HUMAN_ANIM_WALK,
+	HUMAN_ANIM_ABDUCTED,
+	HUMAN_ANIM_TELEPORT
+};
 
 /*********************/
 /*    VARIABLES      */
@@ -44,6 +56,23 @@ float	gHumanScaleRatio;
 
 #define	HumanTypeInHut		Special[0]
 #define	NumPeopleInHut		Special[1]
+
+
+/********************* GET SKELETON FROM HUMAN TYPE **************************/
+
+static Byte GetSkeletonFromHumanType(Byte humanType)
+{
+	switch (humanType)
+	{
+		case HUMAN_TYPE_FARMER:		return SKELETON_TYPE_FARMER;
+		case HUMAN_TYPE_BEEWOMAN:	return SKELETON_TYPE_BEEWOMAN;
+		case HUMAN_TYPE_SCIENTIST:	return SKELETON_TYPE_SCIENTIST;
+		case HUMAN_TYPE_SKIRTLADY:	return SKELETON_TYPE_SKIRTLADY;
+		default:
+			DoFatalAlert("GetSkeletonFromHumanType: who?");
+			return SKELETON_TYPE_FARMER;
+	}
+}
 
 
 /********************* INIT HUMANS **************************/
@@ -86,33 +115,79 @@ void DoHumanCollisionDetect(ObjNode *theNode)
 
 
 
+/************************ MAKE HUMAN *************************/
+
+ObjNode *MakeHuman(int humanType, float x, float z)
+{
+ObjNode	*newObj;
+
+		/* MAKE OBJECT */
+
+	gNewObjectDefinition.type 		= GetSkeletonFromHumanType(humanType);
+	gNewObjectDefinition.animNum	= HUMAN_ANIM_STAND;
+	gNewObjectDefinition.coord.x 	= x;
+	gNewObjectDefinition.coord.y 	= FindHighestCollisionAtXZ(x,z,CTYPE_MISC|CTYPE_MPLATFORM|CTYPE_TERRAIN);
+	gNewObjectDefinition.coord.z 	= z;
+	gNewObjectDefinition.flags 		= STATUS_BIT_SAUCERTARGET|gAutoFadeStatusBits;
+	gNewObjectDefinition.slot 		= HUMAN_SLOT;
+	gNewObjectDefinition.moveCall	= MoveHuman;
+	gNewObjectDefinition.rot 		= 0;
+	gNewObjectDefinition.scale 		= HUMAN_SCALE;
+
+	newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
+
+
+				/* SET BETTER INFO */
+
+	newObj->HumanType = humanType;
+
+	newObj->Coord.y 	-= newObj->BBox.min.y - 20.0f;
+	UpdateObjectTransforms(newObj);
+
+	newObj->Health 		= 1.0;
+
+	newObj->SaucerTargetType = SAUCER_TARGET_TYPE_ABDUCT;
+	newObj->SaucerAbductHandler = AbductHuman;
+
+
+				/* SET COLLISION INFO */
+
+	newObj->TriggerSides 	= ALL_SOLID_SIDES;				// side(s) to activate it
+	newObj->Kind		 	= TRIGTYPE_HUMAN;
+	newObj->CType			= CTYPE_HUMAN|CTYPE_TRIGGER;
+	newObj->CBits			= CBITS_ALLSOLID|CBITS_ALWAYSTRIGGER;
+	CreateCollisionBoxFromBoundingBox(newObj, 1,1);
+
+
+
+				/* MAKE SHADOW */
+
+	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8.0f * gHumanScaleRatio, 8.0f * gHumanScaleRatio, true);
+
+	return(newObj);
+}
+
+
 /************************ ADD HUMAN *************************/
 
-Boolean AddHuman(TerrainItemEntryType *itemPtr, long x, long z)
+Boolean AddHuman(TerrainItemEntryType* itemPtr, long x, long z)
 {
+	ObjNode* newObj;
 
-	switch(itemPtr->parm[0])
-	{
-				/* FARMER */
-		case	0:
-				return (AddFarmer(itemPtr, x, z));
+	Byte humanType = itemPtr->parm[0];
 
-				/* BEE WOMAN */
-		case	1:
-				return (AddBeeWoman(itemPtr,x,z));
+	/* MAKE OBJECT */
 
-				/* SKIRT LADY */
-		case	2:
-				return (AddSkirtLady(itemPtr,x,z));
-
-				/* SCIENTIST */
-		case	3:
-				return (AddScientist(itemPtr,x,z));
+	newObj = MakeHuman(humanType, x, z);
+	newObj->TerrainItemPtr = itemPtr;
 
 
-	}
+	/* SEE IF ENCASED IN ICE */
 
-	return(false);
+	if (itemPtr->parm[3] & 1)
+		EncaseHumanInIce(newObj);
+
+	return true;
 }
 
 
@@ -120,30 +195,67 @@ Boolean AddHuman(TerrainItemEntryType *itemPtr, long x, long z)
 
 Boolean PrimeHuman(long splineNum, SplineItemType *itemPtr)
 {
-	switch(itemPtr->parm[0])
-	{
-				/* FARMER */
-		case	0:
-				return (PrimeFarmer(splineNum, itemPtr));
+ObjNode			*newObj;
+float			x,z,placement;
+
+			/* GET SPLINE INFO */
+
+	Byte humanType = itemPtr->parm[0];
+
+	placement = itemPtr->placement;
+	GetCoordOnSpline(&(*gSplineList)[splineNum], placement, &x, &z);
 
 
-				/* BEE WOMAN */
-		case	1:
-				return (PrimeBeeWoman(splineNum, itemPtr));
 
-				/* SKIRT LADY */
-		case	2:
-				return (PrimeSkirtLady(splineNum, itemPtr));
+		/* MAKE OBJECT */
 
-				/* SCIENTIST */
-		case	3:
-				return (PrimeScientist(splineNum, itemPtr));
+	gNewObjectDefinition.type 		= GetSkeletonFromHumanType(humanType);
+	gNewObjectDefinition.animNum	= HUMAN_ANIM_WALK;
+	gNewObjectDefinition.coord.x 	= x;
+	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
+	gNewObjectDefinition.coord.z 	= z;
+	gNewObjectDefinition.flags 		= STATUS_BIT_SAUCERTARGET|STATUS_BIT_ONSPLINE|gAutoFadeStatusBits;
+	gNewObjectDefinition.slot 		= HUMAN_SLOT;
+	gNewObjectDefinition.rot 		= 0;
+	gNewObjectDefinition.scale 		= HUMAN_SCALE;
+	gNewObjectDefinition.moveCall 	= MoveHuman;
 
-	}
+	newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
 
-	return(false);
+
+	newObj->Skeleton->AnimSpeed = 1.5;
+
+
+				/* SET MORE INFO */
+
+	newObj->HumanType = humanType;
+
+	newObj->SaucerTargetType = SAUCER_TARGET_TYPE_ABDUCT;
+	newObj->SaucerAbductHandler = AbductHuman;
+
+	newObj->SplineItemPtr 	= itemPtr;
+	newObj->SplineNum 		= splineNum;
+	newObj->SplinePlacement = placement;
+	newObj->SplineMoveCall 	= MoveHumanOnSpline;						// set move call
+	newObj->CBits			= CBITS_ALLSOLID|CBITS_ALWAYSTRIGGER;
+
+	newObj->TriggerSides 	= ALL_SOLID_SIDES;				// side(s) to activate it
+	newObj->Kind		 	= TRIGTYPE_HUMAN;
+	newObj->CType			= CTYPE_MISC|CTYPE_HUMAN|CTYPE_TRIGGER;
+
+	CreateCollisionBoxFromBoundingBox(newObj,1,1);
+
+	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8.0f * gHumanScaleRatio, 8.0f * gHumanScaleRatio, false);
+
+
+			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */
+
+	DetachObject(newObj, true);									// detach this object from the linked list
+	AddToSplineObjectList(newObj, true);
+
+
+	return(true);
 }
-
 
 
 /********************* START HUMAN TELEPORT ***********************/
@@ -484,6 +596,163 @@ ObjNode	*human = ice->ChainHead;
 #pragma mark -
 
 
+/********************* MOVE HUMAN **************************/
+
+static void MoveHuman(ObjNode *theNode)
+{
+static	void(*myMoveTable[])(ObjNode *) =
+				{
+					MoveHuman_Standing,
+					MoveHuman_Walking,
+					MoveHuman_Standing,					// abducted
+					MoveHuman_Teleport,
+				};
+
+	if (gLevelNum != LEVEL_NUM_SAUCER)
+	{
+		if (TrackTerrainItem(theNode))						// just check to see if it's gone
+		{
+			if (gSaucerTarget == theNode)					// see if was a saucer target
+				gSaucerTarget = nil;
+			DeleteObject(theNode);
+			return;
+		}
+	}
+	GetObjectInfo(theNode);
+	myMoveTable[theNode->Skeleton->AnimNum](theNode);
+}
+
+
+/******************** MOVE HUMAN ON SPLINE ***************************/
+
+static void MoveHumanOnSpline(ObjNode *theNode)
+{
+Boolean isVisible;
+
+	isVisible = IsSplineItemVisible(theNode);					// update its visibility
+
+
+		/* MOVE ALONG THE SPLINE */
+
+	IncreaseSplineIndex(theNode, 30.0f * gHumanScaleRatio);
+
+	GetObjectCoordOnSpline(theNode);
+
+
+			/***************************/
+			/* UPDATE STUFF IF VISIBLE */
+			/***************************/
+
+	if (isVisible)
+	{
+		theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, theNode->OldCoord.x, theNode->OldCoord.z,	// calc y rot aim
+												theNode->Coord.x, theNode->Coord.z);
+
+		theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z) - theNode->BottomOff;	// get ground Y
+		UpdateObjectTransforms(theNode);												// update transforms
+		CalcObjectBoxFromNode(theNode);													// update collision box
+
+		UpdateHuman(theNode);
+		UpdateShadow(theNode);
+	}
+
+			/* NOT VISIBLE */
+	else
+	{
+	}
+}
+
+
+/********************** MOVE HUMAN: STANDING ******************************/
+
+static void  MoveHuman_Standing(ObjNode *theNode)
+{
+float	fps = gFramesPerSecondFrac;
+float	dx,dy,dz;
+
+			/* MOVE */
+
+	gDelta.x = gDelta.z = 0;					// no intertia while standing
+
+	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
+
+	dx = gDelta.x;
+	dy = gDelta.y;
+	dz = gDelta.z;
+
+	if (theNode->MPlatform)						// see if factor in moving platform
+	{
+		ObjNode *plat = theNode->MPlatform;
+		dx += plat->Delta.x;
+		dy += plat->Delta.y;
+		dz += plat->Delta.z;
+	}
+
+	gCoord.x += dx*fps;
+	gCoord.y += dy*fps;
+	gCoord.z += dz*fps;
+
+
+			/* COLLISION */
+
+	DoHumanCollisionDetect(theNode);
+
+	UpdateHuman(theNode);
+}
+
+
+/********************** MOVE HUMAN: WALKING ******************************/
+
+static void  MoveHuman_Walking(ObjNode *theNode)
+{
+float	fps = gFramesPerSecondFrac;
+float	r;
+
+	r = theNode->Rot.y;							// get aim
+	gDelta.x = -sin(r) * 100.0f;				// set delta
+	gDelta.z = -cos(r) * 100.0f;
+
+			/* MOVE */
+
+	gDelta.y -= ENEMY_GRAVITY*fps;				// add gravity
+	gCoord.x += gDelta.x * fps;
+	gCoord.y += gDelta.y * fps;
+	gCoord.z += gDelta.z * fps;
+
+
+			/* COLLISION */
+
+	DoHumanCollisionDetect(theNode);
+
+	UpdateHuman(theNode);
+
+
+			/* SEE IF DONE WALKING */
+
+	theNode->HumanWalkTimer -= fps;
+	if (theNode->HumanWalkTimer <= 0.0f)
+		MorphToSkeletonAnim(theNode->Skeleton, 0, 3);				// go to stand anim
+}
+
+/********************** MOVE HUMAN: TELEPORT ******************************/
+
+static void  MoveHuman_Teleport(ObjNode *theNode)
+{
+float	fps = gFramesPerSecondFrac;
+
+	theNode->ColorFilter.r = theNode->ColorFilter.b -= fps * .5f;
+
+	UpdateObject(theNode);
+
+
+			/* UPDATE TELEPORT EFFECT */
+
+	if (UpdateHumanTeleport(theNode, true))				// returns true if human is deleted
+		return;
+
+}
+
+
 /******************** MOVE HUMAN:  TO PLAYER SAUCER *********************/
 
 void MoveHuman_ToPlayerSaucer(ObjNode *theNode)
@@ -706,6 +975,36 @@ static void UpdateHumanFromSaucer(ObjNode *theNode)
 #pragma mark -
 
 
+/**************** ABDUCT HUMAN **************************/
+//
+// Callback called when alien saucer is in position and ready to abduct.
+//
+
+static void AbductHuman(ObjNode *theNode)
+{
+			/* SEE IF REMOVE FROM SPLINE */
+
+	if (theNode->StatusBits & STATUS_BIT_ONSPLINE)
+		DetachObjectFromSpline(theNode, nil);
+
+	theNode->CType = 0;					// no longer interesting
+	theNode->Delta.x =
+	theNode->Delta.y =
+	theNode->Delta.z = 0;				// stop him
+
+	MorphToSkeletonAnim(theNode->Skeleton, HUMAN_ANIM_ABDUCTED, 6);
+
+	theNode->TerrainItemPtr = nil;		// dont come back
+
+	if (gLevelNum == LEVEL_NUM_SAUCER)	// if abducted by player saucer then change move call
+		theNode->MoveCall = MoveHuman_ToPlayerSaucer;
+	else
+		theNode->MoveCall = nil;
+}
+
+
+#pragma mark -
+
 
 /************************ ADD PEOPLE HUT *************************/
 
@@ -781,28 +1080,7 @@ ObjNode	*human;
 		x = hut->Coord.x + RandomFloat2() * (hut->BoundingSphereRadius * .8f);
 		z = hut->Coord.z + RandomFloat2() * (hut->BoundingSphereRadius * .8f);
 
-		switch(h)
-		{
-			case	HUMAN_TYPE_FARMER:
-					human = MakeFarmer(x,z);
-					break;
-
-			case	HUMAN_TYPE_BEEWOMAN:
-					human = MakeBeeWoman(x,z);
-					break;
-
-			case	HUMAN_TYPE_SCIENTIST:
-					human = MakeScientist(x,z);
-					break;
-
-			case	HUMAN_TYPE_SKIRTLADY:
-					human = MakeSkirtLady(x,z);
-					break;
-
-			default:
-					DoAlert("BlowUpPeopleHut: unsupported human type");
-					continue;
-		}
+		human = MakeHuman(h, x, z);
 
 
 				/* SET SOME HUMAN INFO */
@@ -830,9 +1108,23 @@ ObjNode	*human;
 }
 
 
+#pragma mark -
 
+/************************ ADD/PRIME SCIENTIST HUMAN *************************/
+//
+// Terrain item type 61 is reserved for the scientist,
+// so we have to define special callbacks for him.
+//
 
+Boolean AddHumanScientist(TerrainItemEntryType* itemPtr, long x, long z)
+{
+	itemPtr->parm[0] = HUMAN_TYPE_SCIENTIST;
+	return AddHuman(itemPtr, x, z);
+}
 
-
-
+Boolean PrimeHumanScientist(long splineNum, SplineItemType* itemPtr)
+{
+	itemPtr->parm[0] = HUMAN_TYPE_SCIENTIST;
+	return PrimeHuman(splineNum, itemPtr);
+}
 

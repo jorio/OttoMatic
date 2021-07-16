@@ -104,7 +104,7 @@ Boolean (*gSplineItemPrimeRoutines[MAX_SPLINE_ITEM_NUM+1])(long, SplineItemType 
 		NilPrime,							// 58:
 		PrimeEnemy_Mutant,					// 59:
 		PrimeEnemy_MutantRobot,				// 60:
-		PrimeScientist,						// 61:  scientist human
+		PrimeHumanScientist,				// 61:  scientist human
 		NilPrime,							// 62:  proximity mine
 		NilPrime,							// 63:  lamp posts
 		NilPrime,							// 64:  debris gate

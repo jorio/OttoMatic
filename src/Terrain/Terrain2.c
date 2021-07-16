@@ -106,7 +106,7 @@ static Boolean (*gTerrainItemAddRoutines[MAX_ITEM_NUM+1])(TerrainItemEntryType *
 		AddZipLinePost,						// 58:  zip line post
 		AddEnemy_Mutant,					// 59:  mutant enemy
 		AddEnemy_MutantRobot,				// 60:  mutant robot enemy
-		AddScientist,						// 61:  scientist human
+		AddHumanScientist,					// 61:  scientist human
 		AddProximityMine,					// 62:  proximity mine
 		AddLampPost,						// 63:  lamp posts
 		AddDebrisGate,						// 64:  debris gate

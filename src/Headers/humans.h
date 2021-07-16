@@ -18,6 +18,7 @@ enum
 
 void InitHumans(void);
 
+ObjNode* MakeHuman(int humanType, float x, float z);
 Boolean AddHuman(TerrainItemEntryType *itemPtr, long x, long z);
 Boolean PrimeHuman(long splineNum, SplineItemType *itemPtr);
 void DoHumanCollisionDetect(ObjNode *theNode);
@@ -30,23 +31,8 @@ void EncaseHumanInIce(ObjNode *human);
 void MoveHuman_ToPlayerSaucer(ObjNode *theNode);
 void MoveHuman_BeamDown(ObjNode *theNode);
 
-
-Boolean AddFarmer(TerrainItemEntryType *itemPtr, long x, long z);
-ObjNode *MakeFarmer(float x, float z);
-Boolean PrimeFarmer(long splineNum, SplineItemType *itemPtr);
-
-
-Boolean AddBeeWoman(TerrainItemEntryType *itemPtr, long x, long z);
-Boolean PrimeBeeWoman(long splineNum, SplineItemType *itemPtr);
-ObjNode *MakeBeeWoman(float x, float z);
-
-Boolean AddScientist(TerrainItemEntryType *itemPtr, long x, long z);
-Boolean PrimeScientist(long splineNum, SplineItemType *itemPtr);
-ObjNode *MakeScientist(float x, float z);
-
-Boolean AddSkirtLady(TerrainItemEntryType *itemPtr, long x, long z);
-Boolean PrimeSkirtLady(long splineNum, SplineItemType *itemPtr);
-ObjNode *MakeSkirtLady(float x, float z);
-
 Boolean AddPeopleHut(TerrainItemEntryType *itemPtr, long x, long z);
+
+Boolean AddHumanScientist(TerrainItemEntryType *itemPtr, long x, long z);
+Boolean PrimeHumanScientist(long splineNum, SplineItemType *itemPtr);
 
