@@ -302,10 +302,11 @@ float		originalX,originalY,originalZ;
 float		offset,maxOffsetX,maxOffsetZ,maxOffsetY;
 float		offXSign,offZSign,offYSign;
 Byte		base,target;
-ObjNode		*targetObj;
-CollisionBoxType *baseBoxPtr,*targetBoxPtr;
+ObjNode		*targetObj = nil;
+CollisionBoxType* baseBoxPtr = nil;
+CollisionBoxType* targetBoxPtr = nil;
 long		leftSide,rightSide,frontSide,backSide,bottomSide;
-CollisionBoxType *boxList;
+CollisionBoxType *boxList = nil;
 short		numSolidHits, numPasses = 0;
 Boolean		hitImpenetrable = false;
 short		oldNumCollisions;
@@ -613,7 +614,7 @@ again:
 
 
 
-#pragma mark ############ POINT COLLISION #################
+#pragma mark ------------------ POINT COLLISION ----------------------
 
 /****************** IS POINT IN POLY ****************************/
 /*

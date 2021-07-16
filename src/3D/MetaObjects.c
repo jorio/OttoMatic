@@ -30,7 +30,7 @@ static void MO_CalcBoundingBox_Recurse(MetaObjectPtr object, OGLBoundingBox *bBo
 static void MO_DisposeObject_Picture(MOPictureObject *obj);
 static void MO_DeleteObjectInfo_Picture(MOPictureObject *obj);
 
-static void SetMetaObjectToSprite(MOSpriteObject *spriteObj, OGLSetupOutputType *setupInfo, MOSpriteSetupData *inData);
+static void SetMetaObjectToSprite(MOSpriteObject *spriteObj, MOSpriteSetupData* inData);
 static void MO_DisposeObject_Sprite(MOSpriteObject *obj);
 
 
@@ -180,7 +180,7 @@ MetaObjectPtr	mo;
 				break;
 
 		case	MO_TYPE_SPRITE:
-				SetMetaObjectToSprite(mo, (OGLSetupOutputType *)subType, data);
+				SetMetaObjectToSprite(mo, data);
 				break;
 
 		default:
@@ -405,7 +405,7 @@ static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData)
 // This takes the given input data and copies it.
 //
 
-static void SetMetaObjectToSprite(MOSpriteObject *spriteObj, OGLSetupOutputType *setupInfo, MOSpriteSetupData *inData)
+static void SetMetaObjectToSprite(MOSpriteObject *spriteObj, MOSpriteSetupData* inData)
 {
 MOSpriteData	*spriteData = &spriteObj->objectData;
 

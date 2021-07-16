@@ -795,10 +795,13 @@ ObjNode	*human;
 					human = MakeScientist(x,z);
 					break;
 
-
 			case	HUMAN_TYPE_SKIRTLADY:
 					human = MakeSkirtLady(x,z);
 					break;
+
+			default:
+					DoAlert("BlowUpPeopleHut: unsupported human type");
+					continue;
 		}
 
 

@@ -2,8 +2,9 @@
 // triggers.h
 //
 
-#ifndef __TRIGGERS_H__
-#define __TRIGGERS_H__
+#pragma once
+
+#undef AddAtom	// some windows header defines this
 
 
 #define	TRIGGER_SLOT	4					// needs to be early in the collision list
@@ -109,9 +110,3 @@ Boolean DoTrig_ChainReactingMine(ObjNode *mine, ObjNode *whoNode, Byte sideBits)
 
 Boolean AddTrapDoor(TerrainItemEntryType *itemPtr, long  x, long z);
 Boolean DoTrig_TrapDoor(ObjNode *theNode, ObjNode *whoNode, Byte sideBits);
-
-
-
-#endif
-
-

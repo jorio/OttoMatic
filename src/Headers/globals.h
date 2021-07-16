@@ -4,15 +4,13 @@
 /* By Brian Greenstone      */
 /****************************/
 
-#ifndef MYGLOBALS_H
-#define MYGLOBALS_H
+#pragma once
 
 
 #define	kGameID 		'Otto'
 
 			/* SOME FLOATING POINT HELPERS */
-			
-#define INFINITE	1e20
+
 #define EPS .0001					// a very small number which is useful for FP compares close to 0
 #define	IS_ZERO(_x)  (fabs(_x) < EPS)
 
@@ -220,19 +218,3 @@ enum
 
 	NUM_POW_TYPES
 };
-
-
-
-#include "structs.h"
-
-#endif
-
-
-
-
-
-
-
-
-
-

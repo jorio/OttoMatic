@@ -299,6 +299,14 @@ static char			*s;
 	GAME_ASSERT_MESSAGE(mkc == 0, SDL_GetError());
 
 
+			/* GET OPENGL EXTENSIONS */
+			//
+			// On Mac/Linux, we only need to do this once.
+			// But on Windows, we must do it whenever we create a draw context.
+			//
+
+	OGL_InitFunctions();
+
 
 				/* SET VARIOUS STATE INFO */
 
@@ -1219,9 +1227,9 @@ OGLLightDefType	*lights;
 	{
 		float	left, right;
 		float	halfFOV = setupInfo->fov * .5f;
-		float	near 	= setupInfo->hither;
-	   	float	wd2     = near * tan(halfFOV);
-		float	ndfl    = near / gAnaglyphFocallength;
+		float	znear 	= setupInfo->hither;
+	   	float	wd2     = znear * tan(halfFOV);
+		float	ndfl    = znear / gAnaglyphFocallength;
 
 		if (gAnaglyphPass == 0)
 		{

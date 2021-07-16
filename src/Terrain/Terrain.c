@@ -497,18 +497,19 @@ static u_short	BuildTerrainSuperTile(long	startCol, long startRow)
 long	 			row,col,row2,col2,numPoints,i;
 u_short				superTileNum;
 float				height,miny,maxy;
-MOVertexArrayData	*meshData;
-SuperTileMemoryType	*superTilePtr;
-OGLColorRGBA		*vertexColorList;
-float				ambientR,ambientG,ambientB;
-float				fillR0,fillG0,fillB0;
-float				fillR1,fillG1,fillB1;
-OGLVector3D			*fillDir0,*fillDir1;
+MOVertexArrayData	*meshData = nil;
+SuperTileMemoryType	*superTilePtr = nil;
+OGLColorRGBA		*vertexColorList = nil;
+float				ambientR = 1.0f, ambientG = 1.0f, ambientB = 1.0f;
+float				fillR0 = 1.0f, fillG0 = 0.0f, fillB0 = 1.0f;
+float				fillR1 = 1.0f, fillG1 = 0.0f, fillB1 = 1.0f;
+OGLVector3D			*fillDir0 = nil;
+OGLVector3D			*fillDir1 = nil;
 Byte				numFillLights;
-MOTriangleIndecies	*triangleList;
-OGLPoint3D			*vertexPointList;
-OGLTextureCoord		*uvs;
-OGLVector3D			*vertexNormals;
+MOTriangleIndecies	*triangleList = nil;
+OGLPoint3D			*vertexPointList = nil;
+OGLTextureCoord		*uvs = nil;
+OGLVector3D			*vertexNormals = nil;
 
 	superTileNum = GetFreeSuperTileMemory();						// get memory block for the data
 	superTilePtr = &gSuperTileMemoryList[superTileNum];				// get ptr to it

@@ -98,7 +98,8 @@ void MakeBlobBossMachine(void)
 {
 long					i;
 TerrainItemEntryType	*itemPtr;
-float					x,z;
+float					x = 0;
+float					z = 0;
 
 			/*********************************/
 			/* FIND BLOB BOSS ON THE TERRAIN */
@@ -115,8 +116,8 @@ float					x,z;
 			break;
 		}
 	}
-	if (i == gNumTerrainItems)											// see if nothing was found
-		return;
+
+	GAME_ASSERT_MESSAGE(i != gNumTerrainItems, "MAP_ITEM_BLOBBOSS not found on terrain!");
 
 	gBlobBossX = x;
 	gBlobBossZ = z;

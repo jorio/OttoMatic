@@ -241,8 +241,8 @@ int			pointsPerSpan;
 
 const short numNubs = 4;
 
-	maxX = maxZ = -10000000;
-	minX = minZ = -maxX;
+	maxX = maxY = maxZ = -10000000;
+	minX = minY = minZ = -maxX;
 
 				/* CALC POINT DENSITY */
 

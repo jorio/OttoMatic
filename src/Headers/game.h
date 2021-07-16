@@ -4,12 +4,16 @@
 
 #define __LITTLE_ENDIAN__	1
 
+#if _MSC_VER
+	#define _Static_assert static_assert
+#endif
 
 		/* HEADERS */
 
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
+#include <stdio.h>
 
 #include "Pomme.h"
 
@@ -59,6 +63,8 @@
 #include "textmesh.h"
 #include "tga.h"
 #include "menu.h"
+
+		/* EXTERNS */
 
 extern	BG3DFileContainer		*gBG3DContainerList[];
 extern	Boolean					gAllowAudioKeys;

@@ -168,7 +168,8 @@ float	z = gPlayerInfo.coord.z;
 static void MoveIceSaucer_UnderIce(ObjNode *saucer)
 {
 ObjNode	*hatch;
-float	fps, dist;
+float	fps = gFramesPerSecondFrac;
+float	dist = 10000000.0f;
 
 	if (!gIceCracked)										// only check if gone if ice not cracked
 	{

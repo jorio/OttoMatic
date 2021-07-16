@@ -22,10 +22,10 @@ enum
 	KEYSTATE_ACTIVE_BIT	= 0b10,
 };
 
-const int16_t	kJoystickDeadZone				= (33 * 32767 / 100);
-const int16_t	kJoystickDeadZone_UI			= (66 * 32767 / 100);
-const float		kJoystickDeadZoneFrac			= kJoystickDeadZone / 32767.0f;
-const float		kJoystickDeadZoneFracSquared	= kJoystickDeadZoneFrac * kJoystickDeadZoneFrac;
+#define kJoystickDeadZone				(33 * 32767 / 100)
+#define kJoystickDeadZone_UI			(66 * 32767 / 100)
+#define kJoystickDeadZoneFrac			(kJoystickDeadZone / 32767.0f)
+#define kJoystickDeadZoneFracSquared	(kJoystickDeadZoneFrac * kJoystickDeadZoneFrac)
 
 /***************/
 /* EXTERNALS   */

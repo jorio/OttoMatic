@@ -518,7 +518,7 @@ float			numPointsInSpline;
 
 /******************** DETACH OBJECT FROM SPLINE ***********************/
 
-void DetachObjectFromSpline(ObjNode *theNode, void *moveCall)
+void DetachObjectFromSpline(ObjNode *theNode, void (*moveCall)(ObjNode*))
 {
 
 	if (!(theNode->StatusBits & STATUS_BIT_ONSPLINE))

@@ -937,6 +937,9 @@ int		type = itemPtr->parm[0];
 				KeepOldCollisionBoxes(pipe);
 				return(true);
 
+		default:
+				DoFatalAlert("AddSlimePipe: illegal slime type (parm 0)");
+				return false;
 	}
 
 	slime->Kind = type;						// save pipe type

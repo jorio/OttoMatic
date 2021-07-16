@@ -63,7 +63,8 @@ HighScoreType	gHighScores[NUM_SCORES];
 
 static	float	gFinalScoreTimer,gFinalScoreAlpha, gCursorFlux = 0;
 
-static	short	gNewScoreSlot,gCursorIndex;
+static	short	gNewScoreSlot;
+static	int		gCursorIndex;
 
 static	Boolean	gDrawScoreVerbage,gExitHighScores;
 
@@ -147,7 +148,7 @@ void NewScore(void)
 			}
 			else if (GetNewKeyState(SDL_SCANCODE_RIGHT))
 			{
-				short myLength = strlen(myName);
+				int myLength = (int) strlen(myName);
 				if (gCursorIndex < myLength)
 					gCursorIndex++;
 				else
@@ -162,7 +163,7 @@ void NewScore(void)
 			}
 			else if (GetNewKeyState(SDL_SCANCODE_END))
 			{
-				gCursorIndex = strlen(myName);
+				gCursorIndex = (int) strlen(myName);
 				UpdateCursorPos();
 			}
 			else if (GetNewKeyState(SDL_SCANCODE_BACKSPACE))
@@ -702,7 +703,7 @@ err:
 void ClearHighScores(void)
 {
 short				i,j;
-char				blank[MAX_NAME_LENGTH] = "EMPTY----------";
+char				blank[MAX_NAME_LENGTH+1] = "EMPTY----------";
 
 
 			/* INIT SCORES */

@@ -57,7 +57,8 @@ void LoadLocalizedStrings(int languageID)
 
 	GAME_ASSERT(count == eof);
 
-	memset(gStringsTable, 0, sizeof(gStringsTable));
+	for (int i = 0; i < MAX_STRINGS; i++)
+		gStringsTable[i] = nil;
 
 	gStringsTable[0] = gStringsBuffer;
 	int currStringNo = 0;

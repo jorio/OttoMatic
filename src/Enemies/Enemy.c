@@ -185,7 +185,7 @@ void UpdateEnemy(ObjNode *theNode)
 // OUTPUT:	ObjNode or nil if err.
 //
 
-ObjNode *MakeEnemySkeleton(Byte skeletonType, float x, float z, float scale, float rot, void *moveCall)
+ObjNode *MakeEnemySkeleton(Byte skeletonType, float x, float z, float scale, float rot, void (*moveCall)(ObjNode*))
 {
 ObjNode	*newObj;
 
@@ -238,7 +238,7 @@ void MoveEnemy(ObjNode *theNode)
 // OUTPUT: true if was on spline, false if wasnt
 //
 
-void DetachEnemyFromSpline(ObjNode *theNode, void *moveCall)
+void DetachEnemyFromSpline(ObjNode *theNode, void (*moveCall)(ObjNode*))
 {
 	if (!(theNode->StatusBits & STATUS_BIT_ONSPLINE))	// must be on spline
 		return;

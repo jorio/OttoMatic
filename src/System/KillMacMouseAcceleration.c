@@ -27,7 +27,11 @@
 // - https://forums3.armagetronad.net/viewtopic.php?f=12&t=3364&start=15
 //   The people who found the basis for the current approach.
 
-#if __APPLE__
+#if !(__APPLE__)
+
+typedef char BogusTypedef;  // work around ISO C warning about empty translation unit
+
+#else
 
 #include "killmacmouseacceleration.h"
 

@@ -115,5 +115,5 @@ Ptr			initialDestPtr = destPtr;
 	SafeDisposePtr((Ptr)rson);
 	SafeDisposePtr((Ptr)dad);
 
-	return(decompSize);
+	return (long) decompSize;
 }

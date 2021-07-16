@@ -30,7 +30,7 @@ if(MSVC)
 	add_compile_options(/Zc:__cplusplus)
 	add_compile_definitions(UNICODE _UNICODE)
 
-	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Bugdom)
+	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${GAME_TARGET})
 endif()
 
 #------------------------------------------------------------------------------

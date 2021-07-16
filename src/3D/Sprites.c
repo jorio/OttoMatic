@@ -263,7 +263,7 @@ MOSpriteSetupData	spriteData;
 	spriteData.type 	= newObjDef->type;								// set group subtype
 
 
-	spriteMO = MO_CreateNewObjectOfType(MO_TYPE_SPRITE, (u_long)setupInfo, &spriteData);
+	spriteMO = MO_CreateNewObjectOfType(MO_TYPE_SPRITE, 0, &spriteData);
 	if (!spriteMO)
 		DoFatalAlert("MakeSpriteObject: MO_CreateNewObjectOfType failed!");
 
@@ -305,7 +305,7 @@ MOSpriteObject		*spriteMO;
 	spriteData.group	= theNode->Group;							// set group
 	spriteData.type 	= type;										// set group subtype
 
-	spriteMO = MO_CreateNewObjectOfType(MO_TYPE_SPRITE, (u_long)setupInfo, &spriteData);
+	spriteMO = MO_CreateNewObjectOfType(MO_TYPE_SPRITE, 0, &spriteData);
 	if (!spriteMO)
 		DoFatalAlert("ModifySpriteObjectFrame: MO_CreateNewObjectOfType failed!");
 

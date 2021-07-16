@@ -826,8 +826,10 @@ float	s = theNode->Scale.x;
 
 static void	WeaponAutoTarget(OGLPoint3D *where, OGLVector3D *aim)
 {
-ObjNode	 *thisNode,*nearestEnemy;
-OGLVector3D	vecToEnemy, bestAngle;
+ObjNode*	thisNode = nil;
+ObjNode*	nearestEnemy = nil;
+OGLVector3D	vecToEnemy;
+OGLVector3D	bestAngle = {0,0,0};
 float		dist,dot,bestDist,angle,angleRange;
 float		x,y,z, ex,ey,ez;
 
@@ -1273,6 +1275,7 @@ assign_me:
 				/* NO FREE SLOTS SO ELIMINATE THE FARTHEST */
 
 		worstDist = 10000000;
+		j = 0;
 		for (i = 0; i < maxDischarges; i++)						// scan for the farthest in the list
 		{
 			if (gSuperNovaTargets[i].dist < worstDist)

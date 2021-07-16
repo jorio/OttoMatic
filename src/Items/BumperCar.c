@@ -798,7 +798,8 @@ void PlayerTouchedElectricFloor(ObjNode *theNode)
 
 Boolean AddTireBumperStrip(TerrainItemEntryType *itemPtr, long  x, long z)
 {
-ObjNode	*newObj,*prev;
+ObjNode* newObj = nil;
+ObjNode* prev = nil;
 short	numTires = itemPtr->parm[0];
 float	aim = (float)itemPtr->parm[1] * (PI2/4.0f);
 float	tx,tz,s,diameter,radius;

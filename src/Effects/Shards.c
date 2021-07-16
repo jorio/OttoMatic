@@ -207,7 +207,7 @@ int					t;
 OGLTextureCoord		*uvPtr;
 long				i;
 float				boomForce = gBoomForce;
-OGLPoint3D			origin;
+OGLPoint3D			origin = {0,0,0};
 
 	if (gShardMode & SHARD_MODE_FROMORIGIN)
 	{

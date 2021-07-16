@@ -403,7 +403,7 @@ ObjNode *TextMesh_NewEmpty(int capacity, NewObjectDefinitionType* newObjDef)
 
 ObjNode *TextMesh_New(const char *text, int align, NewObjectDefinitionType* newObjDef)
 {
-	ObjNode* textNode = TextMesh_NewEmpty(strlen(text), newObjDef);
+	ObjNode* textNode = TextMesh_NewEmpty(0, newObjDef);
 	TextMesh_Update(text, align, textNode);
 	return textNode;
 }

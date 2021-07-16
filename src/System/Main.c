@@ -104,7 +104,6 @@ void ToolBoxInit(void)
 			/* BOOT OGL */
 
 	OGL_Boot();
-	OGL_InitFunctions();
 
 
  	InitInput();
@@ -888,6 +887,12 @@ static void CleanupLevel(void)
 	DisposeSoundBank(SOUND_BANK_LEVELSPECIFIC);
 
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);	// do this last!
+
+
+
+	gPlayerInfo.objNode = nil;
+	gPlayerInfo.leftHandObj = nil;
+	gPlayerInfo.rightHandObj = nil;
 }
 
 

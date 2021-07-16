@@ -18,20 +18,5 @@ Boolean RemoveFromSplineObjectList(ObjNode *theNode);
 void EmptySplineObjectList(void);
 void IncreaseSplineIndex(ObjNode *theNode, float speed);
 void IncreaseSplineIndexZigZag(ObjNode *theNode, float speed);
-void DetachObjectFromSpline(ObjNode *theNode, void *moveCall);
+void DetachObjectFromSpline(ObjNode *theNode, void (*moveCall)(ObjNode*));
 void SetSplineAim(ObjNode *theNode);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

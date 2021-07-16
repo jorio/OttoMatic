@@ -78,13 +78,13 @@ enum
 
 			/* ENEMY */
 			
-ObjNode *MakeEnemySkeleton(Byte skeletonType, float x, float z, float scale, float rot, void *moveCall);
+ObjNode *MakeEnemySkeleton(Byte skeletonType, float x, float z, float scale, float rot, void (*moveCall)(ObjNode*));
 extern	void DeleteEnemy(ObjNode *theEnemy);
 Boolean DoEnemyCollisionDetect(ObjNode *theEnemy, unsigned long ctype, Boolean useBBoxBottom);
 extern	void UpdateEnemy(ObjNode *theNode);
 extern	void InitEnemyManager(void);
 void MoveEnemy(ObjNode *theNode);
-void DetachEnemyFromSpline(ObjNode *theNode, void *moveCall);
+void DetachEnemyFromSpline(ObjNode *theNode, void (*moveCall)(ObjNode*));
 ObjNode *FindClosestEnemy(OGLPoint3D *pt, float *dist);
 Boolean	IsBottomlessPitInFrontOfEnemy(float r);
 void MoveEnemyRobotChunk(ObjNode *chunk);

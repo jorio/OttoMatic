@@ -839,12 +839,16 @@ float					verts2x,verts2y;
 				verts2x = point->x;
 				verts2y = point->y;
 				break;
+
+		default:
+				DoFatalAlert("IsPointInTriangle3D: unknown vector component");
+				return false;
 	}
 
 
 			/* NOW DO 2D POINT-IN-TRIANGLE CHECK */
 
-	return ((Boolean)IsPointInTriangle(pX, pY, verts0x, verts0y, verts1x, verts1y, verts2x, verts2y));
+	return IsPointInTriangle(pX, pY, verts0x, verts0y, verts1x, verts1y, verts2x, verts2y);
 }
 
 #pragma mark -
@@ -2320,7 +2324,7 @@ OGLMatrix4x4	m2,*m;
 	maxY = bBox->max.y;
 	maxZ = bBox->max.z;
 
-	clipCodeAND = ~0;
+	clipCodeAND = ~0u;
 
 	for (i = 0; i < 8; i++)
 	{

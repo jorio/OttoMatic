@@ -258,7 +258,6 @@ void FindPlayerStartCoordItems(void)
 {
 long					i;
 TerrainItemEntryType	*itemPtr;
-Boolean                 flags = false;
 
 
 	itemPtr = *gMasterItemList; 												// get pointer to data inside the LOCKED handle
@@ -278,10 +277,6 @@ Boolean                 flags = false;
 			gPlayerInfo.startRotY = (float)itemPtr[i].parm[0] * (PI2/8.0f);	// calc starting rotation aim
 
 			break;
-
-//			if (flags)                      								// if we already got a coord for this player then err
-  //              DoFatalAlert("FindPlayerStartCoordItems:  duplicate start item for player #n");
-	        flags = true;
 		}
 	}
 }
