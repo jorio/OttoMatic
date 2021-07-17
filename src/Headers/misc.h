@@ -2,11 +2,9 @@
 // misc.h
 //
 
-#define SERIAL_LENGTH      12
-
 extern	void ShowSystemErr(long err);
 extern void	DoAlert(const char*);
-extern void	DoFatalAlert(const char*);
+void DoFatalAlert(const char*);
 void DoAssert(const char* msg, const char* file, int line);
 extern	void CleanQuit(void);
 extern	void SetMyRandomSeed(unsigned long seed);

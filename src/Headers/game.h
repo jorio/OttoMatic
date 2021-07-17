@@ -8,6 +8,7 @@
 	#define _Static_assert static_assert
 #endif
 
+
 		/* HEADERS */
 
 #include <SDL.h>
