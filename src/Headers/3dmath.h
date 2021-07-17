@@ -129,6 +129,13 @@ static inline void OGLVector3D_RawCross(const OGLVector3D *v1, const OGLVector3D
 	result->z = rz;
 }
 
+static inline void OGLPoint3D_Add(const OGLPoint3D* v1, const OGLPoint3D* v2, OGLPoint3D* result)
+{
+	result->x = v1->x + v2->x;
+	result->y = v1->y + v2->y;
+	result->z = v1->z + v2->z;
+}
+
 
 /*********** INTERSECTION OF Y AND PLANE ********************/
 //

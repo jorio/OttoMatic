@@ -10,6 +10,7 @@ enum
 };
 
 void InitVaporTrails(void);
+void DisposeVaporTrails(void);
 int CreatetNewVaporTrail(ObjNode *owner, Byte ownerTrailNum, Byte trailType,
 						const OGLPoint3D *startPoint, const OGLColorRGBA *color,
 						float size, float decayRate, float segmentDist);

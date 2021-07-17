@@ -88,7 +88,14 @@ static void VerifyTargetPickup(void);
 #define	PLAYER_DEFAULT_FRICTION	1200.0f
 #define	PLAYER_HEAVY_FRICTION	2700.0f
 
-#define	PLAYER_VAPOR_THRESHOLD	700.0f
+#define DEBUG_PLAYER_VAPOR		0
+#if DEBUG_PLAYER_VAPOR
+	#define PLAYER_VAPOR_THRESHOLD	10.0f
+	#define PLAYER_VAPOR_ALPHA		1.0f
+#else
+	#define	PLAYER_VAPOR_THRESHOLD	700.0f
+	#define PLAYER_VAPOR_ALPHA		0.2f
+#endif
 
 #define	JUMP_DELTA					1800.0f
 #define	JUMP_JET_ACCELERATION		2000.0f
@@ -1835,8 +1842,8 @@ int		weaponType;
 void UpatePlayerMotionBlur(ObjNode *theNode)
 {
 int		v,i;
-static OGLColorRGBA color = {.6,.6,1.0,.2};
-static OGLColorRGBA color2 = {.4,1,.4,.2};
+static OGLColorRGBA color	= { 0.6f, 0.6f, 1.0f, PLAYER_VAPOR_ALPHA };
+static OGLColorRGBA color2	= { 0.4f, 1.0f, 0.4f, PLAYER_VAPOR_ALPHA };
 OGLPoint3D	p;
 OGLVector3D	playerVec,viewVec;
 float		dot;

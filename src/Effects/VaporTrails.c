@@ -3,6 +3,7 @@
 /* (c)2001 Pangea Software  */
 /* By Brian Greenstone      */
 /****************************/
+// Revised color streak rendering: (C)2021 Iliyas Jorio - https://github.com/jorio/ottomatic
 
 
 /****************************/
@@ -71,6 +72,8 @@ MOTriangleIndecies	gSmokeColumnTriangles[MAX_TRAIL_SEGMENTS * (NUM_RING_POINTS-1
 
 MOVertexArrayData	gSmokeColumnMesh;
 
+MetaObjectPtr		gColorStreakMaterial;
+
 /*************************** INIT VAPOR TRAILS **********************************/
 
 void InitVaporTrails(void)
@@ -89,6 +92,24 @@ int		i;
 	gSmokeColumnMesh.uvs[0]			= gSmokeColumnUVs;
 	gSmokeColumnMesh.colorsByte		= nil;
 	gSmokeColumnMesh.colorsFloat	= gSmokeColumnColors;
+
+
+
+	MOMaterialData matData;
+	memset(&matData, 0, sizeof(matData));
+	matData.setupInfo		= gGameViewInfoPtr;
+	matData.flags			= BG3D_MATERIALFLAG_ALWAYSBLEND;
+	matData.diffuseColor	= (OGLColorRGBA) {1, 1, 1, 1};
+	gColorStreakMaterial = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
+}
+
+/*************************** DISPOSE STREAK MATERIAL ******************************/
+
+
+void DisposeVaporTrails(void)
+{
+	MO_DisposeObjectReference(gColorStreakMaterial);
+	gColorStreakMaterial = nil;
 }
 
 
@@ -392,14 +413,25 @@ void DrawVaporTrails(OGLSetupOutputType *setupInfo)
 
 
 /************************** DRAW VAPOR TRAIL:  COLOR STREAK **************************/
+//
+// Source port note: The original game used GL_LINE_STRIP for this effect.
+// However, modern OpenGL drivers may severely limit line thickness.
+// For instance, the following snippet returns a max thickness of only 10 px
+// on a GeForce GTX 970:
+//		GLfloat range[2];
+//		glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, range);
+// 10 screen-space pixels is way too low for the desired effect.
+// So my alternate version draws a ribbon mesh instead.
+//
 
 static void DrawVaporTrail_ColorStreak(int	i, OGLSetupOutputType *setupInfo)
 {
+#if 0
 u_long	w,p,n;
 float	size,dist;
 
 
-	n = gVaporTrails[i].numSegments;						// get # segments
+ 	n = gVaporTrails[i].numSegments;						// get # segments
 	if (n > MAX_TRAIL_SEGMENTS)
 		DoFatalAlert("DrawVaporTrail_ColorStreak: n > MAX_TRAIL_SEGMENTS");
 
@@ -428,6 +460,112 @@ float	size,dist;
 	}
 
 	glEnd();
+#else
+	VaporTrailType*			trail			= &gVaporTrails[i];
+	const OGLVector3D		up				= {0,1,0};
+	const OGLPoint3D*		camCoords		= &setupInfo->cameraPlacement.cameraLocation;
+	MOTriangleIndecies*		triPtr			= &gSmokeColumnTriangles[0];
+	const float				halfThickness	= trail->size * 30 / 2.0f;
+	OGLPoint3D				viewSpaceTrailPoint[MAX_TRAIL_SEGMENTS];
+	OGLMatrix4x4			billboardMatrix;
+	OGLVector2D				normal2D		= { 0,1 };
+
+
+	GAME_ASSERT(gVaporTrails[i].numSegments <= MAX_TRAIL_SEGMENTS);
+
+	gSmokeColumnMesh.numPoints 		= 2 * (trail->numSegments-1);
+	gSmokeColumnMesh.numTriangles 	= 2 * (trail->numSegments-1);
+
+
+			/* TRANSFORM ALL TRAIL POINTS TO VIEW-SPACE */
+
+	OGLPoint3D_TransformArray(trail->points, &gWorldToViewMatrix, viewSpaceTrailPoint, trail->numSegments);
+
+			/* PREPARE BILLBOARD MATRIX */
+			//
+			// We're using the last point in the ribbon as the 'from' point
+			// instead of computing the matrix for every point in the ribbon.
+			//
+
+	SetLookAtMatrix(&billboardMatrix, &up, &trail->points[trail->numSegments-1], camCoords);
+
+			/* PROCESS EVERY POINT IN THE TRAIL */
+
+	for (int p = 0; p < trail->numSegments; p++)
+	{
+		int p2 = p * 2;
+
+			/*********************************/
+			/* MAKE 2 VERTICES IN THE RIBBON */
+			/*********************************/
+
+			/* CALC NORMAL OF SEGMENT IN VIEW-SPACE */
+
+		if (p < trail->numSegments-1)							// just use previous normal if this is the last segment
+		{
+			OGLPoint3D cur	= viewSpaceTrailPoint[p];			// view-space projection of cur & next points
+			OGLPoint3D next	= viewSpaceTrailPoint[p+1];
+
+			OGLVector2D dir2D = { next.x-cur.x, next.y-cur.y };
+			OGLVector2D_Normalize(&dir2D, &dir2D);
+
+			normal2D = (OGLVector2D) { dir2D.y, dir2D.x };		// here's the segment's normal
+
+			normal2D.x *= halfThickness;						// scale it with desired line thickness
+			normal2D.y *= halfThickness;
+		}
+
+			/* PREP 2 VIEW-SPACE X-Y POINTS PERPENDICULAR TO SEGMENT */
+
+		OGLPoint3D thickened[2] = { { normal2D.x, normal2D.y, 0 }, { -normal2D.x, -normal2D.y, 0 } };
+
+			/* MAKE THEM FACE THE CAMERA */
+
+		OGLPoint3D_TransformArray(thickened, &billboardMatrix, thickened, 2);
+
+			/* AND MOVE THEM BACK TO WORLD SPACE (TO TRAIL POINT'S WORLD POSITION) */
+
+		OGLPoint3D_Add(&thickened[0], &trail->points[p], &gSmokeColumnPoints[p2]);
+		OGLPoint3D_Add(&thickened[1], &trail->points[p], &gSmokeColumnPoints[p2+1]);
+
+			/*******************************************/
+			/* NOW BUILD THE TRIANGLES FROM THE POINTS */
+			/*******************************************/
+
+				/* TRIANGLE A */
+
+		triPtr->vertexIndices[0] = p2 + 0;		// hi pt
+		triPtr->vertexIndices[1] = p2 + 1;		// lo pt
+		triPtr->vertexIndices[2] = p2 + 3;		// lo pt in next seg
+		triPtr++;								// point to next tri
+
+				/* TRIANGLE B */
+
+		triPtr->vertexIndices[0] = p2 + 2;		// hi pt in next seg
+		triPtr->vertexIndices[1] = p2 + 0;		// hi pt
+		triPtr->vertexIndices[2] = p2 + 3;		// lo pt in next seg
+		triPtr++;								// point to next triangle
+
+			/**************/
+			/* SET COLORS */
+			/**************/
+
+		gSmokeColumnColors[p2 + 0] = trail->color[p];
+		gSmokeColumnColors[p2 + 1] = trail->color[p];
+	}
+
+
+			/* SUBMIT VERTEX ARRAY */
+
+
+	OGL_PushState();
+
+	glEnable(GL_CULL_FACE);
+	MO_DrawMaterial(gColorStreakMaterial, setupInfo);		// activate material
+	MO_DrawGeometry_VertexArray(&gSmokeColumnMesh, setupInfo);
+
+	OGL_PopState();
+#endif
 }
 
 

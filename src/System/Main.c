@@ -32,8 +32,6 @@ static void PlayGame(void);
 #define	DEFAULT_ANAGLYPH_G	0x90
 #define	DEFAULT_ANAGLYPH_B	0xff
 
-#define kDefaultNibFileName "main"
-
 
 /****************************/
 /*    VARIABLES             */
@@ -886,6 +884,7 @@ static void CleanupLevel(void)
 	DisposeInfobar();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
+	DisposeVaporTrails();
 	DisposeSuperTileMemoryList();
 	DisposeTerrain();
 	DisposeSky();
