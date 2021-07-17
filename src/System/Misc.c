@@ -57,20 +57,8 @@ Str255		numStr;
 
 	Enter2D();
 
-#if 0
-	if (gAGLContext)
-		aglSetDrawable(gAGLContext, nil);			// diable gl for dialog
-
-	GammaOn();
-	MyFlushEvents();
-	UseResFile(gMainAppRezFile);
-	NumToStringC(err, numStr);
-	DoAlert (numStr);
-#else
 	snprintf(numStr, sizeof(numStr), "System error: %ld", err);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", numStr, gSDLWindow);
-#endif
-
 
 	Exit2D();
 
@@ -87,21 +75,10 @@ Str255		numStr;
 
 	Enter2D();
 
-#if 0
-	if (gAGLContext)
-		aglSetDrawable(gAGLContext, nil);			// diable gl for dialog
-
-		GammaOn();
-	MyFlushEvents();
-	NumToStringC(err, numStr);
-	DoAlert (numStr);
-#else
 	snprintf(numStr, sizeof(numStr), "System error (non-fatal): %ld", err);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", numStr, gSDLWindow);
-#endif
 
 	Exit2D();
-
 }
 
 
@@ -110,25 +87,12 @@ Str255		numStr;
 void DoAlert(const char* s)
 {
 	GammaOn();
-
 	Enter2D();
 
-#if 0
-	if (gAGLContext)
-		aglSetDrawable(gAGLContext, nil);			// diable gl for dialog
-
-	MyFlushEvents();
-	UseResFile(gMainAppRezFile);
-	MyFlushEvents();
-	ParamText(s,NIL_STRING,NIL_STRING,NIL_STRING);
-	NoteAlert(ERROR_ALERT_ID,nil);
-#else
 	printf("OTTO MATIC Alert: %s\n", s);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", s, gSDLWindow);
-#endif
 
 	Exit2D();
-
 	HideCursor();
 }
 
@@ -141,11 +105,8 @@ void DoFatalAlert(const char* s)
 
 	Enter2D();
 
-	UseResFile(gMainAppRezFile);
-
 	printf("OTTO MATIC Fatal Alert: %s\n", s);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", s, gSDLWindow);
-
 
 	Exit2D();
 	CleanQuit();
