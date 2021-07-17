@@ -948,6 +948,8 @@ unsigned long	someLong;
 //	DoWinScreen();	//---------
 
 
+	FlushPtrTracking(false);
+
 
 		/* SHOW LEGAL SCREEN */
 

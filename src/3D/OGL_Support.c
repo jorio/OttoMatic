@@ -218,8 +218,7 @@ void OGL_DisposeWindowSetup(OGLSetupOutputType **dataHandle)
 OGLSetupOutputType	*data;
 
 	data = *dataHandle;
-	if (data == nil)												// see if this setup exists
-		DoFatalAlert("OGL_DisposeWindowSetup: data == nil");
+	GAME_ASSERT(data);										// see if this setup exists
 
 			/* KILL FONT MATERIAL */
 
@@ -238,6 +237,8 @@ OGLSetupOutputType	*data;
 	*dataHandle = nil;
 
 	gAGLContext = nil;
+
+	FlushPtrTracking(true);
 }
 
 
@@ -624,7 +625,11 @@ do_anaglyph:
 
 				/* SHOW BASIC DEBUG INFO */
 
-	if (gDebugMode > 0)
+	if (!gDebugText)
+	{
+		// no-op
+	}
+	else if (gDebugMode > 0)
 	{
 		char debugString[1024];
 		snprintf(
@@ -647,6 +652,7 @@ do_anaglyph:
 			"\n"
 			"vram:\t\t%dK\n"
 			"ptrs:\t\t%d\n"
+			"ptr mem:\t%ldK\n"
 			"nodes:\t%d\n"
 			,
 			(int)(gFramesPerSecond+.5f),
@@ -662,6 +668,7 @@ do_anaglyph:
 			gPlayerInfo.objNode && (gPlayerInfo.objNode->StatusBits & STATUS_BIT_ONGROUND)? 'Y': 'N',
 			gVRAMUsedThisFrame/1024,
 			gNumPointers,
+			gMemAllocatedInPtrs/1024,
 			gNumObjectNodes
 		);
 		TextMesh_Update(debugString, 0, gDebugText);

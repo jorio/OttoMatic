@@ -201,6 +201,7 @@ extern	int						gNumPointers;
 extern	int						gNumSparkles;
 extern	int						gPolysThisFrame;
 extern	int						gVRAMUsedThisFrame;
+extern	long					gMemAllocatedInPtrs;
 extern	long					gNumFences;
 extern	long					gNumSplines;
 extern	long					gNumSpritesInGroupList[MAX_SPRITE_GROUPS];

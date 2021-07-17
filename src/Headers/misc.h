@@ -27,6 +27,8 @@ float RandomFloat2(void);
 int PositiveModulo(int value, unsigned int m);
 
 void SafeDisposePtr(Ptr ptr);
+void FlushPtrTracking(bool issueWarnings);
+
 void MyFlushEvents(void);
 
 int16_t SwizzleShort(int16_t *shortPtr);

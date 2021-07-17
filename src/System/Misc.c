@@ -19,6 +19,9 @@
 
 #define	USE_MALLOC		1
 
+#define	DO_PTR_TRACKING		_DEBUG
+#define MAX_TRACKED_PTRS	1000000
+
 /**********************/
 /*     VARIABLES      */
 /**********************/
@@ -30,7 +33,14 @@ u_long 	seed0 = 0, seed1 = 0, seed2 = 0;
 
 float	gFramesPerSecond, gFramesPerSecondFrac;
 
-int		gNumPointers = 0;
+int			gNumPointers = 0;
+uint32_t	gPtrTrackingBatch = 0;
+uint32_t	gPtrCountInBatch = 0;
+long		gMemAllocatedInPtrs = 0;
+
+#if DO_PTR_TRACKING
+static uint8_t		gLivePtrTracking[MAX_TRACKED_PTRS] = {0};
+#endif
 
 
 
@@ -328,10 +338,27 @@ OSErr	err;
 
 /****************** ALLOC PTR ********************/
 
+static inline void InitPtrCookie(Ptr pr, long size)
+{
+	uint32_t* cookiePtr = (uint32_t*)pr;
+
+	*cookiePtr++ = 'FACE';
+	*cookiePtr++ = gPtrTrackingBatch;
+	*cookiePtr++ = gPtrCountInBatch;
+	*cookiePtr = (uint32_t) size;
+
+#if _DEBUG
+	if (gPtrCountInBatch < MAX_TRACKED_PTRS)
+	{
+		GAME_ASSERT(gLivePtrTracking[gPtrCountInBatch] == 0);
+		gLivePtrTracking[gPtrCountInBatch] = 1;
+	}
+#endif
+}
+
 void *AllocPtr(long size)
 {
 Ptr	pr;
-uint32_t	*cookiePtr;
 
 	size += 16;								// make room for our cookie & whatever else (also keep to 16-byte alignment!)
 
@@ -340,19 +367,17 @@ uint32_t	*cookiePtr;
 #else
 	pr = NewPtr(size);
 #endif
+
 	if (pr == nil)
 		DoFatalAlert("AllocPtr: NewPtr failed");
 
-	cookiePtr = (uint32_t *)pr;
-
-	*cookiePtr++ = 'FACE';
-	*cookiePtr++ = 'PTR2';
-	*cookiePtr++ = 'PTR3';
-	*cookiePtr = 'PTR4';
+	InitPtrCookie(pr, size);
 
 	pr += 16;
 
 	gNumPointers++;
+	gPtrCountInBatch++;
+	gMemAllocatedInPtrs += size;
 
 	return(pr);
 }
@@ -363,7 +388,6 @@ uint32_t	*cookiePtr;
 void *AllocPtrClear(long size)
 {
 Ptr	pr;
-uint32_t	*cookiePtr;
 
 	size += 16;								// make room for our cookie & whatever else (also keep to 16-byte alignment!)
 
@@ -376,16 +400,13 @@ uint32_t	*cookiePtr;
 	if (pr == nil)
 		DoFatalAlert("AllocPtr: NewPtr failed");
 
-	cookiePtr = (uint32_t *)pr;
-
-	*cookiePtr++ = 'FACE';
-	*cookiePtr++ = 'PTC2';
-	*cookiePtr++ = 'PTC3';
-	*cookiePtr = 'PTC4';
+	InitPtrCookie(pr, size);
 
 	pr += 16;
 
 	gNumPointers++;
+	gPtrCountInBatch++;
+	gMemAllocatedInPtrs += size;
 
 	return(pr);
 }
@@ -402,7 +423,20 @@ uint32_t	*cookiePtr;
 	cookiePtr = (uint32_t *)ptr;
 
 	if (*cookiePtr != 'FACE')
-		DoFatalAlert("SafeSafeDisposePtr: invalid cookie!");
+		DoFatalAlert("SafeDisposePtr: invalid cookie!");
+
+#if DO_PTR_TRACKING
+	uint32_t batch = ((uint32_t*)ptr)[1];
+	uint32_t idInBatch = ((uint32_t*)ptr)[2];
+
+	if (batch == gPtrTrackingBatch && idInBatch < MAX_TRACKED_PTRS)
+	{
+		GAME_ASSERT(gLivePtrTracking[idInBatch] == 1);
+		gLivePtrTracking[idInBatch] = 0;
+	}
+#endif
+
+	uint32_t size = ((uint32_t*)ptr)[3];
 
 	*cookiePtr = 0;
 
@@ -413,6 +447,30 @@ uint32_t	*cookiePtr;
 #endif
 
 	gNumPointers--;
+	gMemAllocatedInPtrs -= size;
+}
+
+
+
+void FlushPtrTracking(bool issueWarnings)
+{
+#if DO_PTR_TRACKING
+	if (issueWarnings)
+	{
+		for (uint32_t i = 0; i < gPtrCountInBatch; i++)
+		{
+			if (gLivePtrTracking[i])
+			{
+				printf("%s: ptr %d:%d is still live!\n", __func__, gPtrTrackingBatch, i);
+			}
+		}
+	}
+
+	memset(gLivePtrTracking, 0, sizeof(gLivePtrTracking));
+#endif
+
+	gPtrTrackingBatch++;
+	gPtrCountInBatch = 0;
 }
 
 
