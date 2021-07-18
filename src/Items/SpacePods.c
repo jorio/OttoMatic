@@ -203,7 +203,7 @@ static OGLColorRGBA		vaporColor = {1,1,1, 1.1};
 			AddToVaporTrail(&theNode->VaporTrails[0], &gCoord, &vaporColor);
 		else
 		{
-			theNode->VaporTrails[0] = CreatetNewVaporTrail(theNode, 0, VAPORTRAIL_TYPE_SMOKECOLUMN, &gCoord, &vaporColor, 40.0, 1.0, 200);
+			theNode->VaporTrails[0] = CreateNewVaporTrail(theNode, 0, VAPORTRAIL_TYPE_SMOKECOLUMN, &gCoord, &vaporColor, 40.0, 1.0, 200);
 		}
 
 				/* SEE IF BREAK ATMOSPHERE */

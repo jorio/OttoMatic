@@ -123,7 +123,7 @@ void DisposeVaporTrails(void)
 // OUTPUT:  trail #, or -1 if none
 //
 
-int CreatetNewVaporTrail(ObjNode *owner, Byte ownerTrailNum, Byte trailType,
+int CreateNewVaporTrail(ObjNode *owner, Byte ownerTrailNum, Byte trailType,
 						const OGLPoint3D *startPoint, const OGLColorRGBA *color,
 						float size, float decayRate, float segmentDist)
 {
@@ -170,7 +170,7 @@ got_it:
 				break;
 
 		default:
-				DoFatalAlert("CreatetNewVaporTrail: unsupported type");
+				DoFatalAlert("CreateNewVaporTrail: unsupported type");
 	}
 
 	return(i);

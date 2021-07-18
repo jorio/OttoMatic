@@ -244,7 +244,7 @@ void MakeRocketFlame(ObjNode *rocket);
 
 void MovePlayer_Robot(ObjNode *theNode);
 void InitPlayer_Robot(OGLPoint3D *where, float rotY);
-void UpatePlayerMotionBlur(ObjNode *theNode);
+void UpdatePlayerMotionBlur(ObjNode *theNode);
 void UpdateRobotHands(ObjNode *theNode);
 void UpdatePlayer_Robot(ObjNode *theNode);
 void SetPlayerStandAnim(ObjNode *theNode, float speed);

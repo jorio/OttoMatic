@@ -705,7 +705,7 @@ float		r;
 
 				/* VAPOR TRAIL */
 
-	newObj->VaporTrails[0] = CreatetNewVaporTrail(newObj, 0, VAPORTRAIL_TYPE_COLORSTREAK,
+	newObj->VaporTrails[0] = CreateNewVaporTrail(newObj, 0, VAPORTRAIL_TYPE_COLORSTREAK,
 													&newObj->Coord, &gTrailColorStart, .4, .6, 30);
 
 

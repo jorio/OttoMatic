@@ -718,7 +718,7 @@ short			skelType;
 					UpdateSkinnedGeometry(theNode);													// update skeleton geometry
 
 					if (theNode == gPlayerInfo.objNode)
-						UpatePlayerMotionBlur(theNode);
+						UpdatePlayerMotionBlur(theNode);
 			
 					numTriMeshes = theNode->Skeleton->skeletonDefinition->numDecomposedTriMeshes;
 					skelType = theNode->Type;

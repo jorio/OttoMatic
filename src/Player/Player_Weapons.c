@@ -2471,7 +2471,7 @@ static const OGLPoint3D	off = {0,0,0};
 
 				/* VAPOR TRAIL */
 
-	newObj->VaporTrails[0] = CreatetNewVaporTrail(newObj, 0, VAPORTRAIL_TYPE_COLORSTREAK,
+	newObj->VaporTrails[0] = CreateNewVaporTrail(newObj, 0, VAPORTRAIL_TYPE_COLORSTREAK,
 													&gNewObjectDefinition.coord, &color, .1, .4, 50);
 
 

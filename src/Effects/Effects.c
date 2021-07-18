@@ -398,7 +398,7 @@ got_it:
 
 		color.a = def->alpha;
 
-		gParticleGroups[group]->vaporTrail[p] = CreatetNewVaporTrail(nil, group, VAPORTRAIL_TYPE_COLORSTREAK,
+		gParticleGroups[group]->vaporTrail[p] = CreateNewVaporTrail(nil, group, VAPORTRAIL_TYPE_COLORSTREAK,
 																	def->where, &color, .3, 2.0, 50);
 	}
 

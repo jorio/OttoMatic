@@ -1839,7 +1839,7 @@ int		weaponType;
 //
 
 
-void UpatePlayerMotionBlur(ObjNode *theNode)
+void UpdatePlayerMotionBlur(ObjNode *theNode)
 {
 int		v,i;
 static OGLColorRGBA color	= { 0.6f, 0.6f, 1.0f, PLAYER_VAPOR_ALPHA };
@@ -1892,7 +1892,7 @@ float		dot;
 		else
 		{
 			if (theNode->Speed3D > (PLAYER_VAPOR_THRESHOLD * 1.2f))				// only start new vapor if above the threshold by a good margin to avoid "popping"
-				theNode->VaporTrails[v] = CreatetNewVaporTrail(theNode, v, VAPORTRAIL_TYPE_COLORSTREAK, &p, &color, 1.0, 4.0, 20.0);
+				theNode->VaporTrails[v] = CreateNewVaporTrail(theNode, v, VAPORTRAIL_TYPE_COLORSTREAK, &p, &color, 1.0, 4.0, 20.0);
 		}
 	}
 
