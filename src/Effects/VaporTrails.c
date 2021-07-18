@@ -42,6 +42,7 @@ typedef struct
 	u_short				numSegments;						// # segments in trail
 	OGLPoint3D			points[MAX_TRAIL_SEGMENTS];			// segment points
 	OGLColorRGBA		color[MAX_TRAIL_SEGMENTS];			// each segment has a color+alpha value to fade
+	Boolean				isLastPointPinned;					// if false, last point is currently tracking joint pos each frame
 
 	float				scale[MAX_TRAIL_SEGMENTS];
 	float				scaleDelta[MAX_TRAIL_SEGMENTS];
@@ -152,11 +153,11 @@ got_it:
 	gVaporTrails[i].numSegments 	= 1;
 	gVaporTrails[i].points[0] 		= *startPoint;
 	gVaporTrails[i].color[0]		= *color;
+	gVaporTrails[i].isLastPointPinned = true;
 
 	gVaporTrails[i].size			= size;
 	gVaporTrails[i].decayRate		= decayRate;
 	gVaporTrails[i].segmentDist		= segmentDist;
-
 
 	switch(trailType)
 	{
@@ -183,66 +184,58 @@ got_it:
 
 void AddToVaporTrail(short *trailNum, const OGLPoint3D *where, const OGLColorRGBA *color)
 {
-int		numSegments;
-short 	t = *trailNum;
-float	dist;
-
-	if (t == -1)
+	if (*trailNum == -1)
 		return;
 
-	if (!gVaporTrails[t].isActive)				// see if this trail has gone away
+	VaporTrailType* trail = &gVaporTrails[*trailNum];
+
+			/* SEE IF THIS TRAIL HAS GONE AWAY */
+
+	if (!trail->isActive)
 	{
 		*trailNum = -1;
 		return;
 	}
 
-
 			/* SEE IF THIS TRAIL IS FULL */
 
-	numSegments = gVaporTrails[t].numSegments;						// get # segments in trail
-	if (numSegments >= MAX_TRAIL_SEGMENTS)
+	if (trail->numSegments >= MAX_TRAIL_SEGMENTS)
 		return;
 
+			/* GET DISTANCE TO LAST FIXED POINT */
 
-			/* SEE IF FAR ENOUGH FROM PREVIOUS TO ADD TO LIST */
+	const OGLPoint3D* lastFixedPoint;
+	if (trail->isLastPointPinned)
+		lastFixedPoint = &trail->points[trail->numSegments - 1];
+	else
+		lastFixedPoint = &trail->points[trail->numSegments - 2];
 
-	dist = OGLPoint3D_Distance(where, &gVaporTrails[t].points[numSegments-1]);
+	float dist = OGLPoint3D_Distance(where, lastFixedPoint);
 
-				/* ADD NEW POINT TO LIST */
-
-	if (dist > gVaporTrails[t].segmentDist)
+	if (dist > 1000.0f		// see if too far (teleported, or something like that)
+		|| dist < 0.1f)		// and avoid creating a new point that overlaps the previous one
 	{
-		if (dist > 1000.0f)							// see if too far (teleported, or something like that)
-			return;
-
-		gVaporTrails[t].points[numSegments] = *where;
-		gVaporTrails[t].color[numSegments] = *color;
-
-
-				/*********************/
-				/* DO TYPE SPECIFICS */
-				/*********************/
-
-		switch(gVaporTrails[t].type)
-		{
-			case	VAPORTRAIL_TYPE_COLORSTREAK:
-					break;
-
-			case	VAPORTRAIL_TYPE_SMOKECOLUMN:
-					CreateSmokeColumnRing(t, numSegments);
-					break;
-
-			default:
-					DoFatalAlert("AddToVaporTrail: unsupported type");
-		}
-
-
-		gVaporTrails[t].numSegments++;
+		return;
 	}
 
+			/* IF LAST POINT WAS FIXED, ADD NEW POINT TO LIST */
 
+	if (trail->isLastPointPinned)
+	{
+		trail->numSegments++;
 
+		if (trail->type == VAPORTRAIL_TYPE_SMOKECOLUMN)
+			CreateSmokeColumnRing(*trailNum, trail->numSegments - 1);
+	}
 
+			/* MAKE LAST POINT TRACK CURRENT POS */
+
+	trail->points[trail->numSegments - 1] = *where;
+	trail->color[trail->numSegments - 1] = *color;
+
+			/* PIN LAST POINT IF FAR ENOUGH FROM PREVIOUS */
+
+	trail->isLastPointPinned = (dist >= trail->segmentDist);
 }
 
 
