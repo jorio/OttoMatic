@@ -162,7 +162,7 @@ void OGL_SetupWindow(OGLSetupInputType *setupDefPtr, OGLSetupOutputType **output
 {
 OGLSetupOutputType	*outputPtr;
 
-	HideCursor();		// do this just as a safety precaution to make sure no cursor lingering around
+	SDL_ShowCursor(0);	// do this just as a safety precaution to make sure no cursor lingering around
 
 			/* ALLOC MEMORY FOR OUTPUT DATA */
 

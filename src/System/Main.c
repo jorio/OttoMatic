@@ -867,11 +867,9 @@ DeformationType		defData;
 
 	InitCamera();
 
-	HideCursor();								// do this again to be sure!
+	SDL_ShowCursor(0);							// do this again to be sure!
 
 	GammaFadeOut();
-
-
  }
 
 
@@ -942,7 +940,7 @@ unsigned long	someLong;
 
 	GetDateTime ((unsigned long *)(&someLong));		// init random seed
 	SetMyRandomSeed(someLong);
-	HideCursor();
+	SDL_ShowCursor(0);
 
 //	DoWinScreen();	//---------
 

@@ -93,7 +93,7 @@ void DoAlert(const char* s)
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", s, gSDLWindow);
 
 	Exit2D();
-	HideCursor();
+	SDL_ShowCursor(0);
 }
 
 
@@ -147,10 +147,10 @@ static Boolean	beenHere = false;
 
 	UseResFile(gMainAppRezFile);
 
-	InitCursor();
+	SDL_ShowCursor(1);
 	MyFlushEvents();
 
-	SavePrefs();							// save prefs before bailing
+//	SavePrefs();							// save prefs before bailing
 
 	ExitToShell();
 }
