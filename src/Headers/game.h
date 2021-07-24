@@ -231,7 +231,6 @@ extern	short					gNumSuperTilesDrawn;
 extern	short					gNumTerrainDeformations;
 extern	short					gNumTerrainItems;
 extern	short					gNumWaterDrawn;
-extern	short					gPlayerMultiPassCount;
 extern	short					gPrefsFolderVRefNum;
 extern	signed char				gNumEnemyOfKind[];
 extern	u_long					gAutoFadeStatusBits;

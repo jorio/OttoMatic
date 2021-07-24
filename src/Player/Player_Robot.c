@@ -142,8 +142,6 @@ ObjNode			*gCannon = nil;
 
 float			gPlayerBottomOff = 0;
 
-short			gPlayerMultiPassCount = 0;
-
 float			gTimeSinceLastThrust = 0;			// time since player last made player move
 float			gTimeSinceLastShoot = 0;
 
@@ -793,6 +791,18 @@ static void MovePlayerRobot_ChangeWeapon(ObjNode *theNode)
 		SetPlayerStandAnim(theNode, 3);
 	}
 
+
+			/* FAST WEAPON SWITCHING */
+			//
+			// Player can keep cycling weapons until Otto has started
+			// pulling out a new gun (ChangeWeapon anim flag)
+			//
+
+	if (theNode->Skeleton->AnimNum == PLAYER_ANIM_CHANGEWEAPON
+		&& !theNode->ChangeWeapon)
+	{
+		CheckWeaponChangeControls(theNode);
+	}
 
 			/* UPDATE IT */
 

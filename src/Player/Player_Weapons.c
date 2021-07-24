@@ -126,18 +126,27 @@ int	i;
 #pragma mark -
 
 
+/******************* CHECK WEAPON CHANGE CONTROLS ************************/
+
+void CheckWeaponChangeControls(ObjNode* theNode)
+{
+	if (GetNewNeedState(kNeed_NextWeapon))
+	{
+		int i = FindWeaponInventoryIndex(gPlayerInfo.currentWeaponType);	// get current into inventory list
+		ChangeWeapons(i, 1, false);
+	}
+	else if (GetNewNeedState(kNeed_PrevWeapon))
+	{
+		int i = FindWeaponInventoryIndex(gPlayerInfo.currentWeaponType);	// get current into inventory list
+		ChangeWeapons(i, -1, false);
+	}
+}
+
+
 /******************* CHECK POWERUP CONTROLS ************************/
-//
-//
 
 void CheckPOWControls(ObjNode *theNode)
 {
-int	i;
-
-	if (gPlayerMultiPassCount > 0)							// if doing multipass and on secondary passes, then dont check "New" keys.
-		return;
-
-
 		/* SEE IF SHOOT GUN */
 
 	if (GetNewNeedState(kNeed_Shoot))					// see if user pressed the key
@@ -156,24 +165,12 @@ int	i;
 		}
 	}
 
-		/* SEE IF CHANGE WEAPON (NEXT) */
+		/* SEE IF CHANGE WEAPON */
 
 	else
-	if (GetNewNeedState(kNeed_NextWeapon))
 	{
-		i = FindWeaponInventoryIndex(gPlayerInfo.currentWeaponType);	// get current into inventory list
-		ChangeWeapons(i, 1, false);
+		CheckWeaponChangeControls(theNode);
 	}
-
-		/* SEE IF CHANGE WEAPON (PREVIOUS) */
-
-	else
-	if (GetNewNeedState(kNeed_PrevWeapon))
-	{
-		i = FindWeaponInventoryIndex(gPlayerInfo.currentWeaponType);	// get current into inventory list
-		ChangeWeapons(i, -1, false);
-	}
-
 }
 
 
@@ -517,6 +514,12 @@ Boolean	wasHoldingGun = gPlayerInfo.holdingGun;
 
 					/* DO WEAPON CHANGE ANIM */
 
+			if (gPlayerInfo.objNode->Skeleton->AnimNum == PLAYER_ANIM_CHANGEWEAPON)
+			{
+				GAME_ASSERT_MESSAGE(!gPlayerInfo.objNode->ChangeWeapon,
+									"shouldn't allow fast weapon switching once anim raises ChangeWeapon flag");
+			}
+			else
 			if (wasHoldingGun || gWeaponIsGun[newWeapon])									// do change anim if either weapon is a gun
 			{
 				gPlayerInfo.wasHoldingGun = wasHoldingGun;										// remember if was holding gun during the anim

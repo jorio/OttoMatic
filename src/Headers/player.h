@@ -255,6 +255,7 @@ void StartWeaponChangeAnim(void);
 		/* WEAPON */
 
 void InitWeaponInventory(void);		
+void CheckWeaponChangeControls(ObjNode *theNode);
 void CheckPOWControls(ObjNode *theNode);
 Boolean DischargeSuperNova(void);
 short CreateSuperNovaStatic(ObjNode *novaObj, float x, float y, float z, int maxDischarges, float maxDist);
