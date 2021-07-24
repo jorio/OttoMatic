@@ -304,11 +304,20 @@ float	fps = gFramesPerSecondFrac;
 	{
 		if (theNode->StatusBits & STATUS_BIT_ONGROUND)
 		{
-			PlayEffect_Parms3D(EFFECT_PILLARCRUNCH, &theNode->Coord, NORMAL_CHANNEL_RATE + (MyRandomLong() & 0x3fff), 1.2);
-
 			theNode->Special[0]++;							// inc bounce count
-			if (theNode->Special[0] > 2)
+
+			switch (theNode->Special[0])
 			{
+			case 0:
+				break;
+
+			case 1:
+			case 2:
+				PlayEffect_Parms3D(EFFECT_PILLARCRUNCH, &theNode->Coord, NORMAL_CHANNEL_RATE + (MyRandomLong() & 0x3fff), 1.0);
+				break;
+
+			default:
+				PlayEffect_Parms3D(EFFECT_PILLARCRUNCH, &theNode->Coord, NORMAL_CHANNEL_RATE + (MyRandomLong() & 0x3fff), 1.2);
 				MakePuff(&gCoord, 80, PARTICLE_SObjType_RedFumes, GL_SRC_ALPHA, GL_ONE, 1.0);
 				ExplodeGeometry(theNode, 500, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 1, 2.0);
 				ExplodeGeometry(theNode, 500, SHARD_MODE_BOUNCE, 1, 1.1);
