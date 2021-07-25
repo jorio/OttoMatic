@@ -165,8 +165,8 @@ static const EffectDef kEffectsTable[] =
 	[EFFECT_FLAREUP]          = {SOUNDBANK_MAIN   , "flareup"         , 1500, 0	},
 	[EFFECT_FREEZEPOOF]       = {SOUNDBANK_MAIN   , "freezepoof"      , 300 , 0	},
 	[EFFECT_CHANGEWEAPON]     = {SOUNDBANK_MAIN   , "changeweapon"    , 300 , 0	},
+	[EFFECT_MENUCHANGE]       = {SOUNDBANK_MAIN   , "menuchange"      , 1200, 0	},
 
-	[EFFECT_MENUCHANGE]       = {SOUNDBANK_MENU   , "change"          , 1200, 0	},
 	[EFFECT_LOGOAMBIENCE]     = {SOUNDBANK_MENU   , "ambience"        , 1200, 0	},
 	[EFFECT_ACCENTDRONE1]     = {SOUNDBANK_MENU   , "accentdrone1"    , 1200, 0	},
 	[EFFECT_ACCENTDRONE2]     = {SOUNDBANK_MENU   , "accentdrone2"    , 1200, 0	},
@@ -314,7 +314,6 @@ void InitSoundTools(void)
 		/* LOAD DEFAULT SOUNDS */
 
 	LoadSoundBank(SOUNDBANK_MAIN);
-	LoadSoundBank(SOUNDBANK_MENU);
 }
 
 

@@ -340,10 +340,8 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 
 
 				/* LOAD AUDIO */
-				// Source port note: Menu.sounds is always loaded now
 
-//	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Menu.sounds", &spec);
-//	LoadSoundBank(&spec, SOUND_BANK_MENU);
+	LoadSoundBank(SOUNDBANK_MENU);
 
 
 
@@ -492,7 +490,7 @@ static void FreeMainMenuScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
-//	DisposeSoundBank(SOUND_BANK_MENU);
+	DisposeSoundBank(SOUNDBANK_MENU);
 	DisposeParticleSystem();
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
