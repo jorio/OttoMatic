@@ -599,30 +599,13 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 };
 
 
-const char*	levelSoundFiles[NUM_LEVELS] =
-{
-	":Audio:Farm.sounds",
-	":Audio:Slime.sounds",
-	":Audio:Slime.sounds",
-	":Audio:Apocalypse.sounds",
-	":Audio:Cloud.sounds",
-	":Audio:Jungle.sounds",
-	":Audio:Jungle.sounds",
-	":Audio:FireIce.sounds",
-	":Audio:Saucer.sounds",
-	":Audio:BrainBoss.sounds",
-};
 
 
 
 				/* LOAD AUDIO */
 
 
-	if (levelSoundFiles[gLevelNum][0] > 0)
-	{
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, levelSoundFiles[gLevelNum], &spec);
-		LoadSoundBank(&spec, SOUND_BANK_LEVELSPECIFIC);
-	}
+	LoadSoundBank(kLevelSoundBanks[gLevelNum]);
 
 
 			/* LOAD BG3D GEOMETRY */

@@ -334,8 +334,7 @@ static const OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 
 				/* LOAD AUDIO */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:Bonus.sounds", &spec);
-	LoadSoundBank(&spec, SOUND_BANK_BONUS);
+	LoadSoundBank(SOUNDBANK_BONUS);
 
 
 	if (gLevelNum != LEVEL_NUM_BLOB)
@@ -441,7 +440,7 @@ static void FreeBonusScreen(void)
 	FreeAllSkeletonFiles(-1);
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
-	DisposeSoundBank(SOUND_BANK_BONUS);
+	DisposeSoundBank(SOUNDBANK_BONUS);
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
 }
 

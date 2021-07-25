@@ -201,8 +201,7 @@ static const OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 
 				/* LOAD AUDIO */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Audio:lose.sounds", &spec);
-	LoadSoundBank(&spec, SOUND_BANK_LOSE);
+	LoadSoundBank(SOUNDBANK_LOSE);
 
 			/* LOAD SPRITES */
 
@@ -302,7 +301,7 @@ static void FreeLoseScreen(void)
 	FreeAllSkeletonFiles(-1);
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
-	DisposeSoundBank(SOUND_BANK_LOSE);
+	DisposeSoundBank(SOUNDBANK_LOSE);
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
 }
 

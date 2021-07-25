@@ -417,7 +417,7 @@ static void FreeScoreScreen(void)
 	FreeAllSkeletonFiles(-1);
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
-	DisposeSoundBank(SOUND_BANK_BONUS);
+	DisposeSoundBank(SOUNDBANK_BONUS);
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
 }
 
