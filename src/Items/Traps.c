@@ -935,7 +935,7 @@ float	fps = gFramesPerSecondFrac;
 				/* UPDATE SOUND */
 
 		if (theNode->EffectChannel == -1)
-			theNode->EffectChannel = PlayEffect3D(EFFECT_SLIMEBOAT, &gCoord);
+			theNode->EffectChannel = PlayEffect3D(EFFECT_SLIMEBOAT, &theNode->Coord);
 		else
 			Update3DSoundChannel(EFFECT_SLIMEBOAT, &theNode->EffectChannel, &theNode->Coord);
 
