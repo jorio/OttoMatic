@@ -12,6 +12,7 @@ typedef enum
 	kMenuItem_Pick,
 	kMenuItem_KeyBinding,
 	kMenuItem_PadBinding,
+	kMenuItem_NUM_ITEM_TYPES
 } MenuItemType;
 
 typedef struct MenuItem
@@ -56,7 +57,6 @@ typedef struct MenuStyle
 	OGLColorRGBA	titleColor;
 	OGLColorRGBA	inactiveColor;
 	OGLColorRGBA	inactiveColor2;
-	OGLPoint3D		startPosition;
 	float			standardScale;
 	float			titleScale;
 	float			rowHeight;

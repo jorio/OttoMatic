@@ -49,14 +49,13 @@ const MenuStyle kDefaultMenuStyle =
 {
 	.darkenPane			= true,
 	.darkenPaneScaleY	= 480,
-	.darkenPaneOpacity	= .7f,
+	.darkenPaneOpacity	= .8f,
 	.fadeInSpeed		= 3.0f,
 	.asyncFadeOut		= true,
 	.centeredText		= false,
 	.titleColor			= {1.0f, 1.0f, 0.7f, 1.0f},
 	.inactiveColor		= {0.3f, 0.5f, 0.2f, 1.0f},
 	.inactiveColor2		= {0.8f, 0.0f, 0.5f, 0.5f},
-	.startPosition		= {-170, -160, 0},
 	.standardScale		= .75f,
 	.titleScale			= 1.25f,
 	.rowHeight			= 13*1.5f,
@@ -662,7 +661,8 @@ static ObjNode* MakeTextAtRowCol(const char* text, int row, int col)
 	}
 	else
 	{
-		gNewObjectDefinition.coord = (OGLPoint3D) { gMenuStyle->startPosition.x + gMenuColXs[col], gMenuRowYs[row], 0 };
+		float startX = gMenuStyle->centeredText ? 0 : -170;
+		gNewObjectDefinition.coord = (OGLPoint3D) { startX + gMenuColXs[col], gMenuRowYs[row], 0 };
 		int alignment = gMenuStyle->centeredText? kTextMeshAlignCenter: kTextMeshAlignLeft;
 		node = TextMesh_New(text, alignment, &gNewObjectDefinition);
 		node->SpecialRow = row;
@@ -673,6 +673,20 @@ static ObjNode* MakeTextAtRowCol(const char* text, int row, int col)
 
 	return node;
 }
+
+static const float kMenuItemHeightMultipliers[kMenuItem_NUM_ITEM_TYPES] =
+{
+	[kMenuItem_END_SENTINEL] = 0.0f,
+	[kMenuItem_Title]        = 2.0f,
+	[kMenuItem_Label]        = 1,
+	[kMenuItem_Action]       = 1,
+	[kMenuItem_Submenu]      = 1,
+	[kMenuItem_Spacer]       = 0.5f,
+	[kMenuItem_Cycler]       = 1,
+	[kMenuItem_Pick]         = 1,
+	[kMenuItem_KeyBinding]   = 1,
+	[kMenuItem_PadBinding]   = 1,
+};
 
 static void LayOutMenu(const MenuItem* menu)
 {
@@ -701,7 +715,13 @@ static void LayOutMenu(const MenuItem* menu)
 	gNewObjectDefinition.scale		= gMenuStyle->standardScale;
 	gNewObjectDefinition.slot		= SLOT_OF_DUMB+100;
 
-	float y = gMenuStyle->startPosition.y;
+	float totalHeight = 0;
+	for (int row = 0; menu[row].type != kMenuItem_END_SENTINEL; row++)
+	{
+		totalHeight += kMenuItemHeightMultipliers[menu[row].type] * gMenuStyle->rowHeight;
+	}
+
+	float y = -totalHeight/2.0f;
 
 	for (int row = 0; menu[row].type != kMenuItem_END_SENTINEL; row++)
 	{
@@ -726,7 +746,6 @@ static void LayOutMenu(const MenuItem* menu)
 				ObjNode* label = MakeTextAtRowCol(text, row, 0);
 				label->ColorFilter = gMenuStyle->titleColor;
 				label->MoveCall = MoveLabel;
-				y += gMenuStyle->rowHeight;
 				break;
 			}
 
@@ -798,10 +817,7 @@ static void LayOutMenu(const MenuItem* menu)
 				break;
 		}
 
-		if (entry->type == kMenuItem_Spacer)
-			y += gMenuStyle->rowHeight / 2;
-		else
-			y += gMenuStyle->rowHeight;
+		y += kMenuItemHeightMultipliers[entry->type] * gMenuStyle->rowHeight;
 
 		gNumMenuEntries++;
 		GAME_ASSERT(gNumMenuEntries < MAX_MENU_ROWS);

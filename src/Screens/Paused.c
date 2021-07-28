@@ -39,7 +39,6 @@ void DoPaused(void)
 	menuStyle.asyncFadeOut = true;
 	menuStyle.fadeInSpeed = 15;
 	menuStyle.inactiveColor = gPausedMenuNoHiliteColor;
-	menuStyle.startPosition = (OGLPoint3D) {0,-46,0};
 	menuStyle.standardScale = 1.0f;
 	menuStyle.rowHeight = 24;
 	menuStyle.darkenPane = true;

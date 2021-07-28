@@ -746,7 +746,6 @@ static const OGLColorRGBA noHiliteColor = {.3,.5,.2,1};
 	menuStyle.asyncFadeOut = false;
 	menuStyle.fadeInSpeed = 10;
 	menuStyle.inactiveColor = noHiliteColor;
-	menuStyle.startPosition = (OGLPoint3D) {0,-12,0};
 	menuStyle.standardScale = 1.0f;
 	menuStyle.rowHeight = 24;
 	menuStyle.darkenPane = false;
