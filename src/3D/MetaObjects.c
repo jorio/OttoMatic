@@ -21,6 +21,7 @@ static void SetMetaObjectToGeometry(MetaObjectPtr mo, u_long subType, void *data
 static void SetMetaObjectToMaterial(MOMaterialObject *matObj, MOMaterialData *inData);
 static void SetMetaObjectToVertexArrayGeometry(MOVertexArrayObject *geoObj, MOVertexArrayData *data);
 static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData);
+static void SetMetaObjectToPicture(MOPictureObject* pictObj, const char* tgaPath, int tgaFlags);
 static void MO_DetachFromLinkedList(MetaObjectPtr obj);
 static void MO_DisposeObject_Group(MOGroupObject *group);
 static void MO_DeleteObjectInfo_Material(MOMaterialObject *obj);
@@ -176,7 +177,7 @@ MetaObjectPtr	mo;
 				break;
 
 		case	MO_TYPE_PICTURE:
-				DoFatalAlert("MO_CreateNewObjectOfType: MO_TYPE_PICTURE unsupported");
+				SetMetaObjectToPicture(mo, data, 0);
 				break;
 
 		case	MO_TYPE_SPRITE:
@@ -397,6 +398,46 @@ static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData)
 }
 
 
+/******************* SET META OBJECT TO PICTURE ********************/
+//
+// INPUT:	mo = meta object which has already been allocated and added to linked list.
+//
+
+static void SetMetaObjectToPicture(MOPictureObject* pictObj, const char* tgaPath, int tgaFlags)
+{
+int			width,height;
+MOPictureData	*picData = &pictObj->objectData;
+MOMaterialData	matData;
+
+			/* LOAD TEXTURE */
+
+	GLuint texture = OGL_TextureMap_LoadTGA(tgaPath, tgaFlags, &width, &height);
+
+			/********************************/
+			/* SET SOME PICTURE OBJECT DATA */
+			/********************************/
+
+	picData->fullWidth 		= width;
+	picData->fullHeight		= height;
+
+
+			/***************************/
+			/* CREATE A TEXTURE OBJECT */
+			/***************************/
+
+	memset(&matData, 0, sizeof(matData));
+
+	matData.setupInfo		= gGameViewInfoPtr;
+	matData.flags			= BG3D_MATERIALFLAG_TEXTURED|BG3D_MATERIALFLAG_CLAMP_U|BG3D_MATERIALFLAG_CLAMP_V;
+	matData.diffuseColor	= (OGLColorRGBA) {1,1,1,1};
+	matData.numMipmaps		= 1;
+	matData.width			= width;
+	matData.height			= height;
+	matData.textureName[0] 	= texture;
+
+	picData->material = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
+}
+
 
 /******************* SET META OBJECT TO SPRITE ********************/
 //
@@ -466,6 +507,7 @@ MOSpriteData	*spriteData = &spriteObj->objectData;
 
 #pragma mark -
 
+#if 0
 /*************** SET PICTURE OBJECT COORDS TO MOUSE *******************/
 
 void MO_SetPictureObjectCoordsToMouse(OGLSetupOutputType *info, MOPictureObject *obj)
@@ -486,6 +528,7 @@ int				x,y,w,h;
 	picData->drawCoord.y = 1.0f - (float)my / (float)h * 2.0f;
 
 }
+#endif
 
 
 #pragma mark -
@@ -1152,72 +1195,40 @@ const OGLMatrix4x4		*m;
 
 void MO_DrawPicture(const MOPictureObject *picObj, const OGLSetupOutputType *setupInfo)
 {
-int				row,col,i,w,h;
-float			x,y,z,xadj,yadj;
 const MOPictureData	*picData = &picObj->objectData;
-int				px,py,pw,ph;
-float			screenScaleX,screenScaleY;
 
 			/* INIT MATRICES */
 
 	OGL_PushState();
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_FOG);
+	glDisable(GL_CULL_FACE);
+	OGL_DisableLighting();
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+	glOrtho(0, g2DLogicalWidth, g2DLogicalHeight, 0, 0, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
-			/* SET STATE */
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);	// no filtering!
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	if (setupInfo->useFog)
-		glDisable(GL_FOG);
-	OGL_DisableLighting();
-	glDisable(GL_CULL_FACE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);	// no filtering!
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			/* ACTIVATE THE MATERIAL */
 
+	MO_DrawMaterial(picData->material, setupInfo);			// submit material #0
 
-			/* GET DIMENSIONAL DATA */
+	glBegin(GL_QUADS);
+	glTexCoord2f(0, 0); glVertex3f(0, 0, 0);
+	glTexCoord2f(1, 0); glVertex3f(g2DLogicalWidth, 0, 0);
+	glTexCoord2f(1, 1); glVertex3f(g2DLogicalWidth, g2DLogicalHeight, 0);
+	glTexCoord2f(0, 1); glVertex3f(0, g2DLogicalHeight, 0);
+	glEnd();
 
-	w = picData->cellWidth;
-	h = picData->cellHeight;
-	OGL_GetCurrentViewport(setupInfo, &px, &py, &pw, &ph);
+	gPolysThisFrame += 2;										// 2 more triangles
 
-	screenScaleX = pw/(float)PICTURE_FULL_SCREEN_SIZE_X;
-	screenScaleY = ph/(float)PICTURE_FULL_SCREEN_SIZE_Y;
-
-	xadj = (float)w/(float)pw * (picData->drawScaleX * (screenScaleX * 2.0f));
-	yadj = (float)h/(float)ph * (picData->drawScaleY * (screenScaleY * 2.0f));
-
-
-	i = 0;
-	z = picData->drawCoord.z;
-	y = picData->drawCoord.y - yadj;
-
-	for (row = 0; row < picData->numCellsHigh; row++)
-	{
-		x = picData->drawCoord.x;
-
-		for (col = 0; col < picData->numCellsWide; col++)
-		{
-					/* ACTIVATE THE MATERIAL */
-
-			MO_DrawMaterial(picData->materials[i], setupInfo);			// submit material #0
-
-			glBegin(GL_QUADS);
-			glTexCoord2f(0,1);	glVertex3f(x, y + yadj,z);
-			glTexCoord2f(1,1);	glVertex3f(x + xadj, y + yadj,z);
-			glTexCoord2f(1,0);	glVertex3f(x + xadj, y,z);
-			glTexCoord2f(0,0);	glVertex3f(x, y, z);
-			glEnd();
-
-			i++;														// next material index
-			x += xadj;
-
-			gPolysThisFrame += 2;										// 2 more triangles
-		}
-		y -= yadj;
-
-	}
 
 			/* RESTORE STATE */
 
@@ -1474,11 +1485,8 @@ int	i,n;
 static void MO_DisposeObject_Picture(MOPictureObject *obj)
 {
 MOPictureData *data = &obj->objectData;
-int		numCells,i;
 
-	numCells = data->numCellsWide * data->numCellsHigh;
-	for (i = 0; i < numCells; i++)
-		MO_DisposeObjectReference(data->materials[i]);		// dispose of this object's ref
+	MO_DisposeObjectReference(data->material);		// dispose of this object's ref
 }
 
 /****************** DISPOSE OBJECT: SPRITE *******************/
@@ -1586,12 +1594,6 @@ MOMaterialData		*data = &obj->objectData;
 
 static void MO_DeleteObjectInfo_Picture(MOPictureObject *obj)
 {
-MOPictureData		*data = &obj->objectData;
-
-		/* DISPOSE OF TEXTURE NAMES ARRAY */
-
-	SafeDisposePtr((Ptr)data->materials);
-	data->materials = nil;
 }
 
 

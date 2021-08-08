@@ -1663,7 +1663,7 @@ ObjNode	*pane;
 
 static void DoCredits(void)
 {
-ObjNode	*pane, *glow, *text, *subtext1, *subtext2, *subtext3;
+ObjNode	*pane, *glow, *text, *subtext1, *subtext2;
 
 	if (MyRandomLong()&1)
 		PlayEffect(EFFECT_ACCENTDRONE1);
@@ -1724,10 +1724,7 @@ ObjNode	*pane, *glow, *text, *subtext1, *subtext2, *subtext3;
 	gNewObjectDefinition.coord.y 	+= 14.0f;
 	gNewObjectDefinition.scale 	    = .4f;
 	subtext2 = TextMesh_New("https://github.com/jorio/ottomatic", 1, &gNewObjectDefinition);
-	gNewObjectDefinition.coord.y 	+= 28.0f;
-	subtext3 = TextMesh_New("OTTO MATIC\xAA \xA9 2001 Pangea Software, Inc. Otto Matic is a trademark of Pangea Software, Inc.", 1, &gNewObjectDefinition);
-	subtext1->ColorFilter = subtext2->ColorFilter = subtext3->ColorFilter = (OGLColorRGBA){.67,.84,.1,0};
-
+	subtext1->ColorFilter = subtext2->ColorFilter = (OGLColorRGBA){.67,.84,.1,0};
 
 		/* STOP AUTO-CHAINING NEW NODES */
 

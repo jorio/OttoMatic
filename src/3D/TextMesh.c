@@ -170,7 +170,7 @@ void TextMesh_Init(OGLSetupOutputType* setupInfo, bool redFont)
 	matData.numMipmaps		= 1;
 	matData.width			= (u_long) ATLAS_WIDTH;
 	matData.height			= (u_long) ATLAS_HEIGHT;
-	matData.textureName[0]	= OGL_TextureMap_LoadTGA(redFont? ":system:font2.tga": ":system:font1.tga", 0);
+	matData.textureName[0]	= OGL_TextureMap_LoadTGA(redFont? ":system:font2.tga": ":system:font1.tga", 0, nil, nil);
 	gFontMaterial = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
 
 		/* LOAD METRICS FILE */

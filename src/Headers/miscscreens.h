@@ -31,7 +31,7 @@ enum
 
 
 
-void DisplayPicture(FSSpec *spec);
+void DisplayPicture(const char* path, float timeout);
 void PausedUpdateCallback(void);
 void DoPaused(void);
 

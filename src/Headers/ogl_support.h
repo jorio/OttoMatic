@@ -259,7 +259,7 @@ void OGL_UpdateCameraFromTo(OGLSetupOutputType *setupInfo, const OGLPoint3D *fro
 void OGL_Texture_SetOpenGLTexture(GLuint textureName);
 GLuint OGL_TextureMap_Load(void *imageMemory, int width, int height,
 							GLint srcFormat,  GLint destFormat, GLint dataType);
-GLuint OGL_TextureMap_LoadTGA(const char* path, int flags);
+GLuint OGL_TextureMap_LoadTGA(const char* path, int flags, int* width, int* height);
 GLenum _OGL_CheckError(const char* file, int line);
 #define OGL_CheckError() _OGL_CheckError(__FILE__, __LINE__)
 

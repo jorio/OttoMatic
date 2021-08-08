@@ -28,19 +28,17 @@ static void DisplayPicture_Draw(OGLSetupOutputType *info);
 /*    VARIABLES      */
 /*********************/
 
-MOPictureObject 	*gBackgoundPicture = nil;
+static MOPictureObject 	*gBackgroundPicture = nil;
 
 
 /********************** DISPLAY PICTURE **************************/
 //
 // Displays a picture using OpenGL until the user clicks the mouse or presses any key.
-// If showAndBail == true, then show it and bail out
 //
 
-void DisplayPicture(FSSpec *spec)
+void DisplayPicture(const char* path, float timeout)
 {
 OGLSetupInputType	viewDef;
-float	timeout = 40.0f;
 
 
 			/* SETUP VIEW */
@@ -49,8 +47,8 @@ float	timeout = 40.0f;
 
 	viewDef.camera.hither 			= 10;
 	viewDef.camera.yon 				= 3000;
-	viewDef.view.clearColor.r 		= 0;
-	viewDef.view.clearColor.g 		= 0;
+	viewDef.view.clearColor.r 		= 1;
+	viewDef.view.clearColor.g 		= 1;
 	viewDef.view.clearColor.b		= 0;
 	viewDef.styles.useFog			= false;
 
@@ -59,9 +57,8 @@ float	timeout = 40.0f;
 
 			/* CREATE BACKGROUND OBJECT */
 
-	gBackgoundPicture = MO_CreateNewObjectOfType(MO_TYPE_PICTURE, 0, spec);
-	if (!gBackgoundPicture)
-		DoFatalAlert("DisplayPicture: MO_CreateNewObjectOfType failed");
+	gBackgroundPicture = MO_CreateNewObjectOfType(MO_TYPE_PICTURE, 0, path);
+	GAME_ASSERT(gBackgroundPicture);
 
 
 
@@ -93,7 +90,7 @@ float	timeout = 40.0f;
 			/* CLEANUP */
 
 	DeleteAllObjects();
-	MO_DisposeObjectReference(gBackgoundPicture);
+	MO_DisposeObjectReference(gBackgroundPicture);
 	DisposeAllSpriteGroups();
 
 
@@ -103,8 +100,6 @@ float	timeout = 40.0f;
 
 
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
-
-
 }
 
 
@@ -112,7 +107,7 @@ float	timeout = 40.0f;
 
 static void DisplayPicture_Draw(OGLSetupOutputType *info)
 {
-	MO_DrawObject(gBackgoundPicture, info);
+	MO_DrawObject(gBackgroundPicture, info);
 	DrawObjects(info);
 }
 
@@ -123,10 +118,5 @@ static void DisplayPicture_Draw(OGLSetupOutputType *info)
 
 void DoLegalScreen(void)
 {
-FSSpec	spec;
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Images:Title", &spec);
-
-	DisplayPicture(&spec);
-
+	DisplayPicture(":system:legal.tga", 8.0f);
 }

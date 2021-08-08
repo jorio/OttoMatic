@@ -89,9 +89,9 @@ typedef struct
 	
 	u_long			numMipmaps;						// # texture mipmaps to use
 	u_long			width,height;					// dimensions of texture
-	GLint			pixelSrcFormat;					// OGL format (GL_RGBA, etc.) for src pixels
-	GLint			pixelDstFormat;					// OGL format (GL_RGBA, etc.) for VRAM
-	void			*texturePixels[MO_MAX_MIPMAPS]; // ptr to texture pixels for each mipmap
+	GLint			pixelSrcFormat;					// OGL format (GL_RGBA, etc.) for src pixels (ignored if texturePixels == nil)
+	GLint			pixelDstFormat;					// OGL format (GL_RGBA, etc.) for VRAM (ignored if texturePixels == nil)
+	void			*texturePixels[MO_MAX_MIPMAPS]; // ptr to texture pixels for each mipmap (if nil, user code must preload GL texture)
 	GLuint			textureName[MO_MAX_MIPMAPS]; 	// texture name assigned by OpenGL
 }MOMaterialData;
 		
@@ -163,18 +163,10 @@ typedef struct
 		/* PICTURE OBJECT */
 		/******************/
 
-#define PICTURE_FULL_SCREEN_SIZE_X	1024				// use this as scaling reference base
-#define PICTURE_FULL_SCREEN_SIZE_Y	768
-
-
 typedef struct
 {
-	OGLPoint3D			drawCoord;
-	float				drawScaleX,drawScaleY;
 	int					fullWidth,fullHeight;
-	int					numCellsWide, numCellsHigh;		// # cells w/h
-	int					cellWidth,cellHeight;			// cell w/h
-	MOMaterialObject	**materials;					// array of materials for each cell
+	MOMaterialObject	*material;
 }MOPictureData;
 		
 typedef struct

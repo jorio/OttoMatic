@@ -950,8 +950,19 @@ unsigned long	someLong;
 
 		/* SHOW LEGAL SCREEN */
 
-	SOURCE_PORT_MINOR_PLACEHOLDER(); //DoLegalScreen();
+	DoLegalScreen();
 
+		/* LEVEL CHEAT: HOLD DOWN NUMBER KEY AFTER LEGAL SCREEN */
+
+	for (int i = 0; i < 10; i++)
+	{
+		if (GetKeyState(SDL_SCANCODE_1 + i))	// scancodes 1,2,...,9,0 are contiguous
+		{
+			gLevelNum = i;
+			PlayGame();
+			break;
+		}
+	}
 
 		/* MAIN LOOP */
 

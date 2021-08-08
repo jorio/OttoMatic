@@ -104,7 +104,6 @@ extern	FenceDefType			*gFenceList;
 extern	HighScoreType			gHighScores[];
 extern	MOMaterialObject		*gMostRecentMaterial;
 extern	MOMaterialObject		*gSuperTileTextureObjects[MAX_SUPERTILE_TEXTURES];
-extern	MOPictureObject			*gBackgoundPicture;
 extern	MOVertexArrayData		**gLocalTriMeshesOfSkelType;
 extern	MetaObjectPtr			gBG3DGroupList[MAX_BG3D_GROUPS][MAX_OBJECTS_IN_GROUP];
 extern	NewObjectDefinitionType	gNewObjectDefinition;
