@@ -157,8 +157,6 @@ void GammaOn(void)
 	if (gGammaFadePercent != 1.0f)
 	{
 		gGammaFadePercent = 1.0f;
-
-		SOURCE_PORT_MINOR_PLACEHOLDER(); // CGSetDisplayTransferByTable(0, 256, gOriginalRedTable, gOriginalGreenTable, gOriginalBlueTable);
 	}
 #endif
 }
