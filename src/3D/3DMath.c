@@ -2612,7 +2612,7 @@ short			i;
 
 	p[0].x = inBox->min.x;								// upper far left corner
 	p[0].y = inBox->max.y;
-	p[0].y = inBox->min.z;
+	p[0].z = inBox->min.z;
 
 	p[1].x = inBox->max.x;								// upper far right corner
 	p[1].y = inBox->max.y;
@@ -2628,7 +2628,7 @@ short			i;
 
 	p[4].x = inBox->min.x;								// lower far left corner
 	p[4].y = inBox->min.y;
-	p[4].y = inBox->min.z;
+	p[4].z = inBox->min.z;
 
 	p[5].x = inBox->max.x;								// lower far right corner
 	p[5].y = inBox->min.y;
