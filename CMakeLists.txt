@@ -1,25 +1,22 @@
 cmake_minimum_required(VERSION 3.13)
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+set(GAME_TARGET				"OttoMatic")
+set(GAME_VERSION			"4.0.0")
+set(GAME_MAC_ICNS			"packaging/${GAME_TARGET}.icns")
+set(GAME_MAC_COPYRIGHT		"© 2001 Pangea Software, Inc.\n© 2021 Iliyas Jorio.")
+set(GAME_MAC_BUNDLE_ID		"io.jor.ottomatic")
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_MODULE_PATH		"${CMAKE_SOURCE_DIR}/cmake")
+set(CMAKE_C_STANDARD		11)
+set(CMAKE_CXX_STANDARD		20)
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Target macOS architectures")
 
-project(OttoMatic
-	VERSION 4.0.0
+project(${GAME_TARGET}
+	VERSION ${GAME_VERSION}
 	LANGUAGES C CXX
 )
-
-set(GAME_TARGET ${PROJECT_NAME})
-set(GAME_ICNS packaging/${PROJECT_NAME}.icns)
-
-set(POMME_NO_VIDEO TRUE)		# compile Pomme without QuickTime movie support
-set(POMME_NO_QD3D TRUE)			# compile Pomme without QuickDraw3D/3DMF support
-set(POMME_NO_INPUT true)
-set(POMME_NO_GRAPHICS true)
 
 #------------------------------------------------------------------------------
 # GLOBAL OPTIONS (BEFORE ADDING SUBDIRECTORIES)
@@ -33,6 +30,11 @@ if(MSVC)
 
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${GAME_TARGET})
 endif()
+
+set(POMME_NO_VIDEO true)
+set(POMME_NO_INPUT true)
+set(POMME_NO_GRAPHICS true)
+set(POMME_NO_QD3D true)
 
 #------------------------------------------------------------------------------
 # DEPENDENCIES
@@ -81,7 +83,7 @@ if(WIN32)
 	# "WIN32" here is equivalent to /SUBSYSTEM:WINDOWS for MSVC
 	add_executable(${GAME_TARGET} WIN32
 		${GAME_ALL_SOURCES}
-		"${CMAKE_CURRENT_SOURCE_DIR}/packaging/OttoMatic.exe.rc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/packaging/${GAME_TARGET}.exe.rc"
 	)
 elseif(APPLE)
 	# Add required frameworks for KillMacMouseAcceleration
@@ -89,16 +91,14 @@ elseif(APPLE)
 
 	add_executable(${GAME_TARGET} MACOSX_BUNDLE
 		${GAME_ALL_SOURCES}
-		${GAME_ICNS}
+		${GAME_MAC_ICNS}
 		${SDL2_LIBRARIES}
 	)
 else()
 	# Math lib, explicitly required on some Linux systems
 	list(APPEND GAME_LIBRARIES m)
 
-	add_executable(${GAME_TARGET}
-		${GAME_ALL_SOURCES}
-	)
+	add_executable(${GAME_TARGET} ${GAME_ALL_SOURCES})
 endif()
 
 target_include_directories(${GAME_TARGET} PRIVATE
@@ -145,8 +145,6 @@ if(NOT MSVC)
 		$<$<CXX_COMPILER_ID:GNU>:-Wno-unused-but-set-variable>
 		-Werror=return-type
 		-Wno-unused-parameter
-		-Werror=implicit-function-declaration
-		-Werror=return-type
 	)
 else()
 	# By default, MSVC may add /EHsc to CMAKE_CXX_FLAGS, which we don't want (we use /EHs below)
@@ -165,6 +163,7 @@ else()
 		/wd4201 # nonstandard extension (nameless struct)
 		/wd4244 # conversion from double to float
 		/wd4305 # truncation from double to float
+		/wd5105 # see https://developercommunity.visualstudio.com/t/1249671
 	)
 endif()
 
@@ -180,14 +179,36 @@ if(APPLE)
 		# Explicitly turn off code signing, otherwise downloaded app will be quarantined forever
 		XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
 
-		RESOURCE ${GAME_ICNS}
-		MACOSX_BUNDLE_ICON_FILE OttoMatic.icns
-		MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
-		MACOSX_BUNDLE_COPYRIGHT "© 2001 Pangea Software, Inc."
+		# Set up Info.plist values
+		MACOSX_BUNDLE_ICON_FILE				"${GAME_TARGET}.icns"	# CFBundleIconFile
+		MACOSX_BUNDLE_EXECUTABLE_NAME		${GAME_TARGET}			# CFBundleExecutable - executable name inside the bundle
+		MACOSX_BUNDLE_SHORT_VERSION_STRING	${PROJECT_VERSION}		# CFBundleShortVersionString
+		MACOSX_BUNDLE_COPYRIGHT				${GAME_MAC_COPYRIGHT}	# NSHumanReadableCopyright (supersedes CFBundleGetInfoString (MACOSX_BUNDLE_INFO_STRING))
+		MACOSX_BUNDLE_BUNDLE_NAME			${GAME_TARGET}			# CFBundleName - user-visible (where??) short name for the bundle, up to 15 characters
+		MACOSX_BUNDLE_GUI_IDENTIFIER		${GAME_MAC_BUNDLE_ID}	# CFBundleIdentifier - unique bundle ID in reverse-DNS format
+
+		# Bundle ID required for code signing - must match CFBundleIdentifier otherwise xcode will complain
+		XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER ${GAME_MAC_BUNDLE_ID}
+
+		# Don't bother with universal builds when we're working on the debug version
+		XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=Debug] "YES"
 	)
 
+	# If we have a code signing identity (CODE_SIGN_IDENTITY environment variable),
+	# set up the release build for proper code signing
+	if(NOT "$ENV{CODE_SIGN_IDENTITY}" STREQUAL "")
+		set_target_properties(${GAME_TARGET} PROPERTIES
+			XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY[variant=Release] "$ENV{CODE_SIGN_IDENTITY}"
+
+			# The following is to pass notarization requirements
+			XCODE_ATTRIBUTE_CODE_SIGN_INJECT_BASE_ENTITLEMENTS[variant=Release] "NO"
+			XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS[variant=Release] "--options=runtime --timestamp"
+		)
+		message("Release build will be code signed!")
+	endif()
+
 	# Copy stuff to app bundle contents
-	set_source_files_properties(${GAME_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+	set_source_files_properties(${GAME_MAC_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 	set_source_files_properties(${SDL2_LIBRARIES} PROPERTIES MACOSX_PACKAGE_LOCATION "Frameworks")
 
 	set(BUNDLE_CONTENTS_DIR "$<TARGET_FILE_DIR:${PROJECT_NAME}>/..")
@@ -196,10 +217,6 @@ if(APPLE)
 	add_custom_command(TARGET ${GAME_TARGET} POST_BUILD
 		# Copy assets to app bundle
 		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Data ${BUNDLE_CONTENTS_DIR}/Resources
-
-		# Nuke SDL headers in embedded framework
-		COMMAND rm -rf ${BUNDLE_CONTENTS_DIR}/Frameworks/SDL2.framework/Headers
-		COMMAND rm -rf ${BUNDLE_CONTENTS_DIR}/Frameworks/SDL2.framework/Versions/Current/Headers
 
 		# High-DPI support in Info.plist
 #		plutil -replace NSHighResolutionCapable -bool true ${BUNDLE_CONTENTS_DIR}/Info.plist
@@ -223,10 +240,4 @@ if(WIN32)
 endif()
 
 # Copy documentation to output folder
-#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/packaging/ReadMe.txt.in ${CMAKE_CURRENT_BINARY_DIR}/ReadMe.txt)
-#add_custom_command(TARGET ${GAME_TARGET} POST_BUILD
-#	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/ReadMe.txt ${APP_PARENT_DIR}/ReadMe.txt
-#	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md ${APP_PARENT_DIR}/License.txt
-#	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/docs ${APP_PARENT_DIR}/Documentation
-#)
-
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/packaging/ReadMe.txt.in ${CMAKE_CURRENT_BINARY_DIR}/ReadMe.txt)
