@@ -449,8 +449,31 @@ static OGLVector2D GetThumbStickVector(bool rightStick)
 	float dy = dyRaw / 32767.0f;
 
 	float magnitudeSquared = dx*dx + dy*dy;
+
 	if (magnitudeSquared < kJoystickDeadZoneFracSquared)
+	{
 		return (OGLVector2D) { 0, 0 };
+	}
 	else
-		return (OGLVector2D) { dx, dy };
+	{
+		float magnitude;
+		
+		if (magnitudeSquared > 1.0f)
+		{
+			// Cap magnitude -- what's returned by the controller actually lies within a square
+			magnitude = 1.0f;
+		}
+		else
+		{
+			magnitude = sqrtf(magnitudeSquared);
+
+			// Avoid magnitude bump when thumbstick is pushed past dead zone:
+			// Bring magnitude from [kJoystickDeadZoneFrac, 1.0] to [0.0, 1.0].
+			magnitude = (magnitude - kJoystickDeadZoneFrac) / (1.0f - kJoystickDeadZoneFrac);
+		}
+
+		float angle = atan2f(dy, dx);
+
+		return (OGLVector2D) { cosf(angle) * magnitude, sinf(angle) * magnitude };
+	}
 }
