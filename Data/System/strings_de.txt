@@ -37,9 +37,9 @@ Planet Sulak: Pitcher Plant Boss
 Planet Deniz: Valley of Fire and Ice
 Planet Shebanek: POW Camp
 Planet X: The Giant Brain
-Drücke den Schlagen-Knopf, um Powerup-Behälter zu öffnen
-Drücke den Aufheben-Knopf, um ein Powerup aufzuheben
-Zweimal Springen drücken, um das Jetpack zu aktivieren
+Drücke [#], um Powerup-Behälter zu öffnen
+Drücke [#], um ein Powerup aufzuheben
+Zweimal [#] drücken, um das Jetpack zu aktivieren
 Rasen Sie durch Sperren, indem Sie das Jetpack einsetzen
 Für die Verwendung des Jetpacks benötigen Sie grüne Atome
 Rote Atome bringen Lebensenergie
@@ -49,16 +49,16 @@ Betreten Sie die Rakete, indem Sie auf die Rampe laufen
 Retten Sie die Menschen, indem Sie diese berühren
 Berühren Sie den Kontrollpunkt, um ihn zu aktivieren
 Kommen Sie hierher zurück, wenn Sie Menschen gerettet haben
-Drücken sie Springen, um den Magnet loszulassen
+Drücke [#], um den Magnet loszulassen
 Beamen Sie die Menschen mit dem weißen Strahl hoch
 Jeder gerettete Mensch bringt Ihnen Raketen-Treibstoff
 Die Untertasse ist voll, bringe die Menschen zum Raumschiff
-Rakete ist nun betankt. Zum abfliegen Springen drücken
+Rakete ist nun betankt. Zum abfliegen [#] drücken
 Sie haben nicht genug Treibstoff um schon fortzufliegen
 Gefrorene Bälle können als Powerups verwendet werden
 Diese mechanischen Einrichtungen benötigen Strom
 Die Tür kann von dieser Seite aus nicht aktiviert werden
-Drücke springen, um in die Kanone zu klettern
+Drücke [#], um in die Kanone zu klettern
 Sprache
 Vollbildschirm
 Antialiasing

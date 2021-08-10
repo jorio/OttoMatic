@@ -93,6 +93,7 @@ extern	Boolean					gPlayerHasLanded;
 extern	Boolean					gPlayerIsDead;
 extern	Boolean					gPlayingFromSavedGame;
 extern	Boolean					gSongPlayingFlag;
+extern	Boolean					gUserPrefersGamepad;
 extern	Byte					**gMapSplitMode;
 extern	Byte					gDebugMode;
 extern	Byte					gHumansInSaucerList[];

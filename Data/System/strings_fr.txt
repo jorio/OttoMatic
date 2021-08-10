@@ -21,7 +21,7 @@ avr.
 mai
 juin
 juil.
-aout
+août
 sept.
 oct.
 nov.
@@ -37,9 +37,9 @@ Planète Sulak: La plante carnivore
 Planète Deniz: La vallée de feu et de glace
 Planète Shebanek: Le camp de prisonniers
 Planète X: Le cerveau géant
-Frappe la capsule pour l'ouvrir
-Pour prendre le bonus, appuie sur ramasser
-Pour te propulser, appuie deux fois sur saut
+Ouvre la capsule avec [#]
+Ramasse le bonus avec [#]
+Pour te propulser, appuie deux fois sur [#]
 Propulse-toi à travers la barrière
 Trouve des atomes verts pour te propulser
 Les atomes rouges régénèrent ta santé
@@ -49,16 +49,16 @@ Marche vers la rampe et monte dans la fusée
 Touche un humain pour le sauver
 Touche le point de contrôle pour l'activer
 Reviens ici lorsque tu auras sauvé quelques humains
-Pour lâcher l'aimant, appuie sur saut
+Pour lâcher l'aimant, appuie sur [#]
 Envoie un rayon blanc sur les humains
 Chaque humain sauvé te donne du carburant de fusée
 La soucoupe est pleine, dépose les humains à la fusée
-Le plein est achevé. Appuie sur saut pour repartir
+Le plein est achevé. Appuie sur [#] pour repartir
 Pas assez de carburant pour partir
 Les boules gluantes congelées sont des bonus à ramasser
 Ces dispositifs mécaniques ont besoin d'électricité
 La porte ne peut pas être activée de ce côté
-Pour grimper dans le canon, appuie sur saut
+Grimpe dans le canon avec [#]
 Langue
 Plein écran
 Anticrénelage
@@ -84,6 +84,6 @@ Arme suivante
 Tirer
 Frapper, ramasser
 Sauter
-Mode caméra
-Pivot caméra gauche
-Pivot caméra droite
+Réinitialiser caméra
+Pivoter caméra à gauche
+Pivoter caméra à droite

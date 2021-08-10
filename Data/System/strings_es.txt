@@ -37,9 +37,9 @@ Planet Sulak: Pitcher Plant Boss
 Planet Deniz: Valley of Fire and Ice
 Planet Shebanek: POW Camp
 Planet X: The Giant Brain
-Presione el botón punch para golpar los powerup pods
-Para recoger un powerup, presione el botón pickup
-Active su jump-jet presionando el botón jump dos veces
+Presione [#] para golpar los powerup pods
+Para recoger un powerup, presione [#]
+Active su jump-jet presionando [#] dos veces
 Navegue a través de las puertas utilizando el jump-jet
 Necesitará jumpjet atoms verdes para utilizar su jump-jet
 Los atoms rojos le otorgan salud
@@ -49,16 +49,16 @@ Para ingresar a la nave camine sobre la rampa
 Rescate a los humanos con sólo tocarlos
 Toque los puntos de verificación para activarlos
 Regrese a este sitio cuando haya rescatado humanos
-Presione jump para salir del magneto
+Presione [#] para salir del magneto
 Levante a los humanos con la barra blanca
 Cada humano rescatado le otorga más combustible
 El plato volador está lleno, lleve a los humanos a la nave
-La nave tiene combustible. Presione jump cuando esté listo para partir
+La nave tiene combustible. Presione [#] cuando esté listo para partir
 No tiene suficiente combustible para partir
 Las pelotas congeladas pueden utilizarse como powerups
 Los dispositivos eléctricos necesitan electricidad en este sitio
 La puerta no puede activarse desde este lugar
-Press jump to climb into the cannon
+Presione [#] para entrar en el cañón
 Idioma
 Pantalla completa
 Antialiasing

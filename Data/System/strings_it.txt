@@ -37,9 +37,9 @@ Planet Sulak: Pitcher Plant Boss
 Planet Deniz: Valley of Fire and Ice
 Planet Shebanek: POW Camp
 Planet X: The Giant Brain
-Premi il pulsante pugno per spaccare i bozzoli di ricarica
-Per raccogliere una ricarica, premi il pulsante raccogli
-Per attivare il salto-jet, premi due volte il pulsante salta
+Premi [#] per spaccare i bozzoli di ricarica
+Per raccogliere una ricarica, premi [#]
+Per attivare il salto-jet, premi due volte [#]
 Usa salto-jet per attraversare i cancelli
 Per usare il salto-jet sono necessari gli atomi verdi
 Gli atomi rossi offrono forza
@@ -49,16 +49,16 @@ Per entrare nel razzo, cammina sulla rampa
 Per salvare un umano, toccalo
 Per attivare un checkpoint, toccalo
 Ritorna qui dopo avere salvato più umani possibile
-Premi salta per lasciare il magnete
+Premi [#] per lasciare il magnete
 Illumina gli umani con il raggio bianco
 Ogni umano salvato rappresenta carburante per il razzo
 Il disco volante è pieno, conduci gli umani sul razzo
-Il razzo è ora rifornito di carburante. Premi salta quando sei pronto per partire
+Il razzo è ora rifornito di carburante. Premi [#] quando sei pronto per partire
 Carburante insufficiente per partire
 Raccogli e usa come ricariche le sfere di viscidume ghiacciato
 I dispositivi meccanici hanno bisogno di elettricità
 Impossibile attivare la porta da questo lato
-Premi salta per arrampicarti sul cannone
+Premi [#] per entrare nel cannone
 Lingua
 Schermo intero
 Antialiasing

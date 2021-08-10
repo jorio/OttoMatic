@@ -35,6 +35,8 @@ enum
 /*     PROTOTYPES     */
 /**********************/
 
+Boolean				gUserPrefersGamepad = false;
+
 SDL_GameController	*gSDLController = NULL;
 SDL_Haptic			*gSDLHaptic = NULL;
 SDL_JoystickID		gSDLJoystickInstanceID = -1;		// ID of the joystick bound to gSDLController
@@ -159,6 +161,16 @@ void UpdateInput(void)
 
 				case SDL_JOYDEVICEREMOVED:	// event.jdevice.which is the joy's UNIQUE INSTANCE ID (not an index!)
 					OnJoystickRemoved(event.jdevice.which);
+					break;
+
+				case SDL_KEYDOWN:
+					gUserPrefersGamepad = false;
+					break;
+
+				case SDL_CONTROLLERBUTTONDOWN:
+				case SDL_CONTROLLERBUTTONUP:
+				case SDL_JOYBUTTONDOWN:
+					gUserPrefersGamepad = true;
 					break;
 		}
 	}

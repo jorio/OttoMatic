@@ -37,9 +37,9 @@ Planet Sulak: Pitcher Plant Boss
 Planet Deniz: Valley of Fire and Ice
 Planet Shebanek: POW Camp
 Planet X: The Giant Brain
-Press the punch button to knock open powerup pods
-To pick up a powerup, press the pickup button
-Activate your jump-jet by pressing jump twice
+Press [#] to knock open powerup pods
+To pick up a powerup, press [#]
+Activate your jump-jet by pressing [#] twice
 Smash through gates by using your jump-jet
 You need green atoms to use your jump-jet
 Red atoms give you health
@@ -49,16 +49,16 @@ Enter the rocket by walking to the ramp
 Rescue the humans by touching them
 Touch the checkpoint to activate it
 Come back here when you have rescued some humans
-Press jump to let go of the magnet
+Press [#] to let go of the magnet
 Beam up the humans with the white beam
 Each rescued human gives you rocket fuel
 The saucer is full, take the humans to the rocket ship
-Rocket is now fueled.  Press jump when ready to leave
+Rocket is now fueled.  Press [#] when ready to leave
 You don't have enough fuel to leave yet
 Frozen slime balls can be picked up and used as powerups
 Mechanical devices here need electricity
 Door cannot be activated from this side
-Press jump to climb into the cannon
+Press [#] to climb into the cannon
 Language
 Fullscreen
 Antialiasing
@@ -84,6 +84,6 @@ Next weapon
 Shoot
 Punch, pickup
 Jump
-Camera mode
-Camera swing left
-Camera swing right
+Reset camera
+Turn camera left
+Turn camera right

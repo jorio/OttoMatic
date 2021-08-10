@@ -877,6 +877,107 @@ int	i;
 }
 
 
+/************** GET KEYBINDING NAME FOR USE IN HELP MESSAGES ***************/
+
+static const char* GetShortNameForInputNeed(int need)
+{
+	if (gUserPrefersGamepad)
+	{
+		int8_t type	= gGamePrefs.keys[need].gamepad[0].type;
+		int8_t id	= gGamePrefs.keys[need].gamepad[0].id;
+		switch (type)
+		{
+			case kInputTypeButton:
+				return SDL_GameControllerGetStringForButton(id);
+
+			case kInputTypeAxisMinus:
+			case kInputTypeAxisPlus:
+				return SDL_GameControllerGetStringForAxis(id);
+		}
+	}
+	else
+	{
+		int16_t key = gGamePrefs.keys[need].key[0];
+		switch (key)
+		{
+#if __APPLE__
+			case SDL_SCANCODE_LALT:
+			case SDL_SCANCODE_RALT:
+				return "Option";
+#else
+			case SDL_SCANCODE_LALT:
+				return "Alt";
+
+			case SDL_SCANCODE_RALT:
+				return "AltGr";
+#endif
+
+			case SDL_SCANCODE_LCTRL:
+			case SDL_SCANCODE_RCTRL:
+				return "Ctrl";
+
+			case SDL_SCANCODE_LGUI:
+			case SDL_SCANCODE_RGUI:
+				return "Command";
+
+			case SDL_SCANCODE_LSHIFT:
+			case SDL_SCANCODE_RSHIFT:
+				return "Shift";
+
+			default:
+				return SDL_GetScancodeName(key);
+		}
+	}
+
+	return "???";
+}
+
+/****************** FORMAT HELP MESSAGE WITH INPUT NEED ********************/
+
+static const char* FormatHelpMessage(const char* localized, int need)
+{
+#define N 256
+	static char buf[N];
+	size_t i;
+
+	const char* input = localized;
+
+	const char* keyName = GetShortNameForInputNeed(need);
+
+	i = 0;
+	while (i < N-1)
+	{
+		if (!*input)
+			break;
+
+		if (*input == '#')
+		{
+			const char* k = keyName;
+			while (*k && i < N-1)
+			{
+				if (*k >= 'a' && *k <= 'z')
+					buf[i] = *k + ('A'-'a');
+				else
+					buf[i] = *k;
+				i++;
+				k++;
+			}
+			//i += snprintf(buf+i, N-i, "%s", keyDesc);
+		}
+		else
+		{
+			buf[i++] = *input;
+		}
+
+		input++;
+	}
+
+	buf[i] = '\0';
+
+	return buf;
+#undef N
+}
+
 /**************************** DISPLAY HELP MESSAGE *******************************/
 
 void DisplayHelpMessage(short messNum, float timer, Boolean overrideCurrent)
@@ -907,6 +1008,16 @@ void DisplayHelpMessage(short messNum, float timer, Boolean overrideCurrent)
 			/* GET THE STRING TEXT TO DISPLAY */
 
 	const char* helpString = Localize(messNum + STR_IN_GAME_HELP_0);
+
+	switch (messNum)
+	{
+		case HELP_MESSAGE_POWPOD:				helpString = FormatHelpMessage(helpString, kNeed_PunchPickup); break;
+		case HELP_MESSAGE_PICKUPPOW:			helpString = FormatHelpMessage(helpString, kNeed_PunchPickup); break;
+		case HELP_MESSAGE_JUMPJET:				helpString = FormatHelpMessage(helpString, kNeed_Jump); break;
+		case HELP_MESSAGE_LETGOMAGNET:			helpString = FormatHelpMessage(helpString, kNeed_Jump); break;
+		case HELP_MESSAGE_PRESSJUMPTOLEAVE:		helpString = FormatHelpMessage(helpString, kNeed_Jump); break;
+		case HELP_MESSAGE_INTOCANNON:			helpString = FormatHelpMessage(helpString, kNeed_Jump); break;
+	}
 
 
 			/* CALC STRING PARAMETERS */

@@ -37,9 +37,9 @@ Planet Sulak: Pitcher Plant Boss
 Planet Deniz: Valley of Fire and Ice
 Planet Shebanek: POW Camp
 Planet X: The Giant Brain
-Öppna upp bonusgömmor genom att trycka på knappen för att slå
-Ta upp bonusar genom att trycka på knappen för att plocka upp
-Aktivera jethopp genom att trycka två gånger på hoppknappen
+Öppna upp bonusgömmor genom att trycka på [#]
+Ta upp bonusar genom att trycka på [#]
+Aktivera jethopp genom att trycka två gånger på [#]
 Använd jethopp för att krascha genom dörrar
 Du behöver gröna jethoppsatomer för att använda jethopp
 Av röda atomer får du hälsa
@@ -49,16 +49,16 @@ Gå in i skeppet genom att gå fram till rampen
 Rädda människor genom att nudda dem
 Rör kontrollstationerna för att aktivera dem
 Gå tillbaka hit när du räddat några människor
-Tryck på hoppknappen för att släppa magneten
+Tryck på [#] för att släppa magneten
 Teleportera människor med den vita strålen
 Varje människa du räddar ger dig raketbränsle
 Tefatet är fullt, för människorna till rymdskeppet
-Rymdskeppet är tankat. Tryck på hoppknappen när du vill åka
+Rymdskeppet är tankat. Tryck på [#] när du vill åka
 Än har du inte tillräckligt med bränsle för att åka i väg
 Frusna slembollar kan plockas upp och användas som bonusar
 De mekaniska apparaterna här behöver el för att fungera
 Dörren kan inte aktiveras från detta hållet
-Tryck på hoppknappen för att gå in i kanonen
+Tryck på [#] för att gå in i kanonen
 Språk
 Fullskärm
 Kantutjämning
