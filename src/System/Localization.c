@@ -38,11 +38,8 @@ void LoadLocalizedStrings(int languageID)
 	GAME_ASSERT(languageID >= 0);
 	GAME_ASSERT(languageID < MAX_LANGUAGES);
 
-	Str255 cName;
-	snprintf(cName, 256, ":System:Strings_%s.txt", kLanguageCodesISO639_1[languageID]);
-
 	FSSpec spec;
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, cName, &spec);
+	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":system:strings.tsv", &spec);
 
 	short refNum;
 	if (FSpOpenDF(&spec, fsRdPerm, &refNum) != noErr)
@@ -60,24 +57,48 @@ void LoadLocalizedStrings(int languageID)
 	for (int i = 0; i < MAX_STRINGS; i++)
 		gStringsTable[i] = nil;
 
-	gStringsTable[0] = gStringsBuffer;
-	int currStringNo = 0;
+	int row = 0;
+	int col = 0;
 
 	char prevChar = '\0';
+	char* currentString = gStringsBuffer;
+	char* fallbackString = gStringsBuffer;
 
 	for (int i = 0; i < count; i++)
 	{
 		char currChar = gStringsBuffer[i];
 
+		if (currChar == '\t')
+		{
+			gStringsBuffer[i] = '\0';
+
+			if (col == languageID)
+			{
+				gStringsTable[row] = currentString[0]? currentString: fallbackString;
+			}
+
+			currentString = &gStringsBuffer[i + 1];
+			col++;
+		}
+
 		if (currChar == '\n' || currChar == '\r')
 		{
 			gStringsBuffer[i] = '\0';
+
 			if (!(prevChar == '\r' && currChar == '\n'))	// Windows CR+LF
 			{
-				currStringNo++;
-				GAME_ASSERT(currStringNo < MAX_STRINGS);
+				if (col == languageID)
+				{
+					gStringsTable[row] = currentString[0]? currentString: fallbackString;
+				}
+
+				row++;
+				col = 0;
+				GAME_ASSERT(row < MAX_STRINGS);
 			}
-			gStringsTable[currStringNo] = &gStringsBuffer[i + 1];
+
+			currentString = &gStringsBuffer[i + 1];
+			fallbackString = currentString;
 		}
 
 		prevChar = currChar;
