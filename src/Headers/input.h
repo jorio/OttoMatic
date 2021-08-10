@@ -81,6 +81,7 @@ Boolean GetKeyState(unsigned short sdlScanCode);
 Boolean GetNewNeedState(int needID);
 Boolean GetNeedState(int needID);
 Boolean UserWantsOut(void);
+void Rumble(float strength, uint32_t ms);
 
 SDL_GameController* TryOpenController(bool showMessageOnFailure);
 void OnJoystickRemoved(SDL_JoystickID which);

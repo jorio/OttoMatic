@@ -502,6 +502,7 @@ PrefsType	prefBuffer;
 	return noErr;
 
 fileIsCorrupt:
+	printf("Prefs appear corrupt.\n");
 	FSClose(refNum);
 	return badFileFormat;
 }

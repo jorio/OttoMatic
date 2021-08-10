@@ -66,6 +66,7 @@ typedef struct
 	uint8_t	anaglyphCalibrationGreen;
 	uint8_t	anaglyphCalibrationBlue;
 	Boolean doAnaglyphChannelBalancing;
+	Boolean	gamepadRumble;
 	KeyBinding	keys[NUM_CONTROL_NEEDS];
 }PrefsType;
 

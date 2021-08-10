@@ -67,6 +67,7 @@ Contr™les relatifs au joueur
 Musique
 Configurer le clavier
 Configurer la manette
+Vibration
 Retour
 Oui
 Non

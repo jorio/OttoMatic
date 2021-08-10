@@ -67,6 +67,7 @@ Spieler-bezogene Steuerung
 Musik
 Tastatur konfigurieren
 Gamepad konfigurieren
+Vibration
 Zurück
 Ja
 Nein

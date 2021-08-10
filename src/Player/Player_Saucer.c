@@ -652,6 +652,7 @@ static OGLPoint2D origin = {0,0};
 void BlowUpSaucer(ObjNode *saucer)
 {
 	PlayEffect_Parms3D(EFFECT_SAUCERKABOOM, &saucer->Coord, NORMAL_CHANNEL_RATE, 3.0);
+	Rumble(1.0f, 1000);
 	MakeSparkExplosion(saucer->Coord.x, saucer->Coord.y, saucer->Coord.z, 500.0f, 2.0, PARTICLE_SObjType_RedSpark,0);
 	MakeSparkExplosion(saucer->Coord.x, saucer->Coord.y, saucer->Coord.z, 600.0f, 2.0, PARTICLE_SObjType_WhiteSpark3,0);
 	ExplodeGeometry(saucer, 500, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 1, .3);

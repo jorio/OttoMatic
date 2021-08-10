@@ -960,6 +960,7 @@ static void KillBrainBoss(ObjNode *enemy)
 	SpewAtoms(&enemy->Coord, 1,0, 10, false);
 
 	PlayEffect_Parms3D(EFFECT_BRAINBOSSDIE, &enemy->Coord, NORMAL_CHANNEL_RATE, 2.0f);
+	Rumble(1.0f, 2000);
 	ExplodeGeometry(enemy, 200, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 1, .2);
 
 	DeleteObject(enemy);

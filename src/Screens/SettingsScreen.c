@@ -18,6 +18,14 @@ static void cb_SetLanguage(void)
 	LayoutCurrentMenuAgain();
 }
 
+static void cb_SetRumble(void)
+{
+	if (gGamePrefs.gamepadRumble)
+	{
+		Rumble(1.0f, 500);
+	}
+}
+
 static void cb_ResetKeyBindings(void)
 {
 	for (int i = 0; i < NUM_CONTROL_NEEDS; i++)
@@ -89,6 +97,20 @@ static const MenuItem gKeybindingMenu[] =
 static const MenuItem gGamepadMenu[] =
 {
 	{.type = kMenuItem_Title, .text = STR_CONFIGURE_GAMEPAD},
+
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_GAMEPAD_RUMBLE,
+		.cycler =
+		{
+			.callback = cb_SetRumble,
+			.valuePtr = &gGamePrefs.gamepadRumble,
+			.numChoices = 2,
+			.choices = {STR_OFF, STR_ON},
+		},
+	},
+	{ .type = kMenuItem_Spacer },
+
 	{ .type = kMenuItem_PadBinding, .kb = kNeed_Jump },
 	{ .type = kMenuItem_PadBinding, .kb = kNeed_Shoot },
 	{ .type = kMenuItem_PadBinding, .kb = kNeed_PunchPickup },

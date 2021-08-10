@@ -67,6 +67,7 @@ Controles relativos al jugador
 Mœsica
 Configurar el teclado
 Configurar el mando
+Vibraci—n
 Atr‡s
 S’
 No

@@ -67,6 +67,7 @@ Spelarstyrda kontroller
 Musik
 Konfigurera tangentbordet
 Konfigurera handkontrollen
+Vibration
 Tillbaka
 Ja
 Nej

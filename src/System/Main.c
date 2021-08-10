@@ -143,6 +143,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.anaglyphCalibrationGreen		= DEFAULT_ANAGLYPH_G;
 	gGamePrefs.anaglyphCalibrationBlue		= DEFAULT_ANAGLYPH_B;
 	gGamePrefs.doAnaglyphChannelBalancing	= true;
+	gGamePrefs.gamepadRumble				= true;
 
 	memcpy(gGamePrefs.keys, kDefaultKeyBindings, sizeof(gGamePrefs.keys));
 	_Static_assert(sizeof(kDefaultKeyBindings) == sizeof(gGamePrefs.keys), "size mismatch: default keybindings / prefs keybindings");

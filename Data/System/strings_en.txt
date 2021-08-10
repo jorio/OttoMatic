@@ -67,6 +67,7 @@ Player-relative controls
 Music
 Configure keyboard
 Configure gamepad
+Rumble
 Back
 Yes
 No

@@ -36,6 +36,7 @@ enum
 /**********************/
 
 SDL_GameController	*gSDLController = NULL;
+SDL_Haptic			*gSDLHaptic = NULL;
 SDL_JoystickID		gSDLJoystickInstanceID = -1;		// ID of the joystick bound to gSDLController
 
 Byte				gRawKeyboardState[SDL_NUM_SCANCODES];
@@ -410,15 +411,19 @@ SDL_GameController* TryOpenController(bool showMessage)
 
 	printf("Opened joystick %d as controller: %s\n", gSDLJoystickInstanceID, SDL_GameControllerName(gSDLController));
 
-	/*
 	gSDLHaptic = SDL_HapticOpenFromJoystick(SDL_GameControllerGetJoystick(gSDLController));
-	if (!gSDLHaptic)
-		printf("This joystick can't do haptic.\n");
-	else
-		printf("This joystick can do haptic!\n");
-	*/
+	if (gSDLHaptic)
+		SDL_HapticRumbleInit(gSDLHaptic);
 
 	return gSDLController;
+}
+
+void Rumble(float strength, uint32_t ms)
+{
+	if (NULL == gSDLHaptic || !gGamePrefs.gamepadRumble)
+		return;
+
+	SDL_HapticRumblePlay(gSDLHaptic, strength, ms);
 }
 
 void OnJoystickRemoved(SDL_JoystickID which)
@@ -430,6 +435,12 @@ void OnJoystickRemoved(SDL_JoystickID which)
 		return;
 
 	printf("Current joystick was removed: %d\n", which);
+
+	if (gSDLHaptic)
+	{
+		SDL_HapticClose(gSDLHaptic);
+		gSDLHaptic = NULL;
+	}
 
 	// Nuke reference to this controller+joystick
 	SDL_GameControllerClose(gSDLController);
