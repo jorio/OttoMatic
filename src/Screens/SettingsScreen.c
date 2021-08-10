@@ -50,6 +50,14 @@ static void cb_ResetPadBindings(void)
 	LayoutCurrentMenuAgain();
 }
 
+static const char* GenerateGamepadLabel(void)
+{
+	if (gSDLController)
+		return SDL_GameControllerName(gSDLController);
+	else
+		return Localize(STR_NO_GAMEPAD_DETECTED);
+}
+
 /***************************************************************/
 /*                     MENU DEFINITIONS                        */
 /***************************************************************/
@@ -96,7 +104,10 @@ static const MenuItem gKeybindingMenu[] =
 
 static const MenuItem gGamepadMenu[] =
 {
+	{.type = kMenuItem_Label, .textGenerator = GenerateGamepadLabel },
 	{.type = kMenuItem_Title, .text = STR_CONFIGURE_GAMEPAD},
+
+	{.type = kMenuItem_Spacer, },
 
 	{
 		.type = kMenuItem_Cycler,

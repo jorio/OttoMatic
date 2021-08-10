@@ -67,6 +67,7 @@ Player-relative controls
 Music
 Configure keyboard
 Configure gamepad
+No gamepad detected
 Rumble
 Back
 Yes

@@ -67,6 +67,7 @@ Spieler-bezogene Steuerung
 Musik
 Tastatur konfigurieren
 Gamepad konfigurieren
+Kein Gamepad erkannt
 Vibration
 Zurück
 Ja

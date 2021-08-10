@@ -67,6 +67,7 @@ Controles relativos al jugador
 Mœsica
 Configurar el teclado
 Configurar el mando
+No gamepad detected
 Vibraci—n
 Atr‡s
 S’

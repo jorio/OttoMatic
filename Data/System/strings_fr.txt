@@ -67,6 +67,7 @@ Contrôles relatifs au joueur
 Musique
 Configurer le clavier
 Configurer la manette
+Aucune manette détectée
 Vibration
 Retour
 Oui

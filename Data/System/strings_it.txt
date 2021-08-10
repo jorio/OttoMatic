@@ -67,6 +67,7 @@ Player-relative controls
 Musica
 Configura la tastiera
 Configura il gamepad
+No gamepad detected
 Vibrazione
 Indietro
 S“

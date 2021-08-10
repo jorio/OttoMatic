@@ -732,6 +732,8 @@ static void LayOutMenu(const MenuItem* menu)
 		const char* text = entry->rawText;
 		if (entry->text >= 0)
 			text = Localize(entry->text);
+		if (entry->textGenerator)
+			text = entry->textGenerator();
 
 		gNewObjectDefinition.scale = gMenuStyle->standardScale;
 

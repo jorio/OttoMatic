@@ -20,6 +20,7 @@ typedef struct MenuItem
 	MenuItemType			type;
 	int						text;
 	const char*				rawText;
+	const char*				(*textGenerator)(void);
 
 	union
 	{
