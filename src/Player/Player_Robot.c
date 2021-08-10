@@ -2824,6 +2824,10 @@ static void CheckPlayerActionControls(ObjNode *theNode)
 		gPlayerInfo.health 	= 1.0;
 		gPlayerInfo.fuel 	= 1.0;
 		gPlayerInfo.jumpJet = 1.0;
+		gPlayerInfo.weaponInventory[6].type = WEAPON_TYPE_SUPERNOVA;
+		gPlayerInfo.weaponInventory[6].quantity = 99;
+		gPlayerInfo.weaponInventory[7].type = WEAPON_TYPE_STUNPULSE;
+		gPlayerInfo.weaponInventory[7].quantity = 99;
 	}
 
 			/***************/

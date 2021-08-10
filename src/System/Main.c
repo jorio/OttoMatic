@@ -303,13 +303,7 @@ static void PlayArea(void)
 
 		if (GetKeyState(SDL_SCANCODE_GRAVE))							// cheat key
 		{
-			if (GetNewKeyState(SDL_SCANCODE_F1))						// full health, jumpjet and fuel
-			{
-				gPlayerInfo.health = 1;
-				gPlayerInfo.jumpJet = 1;
-				gPlayerInfo.fuel = 1;
-			}
-			else if (GetNewKeyState(SDL_SCANCODE_F2))					// goto next checkpoint
+			if (GetNewKeyState(SDL_SCANCODE_F9))						// goto checkpoint
 			{
 				DoWarpCheat();
 			}
