@@ -364,4 +364,5 @@ typedef struct
 	int		fullscreenRefreshRate;
 	int		msaa;
 	int		vsync;
+	bool	skipFluff;
 } CommandLineOptions;

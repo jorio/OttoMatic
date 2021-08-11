@@ -23,8 +23,6 @@ static void DrawFadePane(ObjNode* theNode, const OGLSetupOutputType* setupInfo);
 /*    CONSTANTS             */
 /****************************/
 
-#define		DO_GAMMA	1
-
 
 /**********************/
 /*     VARIABLES      */
@@ -62,7 +60,8 @@ static void CheckGLError(const char* file, const int line)
 
 void GammaFadeOut(void)
 {
-#if DO_GAMMA
+	if (gCommandLine.skipFluff)
+		return;
 
 	SDL_GLContext currentContext = SDL_GL_GetCurrentContext();
 	if (!currentContext)
@@ -150,20 +149,19 @@ void GammaFadeOut(void)
 	OGL_PopState();
 
 	gGammaFadePercent = 0;
-#endif
 }
 
 /********************** GAMMA ON *********************/
 
 void GammaOn(void)
 {
-#if DO_GAMMA
+	if (gCommandLine.skipFluff)
+		return;
 
 	if (gGammaFadePercent != 1.0f)
 	{
 		gGammaFadePercent = 1.0f;
 	}
-#endif
 }
 
 

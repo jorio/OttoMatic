@@ -90,7 +90,9 @@ void ParseCommandLine(int argc, const char** argv)
 	{
 		std::string argument = argv[i];
 
-		if (argument == "--no-vsync")
+		if (argument == "--skip-fluff")
+			gCommandLine.skipFluff = true;
+		else if (argument == "--no-vsync")
 			gCommandLine.vsync = 0;
 		else if (argument == "--vsync")
 			gCommandLine.vsync = 1;

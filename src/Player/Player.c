@@ -47,9 +47,6 @@ static void AlignRocketDoor(ObjNode *rocket);
 #define PLAYER_OFF_Z	(9.3f * ROCKET_SCALE)
 
 
-#define	SHIELD_SCALE		(1.6f * gPlayerInfo.scaleRatio)
-#define	SHIELD_DURATION		20.0f
-
 /*********************/
 /*    VARIABLES      */
 /*********************/
@@ -65,8 +62,7 @@ Boolean	gPlayerHasLanded = false;
 Boolean	gPlayerIsDead = false;
 Boolean	gExplodePlayerAfterElectrocute = false;
 
-ObjNode	*gShieldObj,*gExitRocket;
-float	gShieldTimer;
+ObjNode	*gExitRocket;
 
 Boolean	gPlayerFellIntoBottomlessPit;
 
@@ -93,8 +89,6 @@ void InitPlayerInfo_Game(void)
 	}
 
 
-	gShieldObj = nil;
-	gShieldTimer = 0;
 	gDeathTimer = 0;
 	gDoDeathExit = false;
 
@@ -896,6 +890,9 @@ ObjNode	*door = rocket->ChainNode;
 
 	gCoord.y += gDelta.y * gFramesPerSecondFrac;
 
+	if (gCommandLine.skipFluff)
+		gCoord.y -= gFramesPerSecondFrac * 50000;
+
 			/* MAKE SURE SOUND IS GOING */
 
 	if (rocket->EffectChannel == -1)
@@ -967,6 +964,9 @@ float	y;
 	if (gDelta.y < -2000.0f)
 		gDelta.y = -2000.0f;
 
+	if (gCommandLine.skipFluff)
+		gDelta.y = 7500;
+
 
 	gCoord.y += gDelta.y * gFramesPerSecondFrac;
 
@@ -1025,6 +1025,8 @@ ObjNode *door = rocket->ChainNode;
 
 	door->Rot.x += gFramesPerSecondFrac * 1.9f;
 
+	if (gCommandLine.skipFluff)
+		door->Rot.x += gFramesPerSecondFrac * 100;
 
 		/* SEE IF DONE OPENING */
 
@@ -1040,6 +1042,9 @@ ObjNode *door = rocket->ChainNode;
 		{
 			rocket->Mode = ROCKET_MODE_DEPLANE;
 			gDeplaneTimer = 2.5;
+
+			if (gCommandLine.skipFluff)
+				gDeplaneTimer *= 0.1f;
 
 			MorphToSkeletonAnim(gPlayerInfo.objNode->Skeleton, PLAYER_ANIM_WALK, 8);	// start robot walking
 			gPlayerInfo.objNode->Skeleton->AnimSpeed = 2.0f;

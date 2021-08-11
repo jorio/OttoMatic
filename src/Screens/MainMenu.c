@@ -384,7 +384,7 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 
 				/* START W/ GAME LOGO */
 
-	if (gDoCompanyLogos)
+	if (gDoCompanyLogos && !gCommandLine.skipFluff)
 		StartCompanyLogos();
 	else
 		StartGameLogo();

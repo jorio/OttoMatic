@@ -84,6 +84,9 @@ void DoLevelIntro(void)
 {
 float	oldTime,maxTime = 11.0f;
 
+	if (gCommandLine.skipFluff)
+		return;
+
 	switch (gLevelNum)										// level special cases
 	{
 		case	LEVEL_NUM_BLOBBOSS:
