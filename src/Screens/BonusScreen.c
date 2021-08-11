@@ -51,6 +51,9 @@ static void MoveGlowDisc(ObjNode *theNode);
 
 #define	HUMAN_SPACING	160.0f
 
+#define STARS_LOW_Y		(-1000.0f)
+#define STARS_HIGH_Y	(2000.0f)
+
 enum
 {
 	BONUS_ObjType_Star,
@@ -343,20 +346,20 @@ static const OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 				/* MAKE STARS */
 				/**************/
 
-		for (i = 0; i < 60; i++)
+		for (i = 0; i < 60*5; i++)
 		{
 			static const OGLColorRGBA colors[] =
 			{
-				{1,1,1,1},			// white
-				{1,.6,.6,1},		// red
-				{.6,.6,1,1},		// blue
-				{.7,.7,8,1},		// grey
+				{1.0f, 1.0f, 1.0f, 1.0f},			// white
+				{1.0f, 0.6f, 0.6f, 1.0f},			// red
+				{0.6f, 0.6f, 1.0f, 1.0f},			// blue
+				{0.7f, 0.7f, 1.0f, 1.0f},			// grey
 			};
 
 			gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;
 			gNewObjectDefinition.type 		= BONUS_ObjType_Star;
-			gNewObjectDefinition.coord.x 	= RandomFloat2() * 800.0f;
-			gNewObjectDefinition.coord.y 	= 300.0f + RandomFloat2() * 600.0f;
+			gNewObjectDefinition.coord.x 	= RandomFloatRange(-1600.0f, 2000.0f);
+			gNewObjectDefinition.coord.y 	= RandomFloatRange(STARS_LOW_Y, STARS_HIGH_Y);
 			gNewObjectDefinition.coord.z 	= -500;
 			gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_GLOW | STATUS_BIT_NOTEXTUREWRAP |
 											STATUS_BIT_NOZWRITES | STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING;
@@ -1510,6 +1513,7 @@ int		i;
 
 #pragma mark -
 
+
 /************************ MOVE STAR *************************/
 
 static void MoveStar(ObjNode *theNode)
@@ -1521,8 +1525,8 @@ float	fps = gFramesPerSecondFrac;
 	theNode->ColorFilter.a = .3f + (sin(theNode->SpecialF[0]) + 1.0f) * .5f;
 
 	theNode->Coord.y += theNode->Delta.y * fps;
-	if (theNode->Coord.y > 850.0f)
-		theNode->Coord.y = -850.0f;
+	if (theNode->Coord.y < STARS_LOW_Y)
+		theNode->Coord.y = STARS_HIGH_Y;
 
 	UpdateObjectTransforms(theNode);
 }

@@ -236,6 +236,18 @@ float	f;
 }
 
 
+/************** RANDOM FLOAT ********************/
+//
+// returns a random float between a and b
+// You must ensure that a < b !!!
+//
+
+float RandomFloatRange(float a, float b)
+{
+	return a + (b-a) * RandomFloat();
+}
+
+
 
 /**************** SET MY RANDOM SEED *******************/
 

@@ -22,6 +22,7 @@ extern	void ShowSystemErr_NonFatal(long err);
 void CalcFramesPerSecond(void);
 Boolean IsPowerOf2(int num);
 float RandomFloat2(void);
+float RandomFloatRange(float a, float b);
 int PositiveModulo(int value, unsigned int m);
 
 void SafeDisposePtr(Ptr ptr);
