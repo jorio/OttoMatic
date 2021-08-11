@@ -290,7 +290,24 @@ void Exit2D(void)
 
 void SetFullscreenModeFromPrefs(void)
 {
-	SDL_SetWindowFullscreen(
-			gSDLWindow,
-			gGamePrefs.fullscreen? SDL_WINDOW_FULLSCREEN_DESKTOP: 0);
+	if (!gGamePrefs.fullscreen)
+	{
+		SDL_SetWindowFullscreen(gSDLWindow, 0);
+	}
+	else if (gCommandLine.fullscreenWidth > 0 && gCommandLine.fullscreenHeight > 0)
+	{
+
+		SDL_DisplayMode mode;
+		mode.w = gCommandLine.fullscreenWidth;
+		mode.h = gCommandLine.fullscreenHeight;
+		mode.refresh_rate = gCommandLine.fullscreenRefreshRate;
+		mode.driverdata = nil;
+		mode.format = SDL_PIXELFORMAT_UNKNOWN;
+		SDL_SetWindowDisplayMode(gSDLWindow, &mode);
+		SDL_SetWindowFullscreen(gSDLWindow, SDL_WINDOW_FULLSCREEN);
+	}
+	else
+	{
+		SDL_SetWindowFullscreen(gSDLWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	}
 }

@@ -8,6 +8,10 @@
 	#define _Static_assert static_assert
 #endif
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 		/* HEADERS */
 
@@ -101,6 +105,7 @@ extern	Byte					gHumansInSaucerList[];
 extern	ChannelInfoType			gChannelInfo[];
 extern	CollisionBoxType 		*gSaucerIceBounds;
 extern	CollisionRec			gCollisionList[];
+extern	CommandLineOptions		gCommandLine;
 extern	FSSpec					gDataSpec;
 extern	FenceDefType			*gFenceList;
 extern	HighScoreType			gHighScores[];
@@ -242,6 +247,10 @@ extern	u_long					gLoadedScore;
 extern	u_long					gScore;
 extern	u_short					**gTileGrid;
 extern	u_short					gTileAttribFlags;
+
+#ifdef __cplusplus
+};
+#endif
 
 #define GAME_ASSERT(condition) do { if (!(condition)) DoAssert(#condition, __func__, __LINE__); } while(0)
 #define GAME_ASSERT_MESSAGE(condition, message) do { if (!(condition)) DoAssert(message, __func__, __LINE__); } while(0)

@@ -7,8 +7,7 @@
 #include "PommeFiles.h"
 #include "PommeGraphics.h"
 #include "version.h"
-
-#include <SDL.h>
+#include "game.h"
 
 #include <iostream>
 #include <cstring>
@@ -25,6 +24,8 @@ extern "C"
 	extern FSSpec gDataSpec;
 
 	SDL_Window* gSDLWindow;
+
+	CommandLineOptions gCommandLine;
 
 	// Tell Windows graphics driver that we prefer running on a dedicated GPU if available
 #if _WIN32
@@ -79,27 +80,67 @@ static const char* GetWindowTitle()
 	return windowTitle;
 }
 
+void ParseCommandLine(int argc, const char** argv)
+{
+	memset(&gCommandLine, 0, sizeof(gCommandLine));
+	gCommandLine.msaa = 0;
+	gCommandLine.vsync = 1;
+
+	for (int i = 1; i < argc; i++)
+	{
+		std::string argument = argv[i];
+
+		if (argument == "--no-vsync")
+			gCommandLine.vsync = 0;
+		else if (argument == "--vsync")
+			gCommandLine.vsync = 1;
+		else if (argument == "--adaptive-vsync")
+			gCommandLine.vsync = -1;
+		else if (argument == "--msaa2x")
+			gCommandLine.msaa = 2;
+		else if (argument == "--msaa4x")
+			gCommandLine.msaa = 4;
+		else if (argument == "--msaa8x")
+			gCommandLine.msaa = 8;
+		else if (argument == "--msaa16x")
+			gCommandLine.msaa = 16;
+		else if (argument == "--fullscreen-resolution")
+		{
+			GAME_ASSERT_MESSAGE(i + 2 < argc, "fullscreen width & height unspecified");
+			gCommandLine.fullscreenWidth = atoi(argv[i + 1]);
+			gCommandLine.fullscreenHeight = atoi(argv[i + 2]);
+			i += 2;
+		}
+		else if (argument == "--fullscreen-refresh-rate")
+		{
+			GAME_ASSERT_MESSAGE(i + 1 < argc, "fullscreen refresh rate unspecified");
+			gCommandLine.fullscreenRefreshRate = atoi(argv[i + 1]);
+			i += 1;
+		}
+	}
+}
+
 int CommonMain(int argc, const char** argv)
 {
+	ParseCommandLine(argc, argv);
+
 	// Start our "machine"
 	Pomme::Init();
-
-	// Uncomment to dump the game's resources to a temporary directory.
-//	Pomme_StartDumpingResources("/tmp/OttoRezDump");
 
 	if (0 != SDL_Init(SDL_INIT_VIDEO))
 	{
 		throw std::runtime_error("Couldn't initialize SDL video subsystem.");
 	}
 
-//	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-//#ifndef _WIN32
-//	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-//	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-//#endif
-
-//	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-//	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, msaaSamples);
+	// Create window
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	if (gCommandLine.msaa != 0)
+	{
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, gCommandLine.msaa);
+	}
 
 	gSDLWindow = SDL_CreateWindow(
 			GetWindowTitle(),
@@ -115,9 +156,6 @@ int CommonMain(int argc, const char** argv)
 	}
 
 	fs::path dataPath = FindGameData();
-//#if !(__APPLE__)
-//	Pomme::Graphics::SetWindowIconFromIcl8Resource(gSDLWindow, 500);
-//#endif
 
 	// Init joystick subsystem
 	{

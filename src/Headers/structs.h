@@ -354,3 +354,14 @@ typedef struct
 	ObjNode		*autoChain;
 }NewObjectDefinitionType;
 
+
+		/* COMMAND LINE OPTIONS */
+
+typedef struct
+{
+	int		fullscreenWidth;
+	int		fullscreenHeight;
+	int		fullscreenRefreshRate;
+	int		msaa;
+	int		vsync;
+} CommandLineOptions;

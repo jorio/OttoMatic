@@ -117,9 +117,7 @@ void ToolBoxInit(void)
 
 	if (gSDLWindow)
 	{
-		SDL_SetWindowFullscreen(
-				gSDLWindow,
-				gGamePrefs.fullscreen? SDL_WINDOW_FULLSCREEN_DESKTOP: 0);
+		SetFullscreenModeFromPrefs();
 	}
 
 	MyFlushEvents();

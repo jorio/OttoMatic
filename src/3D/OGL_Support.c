@@ -182,6 +182,8 @@ OGLSetupOutputType	*outputPtr;
 	OGL_CreateLights(&setupDefPtr->lights);
 	OGL_CheckError();
 
+	SDL_GL_SetSwapInterval(gCommandLine.vsync);
+
 
 
 				/* PASS BACK INFO */
