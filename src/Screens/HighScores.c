@@ -52,6 +52,8 @@ enum
 #define kHSTableXSpread		150
 #define kHSTableLineHeight	20
 
+static const char* kGamepadTextEntryCharset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+static const float kCancelAutoAdvance = -1e7f;
 
 /***************************/
 /*    VARIABLES            */
@@ -70,6 +72,8 @@ static	Boolean	gDrawScoreVerbage,gExitHighScores;
 
 static	ObjNode	*gNewScoreNameMesh = nil;
 static	ObjNode	*gCursorMesh = nil;
+static	float	gTimeSinceKeyRepeat = 0;
+static	float	gTimeSinceAutoAdvance = 0;
 
 
 /*********************** NEW SCORE ***********************************/
@@ -95,8 +99,203 @@ static void UpdateCursorPos(void)
 {
 	GAME_ASSERT(gCursorMesh);
 
-	gCursorMesh->Coord.x = -kHSTableXSpread + kHSTableScale * .5f * TextMesh_GetCharX(gHighScores[gNewScoreSlot].name, gCursorIndex) - 2.5;
+	gCursorMesh->Coord.x = gCoord.x = -kHSTableXSpread + kHSTableScale * .5f * TextMesh_GetCharX(gHighScores[gNewScoreSlot].name, gCursorIndex) - 2.5;
 	UpdateObjectTransforms(gCursorMesh);
+}
+
+static void DoTextEntry(char* myName)
+{
+	int myLength = (int) strlen(myName);
+
+	gTimeSinceKeyRepeat += gFramesPerSecondFrac;
+
+	if (gCursorIndex < myLength)
+	{
+		gTimeSinceAutoAdvance += gFramesPerSecondFrac;
+
+		bool doAdvance;
+
+		if (gTimeSinceAutoAdvance > 1)
+		{
+			doAdvance = true;
+		}
+		else if (gTimeSinceAutoAdvance > 0)
+		{
+			doAdvance = GetNewNeedState(kNeed_TextEntry_Bksp) || GetNewNeedState(kNeed_TextEntry_Space);
+		}
+		else
+		{
+			doAdvance = false;
+		}
+
+		if (doAdvance)
+		{
+			gCursorIndex++;
+			gTimeSinceAutoAdvance = kCancelAutoAdvance;
+			UpdateCursorPos();
+		}
+	}
+	else
+	{
+		gTimeSinceAutoAdvance = kCancelAutoAdvance;
+	}
+
+	if (GetNewNeedState(kNeed_TextEntry_Done))
+	{
+		gExitHighScores = true;
+	}
+	else if (GetNewNeedState(kNeed_TextEntry_Left) || GetNewNeedState(kNeed_TextEntry_Left2))
+	{
+		if (gCursorIndex > 0)
+			gCursorIndex--;
+
+		UpdateCursorPos();
+		gTimeSinceAutoAdvance = kCancelAutoAdvance;
+	}
+	else if (GetNewNeedState(kNeed_TextEntry_Right) || GetNewNeedState(kNeed_TextEntry_Right2))
+	{
+		if (gCursorIndex < myLength)
+			gCursorIndex++;
+		else
+			gCursorIndex = myLength;
+
+		UpdateCursorPos();
+		gTimeSinceAutoAdvance = kCancelAutoAdvance;
+	}
+	else if (GetNewNeedState(kNeed_TextEntry_Home))
+	{
+		gCursorIndex = 0;
+		UpdateCursorPos();
+		gTimeSinceAutoAdvance = kCancelAutoAdvance;
+	}
+	else if (GetNewNeedState(kNeed_TextEntry_End))
+	{
+		gCursorIndex = myLength;
+		UpdateCursorPos();
+		gTimeSinceAutoAdvance = kCancelAutoAdvance;
+	}
+	else if (GetNewNeedState(kNeed_TextEntry_Bksp))
+	{
+		if (gCursorIndex > 0)
+		{
+			gCursorIndex--;
+
+			for (int i = gCursorIndex; i < MAX_NAME_LENGTH; i++)
+				myName[i] = myName[i+1];
+
+			myName[MAX_NAME_LENGTH-1] = ' ';
+
+			UpdateNewNameMesh();
+			UpdateCursorPos();
+			gTimeSinceAutoAdvance = kCancelAutoAdvance;
+		}
+	}
+	else if (GetNewNeedState(kNeed_TextEntry_Del))
+	{
+		if (gCursorIndex < MAX_NAME_LENGTH)
+		{
+			for (int i = gCursorIndex; i < MAX_NAME_LENGTH; i++)
+				myName[i] = myName[i+1];
+			UpdateNewNameMesh();
+			UpdateCursorPos();
+
+			gTimeSinceAutoAdvance = kCancelAutoAdvance;
+		}
+	}
+	else if (GetNewNeedState(kNeed_TextEntry_CharPP) ||
+		(GetNeedState(kNeed_TextEntry_CharPP) && gTimeSinceKeyRepeat > .125f))
+	{
+		if (gCursorIndex < MAX_NAME_LENGTH)
+		{
+			gTimeSinceKeyRepeat = 0;
+			gTimeSinceAutoAdvance = 0;
+
+			char c = myName[gCursorIndex];
+
+			const char* posInCharset = strchr(kGamepadTextEntryCharset, c);
+
+			if (!posInCharset)
+			{
+				c = kGamepadTextEntryCharset[0];		// fall back to first allowed char
+			}
+			else
+			{
+				c = *(posInCharset + 1);				// advance to next allowed char
+				if (!c)									// reached end of allowed charset
+					c = kGamepadTextEntryCharset[0];	// fall back to first allowed char
+			}
+
+			myName[gCursorIndex] = c;
+			UpdateNewNameMesh();
+		}
+	}
+	else if (GetNewNeedState(kNeed_TextEntry_CharMM) ||
+		(GetNeedState(kNeed_TextEntry_CharMM) && gTimeSinceKeyRepeat > .125f))
+	{
+		if (gCursorIndex < MAX_NAME_LENGTH)
+		{
+			gTimeSinceKeyRepeat = 0;
+			gTimeSinceAutoAdvance = 0;
+
+			char c = myName[gCursorIndex];
+
+			const char* posInCharset = strchr(kGamepadTextEntryCharset, c);
+
+			if (!posInCharset)
+			{
+				c = kGamepadTextEntryCharset[0];		// fall back to first allowed char
+			}
+			else
+			{
+				if (posInCharset == kGamepadTextEntryCharset)
+					posInCharset = kGamepadTextEntryCharset + strlen(kGamepadTextEntryCharset) - 1;
+				else
+					posInCharset--;
+
+				c = *posInCharset;
+			}
+
+			myName[gCursorIndex] = c;
+			UpdateNewNameMesh();
+		}
+	}
+	else if (GetNewNeedState(kNeed_TextEntry_Space))
+	{
+		if (gCursorIndex < MAX_NAME_LENGTH)								// dont add anything more if maxxed out now
+		{
+			for (int i = MAX_NAME_LENGTH-1; i > gCursorIndex; i--)
+				myName[i] = myName[i-1];
+
+			myName[gCursorIndex] = ' ';
+			gCursorIndex++;
+			gTimeSinceAutoAdvance = kCancelAutoAdvance;
+
+			UpdateNewNameMesh();
+			UpdateCursorPos();
+		}
+	}
+	else if (gTextInput[0] && gTextInput[0] >= ' ' && gTextInput[0] < '~')
+	{
+		// The text event gives us UTF-8. Use the key only if it's a printable ASCII character.
+		char theChar = gTextInput[0];
+		if (gCursorIndex < MAX_NAME_LENGTH)								// dont add anything more if maxxed out now
+		{
+			if ((theChar >= 'a') && (theChar <= 'z'))					// see if convert lower case to upper case a..z
+				theChar = 'A' + (theChar-'a');
+
+			for (int i = MAX_NAME_LENGTH-1; i > gCursorIndex; i--)
+				myName[i] = myName[i-1];
+
+			myName[gCursorIndex] = theChar;
+			gCursorIndex++;
+			gTimeSinceAutoAdvance = kCancelAutoAdvance;
+
+			UpdateNewNameMesh();
+			UpdateCursorPos();
+		}
+	}
+
+	GAME_ASSERT(myName[MAX_NAME_LENGTH] == '\0');
 }
 
 void NewScore(void)
@@ -121,6 +320,13 @@ void NewScore(void)
 
 	char* myName = gHighScores[gNewScoreSlot].name;
 
+	for (int i = 0; i < MAX_NAME_LENGTH; i++)
+		myName[i] = ' ';
+	myName[MAX_NAME_LENGTH] = '\0';
+
+	gTimeSinceKeyRepeat = 0;
+	gTimeSinceAutoAdvance = kCancelAutoAdvance;
+
 	while(!gExitHighScores)
 	{
 
@@ -135,81 +341,7 @@ void NewScore(void)
 
 		if (!gDrawScoreVerbage)
 		{
-			if (GetNewKeyState(SDL_SCANCODE_RETURN) || GetNewKeyState(SDL_SCANCODE_KP_ENTER))
-			{
-				gExitHighScores = true;
-			}
-			else if (GetNewKeyState(SDL_SCANCODE_LEFT))
-			{
-				if (gCursorIndex > 0)
-					gCursorIndex--;
-
-				UpdateCursorPos();
-			}
-			else if (GetNewKeyState(SDL_SCANCODE_RIGHT))
-			{
-				int myLength = (int) strlen(myName);
-				if (gCursorIndex < myLength)
-					gCursorIndex++;
-				else
-					gCursorIndex = myLength;
-
-				UpdateCursorPos();
-			}
-			else if (GetNewKeyState(SDL_SCANCODE_HOME))
-			{
-				gCursorIndex = 0;
-				UpdateCursorPos();
-			}
-			else if (GetNewKeyState(SDL_SCANCODE_END))
-			{
-				gCursorIndex = (int) strlen(myName);
-				UpdateCursorPos();
-			}
-			else if (GetNewKeyState(SDL_SCANCODE_BACKSPACE))
-			{
-				if (gCursorIndex > 0)
-				{
-					gCursorIndex--;
-
-					for (int i = gCursorIndex; i < MAX_NAME_LENGTH; i++)
-						myName[i] = myName[i+1];
-
-					UpdateNewNameMesh();
-					UpdateCursorPos();
-				}
-			}
-			else if (GetNewKeyState(SDL_SCANCODE_DELETE))
-			{
-				if (gCursorIndex < MAX_NAME_LENGTH)
-				{
-					for (int i = gCursorIndex; i < MAX_NAME_LENGTH; i++)
-						myName[i] = myName[i+1];
-					UpdateNewNameMesh();
-					UpdateCursorPos();
-				}
-			}
-			else if (gTextInput[0] && gTextInput[0] >= ' ' && gTextInput[0] < '~')
-			{
-				// The text event gives us UTF-8. Use the key only if it's a printable ASCII character.
-				char theChar = gTextInput[0];
-				if (gCursorIndex < MAX_NAME_LENGTH)								// dont add anything more if maxxed out now
-				{
-					if ((theChar >= 'a') && (theChar <= 'z'))					// see if convert lower case to upper case a..z
-						theChar = 'A' + (theChar-'a');
-
-					for (int i = MAX_NAME_LENGTH-1; i > gCursorIndex; i--)
-						myName[i] = myName[i-1];
-
-					myName[gCursorIndex] = theChar;
-					gCursorIndex++;
-
-					UpdateNewNameMesh();
-					UpdateCursorPos();
-				}
-			}
-
-			GAME_ASSERT(myName[MAX_NAME_LENGTH] == '\0');
+			DoTextEntry(myName);
 		}
 	}
 
@@ -250,7 +382,12 @@ ObjNode* SetupHighScoreTableObjNodes(ObjNode* chainTail, int returnNth)
 			/* DRAW NAME */
 
 		gNewObjectDefinition.coord.x = -kHSTableXSpread;
-		ObjNode* text1 = TextMesh_New(gHighScores[i].name, 0, &gNewObjectDefinition);
+
+		const char* name = gHighScores[i].name;
+		if (!name[0])
+			name = Localize(STR_EMPTY_SLOT);
+
+		ObjNode* text1 = TextMesh_New(name, 0, &gNewObjectDefinition);
 
 		if (returnNth == i)
 			toReturn = text1;
@@ -548,7 +685,7 @@ static void DrawHighScoresAndCursor(OGLSetupOutputType *info)
 		/* DRAW THE CURSOR */
 		/*******************/
 
-	if (gCursorIndex < MAX_NAME_LENGTH)						// dont draw if off the right side
+	if (gUserPrefersGamepad || gCursorIndex < MAX_NAME_LENGTH)						// dont draw if off the right side
 	{
 		gCursorMesh->ColorFilter.a = (.3f + ((sinf(gCursorFlux) + 1.0f) * .5f) * .699f) * gFinalScoreAlpha;
 	}
@@ -591,6 +728,8 @@ static void StartEnterName(void)
 	gNewObjectDefinition.coord.z 	= 0;
 
 	gCursorMesh = TextMesh_New("|", 0, &gNewObjectDefinition);
+
+	UpdateCursorPos();
 }
 
 
@@ -702,19 +841,7 @@ err:
 
 void ClearHighScores(void)
 {
-short				i,j;
-char				blank[MAX_NAME_LENGTH+1] = "EMPTY----------";
-
-
-			/* INIT SCORES */
-
-	for (i=0; i < NUM_SCORES; i++)
-	{
-		gHighScores[i].name[0] = MAX_NAME_LENGTH;
-		for (j=0; j < MAX_NAME_LENGTH; j++)
-			gHighScores[i].name[j+1] = blank[j];
-		gHighScores[i].score = 0;
-	}
+	memset(gHighScores, 0, sizeof(gHighScores));
 
 	SaveHighScores();
 }
@@ -769,12 +896,4 @@ short	slot;
 
 	return(false);
 }
-
-
-
-
-
-
-
-
 

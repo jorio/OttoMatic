@@ -68,6 +68,18 @@ enum
 	kNeed_UIStart,
 	kNeed_UIBack,
 	kNeed_UIPause,
+	kNeed_TextEntry_Left,
+	kNeed_TextEntry_Left2,
+	kNeed_TextEntry_Right,
+	kNeed_TextEntry_Right2,
+	kNeed_TextEntry_Home,
+	kNeed_TextEntry_End,
+	kNeed_TextEntry_Bksp,
+	kNeed_TextEntry_Del,
+	kNeed_TextEntry_Done,
+	kNeed_TextEntry_CharPP,
+	kNeed_TextEntry_CharMM,
+	kNeed_TextEntry_Space,
 
 	NUM_CONTROL_NEEDS
 };

@@ -53,4 +53,17 @@ const KeyBinding kDefaultKeyBindings[NUM_CONTROL_NEEDS] =
 [kNeed_UIStart			] = { { 0			, 0				}, MBNULL()		, { CB(START)			, CBNULL()				} },
 [kNeed_UIBack			] = { { SC(ESCAPE)	, 0				}, MBNULL()		, { CB(B)				, CB(BACK)				} },
 [kNeed_UIPause			] = { { SC(ESCAPE)	, 0				}, MBNULL()		, { CB(START)			, CBNULL()				} },
+
+[kNeed_TextEntry_Left	] = { { SC(LEFT)	, 0				}, MBNULL()		, { CB(DPAD_LEFT)		, CB(LEFTSHOULDER)		} },
+[kNeed_TextEntry_Left2	] = { { 0			, 0				}, MBNULL()		, { CAMINUS(LEFTX)		, 						} },
+[kNeed_TextEntry_Right	] = { { SC(RIGHT)	, 0				}, MBNULL()		, { CB(DPAD_RIGHT)		, CB(RIGHTSHOULDER)		} },
+[kNeed_TextEntry_Right2	] = { { 0			, 0				}, MBNULL()		, { CAPLUS(LEFTX)		, CBNULL()				} },
+[kNeed_TextEntry_Home	] = { { SC(HOME)	, 0				}, MBNULL()		, { CBNULL()			, CBNULL()				} },
+[kNeed_TextEntry_End	] = { { SC(HOME)	, 0				}, MBNULL()		, { CBNULL()			, CBNULL()				} },
+[kNeed_TextEntry_Bksp	] = { { SC(BACKSPACE),0				}, MBNULL()		, { CB(X)				, CBNULL()				} },
+[kNeed_TextEntry_Del	] = { { SC(DELETE)	, 0				}, MBNULL()		, { CBNULL()			, CBNULL()				} },
+[kNeed_TextEntry_Done	] = { { SC(RETURN)	, SC(KP_ENTER)	}, MBNULL()		, { CB(START)			, CBNULL()				} },
+[kNeed_TextEntry_CharPP	] = { { 0			, 0				}, MBNULL()		, { CB(A)				, CB(DPAD_UP)			} },
+[kNeed_TextEntry_CharMM	] = { { 0			, 0				}, MBNULL()		, { CB(B)				, CB(DPAD_DOWN)			} },
+[kNeed_TextEntry_Space	] = { { 0			, 0				}, MBNULL()		, { CB(Y)				, CBNULL()				} },
 };

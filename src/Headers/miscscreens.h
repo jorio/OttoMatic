@@ -3,7 +3,7 @@
 //
 
 #define	NUM_SCORES		15
-#define	MAX_NAME_LENGTH	15
+#define	MAX_NAME_LENGTH	24
 
 typedef struct
 {
