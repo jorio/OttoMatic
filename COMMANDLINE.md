@@ -12,12 +12,6 @@ In true fullscreen mode, sets your display to the specified refresh rate.
 
 Example: --fullscreen-refresh-rate 75
 
-## --msaa4x
-
-Enable 4x multisample antialiasing (MSAA).
-
-You can also try --msaa2x, --msaa4x, --msaa8x, or --msaa16x.
-
 ## --vsync
 
 Enable vertical synchronization (enabled by default).

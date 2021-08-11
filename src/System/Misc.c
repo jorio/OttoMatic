@@ -448,15 +448,12 @@ void FlushPtrTracking(bool issueWarnings)
 
 
 
-/******************* VERIFY SYSTEM ******************/
+/******************* CHECK PREFERENCES FOLDER ******************/
 
-void VerifySystem(void)
+void CheckPreferencesFolder(void)
 {
 OSErr	iErr;
 long		createdDirID;
-
-
-	gG4 = true;
 
 
 			/* CHECK PREFERENCES FOLDER */

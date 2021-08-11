@@ -83,7 +83,6 @@ static const char* GetWindowTitle()
 void ParseCommandLine(int argc, const char** argv)
 {
 	memset(&gCommandLine, 0, sizeof(gCommandLine));
-	gCommandLine.msaa = 0;
 	gCommandLine.vsync = 1;
 
 	for (int i = 1; i < argc; i++)
@@ -98,14 +97,6 @@ void ParseCommandLine(int argc, const char** argv)
 			gCommandLine.vsync = 1;
 		else if (argument == "--adaptive-vsync")
 			gCommandLine.vsync = -1;
-		else if (argument == "--msaa2x")
-			gCommandLine.msaa = 2;
-		else if (argument == "--msaa4x")
-			gCommandLine.msaa = 4;
-		else if (argument == "--msaa8x")
-			gCommandLine.msaa = 8;
-		else if (argument == "--msaa16x")
-			gCommandLine.msaa = 16;
 		else if (argument == "--fullscreen-resolution")
 		{
 			GAME_ASSERT_MESSAGE(i + 2 < argc, "fullscreen width & height unspecified");
@@ -122,13 +113,18 @@ void ParseCommandLine(int argc, const char** argv)
 	}
 }
 
-int CommonMain(int argc, const char** argv)
+int Boot(int argc, const char** argv)
 {
 	ParseCommandLine(argc, argv);
 
 	// Start our "machine"
 	Pomme::Init();
 
+	// Load game preferences
+	InitDefaultPrefs();
+	LoadPrefs(&gGamePrefs);
+
+retry:
 	if (0 != SDL_Init(SDL_INIT_VIDEO))
 	{
 		throw std::runtime_error("Couldn't initialize SDL video subsystem.");
@@ -138,10 +134,10 @@ int CommonMain(int argc, const char** argv)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-	if (gCommandLine.msaa != 0)
+	if (gGamePrefs.antialiasingLevel != 0)
 	{
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, gCommandLine.msaa);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 1 << gGamePrefs.antialiasingLevel);
 	}
 
 	gSDLWindow = SDL_CreateWindow(
@@ -154,7 +150,19 @@ int CommonMain(int argc, const char** argv)
 
 	if (!gSDLWindow)
 	{
-		throw std::runtime_error("Couldn't create SDL window.");
+		if (gGamePrefs.antialiasingLevel != 0)
+		{
+			printf("Couldn't create SDL window with the requested MSAA level. Retrying without MSAA...\n");
+
+			// retry without MSAA
+			gGamePrefs.antialiasingLevel = 0;
+			SDL_QuitSubSystem(SDL_INIT_VIDEO);
+			goto retry;
+		}
+		else
+		{
+			throw std::runtime_error("Couldn't create SDL window.");
+		}
 	}
 
 	fs::path dataPath = FindGameData();
@@ -198,13 +206,13 @@ int main(int argc, char** argv)
 #if _DEBUG
 	// In debug builds, if CommonMain throws, don't catch.
 	// This way, it's easier to get a clean stack trace.
-	returnCode = CommonMain(argc, const_cast<const char**>(argv));
+	returnCode = Boot(argc, const_cast<const char **>(argv));
 #else
-	// In release builds, catch anything that might be thrown by CommonMain
+	// In release builds, catch anything that might be thrown by Boot
 	// so we can show an error dialog to the user.
 	try
 	{
-		returnCode = CommonMain(argc, const_cast<const char**>(argv));
+		returnCode = Boot(argc, const_cast<const char**>(argv));
 	}
 	catch (std::exception& ex)		// Last-resort catch
 	{

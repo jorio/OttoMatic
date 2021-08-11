@@ -221,6 +221,20 @@ static const MenuItem gSettingsMenu[] =
 
 	{
 		.type = kMenuItem_Cycler,
+		.text = STR_MUSIC,
+		.cycler =
+		{
+			.callback = EnforceMusicPausePref,
+			.valuePtr = &gGamePrefs.music,
+			.numChoices = 2,
+			.choices = {STR_OFF, STR_ON},
+		},
+	},
+
+	{ .type = kMenuItem_Spacer },
+
+	{
+		.type = kMenuItem_Cycler,
 		.text = STR_FULLSCREEN,
 		.cycler =
 		{
@@ -233,26 +247,22 @@ static const MenuItem gSettingsMenu[] =
 
 	{
 		.type = kMenuItem_Cycler,
+		.text = STR_ANTIALIASING,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.antialiasingLevel,
+			.numChoices = 4,
+			.choices = {STR_OFF, STR_MSAA_2X, STR_MSAA_4X, STR_MSAA_8X},
+		}
+	},
+
+	{
+		.type = kMenuItem_Cycler,
 		.text = STR_ANAGLYPH,
 		.cycler =
 		{
 			.callback = NULL,
 			.valuePtr = &gGamePrefs.anaglyph,
-			.numChoices = 2,
-			.choices = {STR_OFF, STR_ON},
-		},
-	},
-
-	{ .type = kMenuItem_Spacer },
-
-
-	{
-		.type = kMenuItem_Cycler,
-		.text = STR_MUSIC,
-		.cycler =
-		{
-			.callback = EnforceMusicPausePref,
-			.valuePtr = &gGamePrefs.music,
 			.numChoices = 2,
 			.choices = {STR_OFF, STR_ON},
 		},
@@ -289,6 +299,26 @@ static const MenuItem gSettingsMenu[] =
 	{ .type = kMenuItem_END_SENTINEL }
 };
 
+static const MenuItem kAntialiasingWarning[] =
+{
+	{ .type = kMenuItem_Label, .text = STR_ANTIALIASING_CHANGE_WARNING_1 },
+	{ .type = kMenuItem_Label, .text = STR_ANTIALIASING_CHANGE_WARNING_2 },
+	{ .type = kMenuItem_Spacer },
+	{ .type = kMenuItem_Action, .text = STR_OK, .action = { .callback = MenuCallback_Back } },
+	{ .type = kMenuItem_END_SENTINEL },
+};
+
+static const MenuItem kAnaglyphWarning[] =
+{
+	{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING_1 },
+	{ .type = kMenuItem_Spacer },
+	{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING_2 },
+	{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING_3 },
+	{ .type = kMenuItem_Spacer },
+	{ .type = kMenuItem_Action, .text = STR_OK, .action = { .callback = MenuCallback_Back } },
+	{ .type = kMenuItem_END_SENTINEL },
+};
+
 #pragma mark -
 
 /***************************************************************/
@@ -312,19 +342,15 @@ void DoSettingsOverlay(void (*updateRoutine)(void),
 
 	gAllowAudioKeys = true;
 
-	// If user changed anaglyph setting, tell them colors will look off until a new level begins
+	// If user changed antialiasing setting, show warning
+	if (gPreviousPrefs.antialiasingLevel != gGamePrefs.antialiasingLevel)
+	{
+		StartMenu(kAntialiasingWarning, nil, updateRoutine, backgroundDrawRoutine);
+	}
+
+	// If user changed anaglyph setting, show warning
 	if (gPreviousPrefs.anaglyph != gGamePrefs.anaglyph)
 	{
-		static const MenuItem kAnaglyphWarning[] =
-		{
-			{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING_1 },
-			{ .type = kMenuItem_Spacer },
-			{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING_2 },
-			{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING_3 },
-			{ .type = kMenuItem_Spacer },
-			{ .type = kMenuItem_Action, .text = STR_OK, .action = { .callback = MenuCallback_Back } },
-			{ .type = kMenuItem_END_SENTINEL },
-		};
 		StartMenu(kAnaglyphWarning, nil, updateRoutine, backgroundDrawRoutine);
 	}
 }

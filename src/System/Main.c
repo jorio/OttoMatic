@@ -109,9 +109,6 @@ void ToolBoxInit(void)
 
 
 
-		/* FIRST VERIFY SYSTEM BEFORE GOING TOO FAR */
-
-	VerifySystem();
 
 
 			/* BOOT OGL */
@@ -122,12 +119,13 @@ void ToolBoxInit(void)
  	InitInput();
 
 
-			/********************/
-			/* INIT PREFERENCES */
-			/********************/
+			/*********************/
+			/* APPLY PREFERENCES */
+			/*********************/
+			//
+			// Note: the preferences are loaded in Main.cpp
+			//
 
-	InitDefaultPrefs();
-	LoadPrefs(&gGamePrefs);
 	LoadLocalizedStrings(gGamePrefs.language);
 
 	if (gSDLWindow)
@@ -147,7 +145,7 @@ void InitDefaultPrefs(void)
 
 	gGamePrefs.language						= GetBestLanguageIDFromSystemLocale();
 	gGamePrefs.fullscreen					= true;
-	gGamePrefs.antialiasing					= true;
+	gGamePrefs.antialiasingLevel			= 0;
 	gGamePrefs.music						= true;
 	gGamePrefs.playerRelControls			= false;
 	gGamePrefs.mouseControlsOtto			= true;
@@ -162,8 +160,6 @@ void InitDefaultPrefs(void)
 
 	memcpy(gGamePrefs.keys, kDefaultKeyBindings, sizeof(gGamePrefs.keys));
 	_Static_assert(sizeof(kDefaultKeyBindings) == sizeof(gGamePrefs.keys), "size mismatch: default keybindings / prefs keybindings");
-
-	LoadLocalizedStrings(gGamePrefs.language);
 }
 
 

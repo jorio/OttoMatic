@@ -13,7 +13,7 @@ extern	Handle	AllocHandle(long size);
 extern	void *AllocPtr(long size);
 void *AllocPtrClear(long size);
 extern	void InitMyRandomSeed(void);
-extern	void VerifySystem(void);
+extern	void CheckPreferencesFolder(void);
 extern	float RandomFloat(void);
 u_short	RandomRange(unsigned short min, unsigned short max);
 extern	void RegulateSpeed(short fps);

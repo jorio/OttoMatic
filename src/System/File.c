@@ -447,6 +447,8 @@ long		count;
 char		header[PREFS_HEADER_LENGTH + 1];
 PrefsType	prefBuffer;
 
+	CheckPreferencesFolder();
+
 				/*************/
 				/* READ FILE */
 				/*************/
@@ -517,6 +519,8 @@ FSSpec				file;
 OSErr				iErr;
 short				refNum;
 long				count;
+
+	CheckPreferencesFolder();
 
 				/* CREATE BLANK FILE */
 
