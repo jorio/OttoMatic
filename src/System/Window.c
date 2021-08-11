@@ -82,6 +82,11 @@ void GammaFadeOut(void)
 	GLint textureHeight = windowHeight;
 	char* textureData = AllocPtr(textureWidth * textureHeight * 3);
 
+	float u1 = 0;
+	float v1 = 0;
+	float u2 = (float)windowWidth / textureWidth;
+	float v2 = (float)windowHeight / textureHeight;
+
 	//SDL_GL_SwapWindow(gSDLWindow);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, textureWidth);
@@ -128,10 +133,10 @@ void GammaFadeOut(void)
 		glColor4f(gGammaFadePercent, gGammaFadePercent, gGammaFadePercent, 1.0f);
 
 		glBegin(GL_QUADS);
-		glTexCoord2f(0,1); glVertex3f(0, 0, 0);
-		glTexCoord2f(1,1); glVertex3f(g2DLogicalWidth, 0, 0);
-		glTexCoord2f(1,0); glVertex3f(g2DLogicalWidth, g2DLogicalHeight, 0);
-		glTexCoord2f(0,0); glVertex3f(0, g2DLogicalHeight, 0);
+		glTexCoord2f(u1,v2); glVertex3f(0, 0, 0);
+		glTexCoord2f(u2,v2); glVertex3f(g2DLogicalWidth, 0, 0);
+		glTexCoord2f(u2,v1); glVertex3f(g2DLogicalWidth, g2DLogicalHeight, 0);
+		glTexCoord2f(u1,v1); glVertex3f(0, g2DLogicalHeight, 0);
 		glEnd();
 		SDL_GL_SwapWindow(gSDLWindow);
 		CHECK_GL_ERROR();
