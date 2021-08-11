@@ -377,7 +377,6 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 		/******************************************/
 		/* SEE IF THE USER WILL WANT SOME CONTROL */
 		/******************************************/
-gTimeSinceLastThrust = -999;	// TEMP free camera control
 	if (gAutoRotateCamera)
 	{
 		gCameraUserRotY += fps * gAutoRotateCameraSpeed;
@@ -385,6 +384,7 @@ gTimeSinceLastThrust = -999;	// TEMP free camera control
 	else
 	if (skeleton->AnimNum != PLAYER_ANIM_BUBBLE)					// user can't swing camera if in bubble
 	{
+		// Vanilla manual camera swivel
 		if (!gFreeCameraControl && gCameraControlDelta.x != 0)
 		{
 			gCameraUserRotY += fps * PI * gCameraControlDelta.x;
@@ -398,6 +398,11 @@ gTimeSinceLastThrust = -999;	// TEMP free camera control
 	{
 		gCameraUserRotY = 0;
 		gForceCameraAlignment = true;
+	}
+	else if (gFreeCameraControl && gCameraControlDelta.x != 0 && !gAutoRotateCamera)
+	{
+		// force camera alignment is ALWAYS overridden by user
+		gForceCameraAlignment = false;
 	}
 
 
@@ -608,6 +613,9 @@ gTimeSinceLastThrust = -999;	// TEMP free camera control
 
 	if (gFreeCameraControl && gCameraControlDelta.x != 0 && !gAutoRotateCamera)
 	{
+		gTimeSinceLastThrust = -1000;
+		gForceCameraAlignment = false;
+
 		OGLMatrix4x4	m;
 		float			r = gCameraControlDelta.x * fps * 2.5f;
 		OGLMatrix4x4_SetRotateAboutPoint(&m, &to, 0, r, 0);
