@@ -311,4 +311,20 @@ void DoSettingsOverlay(void (*updateRoutine)(void),
 		SavePrefs();
 
 	gAllowAudioKeys = true;
+
+	// If user changed anaglyph setting, tell them colors will look off until a new level begins
+	if (gPreviousPrefs.anaglyph != gGamePrefs.anaglyph)
+	{
+		static const MenuItem kAnaglyphWarning[] =
+		{
+			{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING_1 },
+			{ .type = kMenuItem_Spacer },
+			{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING_2 },
+			{ .type = kMenuItem_Label, .text = STR_ANAGLYPH_TOGGLE_WARNING_3 },
+			{ .type = kMenuItem_Spacer },
+			{ .type = kMenuItem_Action, .text = STR_OK, .action = { .callback = MenuCallback_Back } },
+			{ .type = kMenuItem_END_SENTINEL },
+		};
+		StartMenu(kAnaglyphWarning, nil, updateRoutine, backgroundDrawRoutine);
+	}
 }

@@ -82,11 +82,15 @@ Mouse sensitivity	Sensibilité	Mouse sensitivity
 Mouse motion	Mouvement souris				
 Swing camera	La souris contrôle la caméra				
 Move Otto	La souris déplace Otto				
+OK	OK	OK	OK	OK	OK
 Back	Retour	Zurück	Atrás	Indietro	Tillbaka
 Yes	Oui	Ja	Sí	Sì	Ja
 No	Non	Nein	No	No	Nej
 Yes, monochrome	Oui, monochrome	Ja, Monochrome	Sí, monochrome	Sì, monochrome	Ja, monochrome
 Yes, color	Oui, couleur	Ja, Color	Sí, color	Sì, color	Ja, färg
+You have toggled Anaglyph 3D mode.	Tu as modifié le mode anaglyphe 3D.				
+Colors will be recalibrated	Les couleurs seront recalibrées				
+when you start a new level.	lors du prochain niveau.				
 Press!	Appuie!	Drück!			Tryck!
 Restore default configuration	Restaurer la configuration par défaut	Standardkonfiguration zurücksetzen			Återställ standardkonfiguration
 Go forward	Avancer	Vorwärts			Gå framåt
