@@ -287,7 +287,7 @@ OGLSetupInputType	viewDef;
 ObjNode				*newObj;
 Str255				scoreString;
 
-	PlaySong(SONG_HIGHSCORE, true);
+	PlaySong(SONG_HIGHSCORE, 0);
 
 	gDrawScoreVerbage = true;
 	gExitHighScores = false;

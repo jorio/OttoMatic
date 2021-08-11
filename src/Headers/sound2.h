@@ -257,6 +257,13 @@ enum
 };
 
 
+enum
+{
+	kPlaySong_PlayOnceFlag = 1 << 1,	// don't loop the song
+	kPlaySong_PreloadFlag = 2 << 1,		// pause the song immediately for later playback
+};
+
+
 
 
 //===================== PROTOTYPES ===================================
@@ -267,8 +274,8 @@ void ShutdownSound(void);
 
 void StopAChannel(short *channelNum);
 extern	void StopAllEffectChannels(void);
-void PlaySong(short songNum, Boolean loopFlag);
-extern void	KillSong(void);
+void PlaySong(short songNum, int flags);
+void KillSong(void);
 extern	short PlayEffect(short effectNum);
 short PlayEffect_Parms3D(short effectNum, OGLPoint3D *where, u_long rateMultiplier, float volumeAdjust);
 void EnforceMusicPausePref(void);

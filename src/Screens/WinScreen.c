@@ -475,7 +475,7 @@ static const OGLPoint3D	humanPt[] =
 
 
 
-	PlaySong(SONG_WIN, false);
+	PlaySong(SONG_WIN, kPlaySong_PlayOnceFlag);
 
 }
 

@@ -343,6 +343,8 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 
 	LoadSoundBank(SOUNDBANK_MENU);
 
+	PlaySong(SONG_THEME, kPlaySong_PreloadFlag);		// preload the song to avoid hiccup when starting playback later
+
 
 
 			/**************/
@@ -477,7 +479,7 @@ ObjNode	*newObj2;
 	gLogoObj->ChainNode = newObj2;
 
 
-	PlaySong(SONG_THEME, true);
+	PlaySong(SONG_THEME, 0);
 
 	gCanSpawnSaucers = true;
 }
@@ -506,8 +508,7 @@ static void BuildMenu(void)
 {
 ObjNode	*ring,*glow,*ringGlow;
 
-	if (!gSongPlayingFlag)									// if theme not already going, then do it
-		PlaySong(SONG_THEME, true);
+	PlaySong(SONG_THEME, 0);		// if theme not already going, then do it (no-op otherwise)
 
 	gCanSpawnSaucers = true;
 
@@ -1566,7 +1567,7 @@ static void DoHighScores(void)
 {
 ObjNode	*pane;
 
-	PlaySong(SONG_HIGHSCORE, true);
+	PlaySong(SONG_HIGHSCORE, 0);
 
 			/* LOAD HIGH SCORES */
 
@@ -1647,7 +1648,7 @@ ObjNode	*pane;
 		/* CLEANUP */
 	DeleteObject(pane);
 	UpdateInput();
-	PlaySong(SONG_THEME, true);
+	PlaySong(SONG_THEME, 0);
 }
 
 

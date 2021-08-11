@@ -428,7 +428,7 @@ static const OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 
 	gInteriorObj->ChainNode->ColorFilter.a = gInteriorObj->ColorFilter.a * .99f;
 
-	PlaySong(SONG_BONUS, true);
+	PlaySong(SONG_BONUS, 0);
 
 }
 

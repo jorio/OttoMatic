@@ -33,6 +33,21 @@ static void PlayGame(void);
 #define	DEFAULT_ANAGLYPH_B	0xff
 
 
+static const short kLevelSongs[NUM_LEVELS] =
+{
+	[LEVEL_NUM_FARM]		= SONG_FARM,
+	[LEVEL_NUM_BLOB]		= SONG_SLIME,
+	[LEVEL_NUM_BLOBBOSS]	= SONG_SLIMEBOSS,
+	[LEVEL_NUM_CLOUD]		= SONG_CLOUD,
+	[LEVEL_NUM_APOCALYPSE]	= SONG_APOCALYPSE,
+	[LEVEL_NUM_JUNGLE]		= SONG_JUNGLE,
+	[LEVEL_NUM_JUNGLEBOSS]	= SONG_JUNGLEBOSS,
+	[LEVEL_NUM_FIREICE]		= SONG_FIREICE,
+	[LEVEL_NUM_SAUCER]		= SONG_SAUCER,
+	[LEVEL_NUM_BRAINBOSS]	= SONG_BRAINBOSS,
+};
+
+
 /****************************/
 /*    VARIABLES             */
 /****************************/
@@ -178,6 +193,10 @@ static void PlayGame(void)
 
 	for (;gLevelNum < 10; gLevelNum++)
 	{
+				/* KICK OFF MUSIC */
+
+		PlaySong(kLevelSongs[gLevelNum], 0);
+
 				/* DO LEVEL INTRO */
 
 		DoLevelIntro();

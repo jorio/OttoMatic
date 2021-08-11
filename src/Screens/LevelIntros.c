@@ -84,52 +84,15 @@ void DoLevelIntro(void)
 {
 float	oldTime,maxTime = 11.0f;
 
-			/**************/
-			/* PLAY MUSIC */
-			/**************/
-
-	switch(gLevelNum)
+	switch (gLevelNum)										// level special cases
 	{
-		case	LEVEL_NUM_FARM:
-				PlaySong(SONG_FARM, true);
-				break;
-
-		case	LEVEL_NUM_BLOB:
-				PlaySong(SONG_SLIME, true);
-				break;
-
 		case	LEVEL_NUM_BLOBBOSS:
-				PlaySong(SONG_SLIMEBOSS, true);
-				return;										// this level doesn't have an intro, so bail now.
-
-		case	LEVEL_NUM_CLOUD:
-				PlaySong(SONG_CLOUD, true);
-				break;
-
-		case	LEVEL_NUM_JUNGLE:
-				PlaySong(SONG_JUNGLE, true);
-				break;
-
 		case	LEVEL_NUM_JUNGLEBOSS:
-				PlaySong(SONG_JUNGLEBOSS, true);
-				return;										// this level doesn't have an intro, so bail now.
-				break;
-
-		case	LEVEL_NUM_FIREICE:
-				PlaySong(SONG_FIREICE, true);
-				break;
-
-		case	LEVEL_NUM_SAUCER:
-				PlaySong(SONG_SAUCER, true);
-				break;
+				return;										// these levels don't have an intro, so bail now.
 
 		case	LEVEL_NUM_BRAINBOSS:
-				PlaySong(SONG_BRAINBOSS, true);
-				maxTime = 5.0f;
+				maxTime = 5.0f;								// shorter intro time
 				break;
-
-		default:
-				PlaySong(SONG_APOCALYPSE, true);
 	}
 
 

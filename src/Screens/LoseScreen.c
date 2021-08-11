@@ -135,7 +135,7 @@ ObjNode			*newObj;
 int				i,j;
 static const OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 
-	PlaySong(SONG_LOSESONG, false);
+	PlaySong(SONG_LOSESONG, kPlaySong_PlayOnceFlag);
 
 
 			/* INIT HUMANS */

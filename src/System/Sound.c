@@ -97,12 +97,12 @@ static short				gMaxChannels = 0;
 static	SndChannelPtr		gMusicChannel = nil;
 
 
-Boolean						gSongPlayingFlag = false;
 Boolean						gAllowAudioKeys = true;
 
 
 static short				gMusicFileRefNum = 0x0ded;
-short				gCurrentSong = -1;
+static short				gCurrentSong = -1;
+static Boolean				gSongPlayingFlag = false;
 
 
 		/*****************/
@@ -698,13 +698,8 @@ short		i;
 #pragma mark -
 
 /******************** PLAY SONG ***********************/
-//
-// if songNum == -1, then play existing open song
-//
-// INPUT: loopFlag = true if want song to loop
-//
 
-void PlaySong(short songNum, Boolean loopFlag)
+void PlaySong(short songNum, int flags)
 {
 static const char*	songNames[NUM_SONGS] =
 {
@@ -744,13 +739,21 @@ static const float	volumeTweaks[NUM_SONGS] =
 	1.0,				// win song
 };
 
-	if (songNum == gCurrentSong)					// see if this is already playing
-		return;
+
+	if (songNum == gCurrentSong)					// see if this is already loaded
+	{
+		if (!gSongPlayingFlag && gGamePrefs.music)
+		{
+			SndPauseFilePlay(gMusicChannel);
+			gSongPlayingFlag = true;
+		}
+
+		return;										// bail -- don't restart the song
+	}
 
 
 		/* ZAP ANY EXISTING SONG */
 
-	gCurrentSong 	= songNum;
 	KillSong();
 	DoSoundMaintenance();
 
@@ -823,7 +826,7 @@ static const float	volumeTweaks[NUM_SONGS] =
 			/* So we don't need to re-read the file over and over. */
 
 	mySndCmd.cmd = pommeSetLoopCmd;
-	mySndCmd.param1 = loopFlag ? 1 : 0;
+	mySndCmd.param1 = (!(flags & kPlaySong_PlayOnceFlag)) ? 1 : 0;
 	mySndCmd.param2 = 0;
 	iErr = SndDoImmediate(gMusicChannel, &mySndCmd);
 	GAME_ASSERT_MESSAGE(!iErr, "PlaySong: SndDoImmediate (pomme loop extension) failed!");
@@ -831,9 +834,11 @@ static const float	volumeTweaks[NUM_SONGS] =
 
 			/* SEE IF WANT TO MUTE THE MUSIC */
 
-	if (!gGamePrefs.music)
+	if ((flags & kPlaySong_PreloadFlag)
+		|| !gGamePrefs.music)
 	{
 		SndPauseFilePlay(gMusicChannel);			// pause it
+		gSongPlayingFlag = false;
 	}
 }
 
@@ -843,15 +848,14 @@ static const float	volumeTweaks[NUM_SONGS] =
 
 void KillSong(void)
 {
-
-	gCurrentSong = -1;
-
-	if (!gSongPlayingFlag)
+	if (gCurrentSong < 0)												// no song loaded
 		return;
 
-	gSongPlayingFlag = false;											// tell callback to do nothing
+	gCurrentSong = -1;
+	gSongPlayingFlag = false;
 
 	SndStopFilePlay(gMusicChannel, true);
+
 	if (gMusicFileRefNum == 0x0ded)
 		DoAlert("KillSong: gMusicFileRefNum == 0x0ded");
 	else
