@@ -60,6 +60,8 @@ typedef struct
 	Boolean	music;
 	Byte	language;
 	Boolean	playerRelControls;
+	Byte	mouseSensitivityLevel;
+	Boolean	mouseControlsOtto;
 	Boolean	anaglyph;
 	Boolean	anaglyphColor;
 	uint8_t	anaglyphCalibrationRed;

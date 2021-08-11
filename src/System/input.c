@@ -295,23 +295,25 @@ void UpdateInput(void)
 
 		/* AND FINALLY SEE IF MOUSE DELTAS ARE BEST */
 
+	const float mouseSensitivityFrac = (float)gGamePrefs.mouseSensitivityLevel / NUM_MOUSE_SENSITIVITY_LEVELS;
 	int mdx, mdy;
 	MouseSmoothing_GetDelta(&mdx, &mdy);
-	float mouseDX = mdx * 0.015f;								// scale down deltas for our use
-	float mouseDY = mdy * 0.015f;
-	mouseDX *= 10;
-	mouseDY *= 10;
-
-	mouseDX = CLAMP(mouseDX, -1.0f, 1.0f);						// keep values pinned
-	mouseDY = CLAMP(mouseDY, -1.0f, 1.0f);
-
-	if (fabsf(mouseDX) > fabsf(gPlayerInfo.analogControlX))		// is the mouse delta better than what we've got from the other devices?
-		gPlayerInfo.analogControlX = mouseDX;
-
-	if (fabsf(mouseDY) > fabsf(gPlayerInfo.analogControlZ))		// is the mouse delta better than what we've got from the other devices?
-		gPlayerInfo.analogControlZ = mouseDY;
 
 
+	if (gGamePrefs.mouseControlsOtto)
+	{
+		float mouseDX = mdx * mouseSensitivityFrac * .1f;
+		float mouseDY = mdy * mouseSensitivityFrac * .1f;
+
+		mouseDX = CLAMP(mouseDX, -1.0f, 1.0f);						// keep values pinned
+		mouseDY = CLAMP(mouseDY, -1.0f, 1.0f);
+
+		if (fabsf(mouseDX) > fabsf(gPlayerInfo.analogControlX))		// is the mouse delta better than what we've got from the other devices?
+			gPlayerInfo.analogControlX = mouseDX;
+
+		if (fabsf(mouseDY) > fabsf(gPlayerInfo.analogControlZ))		// is the mouse delta better than what we've got from the other devices?
+			gPlayerInfo.analogControlZ = mouseDY;
+	}
 
 
 			/* UPDATE SWIVEL CAMERA */
@@ -331,6 +333,9 @@ void UpdateInput(void)
 
 	if (GetNeedState(kNeed_CameraRight))
 		gCameraControlDelta.x += 1.0f;
+
+	if (!gGamePrefs.mouseControlsOtto)
+		gCameraControlDelta.x -= mdx * mouseSensitivityFrac * 0.04f;
 }
 
 void CaptureMouse(Boolean doCapture)

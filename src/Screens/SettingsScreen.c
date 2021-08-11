@@ -146,6 +146,62 @@ static const MenuItem gGamepadMenu[] =
 	{ .type = kMenuItem_END_SENTINEL }
 };
 
+static const MenuItem gMouseMenu[] =
+{
+	{.type = kMenuItem_Title, .text = STR_CONFIGURE_MOUSE},
+
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_MOUSE_CONTROL_TYPE,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.mouseControlsOtto,
+			.numChoices = 2,
+			.choices = {STR_MOUSE_CONTROLS_CAMERA, STR_MOUSE_CONTROLS_OTTO},
+		},
+	},
+
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_MOUSE_SENSITIVITY,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.mouseSensitivityLevel,
+			.numChoices = NUM_MOUSE_SENSITIVITY_LEVELS,
+			.choices =
+			{
+				STR_MOUSE_SENSITIVITY_1,
+				STR_MOUSE_SENSITIVITY_2,
+				STR_MOUSE_SENSITIVITY_3,
+				STR_MOUSE_SENSITIVITY_4,
+				STR_MOUSE_SENSITIVITY_5,
+				STR_MOUSE_SENSITIVITY_6,
+				STR_MOUSE_SENSITIVITY_7,
+				STR_MOUSE_SENSITIVITY_8,
+			},
+		},
+	},
+
+	{ .type = kMenuItem_Spacer },
+
+	/*
+	{
+		.type = kMenuItem_Action,
+		.text = STR_RESET_KEYBINDINGS,
+		.action = { .callback = cb_ResetMouseBindings },
+	},
+	*/
+
+	{
+		.type = kMenuItem_Action,
+		.text = STR_BACK,
+		.action = { .callback = MenuCallback_Back },
+	},
+
+	{ .type = kMenuItem_END_SENTINEL }
+};
+
+
 static const MenuItem gSettingsMenu[] =
 {
 	{.type = kMenuItem_Title, .text = STR_SETTINGS},
@@ -214,6 +270,12 @@ static const MenuItem gSettingsMenu[] =
 		.type = kMenuItem_Submenu,
 		.text = STR_CONFIGURE_GAMEPAD,
 		.submenu = {.menu = gGamepadMenu},
+	},
+
+	{
+		.type = kMenuItem_Submenu,
+		.text = STR_CONFIGURE_MOUSE,
+		.submenu = {.menu = gMouseMenu},
 	},
 
 	{ .type = kMenuItem_Spacer },

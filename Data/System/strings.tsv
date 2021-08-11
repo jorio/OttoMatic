@@ -67,8 +67,21 @@ Player-relative controls	Contrôles relatifs au joueur	Spieler-bezogene Steuerung
 Music	Musique	Musik	Música	Musica	Musik
 Configure keyboard	Configurer le clavier	Tastatur konfigurieren	Configurar el teclado	Configura la tastiera	Konfigurera tangentbordet
 Configure gamepad	Configurer la manette	Gamepad konfigurieren	Configurar el mando	Configura il gamepad	Konfigurera handkontrollen
+Configure mouse	Configurer la souris	Maus konfigurieren	Configurar el ratón	Configura il mouse	Konfigurera musen
 No gamepad detected	Aucune manette détectée	Kein Gamepad erkannt			Ingen handkontroll hittades
 Rumble	Vibration	Vibration	Vibración	Vibrazione	Vibration
+Mouse sensitivity	Sensibilité	Mouse sensitivity			
+1/8					
+2/8					
+3/8					
+4/8					
+5/8					
+6/8					
+7/8					
+8/8					
+Mouse motion	Mouvement souris				
+Swing camera	La souris contrôle la caméra				
+Move Otto	La souris déplace Otto				
 Back	Retour	Zurück	Atrás	Indietro	Tillbaka
 Yes	Oui	Ja	Sí	Sì	Ja
 No	Non	Nein	No	No	Nej

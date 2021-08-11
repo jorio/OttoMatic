@@ -137,6 +137,8 @@ void InitDefaultPrefs(void)
 	gGamePrefs.antialiasing					= true;
 	gGamePrefs.music						= true;
 	gGamePrefs.playerRelControls			= false;
+	gGamePrefs.mouseControlsOtto			= true;
+	gGamePrefs.mouseSensitivityLevel		= DEFAULT_MOUSE_SENSITIVITY_LEVEL;
 	gGamePrefs.anaglyph						= false;
 	gGamePrefs.anaglyphColor				= true;
 	gGamePrefs.anaglyphCalibrationRed		= DEFAULT_ANAGLYPH_R;
