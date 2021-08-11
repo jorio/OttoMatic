@@ -129,11 +129,7 @@ float	oldTime,maxTime = 11.0f;
 		gIntroTimer += gFramesPerSecondFrac;
 		if ((gIntroTimer > maxTime) && (oldTime <= maxTime))
 		{
-#if ALLOW_FADE
 			MakeFadeEvent(false, 1.0);
-#else
-			break;
-#endif
 		}
 
 		if (gGammaFadePercent <= 0.0f)

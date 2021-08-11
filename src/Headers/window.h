@@ -2,12 +2,6 @@
 // windows.h
 //
 
-#define	USE_DSP			1
-#define	ALLOW_FADE		(1 && USE_DSP)
-
-
-
-extern	Boolean			gPlayFullScreen;
 extern	float			gGammaFadePercent;
 
 //=================================
