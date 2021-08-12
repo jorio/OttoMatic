@@ -1664,94 +1664,39 @@ ObjNode	*pane;
 
 static void DoCredits(void)
 {
-ObjNode	*pane, *glow, *text, *subtext1, *subtext2;
+static const MenuItem kCreditsMenu[] =
+{
+	{ .type = kMenuItem_Label, .text = -1, .rawText = " " },  // make up for invisible OK button
+	{ .type = kMenuItem_Title, .text = STR_CREDITS },
+	{ .type = kMenuItem_Spacer },
+	{ .type = kMenuItem_Label, .text = STR_CREDITS_GAME_DESIGN },
+	{ .type = kMenuItem_Label, .text = -1, .rawText = "      Brian Greenstone" },
+	{ .type = kMenuItem_Label, .text = -1, .rawText = "      Duncan Knarr" },
+	{ .type = kMenuItem_Spacer },
+	{ .type = kMenuItem_Label, .text = STR_CREDITS_PROGRAMMING },
+	{ .type = kMenuItem_Label, .text = -1, .rawText = "      Brian Greenstone" },
+	{ .type = kMenuItem_Spacer },
+	{ .type = kMenuItem_Label, .text = STR_CREDITS_ARTWORK },
+	{ .type = kMenuItem_Label, .text = -1, .rawText = "      Duncan Knarr" },
+	{ .type = kMenuItem_Spacer },
+	{ .type = kMenuItem_Label, .text = STR_CREDITS_MUSIC },
+	{ .type = kMenuItem_Label, .text = -1, .rawText = "      Aleksander Dimitrijevic" },
+	{ .type = kMenuItem_Spacer },
+	{ .type = kMenuItem_Label, .text = STR_CREDITS_ADDITIONAL_PROGRAMMING },
+	{ .type = kMenuItem_Label, .text = -1, .rawText = "      Iliyas Jorio" },
+	{ .type = kMenuItem_Action, .text = -1, .rawText = " ", .action = { .callback = MenuCallback_Back } },
+	{ .type = kMenuItem_END_SENTINEL },
+};
 
 	if (MyRandomLong()&1)
 		PlayEffect(EFFECT_ACCENTDRONE1);
 	else
 		PlayEffect(EFFECT_ACCENTDRONE2);
 
-	gFadeInText = true;
-	gTextDone = false;
-
-		/* DARKEN PANE */
-
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;
-	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOTEXTUREWRAP|
-										STATUS_BIT_KEEPBACKFACES;
-	gNewObjectDefinition.slot 		= 900;
-	gNewObjectDefinition.moveCall 	= MoveCredits;
-	pane = MakeNewObject(&gNewObjectDefinition);
-	pane->CustomDrawFunction = DrawDarkenPane;
-	pane->Scale.y = 480;
-	pane->ColorFilter = (OGLColorRGBA) {0,0,0,0};
-
-	gNewObjectDefinition.autoChain = pane;
 
 
-			/* CREDIT GLOW */
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_MAINMENU;
-	gNewObjectDefinition.type 		= MAINMENU_ObjType_CreditsGlow;
-	gNewObjectDefinition.coord.x 	= 0;
-	gNewObjectDefinition.coord.y 	= 0;
-	gNewObjectDefinition.coord.z 	= DARKEN_PANE_Z + 4;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOTEXTUREWRAP|STATUS_BIT_NOLIGHTING|
-									STATUS_BIT_GLOW|STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOZWRITES;
-	gNewObjectDefinition.slot++;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 	    = .7;
-	glow = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-
-	glow->ColorFilter.a = 0;
-
-
-			/* TEXT */
-
-	gNewObjectDefinition.type 		= MAINMENU_ObjType_CreditsText;
-	gNewObjectDefinition.coord.z 	+= 1.0;
-	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOTEXTUREWRAP|STATUS_BIT_NOLIGHTING|STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOZWRITES;
-	gNewObjectDefinition.slot++;
-	text = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-
-	text->ColorFilter.a = 0;
-
-
-	gNewObjectDefinition.scale 	    = .6;
-	gNewObjectDefinition.coord.y 	= 180;
-	gNewObjectDefinition.coord.z 	= 0.0f;
-	subtext1 = TextMesh_New("Ported by Iliyas Jorio", 1, &gNewObjectDefinition);
-	gNewObjectDefinition.coord.y 	+= 14.0f;
-	gNewObjectDefinition.scale 	    = .4f;
-	subtext2 = TextMesh_New("https://github.com/jorio/ottomatic", 1, &gNewObjectDefinition);
-	subtext1->ColorFilter = subtext2->ColorFilter = (OGLColorRGBA){.67,.84,.1,0};
-
-		/* STOP AUTO-CHAINING NEW NODES */
-
-	gNewObjectDefinition.autoChain = nil;
-
-		/*************************/
-		/* SHOW IN ANIMATED LOOP */
-		/*************************/
-
-	while(!gTextDone)
-	{
-		UpdateInput();
-		if (UserWantsOut())
-			gFadeInText = false;
-
-			/* DRAW STUFF */
-
-		CalcFramesPerSecond();
-		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);
-	}
-
-
-		/* CLEANUP */
-	DeleteObject(pane);
-	UpdateInput();
+	StartMenu(kCreditsMenu, nil, nil, DrawMainMenuCallback);
 }
 
 
