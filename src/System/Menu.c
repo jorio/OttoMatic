@@ -15,8 +15,10 @@
 static ObjNode* MakeTextAtRowCol(const char* text, int row, int col);
 static void LayOutMenu(const MenuItem* menu);
 
-#define SpecialRow		Special[0]
-#define SpecialCol		Special[1]
+#define SpecialRow					Special[0]
+#define SpecialCol					Special[1]
+#define SpecialPulsateTimer			SpecialF[0]
+#define SpecialSweepTimer			SpecialF[1]
 
 /****************************/
 /*    CONSTANTS             */
@@ -183,9 +185,36 @@ static void MoveDarkenPane(ObjNode* node)
 	node->ColorFilter.a = gMenuFadeAlpha * gMenuStyle->darkenPaneOpacity;
 }
 
+static void MoveGenericMenuItem(ObjNode* node)
+{
+	node->SpecialSweepTimer += gFramesPerSecondFrac * 5;
+
+	if (node->SpecialSweepTimer < 0)
+	{
+		node->ColorFilter.a = 0;
+	}
+	else if (node->SpecialSweepTimer < 1)
+	{
+		node->ColorFilter.a *= node->SpecialSweepTimer;
+
+		float xBackup = node->Coord.x;
+
+		float p = (1.0f - node->SpecialSweepTimer);
+		node->Coord.x -= p*p * 50.0f;
+		UpdateObjectTransforms(node);
+
+		node->Coord.x = xBackup;
+	}
+	else
+	{
+		UpdateObjectTransforms(node);
+	}
+}
+
 static void MoveLabel(ObjNode* node)
 {
 	node->ColorFilter.a = gMenuFadeAlpha;
+	MoveGenericMenuItem(node);
 }
 
 static void MoveAction(ObjNode* node)
@@ -196,6 +225,7 @@ static void MoveAction(ObjNode* node)
 		node->ColorFilter = gMenuStyle->inactiveColor;
 
 	node->ColorFilter.a *= gMenuFadeAlpha;
+	MoveGenericMenuItem(node);
 }
 
 static void MoveKeyBinding(ObjNode* node)
@@ -203,7 +233,7 @@ static void MoveKeyBinding(ObjNode* node)
 	if (node->SpecialRow == gMenuRow && node->SpecialCol == (gKeyColumn+1))
 	{
 		if (gMenuState == kMenuStateAwaitingKeyPress)
-			node->ColorFilter = PulsateColor(&node->SpecialF[0]);
+			node->ColorFilter = PulsateColor(&node->SpecialPulsateTimer);
 		else
 			node->ColorFilter = TwinkleColor();
 	}
@@ -211,6 +241,7 @@ static void MoveKeyBinding(ObjNode* node)
 		node->ColorFilter = gMenuStyle->inactiveColor;
 
 	node->ColorFilter.a *= gMenuFadeAlpha;
+	MoveGenericMenuItem(node);
 }
 
 static void MovePadBinding(ObjNode* node)
@@ -218,7 +249,7 @@ static void MovePadBinding(ObjNode* node)
 	if (node->SpecialRow == gMenuRow && node->SpecialCol == (gPadColumn+1))
 	{
 		if (gMenuState == kMenuStateAwaitingPadPress)
-			node->ColorFilter = PulsateColor(&node->SpecialF[0]);
+			node->ColorFilter = PulsateColor(&node->SpecialPulsateTimer);
 		else
 			node->ColorFilter = TwinkleColor();
 	}
@@ -226,6 +257,7 @@ static void MovePadBinding(ObjNode* node)
 		node->ColorFilter = gMenuStyle->inactiveColor;
 
 	node->ColorFilter.a *= gMenuFadeAlpha;
+	MoveGenericMenuItem(node);
 }
 
 static void MoveAsyncFadeOutAndDelete(ObjNode *theNode)
@@ -723,6 +755,8 @@ static void LayOutMenu(const MenuItem* menu)
 
 	float y = -totalHeight/2.0f;
 
+	float sweepFactor = 0.0f;
+
 	for (int row = 0; menu[row].type != kMenuItem_END_SENTINEL; row++)
 	{
 		gMenuRowYs[row] = y;
@@ -748,6 +782,7 @@ static void LayOutMenu(const MenuItem* menu)
 				ObjNode* label = MakeTextAtRowCol(text, row, 0);
 				label->ColorFilter = gMenuStyle->titleColor;
 				label->MoveCall = MoveLabel;
+				label->SpecialSweepTimer = .5f;		// Title appears sooner than the rest
 				break;
 			}
 
@@ -756,6 +791,7 @@ static void LayOutMenu(const MenuItem* menu)
 				ObjNode* label = MakeTextAtRowCol(text, row, 0);
 				label->ColorFilter = gMenuStyle->inactiveColor;
 				label->MoveCall = MoveLabel;
+				label->SpecialSweepTimer = sweepFactor;
 				break;
 			}
 
@@ -765,6 +801,7 @@ static void LayOutMenu(const MenuItem* menu)
 			{
 				ObjNode* node = MakeTextAtRowCol(text, row, 0);
 				node->MoveCall = MoveAction;
+				node->SpecialSweepTimer = sweepFactor;
 				break;
 			}
 
@@ -774,11 +811,14 @@ static void LayOutMenu(const MenuItem* menu)
 
 				ObjNode* node1 = MakeTextAtRowCol(buf, row, 0);
 				node1->MoveCall = MoveAction;
+				node1->SpecialSweepTimer = sweepFactor;
+
 				if (entry->cycler.numChoices > 0)
 				{
 					const char* choiceCaption = Localize(entry->cycler.choices[*entry->cycler.valuePtr]);
 					ObjNode* node2 = MakeTextAtRowCol(choiceCaption, row, 1);
 					node2->MoveCall = MoveAction;
+					node2->SpecialSweepTimer = sweepFactor;
 				}
 				break;
 			}
@@ -790,11 +830,14 @@ static void LayOutMenu(const MenuItem* menu)
 				gNewObjectDefinition.scale = 0.6f;
 				ObjNode* label = MakeTextAtRowCol(buf, row, 0);
 				label->ColorFilter = gMenuStyle->inactiveColor2;
+				label->MoveCall = MoveLabel;
+				label->SpecialSweepTimer = sweepFactor;
 
 				for (int j = 0; j < KEYBINDING_MAX_KEYS; j++)
 				{
 					ObjNode* keyNode = MakeTextAtRowCol(GetKeyBindingName(row, j), row, j + 1);
 					keyNode->MoveCall = MoveKeyBinding;
+					keyNode->SpecialSweepTimer = sweepFactor;
 				}
 				break;
 			}
@@ -805,11 +848,14 @@ static void LayOutMenu(const MenuItem* menu)
 
 				ObjNode* label = MakeTextAtRowCol(buf, row, 0);
 				label->ColorFilter = gMenuStyle->inactiveColor2;
+				label->MoveCall = MoveLabel;
+				label->SpecialSweepTimer = sweepFactor;
 
 				for (int j = 0; j < KEYBINDING_MAX_KEYS; j++)
 				{
 					ObjNode* keyNode = MakeTextAtRowCol(GetPadBindingName(row, j), row, j + 1);
 					keyNode->MoveCall = MovePadBinding;
+					keyNode->SpecialSweepTimer = sweepFactor;
 				}
 				break;
 			}
@@ -820,6 +866,9 @@ static void LayOutMenu(const MenuItem* menu)
 		}
 
 		y += kMenuItemHeightMultipliers[entry->type] * gMenuStyle->rowHeight;
+
+		if (entry->type != kMenuItem_Spacer)
+			sweepFactor -= .2f;
 
 		gNumMenuEntries++;
 		GAME_ASSERT(gNumMenuEntries < MAX_MENU_ROWS);
