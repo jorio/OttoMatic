@@ -201,35 +201,9 @@ static const MenuItem gMouseMenu[] =
 	{ .type = kMenuItem_END_SENTINEL }
 };
 
-
-static const MenuItem gSettingsMenu[] =
+static const MenuItem gVideoMenu[] =
 {
-	{.type = kMenuItem_Title, .text = STR_SETTINGS},
-
-	{
-		.type = kMenuItem_Cycler,
-		.text = STR_LANGUAGE,
-		.cycler =
-		{
-			.callback = cb_SetLanguage,
-			.valuePtr = &gGamePrefs.language,
-			.numChoices = MAX_LANGUAGES,
-		},
-	},
-
-	{ .type = kMenuItem_Spacer },
-
-	{
-		.type = kMenuItem_Cycler,
-		.text = STR_MUSIC,
-		.cycler =
-		{
-			.callback = EnforceMusicPausePref,
-			.valuePtr = &gGamePrefs.music,
-			.numChoices = 2,
-			.choices = {STR_OFF, STR_ON},
-		},
-	},
+	{.type = kMenuItem_Title, .text = STR_VIDEO_SETTINGS},
 
 	{ .type = kMenuItem_Spacer },
 
@@ -271,6 +245,51 @@ static const MenuItem gSettingsMenu[] =
 	{ .type = kMenuItem_Spacer },
 
 	{
+		.type = kMenuItem_Action,
+		.text = STR_BACK,
+		.action = { .callback = MenuCallback_Back },
+	},
+
+	{ .type = kMenuItem_END_SENTINEL }
+};
+
+static const MenuItem gSettingsMenu[] =
+{
+	{.type = kMenuItem_Title, .text = STR_SETTINGS},
+
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_LANGUAGE,
+		.cycler =
+		{
+			.callback = cb_SetLanguage,
+			.valuePtr = &gGamePrefs.language,
+			.numChoices = MAX_LANGUAGES,
+		},
+	},
+
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_MUSIC,
+		.cycler =
+		{
+			.callback = EnforceMusicPausePref,
+			.valuePtr = &gGamePrefs.music,
+			.numChoices = 2,
+			.choices = {STR_OFF, STR_ON},
+		},
+	},
+
+
+	{
+		.type = kMenuItem_Submenu,
+		.text = STR_VIDEO_SETTINGS,
+		.submenu = {.menu = gVideoMenu},
+	},
+
+	{ .type = kMenuItem_Spacer },
+
+	{
 		.type = kMenuItem_Submenu,
 		.text = STR_CONFIGURE_KEYBOARD,
 		.submenu = {.menu = gKeybindingMenu},
@@ -287,6 +306,22 @@ static const MenuItem gSettingsMenu[] =
 		.text = STR_CONFIGURE_MOUSE,
 		.submenu = {.menu = gMouseMenu},
 	},
+
+
+#if _DEBUG
+	{.type = kMenuItem_Spacer},
+	{
+		.type = kMenuItem_Cycler,
+		.text = -1,
+		.rawText = "Tank controls",
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.playerRelControls,
+			.numChoices = 2,
+			.choices = {STR_OFF, STR_ON},
+		},
+	},
+#endif
 
 	{ .type = kMenuItem_Spacer },
 
