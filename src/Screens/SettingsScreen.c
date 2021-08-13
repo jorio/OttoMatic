@@ -93,6 +93,8 @@ static const MenuItem gKeybindingMenu[] =
 		.action = { .callback = cb_ResetKeyBindings },
 	},
 
+	{ .type = kMenuItem_Spacer },
+
 	{
 		.type = kMenuItem_Action,
 		.text = STR_BACK,
@@ -136,6 +138,8 @@ static const MenuItem gGamepadMenu[] =
 		.text = STR_RESET_KEYBINDINGS,
 		.action = { .callback = cb_ResetPadBindings },
 	},
+
+	{ .type = kMenuItem_Spacer },
 
 	{
 		.type = kMenuItem_Action,
@@ -190,6 +194,8 @@ static const MenuItem gMouseMenu[] =
 		.text = STR_RESET_KEYBINDINGS,
 		.action = { .callback = cb_ResetMouseBindings },
 	},
+
+	{ .type = kMenuItem_Spacer },
 	*/
 
 	{

@@ -22,6 +22,8 @@ enum
 	KEYSTATE_ACTIVE_BIT	= 0b10,
 };
 
+#define NUM_MOUSE_BUTTONS 6
+
 #define kJoystickDeadZone				(33 * 32767 / 100)
 #define kJoystickDeadZone_UI			(66 * 32767 / 100)
 #define kJoystickDeadZoneFrac			(kJoystickDeadZone / 32767.0f)
@@ -46,7 +48,9 @@ char				gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
 
 Byte				gNeedStates[NUM_CONTROL_NEEDS];
 
-bool				gEatMouse = false;
+Boolean				gEatMouse = false;
+Boolean				gMouseMotionNow = false;
+static Byte			gMouseButtonState[NUM_MOUSE_BUTTONS];
 
 OGLVector2D			gCameraControlDelta;
 
@@ -86,6 +90,8 @@ void InitInput(void)
 void UpdateInput(void)
 {
 	gTextInput[0] = '\0';
+	gMouseMotionNow = false;
+	gEatMouse = false;
 
 			/**********************/
 			/* DO SDL MAINTENANCE */
@@ -123,6 +129,7 @@ void UpdateInput(void)
 						// On Mac, always restore system mouse accel if cmd-tabbing away from the game
 						RestoreMacMouseAcceleration();
 #endif
+						gEatMouse = true;
 						break;
 
 					case SDL_WINDOWEVENT_FOCUS_GAINED:
@@ -131,6 +138,7 @@ void UpdateInput(void)
 						if (SDL_GetRelativeMouseMode())
 							KillMacMouseAcceleration();
 #endif
+						gEatMouse = true;
 						break;
 				}
 				break;
@@ -143,6 +151,7 @@ void UpdateInput(void)
 				case SDL_MOUSEMOTION:
 					if (!gEatMouse)
 					{
+						gMouseMotionNow = true;
 						MouseSmoothing_OnMouseMotion(&event.motion);
 					}
 					break;
@@ -175,9 +184,28 @@ void UpdateInput(void)
 		}
 	}
 
+	// --------------------------------------------
+
+	if (gEatMouse)
+	{
+		MouseSmoothing_ResetState();
+		memset(gMouseButtonState, KEYSTATE_OFF, sizeof(gMouseButtonState));
+	}
+	else
+	{
+		uint32_t mouseButtons = SDL_GetMouseState(NULL, NULL);
+
+		for (int i = 1; i < NUM_MOUSE_BUTTONS; i++)
+		{
+			bool downNow = mouseButtons & SDL_BUTTON(i);
+			UpdateKeyState(&gMouseButtonState[i], downNow);
+		}
+	}
+
+	// --------------------------------------------
+
 	int numkeys = 0;
 	const UInt8* keystate = SDL_GetKeyboardState(&numkeys);
-	uint32_t mouseButtons = SDL_GetMouseState(NULL, NULL);
 
 	{
 		int minNumKeys = numkeys < SDL_NUM_SCANCODES ? numkeys : SDL_NUM_SCANCODES;
@@ -206,7 +234,7 @@ void UpdateInput(void)
 		switch (kb->mouse.type)
 		{
 			case kInputTypeButton:
-				downNow |= 0 != (mouseButtons & SDL_BUTTON(kb->mouse.id));
+				downNow |= gMouseButtonState[kb->mouse.id] & KEYSTATE_ACTIVE_BIT;
 				break;
 
 			case kInputTypeAxisPlus:
@@ -366,7 +394,10 @@ Boolean GetKeyState(unsigned short sdlScanCode)
 
 Boolean UserWantsOut(void)
 {
-	return GetNewNeedState(kNeed_UIConfirm) || GetNewNeedState(kNeed_UIBack) || GetNewNeedState(kNeed_UIStart);
+	return GetNewNeedState(kNeed_UIConfirm)
+		|| GetNewNeedState(kNeed_UIBack)
+		|| GetNewNeedState(kNeed_UIStart)
+		|| FlushMouseButtonPress(SDL_BUTTON_LEFT);
 }
 
 Boolean GetNeedState(int needID)
@@ -379,6 +410,15 @@ Boolean GetNewNeedState(int needID)
 {
 	GAME_ASSERT(needID < NUM_CONTROL_NEEDS);
 	return gNeedStates[needID] == KEYSTATE_PRESSED;
+}
+
+Boolean FlushMouseButtonPress(uint8_t sdlButton)
+{
+	GAME_ASSERT(sdlButton < NUM_MOUSE_BUTTONS);
+	Boolean gotPress = KEYSTATE_PRESSED == gMouseButtonState[sdlButton];
+	if (gotPress)
+		gMouseButtonState[sdlButton] = KEYSTATE_HELD;
+	return gotPress;
 }
 
 #pragma mark -

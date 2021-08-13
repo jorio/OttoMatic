@@ -95,6 +95,7 @@ Boolean GetNewKeyState(unsigned short sdlScanCode);
 Boolean GetKeyState(unsigned short sdlScanCode);
 Boolean GetNewNeedState(int needID);
 Boolean GetNeedState(int needID);
+Boolean FlushMouseButtonPress(uint8_t sdlButton);
 Boolean UserWantsOut(void);
 void Rumble(float strength, uint32_t ms);
 
