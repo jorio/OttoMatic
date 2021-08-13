@@ -256,20 +256,32 @@ static void TextMesh_InitMesh(MOVertexArrayData* mesh, int numQuads)
 	TextMesh_ReallocateMesh(mesh, numQuads);
 }
 
-static void TextMesh_SetMesh(
-		const char* text,
-		int align,
-		MOVertexArrayData* mesh,
-		int* meshQuadCapacity)
+void TextMesh_Update(const char* text, int align, ObjNode* textNode)
 {
+	GAME_ASSERT_MESSAGE(gFontMaterial, "Can't lay out text if the font isn't loaded!");
+
+	//-----------------------------------
+	// Get mesh from ObjNode
+
+	GAME_ASSERT(textNode->Genre == TEXTMESH_GENRE);
+	GAME_ASSERT(textNode->BaseGroup);
+	GAME_ASSERT(textNode->BaseGroup->objectData.numObjectsInGroup >= 2);
+
+	MetaObjectPtr			metaObject			= textNode->BaseGroup->objectData.groupContents[1];
+	MetaObjectHeader*		metaObjectHeader	= metaObject;
+	MOVertexArrayObject*	vertexObject		= metaObject;
+	MOVertexArrayData*		mesh				= &vertexObject->objectData;
+
+	GAME_ASSERT(metaObjectHeader->type == MO_TYPE_GEOMETRY);
+	GAME_ASSERT(metaObjectHeader->subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
+
+	//-----------------------------------
+
 	float S = .5f;
 	float x = 0;
 	float y = 0;
 	float z = 0;
 	float spacing = 0;
-
-//	GAME_ASSERT(gAtlasGlyphs);
-	GAME_ASSERT(gFontMaterial);
 
 	// Compute number of quads and line width
 	float lineWidth = 0;
@@ -277,9 +289,16 @@ static void TextMesh_SetMesh(
 	for (const char* c = text; *c; c++)
 	{
 		if (*c == '\n')		// TODO: line widths for strings containing line breaks aren't supported yet
+		{
+			lineWidth = 0;
 			continue;
-		if (*c == '\t')		// TODO: line widths for strings containing tabs aren't supported yet
+		}
+
+		if (*c == '\t')
+		{
+			lineWidth = TAB_STOP * ceilf((lineWidth+1.0f) / TAB_STOP);
 			continue;
+		}
 
 		const AtlasGlyph g = gAtlasGlyphs[(uint8_t)*c];
 		lineWidth += S*(g.xadv + spacing);
@@ -298,11 +317,17 @@ static void TextMesh_SetMesh(
 	// Adjust y for ascender
 	y -= S*(gFontLineHeight * .3f);
 
+	// Save extents
+	textNode->LeftOff	= x;
+	textNode->RightOff	= x + lineWidth;
+	textNode->TopOff		= y + S*gFontLineHeight*0.3f;
+	textNode->BottomOff	= y + S*gFontLineHeight*1.25f;
+
 	// Ensure mesh has capacity for quads
-	if (*meshQuadCapacity < numQuads)
+	if (textNode->TextQuadCapacity < numQuads)
 	{
-		*meshQuadCapacity = numQuads * 2;			// avoid reallocating often if text keeps growing
-		TextMesh_ReallocateMesh(mesh, *meshQuadCapacity);
+		textNode->TextQuadCapacity = numQuads * 2;		// avoid reallocating often if text keeps growing
+		TextMesh_ReallocateMesh(mesh, textNode->TextQuadCapacity);
 	}
 
 	// Set # of triangles and points
@@ -408,22 +433,6 @@ ObjNode *TextMesh_New(const char *text, int align, NewObjectDefinitionType* newO
 	return textNode;
 }
 
-void TextMesh_Update(const char* text, int align, ObjNode* textNode)
-{
-	GAME_ASSERT(textNode->Genre == TEXTMESH_GENRE);
-	GAME_ASSERT(textNode->BaseGroup);
-	GAME_ASSERT(textNode->BaseGroup->objectData.numObjectsInGroup >= 2);
-
-	MetaObjectPtr object = textNode->BaseGroup->objectData.groupContents[1];
-	MetaObjectHeader* objHead = object;
-	MOVertexArrayObject* vObj = object;
-
-	GAME_ASSERT(objHead->type == MO_TYPE_GEOMETRY);
-	GAME_ASSERT(objHead->subType == MO_GEOMETRY_SUBTYPE_VERTEXARRAY);
-
-	TextMesh_SetMesh(text, align, &vObj->objectData, &textNode->TextQuadCapacity);
-}
-
 float TextMesh_GetCharX(const char* text, int n)
 {
 	float x = 0;
@@ -435,4 +444,40 @@ float TextMesh_GetCharX(const char* text, int n)
 		x += gAtlasGlyphs[(uint8_t)*c].xadv;
 	}
 	return x;
+}
+
+OGLRect TextMesh_GetExtents(ObjNode* textNode)
+{
+	GAME_ASSERT(textNode->Genre == TEXTMESH_GENRE);
+
+	return (OGLRect)
+	{
+		.left		= textNode->Coord.x + textNode->Scale.x * textNode->LeftOff,
+		.right		= textNode->Coord.x + textNode->Scale.x * textNode->RightOff,
+		.top		= textNode->Coord.y + textNode->Scale.y * textNode->TopOff,
+		.bottom		= textNode->Coord.y + textNode->Scale.y * textNode->BottomOff,
+	};
+}
+
+void TextMesh_DrawExtents(ObjNode* textNode)
+{
+	GAME_ASSERT(textNode->Genre == TEXTMESH_GENRE);
+
+	OGL_PushState();								// keep state
+	SetInfobarSpriteState(true);
+	glDisable(GL_TEXTURE_2D);
+
+	OGLRect extents = TextMesh_GetExtents(textNode);
+	float z = textNode->Coord.z;
+
+	glColor4f(1,1,1,1);
+	glBegin(GL_LINE_LOOP);
+	glVertex3f(extents.left,		extents.top,	z);
+	glVertex3f(extents.right,		extents.top,	z);
+	glColor4f(0,.5,1,1);
+	glVertex3f(extents.right,		extents.bottom,	z);
+	glVertex3f(extents.left,		extents.bottom,	z);
+	glEnd();
+
+	OGL_PopState();
 }

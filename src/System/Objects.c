@@ -772,6 +772,12 @@ short			skelType;
 						OGL_PushState();								// keep state
 						SetInfobarSpriteState(true);
 						MO_DrawObject(theNode->BaseGroup, setupInfo);
+
+						if (gDebugMode == 1)
+						{
+							TextMesh_DrawExtents(theNode);
+						}
+
 						OGL_PopState();									// restore state
 					}
 					break;
