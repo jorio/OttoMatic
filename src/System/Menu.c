@@ -218,6 +218,17 @@ static bool IsMenuItemTypeSelectable(int type)
 	}
 }
 
+static void ReplaceMenuText(LocStrID originalTextInMenuDefinition, LocStrID newText)
+{
+	for (int i = 0; i < MAX_MENU_ROWS && gMenu[i].type != kMenuItem_END_SENTINEL; i++)
+	{
+		if (gMenu[i].text == originalTextInMenuDefinition)
+		{
+			MakeTextAtRowCol(Localize(newText), i, 0);
+		}
+	}
+}
+
 /****************************/
 /*    MENU MOVE CALLS       */
 /****************************/
@@ -560,6 +571,10 @@ static void NavigateKeyBinding(const MenuItem* entry)
 	{
 		gMenuState = kMenuStateAwaitingKeyPress;
 		MakeTextAtRowCol(Localize(STR_PRESS), gMenuRow, gKeyColumn+1);
+
+		// Change subtitle to help message
+		ReplaceMenuText(STR_CONFIGURE_KEYBOARD_HELP, STR_CONFIGURE_KEYBOARD_HELP_CANCEL);
+
 		return;
 	}
 }
@@ -606,6 +621,10 @@ static void NavigatePadBinding(const MenuItem* entry)
 
 		gMenuState = kMenuStateAwaitingPadPress;
 		MakeTextAtRowCol(Localize(STR_PRESS), gMenuRow, gPadColumn+1);
+
+		// Change subtitle to help message
+		ReplaceMenuText(STR_CONFIGURE_GAMEPAD_HELP, STR_CONFIGURE_GAMEPAD_HELP_CANCEL);
+
 		return;
 	}
 }
@@ -757,6 +776,7 @@ static void AwaitKeyPress(void)
 		MakeTextAtRowCol(GetKeyBindingName(gMenuRow, gKeyColumn), gMenuRow, 1 + gKeyColumn);
 		gMenuState = kMenuStateReady;
 		PlayEffect(kSfxError);
+		ReplaceMenuText(STR_CONFIGURE_KEYBOARD_HELP, STR_CONFIGURE_KEYBOARD_HELP);
 		return;
 	}
 
@@ -771,6 +791,7 @@ static void AwaitKeyPress(void)
 			MakeTextAtRowCol(GetKeyBindingName(gMenuRow, gKeyColumn), gMenuRow, gKeyColumn+1);
 			gMenuState = kMenuStateReady;
 			PlayEffect(kSfxCycle);
+			ReplaceMenuText(STR_CONFIGURE_KEYBOARD_HELP, STR_CONFIGURE_KEYBOARD_HELP);
 			return;
 		}
 	}
@@ -778,25 +799,20 @@ static void AwaitKeyPress(void)
 
 static void AwaitPadPress(void)
 {
-	if (GetNewKeyState(SDL_SCANCODE_ESCAPE))
+	if (GetNewKeyState(SDL_SCANCODE_ESCAPE)
+		|| SDL_GameControllerGetButton(gSDLController, SDL_CONTROLLER_BUTTON_START))
 	{
 		MakeTextAtRowCol(GetPadBindingName(gMenuRow, gPadColumn), gMenuRow, 1 + gPadColumn);
 		gMenuState = kMenuStateReady;
 		PlayEffect(kSfxError);
+		ReplaceMenuText(STR_CONFIGURE_GAMEPAD_HELP, STR_CONFIGURE_GAMEPAD_HELP);
 		return;
 	}
 
 	KeyBinding* kb = GetBindingAtRow(gMenuRow);
 
-
 	if (!gSDLController)
 		return;
-
-	if (SDL_GameControllerGetButton(gSDLController, SDL_CONTROLLER_BUTTON_START))
-	{
-		MenuCallback_Back();
-		return;
-	}
 
 	for (int8_t button = 0; button < SDL_CONTROLLER_BUTTON_MAX; button++)
 	{
@@ -817,6 +833,7 @@ static void AwaitPadPress(void)
 			MakeTextAtRowCol(GetPadBindingName(gMenuRow, gPadColumn), gMenuRow, gPadColumn+1);
 			gMenuState = kMenuStateReady;
 			PlayEffect(kSfxCycle);
+			ReplaceMenuText(STR_CONFIGURE_GAMEPAD_HELP, STR_CONFIGURE_GAMEPAD_HELP);
 			return;
 		}
 	}
@@ -842,6 +859,7 @@ static void AwaitPadPress(void)
 			MakeTextAtRowCol(GetPadBindingName(gMenuRow, gPadColumn), gMenuRow, gPadColumn+1);
 			gMenuState = kMenuStateReady;
 			PlayEffect(kSfxCycle);
+			ReplaceMenuText(STR_CONFIGURE_GAMEPAD_HELP_CANCEL, STR_CONFIGURE_GAMEPAD_HELP);
 			return;
 		}
 	}

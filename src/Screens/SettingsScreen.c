@@ -92,6 +92,11 @@ static const char* GenerateDisplayName(char* buf, int bufSize, Byte value)
 	return buf;
 }
 
+static const char* GenerateCurrentLanguageName(char* buf, int bufSize, Byte value)
+{
+	return Localize(STR_LANGUAGE_NAME);
+}
+
 /***************************************************************/
 /*                     MENU DEFINITIONS                        */
 /***************************************************************/
@@ -99,6 +104,7 @@ static const char* GenerateDisplayName(char* buf, int bufSize, Byte value)
 static const MenuItem gKeybindingMenu[] =
 {
 	{.type = kMenuItem_Title, .text = STR_CONFIGURE_KEYBOARD},
+	{.type = kMenuItem_Subtitle, .text = STR_CONFIGURE_KEYBOARD_HELP},
 	{.type = kMenuItem_Spacer},
 
 	{ .type = kMenuItem_KeyBinding, .kb = kNeed_Forward },
@@ -143,20 +149,8 @@ static const MenuItem gGamepadMenu[] =
 {
 	{.type = kMenuItem_Title, .text = STR_CONFIGURE_GAMEPAD},
 	{.type = kMenuItem_Subtitle, .generateText = GenerateGamepadLabel },
+	{.type = kMenuItem_Subtitle, .text = STR_CONFIGURE_GAMEPAD_HELP},
 	{.type = kMenuItem_Spacer },
-
-	{
-		.type = kMenuItem_Cycler,
-		.text = STR_GAMEPAD_RUMBLE,
-		.cycler =
-		{
-			.callback = cb_SetRumble,
-			.valuePtr = &gGamePrefs.gamepadRumble,
-			.numChoices = 2,
-			.choices = {STR_OFF, STR_ON},
-		},
-	},
-	{ .type = kMenuItem_Spacer },
 
 	{ .type = kMenuItem_PadBinding, .kb = kNeed_Jump },
 	{ .type = kMenuItem_PadBinding, .kb = kNeed_Shoot },
@@ -171,6 +165,20 @@ static const MenuItem gGamepadMenu[] =
 		.type = kMenuItem_Action,
 		.text = STR_RESET_KEYBINDINGS,
 		.action = { .callback = cb_ResetPadBindings },
+	},
+
+	{ .type = kMenuItem_Spacer },
+
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_GAMEPAD_RUMBLE,
+		.cycler =
+		{
+			.callback = cb_SetRumble,
+			.valuePtr = &gGamePrefs.gamepadRumble,
+			.numChoices = 2,
+			.choices = {STR_OFF, STR_ON},
+		},
 	},
 
 	{ .type = kMenuItem_Spacer },
@@ -325,8 +333,7 @@ static const MenuItem gSettingsMenu[] =
 			.callback = cb_SetLanguage,
 			.valuePtr = &gGamePrefs.language,
 			.numChoices = MAX_LANGUAGES,
-			// The choices array is all 0's, which makes the menu
-			// display the current language as the localized value.
+			.generateChoiceString = GenerateCurrentLanguageName,
 		},
 	},
 
