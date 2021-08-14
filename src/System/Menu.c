@@ -45,6 +45,7 @@ enum
 	kMenuStateFadeOut,
 	kMenuStateAwaitingKeyPress,
 	kMenuStateAwaitingPadPress,
+	kMenuStateAwaitingMouseClick,
 };
 
 const MenuStyle kDefaultMenuStyle =
@@ -181,6 +182,26 @@ static const char* GetPadBindingName(int row, int col)
 	}
 }
 
+static const char* GetMouseBindingName(int row)
+{
+	static char extraButtonBuf[256];
+
+	KeyBinding* kb = GetBindingAtRow(row);
+
+	switch (kb->mouseButton)
+	{
+		case 0:							return kUnboundCaption;
+		case SDL_BUTTON_LEFT:			return Localize(STR_MOUSE_BUTTON_LEFT);
+		case SDL_BUTTON_MIDDLE:			return Localize(STR_MOUSE_BUTTON_MIDDLE);
+		case SDL_BUTTON_RIGHT:			return Localize(STR_MOUSE_BUTTON_RIGHT);
+		case SDL_BUTTON_WHEELUP:		return Localize(STR_MOUSE_WHEEL_UP);
+		case SDL_BUTTON_WHEELDOWN:		return Localize(STR_MOUSE_WHEEL_DOWN);
+		default:
+			snprintf(extraButtonBuf, sizeof(extraButtonBuf), "%s %d", Localize(STR_BUTTON), kb->mouseButton);
+			return extraButtonBuf;
+	}
+}
+
 static bool IsMenuItemTypeSelectable(int type)
 {
 	switch (type)
@@ -270,6 +291,22 @@ static void MovePadBinding(ObjNode* node)
 	if (node->SpecialRow == gMenuRow && node->SpecialCol == (gPadColumn+1))
 	{
 		if (gMenuState == kMenuStateAwaitingPadPress)
+			node->ColorFilter = PulsateColor(&node->SpecialPulsateTimer);
+		else
+			node->ColorFilter = TwinkleColor();
+	}
+	else
+		node->ColorFilter = gMenuStyle->inactiveColor;
+
+	node->ColorFilter.a *= gMenuFadeAlpha;
+	MoveGenericMenuItem(node);
+}
+
+static void MoveMouseBinding(ObjNode* node)
+{
+	if (node->SpecialRow == gMenuRow)
+	{
+		if (gMenuState == kMenuStateAwaitingMouseClick)
 			node->ColorFilter = PulsateColor(&node->SpecialPulsateTimer);
 		else
 			node->ColorFilter = TwinkleColor();
@@ -576,6 +613,33 @@ static void NavigatePadBinding(const MenuItem* entry)
 	}
 }
 
+static void NavigateMouseBinding(const MenuItem* entry)
+{
+	if (GetNewKeyState(SDL_SCANCODE_DELETE)
+		|| GetNewKeyState(SDL_SCANCODE_BACKSPACE)
+		|| (gMouseHoverValidRow && FlushMouseButtonPress(SDL_BUTTON_MIDDLE)))
+	{
+		gGamePrefs.keys[entry->kb].mouseButton = 0;
+		PlayEffect(kSfxDelete);
+		MakeTextAtRowCol(kUnboundCaption, gMenuRow, 1);
+		return;
+	}
+
+	if (GetNewNeedState(kNeed_UIConfirm)
+		|| (gMouseHoverValidRow && FlushMouseButtonPress(SDL_BUTTON_LEFT)))
+	{
+		while (GetNeedState(kNeed_UIConfirm))
+		{
+			UpdateInput();
+			SDL_Delay(30);
+		}
+
+		gMenuState = kMenuStateAwaitingMouseClick;
+		MakeTextAtRowCol(Localize(STR_CLICK), gMenuRow, 1);
+		return;
+	}
+}
+
 static void NavigateMenu(void)
 {
 	if (GetNewNeedState(kNeed_UIBack))
@@ -617,6 +681,9 @@ static void NavigateMenu(void)
 			NavigatePadBinding(entry);
 			break;
 
+		case kMenuItem_MouseBinding:
+			NavigateMouseBinding(entry);
+
 		default:
 			//DoFatalAlert("Not supposed to be hovering on this menu item!");
 			break;
@@ -632,9 +699,7 @@ static void UnbindScancodeFromAllRemappableInputNeeds(int16_t sdlScancode)
 {
 	for (int row = 0; row < gNumMenuEntries; row++)
 	{
-		const MenuItem* entry = &gMenu[row];
-
-		if (entry->type != kMenuItem_KeyBinding)
+		if (gMenu[row].type != kMenuItem_KeyBinding)
 			continue;
 
 		KeyBinding* binding = GetBindingAtRow(row);
@@ -654,9 +719,7 @@ static void UnbindPadButtonFromAllRemappableInputNeeds(int8_t type, int8_t id)
 {
 	for (int row = 0; row < gNumMenuEntries; row++)
 	{
-		const MenuItem* entry = &gMenu[row];
-
-		if (entry->type != kMenuItem_PadBinding)
+		if (gMenu[row].type != kMenuItem_PadBinding)
 			continue;
 
 		KeyBinding* binding = GetBindingAtRow(row);
@@ -669,6 +732,23 @@ static void UnbindPadButtonFromAllRemappableInputNeeds(int8_t type, int8_t id)
 				binding->gamepad[j].id = 0;
 				MakeTextAtRowCol(kUnboundCaption, row, j+1);
 			}
+		}
+	}
+}
+
+static void UnbindMouseButtonFromAllRemappableInputNeeds(int8_t id)
+{
+	for (int row = 0; row < gNumMenuEntries; row++)
+	{
+		if (gMenu[row].type != kMenuItem_MouseBinding)
+			continue;
+
+		KeyBinding* binding = GetBindingAtRow(row);
+
+		if (binding->mouseButton == id)
+		{
+			binding->mouseButton = 0;
+			MakeTextAtRowCol(kUnboundCaption, row, 1);
 		}
 	}
 }
@@ -770,6 +850,32 @@ static void AwaitPadPress(void)
 	}
 }
 
+static void AwaitMouseClick(void)
+{
+	if (GetNewKeyState(SDL_SCANCODE_ESCAPE))
+	{
+		MakeTextAtRowCol(GetMouseBindingName(gMenuRow), gMenuRow, 1);
+		gMenuState = kMenuStateReady;
+		PlayEffect(kSfxError);
+		return;
+	}
+
+	KeyBinding* kb = GetBindingAtRow(gMenuRow);
+
+	for (int8_t mouseButton = 0; mouseButton < NUM_SUPPORTED_MOUSE_BUTTONS; mouseButton++)
+	{
+		if (FlushMouseButtonPress(mouseButton))
+		{
+			UnbindMouseButtonFromAllRemappableInputNeeds(mouseButton);
+			kb->mouseButton = mouseButton;
+			MakeTextAtRowCol(GetMouseBindingName(gMenuRow), gMenuRow, 1);
+			gMenuState = kMenuStateReady;
+			PlayEffect(kSfxCycle);
+			return;
+		}
+	}
+}
+
 /****************************/
 /*    PAGE LAYOUT           */
 /****************************/
@@ -847,6 +953,7 @@ static const float kMenuItemHeightMultipliers[kMenuItem_NUM_ITEM_TYPES] =
 	[kMenuItem_Pick]         = 1,
 	[kMenuItem_KeyBinding]   = 1,
 	[kMenuItem_PadBinding]   = 1,
+	[kMenuItem_MouseBinding] = 1,
 };
 
 static void LayOutMenu(const MenuItem* menu)
@@ -999,6 +1106,21 @@ static void LayOutMenu(const MenuItem* menu)
 				break;
 			}
 
+			case kMenuItem_MouseBinding:
+			{
+				snprintf(buf, sizeof(buf), "%s:", Localize(STR_KEYBINDING_DESCRIPTION_0 + entry->kb));
+
+				ObjNode* label = MakeTextAtRowCol(buf, row, 0);
+				label->ColorFilter = gMenuStyle->inactiveColor2;
+				label->MoveCall = MoveAction;
+				label->SpecialSweepTimer = sweepFactor;
+
+				ObjNode* keyNode = MakeTextAtRowCol(GetMouseBindingName(row), row, 1);
+				keyNode->MoveCall = MoveMouseBinding;
+				keyNode->SpecialSweepTimer = sweepFactor;
+				break;
+			}
+
 			default:
 				DoFatalAlert("Unsupported menu item type");
 				break;
@@ -1103,6 +1225,10 @@ int StartMenu(
 
 			case kMenuStateAwaitingPadPress:
 				AwaitPadPress();
+				break;
+
+			case kMenuStateAwaitingMouseClick:
+				AwaitMouseClick();
 				break;
 
 			default:

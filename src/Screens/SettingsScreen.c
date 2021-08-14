@@ -50,6 +50,18 @@ static void cb_ResetPadBindings(void)
 	LayoutCurrentMenuAgain();
 }
 
+static void cb_ResetMouseBindings(void)
+{
+	for (int i = 0; i < NUM_CONTROL_NEEDS; i++)
+	{
+		gGamePrefs.keys[i].mouseButton = kDefaultKeyBindings[i].mouseButton;
+	}
+
+	MyFlushEvents();
+	PlayEffect(EFFECT_FLAREEXPLODE);
+	LayoutCurrentMenuAgain();
+}
+
 static const char* GenerateGamepadLabel(void)
 {
 	if (gSDLController)
@@ -153,7 +165,7 @@ static const MenuItem gGamepadMenu[] =
 static const MenuItem gMouseMenu[] =
 {
 	{.type = kMenuItem_Title, .text = STR_CONFIGURE_MOUSE},
-	{.type = kMenuItem_Spacer },
+	{.type = kMenuItem_Spacer},
 
 	{
 		.type = kMenuItem_Cycler,
@@ -189,7 +201,14 @@ static const MenuItem gMouseMenu[] =
 
 	{ .type = kMenuItem_Spacer },
 
-	/*
+	{ .type = kMenuItem_MouseBinding, .kb = kNeed_Shoot },
+	{ .type = kMenuItem_MouseBinding, .kb = kNeed_Jump },
+	{ .type = kMenuItem_MouseBinding, .kb = kNeed_PunchPickup },
+	{ .type = kMenuItem_MouseBinding, .kb = kNeed_PrevWeapon },
+	{ .type = kMenuItem_MouseBinding, .kb = kNeed_NextWeapon },
+	{ .type = kMenuItem_MouseBinding, .kb = kNeed_CameraMode },
+	{ .type = kMenuItem_Spacer },
+
 	{
 		.type = kMenuItem_Action,
 		.text = STR_RESET_KEYBINDINGS,
@@ -197,7 +216,6 @@ static const MenuItem gMouseMenu[] =
 	},
 
 	{ .type = kMenuItem_Spacer },
-	*/
 
 	{
 		.type = kMenuItem_Action,
@@ -304,15 +322,16 @@ static const MenuItem gSettingsMenu[] =
 
 	{
 		.type = kMenuItem_Submenu,
-		.text = STR_CONFIGURE_GAMEPAD,
-		.submenu = {.menu = gGamepadMenu},
+		.text = STR_CONFIGURE_MOUSE,
+		.submenu = {.menu = gMouseMenu},
 	},
 
 	{
 		.type = kMenuItem_Submenu,
-		.text = STR_CONFIGURE_MOUSE,
-		.submenu = {.menu = gMouseMenu},
+		.text = STR_CONFIGURE_GAMEPAD,
+		.submenu = {.menu = gGamepadMenu},
 	},
+
 
 
 #if _DEBUG

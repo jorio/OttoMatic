@@ -13,6 +13,7 @@ typedef enum
 	kMenuItem_Pick,
 	kMenuItem_KeyBinding,
 	kMenuItem_PadBinding,
+	kMenuItem_MouseBinding,
 	kMenuItem_NUM_ITEM_TYPES
 } MenuItemType;
 

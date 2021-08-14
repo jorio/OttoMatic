@@ -72,9 +72,9 @@ effect when you restart the game.	effectif après un redémarrage du jeu.
 Anaglyph 3D	3D anaglyphe				
 Player-relative controls	Contrôles relatifs au joueur	Spieler-bezogene Steuerung	Controles relativos al jugador		Spelarstyrda kontroller
 Music	Musique	Musik	Música	Musica	Musik
-Configure keyboard	Configurer le clavier	Tastatur konfigurieren	Configurar el teclado	Configura la tastiera	Konfigurera tangentbordet
-Configure gamepad	Configurer la manette	Gamepad konfigurieren	Configurar el mando	Configura il gamepad	Konfigurera handkontrollen
-Configure mouse	Configurer la souris	Maus konfigurieren	Configurar el ratón	Configura il mouse	Konfigurera musen
+Keyboard controls	Commandes clavier	Tastatur konfigurieren	Configurar el teclado	Configura la tastiera	Konfigurera tangentbordet
+Gamepad controls	Commandes manette	Gamepad konfigurieren	Configurar el mando	Configura il gamepad	Konfigurera handkontrollen
+Mouse controls	Commandes souris	Maus konfigurieren	Configurar el ratón	Configura il mouse	Konfigurera musen
 No gamepad detected	Aucune manette détectée	Kein Gamepad erkannt			Ingen handkontroll hittades
 Rumble	Vibration	Vibration	Vibración	Vibrazione	Vibration
 Mouse sensitivity	Sensibilité	Mouse sensitivity			
@@ -99,7 +99,14 @@ You have toggled Anaglyph 3D mode.	Tu as modifié le mode anaglyphe 3D.
 Colors will be recalibrated	Les couleurs seront recalibrées				
 when you start a new level.	lors du prochain niveau.				
 Press!	Appuie!	Drück!			Tryck!
+Click!	Clique!				
 Restore default configuration	Restaurer la configuration par défaut	Standardkonfiguration zurücksetzen			Återställ standardkonfiguration
+Left click	Clic gauche				
+Middle click	Clic milieu				
+Right click	Clic droit				
+Button	Bouton				
+Scroll up	Défiler vers le haut				
+Scroll down	Défiler vers le bas				
 Go forward	Avancer	Vorwärts			Gå framåt
 Go backwards	Reculer	Rückwärts			Gå bakåt
 Go left	Aller à gauche	Nach links			Gå åt vänster
