@@ -27,6 +27,8 @@ enum
 #define kJoystickDeadZoneFrac			(kJoystickDeadZone / 32767.0f)
 #define kJoystickDeadZoneFracSquared	(kJoystickDeadZoneFrac * kJoystickDeadZoneFrac)
 
+#define kDefaultSnapAngle				OGLMath_DegreesToRadians(10)
+
 /***************/
 /* EXTERNALS   */
 /***************/
@@ -500,6 +502,20 @@ void OnJoystickRemoved(SDL_JoystickID which)
 	TryOpenController(false);
 }
 
+float SnapAngle(float angle, float snap)
+{
+	if (angle >= -snap && angle <= snap)							// east (-0...0)
+		return 0;
+	else if (angle >= PI/2 - snap && angle <= PI/2 + snap)			// south
+		return PI/2;
+	else if (angle >= PI - snap || angle <= -PI + snap)				// west (180...-180)
+		return PI;
+	else if (angle >= -PI/2 - snap && angle <= -PI/2 + snap)		// north
+		return -PI/2;
+	else
+		return angle;
+}
+
 static OGLVector2D GetThumbStickVector(bool rightStick)
 {
 	Sint16 dxRaw = SDL_GameControllerGetAxis(gSDLController, rightStick ? SDL_CONTROLLER_AXIS_RIGHTX : SDL_CONTROLLER_AXIS_LEFTX);
@@ -533,6 +549,8 @@ static OGLVector2D GetThumbStickVector(bool rightStick)
 		}
 
 		float angle = atan2f(dy, dx);
+
+		angle = SnapAngle(angle, kDefaultSnapAngle);
 
 		return (OGLVector2D) { cosf(angle) * magnitude, sinf(angle) * magnitude };
 	}

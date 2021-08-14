@@ -103,6 +103,7 @@ Boolean GetNeedState(int needID);
 Boolean FlushMouseButtonPress(uint8_t sdlButton);
 Boolean UserWantsOut(void);
 void Rumble(float strength, uint32_t ms);
+float SnapAngle(float angle, float snap);
 
 SDL_GameController* TryOpenController(bool showMessageOnFailure);
 void OnJoystickRemoved(SDL_JoystickID which);

@@ -5,6 +5,7 @@
 #pragma once
 
 #define OGLMath_RadiansToDegrees(x)	((float)((x) * 180.0f / PI))
+#define OGLMath_DegreesToRadians(x)	((float)((x) * PI / 180.0f))
 
 float OGLPoint3D_DistanceToPlane(const OGLPoint3D *point,const OGLPlaneEquation	*plane);
 float OGLPoint2D_LineDistance(OGLPoint2D *point, float p1x, float p1y, float p2x, float p2y, float *t);

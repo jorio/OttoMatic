@@ -642,6 +642,7 @@ do_anaglyph:
 			"\n"
 			"input x:\t%.3f\n"
 			"input y:\t%.3f\n"
+			"input a:\t%.0f\u00b0\n"
 			"\n"
 			"player x:\t%.0f\n"
 			"player z:\t%.0f\n"
@@ -667,6 +668,7 @@ do_anaglyph:
 			gPolysThisFrame,
 			gPlayerInfo.analogControlX,
 			gPlayerInfo.analogControlZ,
+			(180/PI) * ( atan2f(gPlayerInfo.analogControlZ,gPlayerInfo.analogControlX) ),
 			gPlayerInfo.coord.x,
 			gPlayerInfo.coord.z,
 			gNumEnemies,
