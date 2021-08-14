@@ -63,13 +63,14 @@ typedef struct
 	Boolean	playerRelControls;
 	Byte	mouseSensitivityLevel;
 	Boolean	mouseControlsOtto;
+	Boolean	snappyCameraControl;		// if false, vanilla momentum-y camera swinging
+	Boolean	gamepadRumble;
 	Boolean	anaglyph;
 	Boolean	anaglyphColor;
 	uint8_t	anaglyphCalibrationRed;
 	uint8_t	anaglyphCalibrationGreen;
 	uint8_t	anaglyphCalibrationBlue;
 	Boolean doAnaglyphChannelBalancing;
-	Boolean	gamepadRumble;
 	KeyBinding	keys[NUM_CONTROL_NEEDS];
 }PrefsType;
 

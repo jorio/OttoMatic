@@ -150,6 +150,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.music						= true;
 	gGamePrefs.playerRelControls			= false;
 	gGamePrefs.mouseControlsOtto			= true;
+	gGamePrefs.snappyCameraControl			= true;
 	gGamePrefs.mouseSensitivityLevel		= DEFAULT_MOUSE_SENSITIVITY_LEVEL;
 	gGamePrefs.anaglyph						= false;
 	gGamePrefs.anaglyphColor				= true;

@@ -40,8 +40,6 @@ static void ResetCameraSettings(void);
 
 static OGLCameraPlacement	gAnaglyphCameraBackup;		// backup of original camera info before offsets applied
 
-Boolean				gFreeCameraControl = true;			// if false, vanilla momentum-y camera swinging
-
 Boolean				gAutoRotateCamera = false;
 float				gAutoRotateCameraSpeed = 0;
 
@@ -385,7 +383,7 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 	if (skeleton->AnimNum != PLAYER_ANIM_BUBBLE)					// user can't swing camera if in bubble
 	{
 		// Vanilla manual camera swivel
-		if (!gFreeCameraControl && gCameraControlDelta.x != 0)
+		if (!gGamePrefs.snappyCameraControl && gCameraControlDelta.x != 0)
 		{
 			gCameraUserRotY += fps * PI * gCameraControlDelta.x;
 			gForceCameraAlignment = true;							// don't zero userRot out if the player isn't moving
@@ -399,7 +397,9 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 		gCameraUserRotY = 0;
 		gForceCameraAlignment = true;
 	}
-	else if (gFreeCameraControl && gCameraControlDelta.x != 0 && !gAutoRotateCamera)
+	else if (gGamePrefs.snappyCameraControl
+		&& gCameraControlDelta.x != 0
+		&& !gAutoRotateCamera)
 	{
 		// force camera alignment is ALWAYS overridden by user
 		gForceCameraAlignment = false;
@@ -611,7 +611,9 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 				/* UPDATE CAMERA INFO */
 				/**********************/
 
-	if (gFreeCameraControl && gCameraControlDelta.x != 0 && !gAutoRotateCamera)
+	if (gGamePrefs.snappyCameraControl
+		&& gCameraControlDelta.x != 0
+		&& !gAutoRotateCamera)
 	{
 		gTimeSinceLastThrust = -1000;
 		gForceCameraAlignment = false;
@@ -783,16 +785,9 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 	{
 		gCameraUserRotY += fps * gAutoRotateCameraSpeed;
 	}
-	else
-	if (GetNeedState(kNeed_CameraRight))
+	else if (gGamePrefs.snappyCameraControl && gCameraControlDelta.x != 0)
 	{
-		gCameraUserRotY += fps * PI;
-		gForceCameraAlignment = true;								// don't zero userRot out if the player isn't moving
-	}
-	else
-	if (GetNeedState(kNeed_CameraLeft))
-	{
-		gCameraUserRotY -= fps * PI;
+		gCameraUserRotY += fps * PI * gCameraControlDelta.x;
 		gForceCameraAlignment = true;								// don't zero userRot out if the player isn't moving
 	}
 
@@ -800,6 +795,13 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 	{
 		gCameraUserRotY = 0;
 		gForceCameraAlignment = true;
+	}
+	else if (gGamePrefs.snappyCameraControl
+		&& gCameraControlDelta.x != 0
+		&& !gAutoRotateCamera)
+	{
+		// force camera alignment is ALWAYS overridden by user
+		gForceCameraAlignment = false;
 	}
 
 
@@ -980,6 +982,20 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 				/**********************/
 				/* UPDATE CAMERA INFO */
 				/**********************/
+
+	if (gGamePrefs.snappyCameraControl
+		&& gCameraControlDelta.x != 0
+		&& !gAutoRotateCamera)
+	{
+		gTimeSinceLastThrust = -1000;
+		gForceCameraAlignment = false;
+
+		OGLMatrix4x4	m;
+		float			r = gCameraControlDelta.x * fps * 2.5f;
+		OGLMatrix4x4_SetRotateAboutPoint(&m, &to, 0, r, 0);
+		OGLPoint3D_Transform(&from, &m, &from);
+	}
+
 
 	if (gAutoRotateCamera && gFreezeCameraFromXZ)				// special auto-rot for frozen xz condition
 	{
