@@ -66,7 +66,9 @@ void GammaFadeOut(void)
 	SDL_GLContext currentContext = SDL_GL_GetCurrentContext();
 	if (!currentContext)
 	{
+#if _DEBUG
 		printf("%s: no GL context; skipping fade out\n", __func__);
+#endif
 		return;
 	}
 

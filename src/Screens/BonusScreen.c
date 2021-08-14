@@ -445,6 +445,7 @@ static void FreeBonusScreen(void)
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUNDBANK_BONUS);
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	Pomme_FlushPtrTracking(true);
 }
 
 #pragma mark -

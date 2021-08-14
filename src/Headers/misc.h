@@ -17,7 +17,6 @@ extern	void CheckPreferencesFolder(void);
 extern	float RandomFloat(void);
 u_short	RandomRange(unsigned short min, unsigned short max);
 extern	void RegulateSpeed(short fps);
-extern	void CopyPStr(ConstStr255Param	inSourceStr, StringPtr	outDestStr);
 extern	void ShowSystemErr_NonFatal(long err);
 void CalcFramesPerSecond(void);
 Boolean IsPowerOf2(int num);
@@ -26,7 +25,6 @@ float RandomFloatRange(float a, float b);
 int PositiveModulo(int value, unsigned int m);
 
 void SafeDisposePtr(Ptr ptr);
-void FlushPtrTracking(bool issueWarnings);
 
 void MyFlushEvents(void);
 

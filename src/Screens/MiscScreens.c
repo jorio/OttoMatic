@@ -119,4 +119,5 @@ static void DisplayPicture_Draw(OGLSetupOutputType *info)
 void DoLegalScreen(void)
 {
 	DisplayPicture(":system:legal.tga", 8.0f);
+	Pomme_FlushPtrTracking(true);
 }

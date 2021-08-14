@@ -303,6 +303,7 @@ static void FreeLoseScreen(void)
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUNDBANK_LOSE);
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	Pomme_FlushPtrTracking(true);
 }
 
 /***************** DRAW LOSE CALLBACK *******************/

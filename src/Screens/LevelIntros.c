@@ -486,6 +486,7 @@ static void FreeIntroScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	Pomme_FlushPtrTracking(true);
 }
 
 #pragma mark -

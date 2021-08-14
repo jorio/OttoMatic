@@ -491,6 +491,7 @@ static void FreeWinScreen(void)
 	DisposeAllBG3DContainers();
 //	DisposeSoundBank(SOUND_BANK_WIN);
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	Pomme_FlushPtrTracking(true);
 }
 
 

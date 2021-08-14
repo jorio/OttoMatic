@@ -205,7 +205,7 @@ OGLSetupOutputType	*outputPtr;
 	*outputHandle = outputPtr;											// return value to caller
 
 
-	TextMesh_Init(outputPtr, setupDefPtr->styles.redFont);
+	TextMesh_InitMaterial(outputPtr, setupDefPtr->styles.redFont);
 	OGL_InitFont();
 }
 
@@ -224,7 +224,7 @@ OGLSetupOutputType	*data;
 
 			/* KILL FONT MATERIAL */
 
-	TextMesh_Shutdown();
+	TextMesh_DisposeMaterial();
 
 			/* KILL GL CONTEXT */
 
@@ -239,8 +239,6 @@ OGLSetupOutputType	*data;
 	*dataHandle = nil;
 
 	gAGLContext = nil;
-
-	FlushPtrTracking(true);
 }
 
 
@@ -654,8 +652,10 @@ do_anaglyph:
 			"ground?\t%c\n"
 			"\n"
 			"vram:\t\t%dK\n"
+#if 0
 			"ptrs:\t\t%d\n"
 			"ptr mem:\t%ldK\n"
+#endif
 			"nodes:\t%d\n"
 			"\n"
 			"time since last thrust:\t%.3f\n"
@@ -677,8 +677,10 @@ do_anaglyph:
 			gNumWaterDrawn,
 			gPlayerInfo.objNode && (gPlayerInfo.objNode->StatusBits & STATUS_BIT_ONGROUND)? 'Y': 'N',
 			gVRAMUsedThisFrame/1024,
+#if 0
 			gNumPointers,
 			gMemAllocatedInPtrs/1024,
+#endif
 			gNumObjectNodes,
 			gTimeSinceLastThrust,
 			gForceCameraAlignment? 'Y': 'N',

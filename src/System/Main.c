@@ -913,7 +913,7 @@ static void CleanupLevel(void)
 
 	OGL_DisposeWindowSetup(&gGameViewInfoPtr);	// do this last!
 
-
+	Pomme_FlushPtrTracking(true);
 
 	gPlayerInfo.objNode = nil;
 	gPlayerInfo.leftHandObj = nil;
@@ -986,6 +986,7 @@ unsigned long	someLong;
 	InitTerrainManager();
 	InitSkeletonManager();
 	InitSoundTools();
+	TextMesh_LoadMetrics();
 
 
 			/* INIT MORE MY STUFF */
@@ -996,10 +997,7 @@ unsigned long	someLong;
 	SetMyRandomSeed(someLong);
 	SDL_ShowCursor(0);
 
-//	DoWinScreen();	//---------
-
-
-	FlushPtrTracking(false);
+	Pomme_FlushPtrTracking(false);
 
 
 		/* SHOW LEGAL SCREEN */

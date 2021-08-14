@@ -186,12 +186,43 @@ static void ParseSFL(const char* data)
 /*                       INIT/SHUTDOWN                         */
 /***************************************************************/
 
-void TextMesh_Init(OGLSetupOutputType* setupInfo, bool redFont)
+void TextMesh_LoadMetrics(void)
 {
 	OSErr err;
 	FSSpec spec;
 	short refNum;
 
+	GAME_ASSERT_MESSAGE(!gFontMetricsLoaded, "Metrics already loaded");
+
+	err = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":system:font.sfl", &spec);
+	GAME_ASSERT(!err);
+	err = FSpOpenDF(&spec, fsRdPerm, &refNum);
+	GAME_ASSERT(!err);
+
+	// Get number of bytes until EOF
+	long eof = 0;
+	GetEOF(refNum, &eof);
+
+	// Prep data buffer
+	Ptr data = AllocPtrClear(eof+1);
+
+	// Read file into data buffer
+	err = FSRead(refNum, &eof, data);
+	GAME_ASSERT(err == noErr);
+	FSClose(refNum);
+
+	// Parse metrics (gAtlasGlyphs) from SFL file
+	memset(gAtlasGlyphsPages, 0, sizeof(gAtlasGlyphsPages));
+	ParseSFL(data);
+
+	// Nuke data buffer
+	SafeDisposePtr(data);
+
+	gFontMetricsLoaded = true;
+}
+
+void TextMesh_InitMaterial(OGLSetupOutputType* setupInfo, bool redFont)
+{
 		/* CREATE FONT MATERIAL */
 
 	GAME_ASSERT_MESSAGE(!gFontMaterial, "gFontMaterial already created");
@@ -205,40 +236,9 @@ void TextMesh_Init(OGLSetupOutputType* setupInfo, bool redFont)
 	matData.height			= (u_long) ATLAS_HEIGHT;
 	matData.textureName[0]	= OGL_TextureMap_LoadTGA(redFont? ":system:font2.tga": ":system:font1.tga", 0, nil, nil);
 	gFontMaterial = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
-
-		/* LOAD METRICS FILE */
-
-	if (!gFontMetricsLoaded)
-	{
-		err = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":system:font.sfl", &spec);
-		GAME_ASSERT(!err);
-		err = FSpOpenDF(&spec, fsRdPerm, &refNum);
-		GAME_ASSERT(!err);
-
-		// Get number of bytes until EOF
-		long eof = 0;
-		GetEOF(refNum, &eof);
-
-		// Prep data buffer
-		Ptr data = AllocPtrClear(eof+1);
-
-		// Read file into data buffer
-		err = FSRead(refNum, &eof, data);
-		GAME_ASSERT(err == noErr);
-		FSClose(refNum);
-
-		// Parse metrics (gAtlasGlyphs) from SFL file
-		memset(gAtlasGlyphsPages, 0, sizeof(gAtlasGlyphsPages));
-		ParseSFL(data);
-
-		// Nuke data buffer
-		SafeDisposePtr(data);
-
-		gFontMetricsLoaded = true;
-	}
 }
 
-void TextMesh_Shutdown(void)
+void TextMesh_DisposeMaterial(void)
 {
 	MO_DisposeObjectReference(gFontMaterial);
 	gFontMaterial = NULL;
@@ -328,7 +328,8 @@ static const AtlasGlyph* GetGlyphFromCodepoint(uint32_t c)
 
 void TextMesh_Update(const char* text, int align, ObjNode* textNode)
 {
-	GAME_ASSERT_MESSAGE(gFontMaterial, "Can't lay out text if the font isn't loaded!");
+	GAME_ASSERT_MESSAGE(gFontMaterial, "Can't lay out text if the font material isn't loaded!");
+	GAME_ASSERT_MESSAGE(gFontMetricsLoaded, "Can't lay out text if the font metrics aren't loaded!");
 
 	//-----------------------------------
 	// Get mesh from ObjNode

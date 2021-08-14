@@ -17,11 +17,6 @@
 
 #define	DEFAULT_FPS			10
 
-#define	USE_MALLOC		1
-
-#define	DO_PTR_TRACKING		_DEBUG
-#define MAX_TRACKED_PTRS	1000000
-
 /**********************/
 /*     VARIABLES      */
 /**********************/
@@ -32,15 +27,6 @@ long	gPrefsFolderDirID;
 u_long 	seed0 = 0, seed1 = 0, seed2 = 0;
 
 float	gFramesPerSecond, gFramesPerSecondFrac;
-
-int			gNumPointers = 0;
-uint32_t	gPtrTrackingBatch = 0;
-uint32_t	gPtrCountInBatch = 0;
-long		gMemAllocatedInPtrs = 0;
-
-#if DO_PTR_TRACKING
-static uint8_t		gLivePtrTracking[MAX_TRACKED_PTRS] = {0};
-#endif
 
 
 
@@ -313,48 +299,9 @@ OSErr	err;
 
 /****************** ALLOC PTR ********************/
 
-static inline void InitPtrCookie(Ptr pr, long size)
-{
-	uint32_t* cookiePtr = (uint32_t*)pr;
-
-	*cookiePtr++ = 'FACE';
-	*cookiePtr++ = gPtrTrackingBatch;
-	*cookiePtr++ = gPtrCountInBatch;
-	*cookiePtr = (uint32_t) size;
-
-#if _DEBUG
-	if (gPtrCountInBatch < MAX_TRACKED_PTRS)
-	{
-		GAME_ASSERT(gLivePtrTracking[gPtrCountInBatch] == 0);
-		gLivePtrTracking[gPtrCountInBatch] = 1;
-	}
-#endif
-}
-
 void *AllocPtr(long size)
 {
-Ptr	pr;
-
-	size += 16;								// make room for our cookie & whatever else (also keep to 16-byte alignment!)
-
-#if USE_MALLOC
-	pr = malloc(size);
-#else
-	pr = NewPtr(size);
-#endif
-
-	if (pr == nil)
-		DoFatalAlert("AllocPtr: NewPtr failed");
-
-	InitPtrCookie(pr, size);
-
-	pr += 16;
-
-	gNumPointers++;
-	gPtrCountInBatch++;
-	gMemAllocatedInPtrs += size;
-
-	return(pr);
+	return NewPtr(size);
 }
 
 
@@ -362,28 +309,7 @@ Ptr	pr;
 
 void *AllocPtrClear(long size)
 {
-Ptr	pr;
-
-	size += 16;								// make room for our cookie & whatever else (also keep to 16-byte alignment!)
-
-#if USE_MALLOC
-	pr = calloc(1, size);
-#else
-	pr = NewPtrClear(size);						// alloc in Application
-#endif
-
-	if (pr == nil)
-		DoFatalAlert("AllocPtr: NewPtr failed");
-
-	InitPtrCookie(pr, size);
-
-	pr += 16;
-
-	gNumPointers++;
-	gPtrCountInBatch++;
-	gMemAllocatedInPtrs += size;
-
-	return(pr);
+	return NewPtrClear(size);
 }
 
 
@@ -391,61 +317,7 @@ Ptr	pr;
 
 void SafeDisposePtr(Ptr ptr)
 {
-uint32_t	*cookiePtr;
-
-	ptr -= 16;					// back up to pt to cookie
-
-	cookiePtr = (uint32_t *)ptr;
-
-	if (*cookiePtr != 'FACE')
-		DoFatalAlert("SafeDisposePtr: invalid cookie!");
-
-#if DO_PTR_TRACKING
-	uint32_t batch = ((uint32_t*)ptr)[1];
-	uint32_t idInBatch = ((uint32_t*)ptr)[2];
-
-	if (batch == gPtrTrackingBatch && idInBatch < MAX_TRACKED_PTRS)
-	{
-		GAME_ASSERT(gLivePtrTracking[idInBatch] == 1);
-		gLivePtrTracking[idInBatch] = 0;
-	}
-#endif
-
-	uint32_t size = ((uint32_t*)ptr)[3];
-
-	*cookiePtr = 0;
-
-#if USE_MALLOC
-	free(ptr);
-#else
 	DisposePtr(ptr);
-#endif
-
-	gNumPointers--;
-	gMemAllocatedInPtrs -= size;
-}
-
-
-
-void FlushPtrTracking(bool issueWarnings)
-{
-#if DO_PTR_TRACKING
-	if (issueWarnings)
-	{
-		for (uint32_t i = 0; i < gPtrCountInBatch; i++)
-		{
-			if (gLivePtrTracking[i])
-			{
-				printf("%s: ptr %d:%d is still live!\n", __func__, gPtrTrackingBatch, i);
-			}
-		}
-	}
-
-	memset(gLivePtrTracking, 0, sizeof(gLivePtrTracking));
-#endif
-
-	gPtrTrackingBatch++;
-	gPtrCountInBatch = 0;
 }
 
 
@@ -480,22 +352,6 @@ static u_long oldTick = 0;
 	while ((TickCount() - oldTick) < n) {}			// wait for n ticks
 	oldTick = TickCount();							// remember current time
 }
-
-
-/************* COPY PSTR **********************/
-
-void CopyPStr(ConstStr255Param	inSourceStr, StringPtr	outDestStr)
-{
-short	dataLen = inSourceStr[0] + 1;
-
-	BlockMoveData(inSourceStr, outDestStr, dataLen);
-	outDestStr[0] = dataLen - 1;
-}
-
-
-
-#pragma mark -
-
 
 
 /************** CALC FRAMES PER SECOND *****************/
