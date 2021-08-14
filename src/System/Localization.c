@@ -4,9 +4,9 @@
 
 #include "game.h"
 
-#define MAX_STRINGS 128
+#define MAX_STRINGS 256
 
-static int				gCurrentStringsLanguage = -1;
+static GameLanguageID	gCurrentStringsLanguage = LANGUAGE_ILLEGAL;
 static Ptr				gStringsBuffer = nil;
 static const char*		gStringsTable[MAX_STRINGS];
 
@@ -20,7 +20,7 @@ static const char kLanguageCodesISO639_1[MAX_LANGUAGES][3] =
 	[LANGUAGE_SWEDISH	] = "sv",
 };
 
-void LoadLocalizedStrings(int languageID)
+void LoadLocalizedStrings(GameLanguageID languageID)
 {
 	// Don't bother reloading strings if we've already loaded this language
 	if (languageID == gCurrentStringsLanguage)
@@ -108,7 +108,7 @@ void LoadLocalizedStrings(int languageID)
 //		printf("String #%d: %s\n", i, gStringsTable[i]);
 }
 
-const char* Localize(int stringID)
+const char* Localize(LocStrID stringID)
 {
 	if (!gStringsBuffer)
 		return "STRINGS NOT LOADED!!";
@@ -122,9 +122,9 @@ const char* Localize(int stringID)
 	return gStringsTable[stringID];
 }
 
-int GetBestLanguageIDFromSystemLocale(void)
+GameLanguageID GetBestLanguageIDFromSystemLocale(void)
 {
-	int languageID = LANGUAGE_ENGLISH;
+	GameLanguageID languageID = LANGUAGE_ENGLISH;
 
 	SDL_Locale* localeList = SDL_GetPreferredLocales();
 	if (!localeList)

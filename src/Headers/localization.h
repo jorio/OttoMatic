@@ -1,7 +1,8 @@
 #pragma once
 
-enum
+typedef enum GameLanguageID
 {
+	LANGUAGE_ILLEGAL = -1,
 	LANGUAGE_ENGLISH = 0,
 	LANGUAGE_FRENCH,
 	LANGUAGE_GERMAN,
@@ -9,9 +10,9 @@ enum
 	LANGUAGE_ITALIAN,
 	LANGUAGE_SWEDISH,
 	MAX_LANGUAGES
-};
+} GameLanguageID;
 
-enum
+typedef enum LocStrID
 {
 	STR_LANGUAGE_NAME			= 0,
 	STR_NEW_GAME,
@@ -82,6 +83,8 @@ enum
 	STR_MSAA_2X,
 	STR_MSAA_4X,
 	STR_MSAA_8X,
+	STR_PREFERRED_DISPLAY,
+	STR_DISPLAY,
 	STR_ANTIALIASING_CHANGE_WARNING_1,
 	STR_ANTIALIASING_CHANGE_WARNING_2,
 	STR_ANAGLYPH,
@@ -139,10 +142,10 @@ enum
 	STR_CREDITS_ARTWORK,
 	STR_CREDITS_MUSIC,
 	STR_CREDITS_ADDITIONAL_PROGRAMMING,
-};
+} LocStrID;
 
-void LoadLocalizedStrings(int languageID);
+void LoadLocalizedStrings(GameLanguageID languageID);
 
-const char* Localize(int stringID);
+const char* Localize(LocStrID stringID);
 
-int GetBestLanguageIDFromSystemLocale(void);
+GameLanguageID GetBestLanguageIDFromSystemLocale(void);

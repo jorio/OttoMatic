@@ -1,5 +1,7 @@
 #pragma once
 
+#define MAX_MENU_CYCLER_CHOICES		8
+
 typedef enum
 {
 	kMenuItem_END_SENTINEL,
@@ -20,7 +22,8 @@ typedef enum
 typedef struct MenuItem
 {
 	MenuItemType			type;
-	int						text;
+
+	LocStrID				text;
 	const char*				rawText;
 	const char*				(*textGenerator)(void);
 
@@ -38,11 +41,13 @@ typedef struct MenuItem
 
 		struct
 		{
-			void			(*callback)(void);
 			Byte*			valuePtr;
-			unsigned int	numChoices;
-			int				choices[8];
+
+			void			(*callback)(void);
 			bool			callbackSetsValue;
+
+			uint8_t			numChoices;
+			LocStrID		choices[MAX_MENU_CYCLER_CHOICES];	// localizable strings
 		} cycler;
 
 		int					pick;
