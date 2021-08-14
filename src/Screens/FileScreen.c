@@ -12,12 +12,13 @@ bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(OGLSetupOutp
 	const int maxLabelLength = 256;
 	char* labelBuffer = AllocPtrClear(maxLabelLength * NUM_SAVE_SLOTS);
 
-	MenuItem menu[NUM_SAVE_SLOTS+4];
+	MenuItem menu[NUM_SAVE_SLOTS+5];
 	memset(menu, 0, sizeof(menu));
 
 	int menuIndex = 0;
 
 	menu[menuIndex++] = (MenuItem) { .type=kMenuItem_Title, .text=(isSave ? STR_SAVE_GAME : STR_LOAD_GAME) };
+	menu[menuIndex++] = (MenuItem) { .type=kMenuItem_Spacer };
 
 	for (int i = 0; i < NUM_SAVE_SLOTS; i++)
 	{

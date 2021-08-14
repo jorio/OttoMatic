@@ -60,6 +60,7 @@ const MenuStyle kDefaultMenuStyle =
 	.inactiveColor2		= {0.8f, 0.0f, 0.5f, 0.5f},
 	.standardScale		= .75f,
 	.titleScale			= 1.25f,
+	.subtitleScale		= .5f,
 	.rowHeight			= 13*1.5f,
 	.playMenuChangeSounds	= true,
 	.startButtonExits	= false,
@@ -187,6 +188,7 @@ static bool IsMenuItemTypeSelectable(int type)
 		case kMenuItem_Spacer:
 		case kMenuItem_Label:
 		case kMenuItem_Title:
+		case kMenuItem_Subtitle:
 			return false;
 
 		default:
@@ -533,7 +535,7 @@ static void NavigatePadBinding(const MenuItem* entry)
 	if (gMouseHoverValidRow && (gMouseHoverColumn == 1 || gMouseHoverColumn == 2))
 		gPadColumn = gMouseHoverColumn - 1;
 
-	if (GetNewNeedState(kNeed_UILeft))
+	if (GetNewNeedState(kNeed_UILeft) || GetNewNeedState(kNeed_UIPrev))
 	{
 		gPadColumn = PositiveModulo(gPadColumn - 1, KEYBINDING_MAX_GAMEPAD_BUTTONS);
 		PlayEffect(kSfxNavigate);
@@ -541,7 +543,7 @@ static void NavigatePadBinding(const MenuItem* entry)
 		return;
 	}
 
-	if (GetNewNeedState(kNeed_UIRight))
+	if (GetNewNeedState(kNeed_UIRight) || GetNewNeedState(kNeed_UINext))
 	{
 		gPadColumn = PositiveModulo(gPadColumn + 1, KEYBINDING_MAX_GAMEPAD_BUTTONS);
 		PlayEffect(kSfxNavigate);
@@ -835,7 +837,8 @@ static ObjNode* MakeTextAtRowCol(const char* text, int row, int col)
 static const float kMenuItemHeightMultipliers[kMenuItem_NUM_ITEM_TYPES] =
 {
 	[kMenuItem_END_SENTINEL] = 0.0f,
-	[kMenuItem_Title]        = 2.0f,
+	[kMenuItem_Title]        = 1.4f,
+	[kMenuItem_Subtitle]     = 0.8f,
 	[kMenuItem_Label]        = 1,
 	[kMenuItem_Action]       = 1,
 	[kMenuItem_Submenu]      = 1,
@@ -905,6 +908,16 @@ static void LayOutMenu(const MenuItem* menu)
 			case kMenuItem_Title:
 			{
 				gNewObjectDefinition.scale = gMenuStyle->titleScale;
+				ObjNode* label = MakeTextAtRowCol(text, row, 0);
+				label->ColorFilter = gMenuStyle->titleColor;
+				label->MoveCall = MoveLabel;
+				label->SpecialSweepTimer = .5f;		// Title appears sooner than the rest
+				break;
+			}
+
+			case kMenuItem_Subtitle:
+			{
+				gNewObjectDefinition.scale = gMenuStyle->subtitleScale;
 				ObjNode* label = MakeTextAtRowCol(text, row, 0);
 				label->ColorFilter = gMenuStyle->titleColor;
 				label->MoveCall = MoveLabel;

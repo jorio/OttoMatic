@@ -65,6 +65,7 @@ static const char* GenerateGamepadLabel(void)
 static const MenuItem gKeybindingMenu[] =
 {
 	{.type = kMenuItem_Title, .text = STR_CONFIGURE_KEYBOARD},
+	{.type = kMenuItem_Spacer},
 
 	{ .type = kMenuItem_KeyBinding, .kb = kNeed_Forward },
 	{ .type = kMenuItem_KeyBinding, .kb = kNeed_Backward },
@@ -106,10 +107,9 @@ static const MenuItem gKeybindingMenu[] =
 
 static const MenuItem gGamepadMenu[] =
 {
-	{.type = kMenuItem_Label, .textGenerator = GenerateGamepadLabel },
 	{.type = kMenuItem_Title, .text = STR_CONFIGURE_GAMEPAD},
-
-	{.type = kMenuItem_Spacer, },
+	{.type = kMenuItem_Subtitle, .textGenerator = GenerateGamepadLabel },
+	{.type = kMenuItem_Spacer },
 
 	{
 		.type = kMenuItem_Cycler,
@@ -153,6 +153,7 @@ static const MenuItem gGamepadMenu[] =
 static const MenuItem gMouseMenu[] =
 {
 	{.type = kMenuItem_Title, .text = STR_CONFIGURE_MOUSE},
+	{.type = kMenuItem_Spacer },
 
 	{
 		.type = kMenuItem_Cycler,
@@ -210,7 +211,6 @@ static const MenuItem gMouseMenu[] =
 static const MenuItem gVideoMenu[] =
 {
 	{.type = kMenuItem_Title, .text = STR_VIDEO_SETTINGS},
-
 	{ .type = kMenuItem_Spacer },
 
 	{
@@ -262,6 +262,7 @@ static const MenuItem gVideoMenu[] =
 static const MenuItem gSettingsMenu[] =
 {
 	{.type = kMenuItem_Title, .text = STR_SETTINGS},
+	{.type = kMenuItem_Spacer},
 
 	{
 		.type = kMenuItem_Cycler,

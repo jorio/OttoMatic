@@ -9,6 +9,7 @@ int DoLevelCheatDialog(void (*backgroundDrawRoutine)(OGLSetupOutputType *))
 	static const MenuItem kLevelCheatMenu[] =
 	{
 		{.type=kMenuItem_Title,		.text=STR_LEVEL_CHEAT},
+		{.type=kMenuItem_Spacer},
 		{.type=kMenuItem_Pick,		.text=STR_LEVEL_1,		.pick=0},
 		{.type=kMenuItem_Pick,		.text=STR_LEVEL_2,		.pick=1},
 		{.type=kMenuItem_Pick,		.text=STR_LEVEL_3,		.pick=2},

@@ -4,6 +4,7 @@ typedef enum
 {
 	kMenuItem_END_SENTINEL,
 	kMenuItem_Title,
+	kMenuItem_Subtitle,
 	kMenuItem_Label,
 	kMenuItem_Action,
 	kMenuItem_Submenu,
@@ -60,6 +61,7 @@ typedef struct MenuStyle
 	OGLColorRGBA	inactiveColor2;
 	float			standardScale;
 	float			titleScale;
+	float			subtitleScale;
 	float			rowHeight;
 	bool			playMenuChangeSounds;
 	float			darkenPaneScaleY;

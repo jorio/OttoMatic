@@ -16,7 +16,8 @@ void DoWarpCheat(void)
 
 		/* BUILD MENU */
 	
-	menu[mi++] = (MenuItem){ .type = kMenuItem_Title, .text = -1, .rawText = "Warp to Item" };
+	menu[mi++] = (MenuItem){ .type = kMenuItem_Title, .text = STR_WARP_TO_ITEM };
+	menu[mi++] = (MenuItem){ .type = kMenuItem_Spacer };
 
 	for (int i = 0; i < gNumTerrainItems; i++)		// Look for checkpoints in map items
 	{
@@ -31,8 +32,8 @@ void DoWarpCheat(void)
 			case MAP_ITEM_TELEPORTER:		itemName = "Teleporter"; break;
 			default:						continue;
 		}
-		
-		GAME_ASSERT(mi < kMaxItems + 1);
+
+		GAME_ASSERT(mi < kMaxItems);
 
 		snprintf(textPtr, kCharsPerLine, "#%03d   %05d,%05d   \t%s", i, item->x, item->y, itemName);
 		menu[mi] = (MenuItem){ .type = kMenuItem_Pick, .text = -1, .rawText = textPtr, .pick = i };
