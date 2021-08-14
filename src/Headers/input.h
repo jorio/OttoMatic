@@ -9,6 +9,11 @@
 #define KEYBINDING_MAX_KEYS					2
 #define KEYBINDING_MAX_GAMEPAD_BUTTONS		2
 
+#define NUM_SUPPORTED_MOUSE_BUTTONS			31
+#define NUM_SUPPORTED_MOUSE_BUTTONS_PURESDL	(NUM_SUPPORTED_MOUSE_BUTTONS-2)
+#define SDL_BUTTON_WHEELUP					(NUM_SUPPORTED_MOUSE_BUTTONS-2)		// make wheelup look like it's a button
+#define SDL_BUTTON_WHEELDOWN				(NUM_SUPPORTED_MOUSE_BUTTONS-1)		// make wheeldown look like it's a button
+
 #define NUM_MOUSE_SENSITIVITY_LEVELS		8
 #define DEFAULT_MOUSE_SENSITIVITY_LEVEL		(NUM_MOUSE_SENSITIVITY_LEVELS/2)
 
@@ -16,11 +21,7 @@ typedef struct KeyBinding
 {
 	int16_t			key[KEYBINDING_MAX_KEYS];
 
-	struct
-	{
-		int8_t		type;
-		int8_t		id;
-	} mouse;
+	int8_t			mouseButton;
 
 	struct
 	{
@@ -58,7 +59,9 @@ enum
 	// --------------------------------------------------------
 	//              NON-REMAPPABLE vvv
 
-	kNeed_UIUp = NUM_REMAPPABLE_NEEDS,
+	kNeed_NULL = NUM_REMAPPABLE_NEEDS,
+
+	kNeed_UIUp,
 	kNeed_UIDown,
 	kNeed_UILeft,
 	kNeed_UIRight,

@@ -22,8 +22,6 @@ enum
 	KEYSTATE_ACTIVE_BIT	= 0b10,
 };
 
-#define NUM_MOUSE_BUTTONS 6
-
 #define kJoystickDeadZone				(33 * 32767 / 100)
 #define kJoystickDeadZone_UI			(66 * 32767 / 100)
 #define kJoystickDeadZoneFrac			(kJoystickDeadZone / 32767.0f)
@@ -50,7 +48,7 @@ Byte				gNeedStates[NUM_CONTROL_NEEDS];
 
 Boolean				gEatMouse = false;
 Boolean				gMouseMotionNow = false;
-static Byte			gMouseButtonState[NUM_MOUSE_BUTTONS];
+static Byte			gMouseButtonState[NUM_SUPPORTED_MOUSE_BUTTONS + 2];
 
 OGLVector2D			gCameraControlDelta;
 
@@ -185,6 +183,8 @@ void UpdateInput(void)
 	}
 
 	// --------------------------------------------
+	// Refresh the state of each individual mouse button,
+	// including wheelup/wheeldown which we are exposed to the game as buttons
 
 	if (gEatMouse)
 	{
@@ -195,14 +195,20 @@ void UpdateInput(void)
 	{
 		uint32_t mouseButtons = SDL_GetMouseState(NULL, NULL);
 
-		for (int i = 1; i < NUM_MOUSE_BUTTONS; i++)
+		// Actual mouse buttons
+		for (int i = 1; i < NUM_SUPPORTED_MOUSE_BUTTONS_PURESDL; i++)
 		{
 			bool downNow = mouseButtons & SDL_BUTTON(i);
 			UpdateKeyState(&gMouseButtonState[i], downNow);
 		}
+
+		// Wheel up/wheel down fake buttons
+		UpdateKeyState(&gMouseButtonState[SDL_BUTTON_WHEELUP],		mouseWheelDelta > 0);
+		UpdateKeyState(&gMouseButtonState[SDL_BUTTON_WHEELDOWN],	mouseWheelDelta < 0);
 	}
 
 	// --------------------------------------------
+	// Refresh the state of each individual keyboard key
 
 	int numkeys = 0;
 	const UInt8* keystate = SDL_GetKeyboardState(&numkeys);
@@ -220,7 +226,6 @@ void UpdateInput(void)
 
 	// --------------------------------------------
 
-
 	for (int i = 0; i < NUM_CONTROL_NEEDS; i++)
 	{
 		const KeyBinding* kb = &gGamePrefs.keys[i];
@@ -231,23 +236,7 @@ void UpdateInput(void)
 			if (kb->key[j] && kb->key[j] < numkeys)
 				downNow |= 0 != keystate[kb->key[j]];
 
-		switch (kb->mouse.type)
-		{
-			case kInputTypeButton:
-				downNow |= gMouseButtonState[kb->mouse.id] & KEYSTATE_ACTIVE_BIT;
-				break;
-
-			case kInputTypeAxisPlus:
-				downNow |= mouseWheelDelta > 0;
-				break;
-
-			case kInputTypeAxisMinus:
-				downNow |= mouseWheelDelta < 0;
-				break;
-
-			default:
-				break;
-		}
+		downNow |= gMouseButtonState[kb->mouseButton] & KEYSTATE_ACTIVE_BIT;
 
 		if (gSDLController)
 		{
@@ -318,8 +307,6 @@ void UpdateInput(void)
 	else
 	if (GetNeedState(kNeed_Backward))						// is Down Key pressed?
 		gPlayerInfo.analogControlZ = 1.0f;
-
-
 
 		/* AND FINALLY SEE IF MOUSE DELTAS ARE BEST */
 
@@ -414,7 +401,7 @@ Boolean GetNewNeedState(int needID)
 
 Boolean FlushMouseButtonPress(uint8_t sdlButton)
 {
-	GAME_ASSERT(sdlButton < NUM_MOUSE_BUTTONS);
+	GAME_ASSERT(sdlButton < NUM_SUPPORTED_MOUSE_BUTTONS);
 	Boolean gotPress = KEYSTATE_PRESSED == gMouseButtonState[sdlButton];
 	if (gotPress)
 		gMouseButtonState[sdlButton] = KEYSTATE_HELD;
