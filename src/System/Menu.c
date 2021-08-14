@@ -36,8 +36,6 @@ static ObjNode* LayOutCyclerValueText(int row);
 
 const int16_t kJoystickDeadZone_BindingThreshold = (75 * 32767 / 100);
 
-static const char* kUnboundCaption = "\xE1\xE1\xE1";
-
 enum
 {
 	kMenuStateOff,
@@ -119,7 +117,7 @@ static const char* GetKeyBindingName(int row, int col)
 {
 	int16_t scancode = GetBindingAtRow(row)->key[col];
 	if (scancode == 0)
-		return kUnboundCaption;
+		return Localize(STR_UNBOUND_PLACEHOLDER);
 	else
 		return SDL_GetScancodeName(scancode);
 }
@@ -131,12 +129,12 @@ static const char* GetPadBindingName(int row, int col)
 	switch (kb->gamepad[col].type)
 	{
 		case kInputTypeUnbound:
-			return kUnboundCaption;
+			return Localize(STR_UNBOUND_PLACEHOLDER);
 
 		case kInputTypeButton:
 			switch (kb->gamepad[col].id)
 			{
-				case SDL_CONTROLLER_BUTTON_INVALID:			return kUnboundCaption;
+				case SDL_CONTROLLER_BUTTON_INVALID:			return Localize(STR_UNBOUND_PLACEHOLDER);
 				case SDL_CONTROLLER_BUTTON_A:				return "A";
 				case SDL_CONTROLLER_BUTTON_B:				return "B";
 				case SDL_CONTROLLER_BUTTON_X:				return "X";
@@ -191,7 +189,7 @@ static const char* GetMouseBindingName(int row)
 
 	switch (kb->mouseButton)
 	{
-		case 0:							return kUnboundCaption;
+		case 0:							return Localize(STR_UNBOUND_PLACEHOLDER);
 		case SDL_BUTTON_LEFT:			return Localize(STR_MOUSE_BUTTON_LEFT);
 		case SDL_BUTTON_MIDDLE:			return Localize(STR_MOUSE_BUTTON_MIDDLE);
 		case SDL_BUTTON_RIGHT:			return Localize(STR_MOUSE_BUTTON_RIGHT);
@@ -561,7 +559,7 @@ static void NavigateKeyBinding(const MenuItem* entry)
 	{
 		gGamePrefs.keys[entry->kb].key[gKeyColumn] = 0;
 		PlayEffect(kSfxDelete);
-		MakeTextAtRowCol(kUnboundCaption, gMenuRow, gKeyColumn+1);
+		MakeTextAtRowCol(Localize(STR_UNBOUND_PLACEHOLDER), gMenuRow, gKeyColumn+1);
 		return;
 	}
 
@@ -604,7 +602,7 @@ static void NavigatePadBinding(const MenuItem* entry)
 	{
 		gGamePrefs.keys[entry->kb].gamepad[gPadColumn].type = kInputTypeUnbound;
 		PlayEffect(kSfxDelete);
-		MakeTextAtRowCol(kUnboundCaption, gMenuRow, gPadColumn+1);
+		MakeTextAtRowCol(Localize(STR_UNBOUND_PLACEHOLDER), gMenuRow, gPadColumn+1);
 		return;
 	}
 
@@ -634,7 +632,7 @@ static void NavigateMouseBinding(const MenuItem* entry)
 	{
 		gGamePrefs.keys[entry->kb].mouseButton = 0;
 		PlayEffect(kSfxDelete);
-		MakeTextAtRowCol(kUnboundCaption, gMenuRow, 1);
+		MakeTextAtRowCol(Localize(STR_UNBOUND_PLACEHOLDER), gMenuRow, 1);
 		return;
 	}
 
@@ -722,7 +720,7 @@ static void UnbindScancodeFromAllRemappableInputNeeds(int16_t sdlScancode)
 			if (binding->key[j] == sdlScancode)
 			{
 				binding->key[j] = 0;
-				MakeTextAtRowCol(kUnboundCaption, row, j+1);
+				MakeTextAtRowCol(Localize(STR_UNBOUND_PLACEHOLDER), row, j+1);
 			}
 		}
 	}
@@ -743,7 +741,7 @@ static void UnbindPadButtonFromAllRemappableInputNeeds(int8_t type, int8_t id)
 			{
 				binding->gamepad[j].type = kInputTypeUnbound;
 				binding->gamepad[j].id = 0;
-				MakeTextAtRowCol(kUnboundCaption, row, j+1);
+				MakeTextAtRowCol(Localize(STR_UNBOUND_PLACEHOLDER), row, j+1);
 			}
 		}
 	}
@@ -761,7 +759,7 @@ static void UnbindMouseButtonFromAllRemappableInputNeeds(int8_t id)
 		if (binding->mouseButton == id)
 		{
 			binding->mouseButton = 0;
-			MakeTextAtRowCol(kUnboundCaption, row, 1);
+			MakeTextAtRowCol(Localize(STR_UNBOUND_PLACEHOLDER), row, 1);
 		}
 	}
 }

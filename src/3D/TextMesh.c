@@ -28,30 +28,13 @@ typedef struct
 /*    CONSTANTS             */
 /****************************/
 
+// This covers the basic multilingual plane (0000-FFFF)
+#define MAX_CODEPOINT_PAGES 256
+
 #define ATLAS_WIDTH 1024
 #define ATLAS_HEIGHT 1024
 
 #define TAB_STOP 60.0f
-
-const uint16_t kMacRomanToUnicode[256] =
-{
-0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000a, 0x000b, 0x000c, 0x000d, 0x000e, 0x000f,
-0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001a, 0x001b, 0x001c, 0x001d, 0x001e, 0x001f,
-' ',    '!',    '"',    '#',    '$',    '%',    '&',    '\'',   '(',    ')',    '*',    '+',    ',',    '-',    '.',    '/',
-'0',    '1',    '2',    '3',    '4',    '5',    '6',    '7',    '8',    '9',    ':',    ';',    '<',    '=',    '>',    '?',
-'@',    'A',    'B',    'C',    'D',    'E',    'F',    'G',    'H',    'I',    'J',    'K',    'L',    'M',    'N',    'O',
-'P',    'Q',    'R',    'S',    'T',    'U',    'V',    'W',    'X',    'Y',    'Z',    '[',    '\\',   ']',    '^',    '_',
-'`',    'a',    'b',    'c',    'd',    'e',    'f',    'g',    'h',    'i',    'j',    'k',    'l',    'm',    'n',    'o',
-'p',    'q',    'r',    's',    't',    'u',    'v',    'w',    'x',    'y',    'z',    '{',    '|',    '}',    '~',    0x007f,
-0x00c4, 0x00c5, 0x00c7, 0x00c9, 0x00d1, 0x00d6, 0x00dc, 0x00e1, 0x00e0, 0x00e2, 0x00e4, 0x00e3, 0x00e5, 0x00e7, 0x00e9, 0x00e8,
-0x00ea, 0x00eb, 0x00ed, 0x00ec, 0x00ee, 0x00ef, 0x00f1, 0x00f3, 0x00f2, 0x00f4, 0x00f6, 0x00f5, 0x00fa, 0x00f9, 0x00fb, 0x00fc,
-0x2020, 0x00b0, 0x00a2, 0x00a3, 0x00a7, 0x2022, 0x00b6, 0x00df, 0x00ae, 0x00a9, 0x2122, 0x00b4, 0x00a8, 0x2260, 0x00c6, 0x00d8,
-0x221e, 0x00b1, 0x2264, 0x2265, 0x00a5, 0x00b5, 0x2202, 0x2211, 0x220f, 0x03c0, 0x222b, 0x00aa, 0x00ba, 0x03a9, 0x00e6, 0x00f8,
-0x00bf, 0x00a1, 0x00ac, 0x221a, 0x0192, 0x2248, 0x2206, 0x00ab, 0x00bb, 0x2026, 0x00a0, 0x00c0, 0x00c3, 0x00d5, 0x0152, 0x0153,
-0x2013, 0x2014, 0x201c, 0x201d, 0x2018, 0x2019, 0x00f7, 0x25ca, 0x00ff, 0x0178, 0x2044, 0x20ac, 0x2039, 0x203a, 0xfb01, 0xfb02,
-0x2021, 0x00b7, 0x201a, 0x201e, 0x2030, 0x00c2, 0x00ca, 0x00c1, 0x00cb, 0x00c8, 0x00cd, 0x00ce, 0x00cf, 0x00cc, 0x00d3, 0x00d4,
-0xf8ff, 0x00d2, 0x00da, 0x00db, 0x00d9, 0x0131, 0x02c6, 0x02dc, 0x00af, 0x02d8, 0x02d9, 0x02da, 0x00b8, 0x02dd, 0x02db, 0x02c7,
-};
 
 /****************************/
 /*    VARIABLES             */
@@ -62,9 +45,57 @@ static MetaObjectPtr gFontMaterial = NULL;
 
 static bool gFontMetricsLoaded = false;
 static float gFontLineHeight = 0;
-static AtlasGlyph gAtlasGlyphs[256];
+
+static AtlasGlyph* gAtlasGlyphsPages[MAX_CODEPOINT_PAGES];
 
 #pragma mark -
+
+/***************************************************************/
+/*                         UTF-8                               */
+/***************************************************************/
+
+static uint32_t ReadNextCodepointFromUTF8(const char** utf8TextPtr)
+{
+#define TRY_ADVANCE(t) do { if (!*t) return 0; else t++; } while(0)
+
+	uint32_t codepoint = 0;
+	const uint8_t* t = (const uint8_t*) *utf8TextPtr;
+
+	if ((*t & 0b10000000) == 0)
+	{
+		// 1 byte code point, ASCII
+		codepoint |= (*t & 0b01111111);			TRY_ADVANCE(t);
+		*utf8TextPtr += 1;
+	}
+	else if ((*t & 0b11100000) == 0b11000000)
+	{
+		// 2 byte code point
+		codepoint |= (*t & 0b00011111) << 6;	TRY_ADVANCE(t);
+		codepoint |= (*t & 0b00111111);			TRY_ADVANCE(t);
+		*utf8TextPtr += 2;
+	}
+	else if ((**utf8TextPtr & 0b11110000) == 0b11100000)
+	{
+		// 3 byte code point
+		codepoint |= (*t & 0b00001111) << 12;	TRY_ADVANCE(t);
+		codepoint |= (*t & 0b00111111) << 6;	TRY_ADVANCE(t);
+		codepoint |= (*t & 0b00111111);
+		*utf8TextPtr += 3;
+	}
+	else
+	{
+		// 4 byte code point
+		codepoint |= (*t & 0b00000111) << 18;	TRY_ADVANCE(t);
+		codepoint |= (*t & 0b00111111) << 12;	TRY_ADVANCE(t);
+		codepoint |= (*t & 0b00111111) << 6;	TRY_ADVANCE(t);
+		codepoint |= (*t & 0b00111111);			TRY_ADVANCE(t);
+		*utf8TextPtr += 4;
+	}
+
+	return codepoint;
+
+#undef TRY_ADVANCE
+}
 
 /***************************************************************/
 /*                       PARSE SFL                             */
@@ -110,7 +141,7 @@ static void ParseSFL(const char* data)
 	for (int i = 0; i < nGlyphs; i++)
 	{
 		AtlasGlyph newGlyph;
-		int codePoint = 0;
+		uint32_t codePoint = 0;
 		nArgs = sscanf(
 				data,
 				"%d %f %f %f %f %f %f %f",
@@ -124,28 +155,30 @@ static void ParseSFL(const char* data)
 				&newGlyph.xadv);
 		GAME_ASSERT(nArgs == 8);
 
-		int macRomanCodePoint = 0;
-		for (int j = 0; j < 256; j++)
+		uint32_t codePointPage = codePoint >> 8;
+		if (codePointPage >= MAX_CODEPOINT_PAGES)
 		{
-			if (kMacRomanToUnicode[j] == codePoint)
-			{
-				macRomanCodePoint = j;
-				break;
-			}
+			printf("WARNING: codepoint 0x%x exceeds supported maximum (0x%x)\n", codePoint, MAX_CODEPOINT_PAGES * 256 - 1);
+			continue;
 		}
 
-		if (macRomanCodePoint != 0)
-			gAtlasGlyphs[macRomanCodePoint] = newGlyph;
+		if (gAtlasGlyphsPages[codePointPage] == NULL)
+		{
+			gAtlasGlyphsPages[codePointPage] = AllocPtrClear(sizeof(AtlasGlyph) * 256);
+		}
+
+		gAtlasGlyphsPages[codePointPage][codePoint & 0xFF] = newGlyph;
 
 		ParseSFL_SkipLine(&data);
 	}
 
 	// Force monospaced numbers
-	AtlasGlyph referenceNumber = gAtlasGlyphs['4'];
+	AtlasGlyph* asciiPage = gAtlasGlyphsPages[0];
+	AtlasGlyph referenceNumber = asciiPage['4'];
 	for (int c = '0'; c <= '9'; c++)
 	{
-		gAtlasGlyphs[c].xoff += (referenceNumber.w - gAtlasGlyphs[c].w) / 2.0f;
-		gAtlasGlyphs[c].xadv = referenceNumber.xadv;
+		asciiPage[c].xoff += (referenceNumber.w - asciiPage[c].w) / 2.0f;
+		asciiPage[c].xadv = referenceNumber.xadv;
 	}
 }
 
@@ -195,6 +228,7 @@ void TextMesh_Init(OGLSetupOutputType* setupInfo, bool redFont)
 		FSClose(refNum);
 
 		// Parse metrics (gAtlasGlyphs) from SFL file
+		memset(gAtlasGlyphsPages, 0, sizeof(gAtlasGlyphsPages));
 		ParseSFL(data);
 
 		// Nuke data buffer
@@ -208,6 +242,23 @@ void TextMesh_Shutdown(void)
 {
 	MO_DisposeObjectReference(gFontMaterial);
 	gFontMaterial = NULL;
+}
+
+void TextMesh_DisposeMetrics(void)
+{
+	if (!gFontMetricsLoaded)
+		return;
+
+	gFontMetricsLoaded = false;
+
+	for (int i = 0; i < MAX_CODEPOINT_PAGES; i++)
+	{
+		if (gAtlasGlyphsPages[i])
+		{
+			SafeDisposePtr((Ptr) gAtlasGlyphsPages[i]);
+			gAtlasGlyphsPages[i] = NULL;
+		}
+	}
 }
 
 /***************************************************************/
@@ -256,6 +307,25 @@ static void TextMesh_InitMesh(MOVertexArrayData* mesh, int numQuads)
 	TextMesh_ReallocateMesh(mesh, numQuads);
 }
 
+static const AtlasGlyph* GetGlyphFromCodepoint(uint32_t c)
+{
+	uint32_t page = c >> 8;
+
+	if (page >= MAX_CODEPOINT_PAGES)
+	{
+		page = 0; // ascii
+		c = '?';
+	}
+
+	if (!gAtlasGlyphsPages[page])
+	{
+		page = 0; // ascii
+		c = '#';
+	}
+
+	return &gAtlasGlyphsPages[page][c & 0xFF];
+}
+
 void TextMesh_Update(const char* text, int align, ObjNode* textNode)
 {
 	GAME_ASSERT_MESSAGE(gFontMaterial, "Can't lay out text if the font isn't loaded!");
@@ -286,23 +356,25 @@ void TextMesh_Update(const char* text, int align, ObjNode* textNode)
 	// Compute number of quads and line width
 	float lineWidth = 0;
 	int numQuads = 0;
-	for (const char* c = text; *c; c++)
+	for (const char* utftext = text; *utftext; )
 	{
-		if (*c == '\n')		// TODO: line widths for strings containing line breaks aren't supported yet
+		uint32_t c = ReadNextCodepointFromUTF8(&utftext);
+
+		if (c == '\n')		// TODO: line widths for strings containing line breaks aren't supported yet
 		{
 			lineWidth = 0;
 			continue;
 		}
 
-		if (*c == '\t')
+		if (c == '\t')
 		{
 			lineWidth = TAB_STOP * ceilf((lineWidth+1.0f) / TAB_STOP);
 			continue;
 		}
 
-		const AtlasGlyph g = gAtlasGlyphs[(uint8_t)*c];
-		lineWidth += S*(g.xadv + spacing);
-		if (*c != ' ')
+		const AtlasGlyph* g = GetGlyphFromCodepoint(c);
+		lineWidth += S*(g->xadv + spacing);
+		if (c != ' ')
 			numQuads++;
 	}
 
@@ -320,7 +392,7 @@ void TextMesh_Update(const char* text, int align, ObjNode* textNode)
 	// Save extents
 	textNode->LeftOff	= x;
 	textNode->RightOff	= x + lineWidth;
-	textNode->TopOff		= y + S*gFontLineHeight*0.3f;
+	textNode->TopOff	= y + S*gFontLineHeight*0.3f;
 	textNode->BottomOff	= y + S*gFontLineHeight*1.25f;
 
 	// Ensure mesh has capacity for quads
@@ -348,24 +420,26 @@ void TextMesh_Update(const char* text, int align, ObjNode* textNode)
 	// Create a quad for each character
 	int t = 0;
 	int p = 0;
-	for (const char* c = text; *c; c++)
+	for (const char* utftext = text; *utftext; )
 	{
-		if (*c == '\n')
+		uint32_t c = ReadNextCodepointFromUTF8(&utftext);
+
+		if (c == '\n')
 		{
 			x = x0;
 			y += gFontLineHeight * S;
 			continue;
 		}
 
-		if (*c == '\t')
+		if (c == '\t')
 		{
 			x = TAB_STOP * ceilf((x+1.0f) / TAB_STOP);
 			continue;
 		}
 
-		const AtlasGlyph g = gAtlasGlyphs[(uint8_t)*c];
+		const AtlasGlyph g = *GetGlyphFromCodepoint(c);
 
-		if (*c == ' ')
+		if (c == ' ')
 		{
 			x += S*(g.xadv + spacing);
 			continue;
@@ -436,12 +510,16 @@ ObjNode *TextMesh_New(const char *text, int align, NewObjectDefinitionType* newO
 float TextMesh_GetCharX(const char* text, int n)
 {
 	float x = 0;
-	for (const char *c = text; *c && n; c++, n--)
+	for (const char *utftext = text;
+		*utftext && n;
+		n--)
 	{
-		if (*c == '\n')		// TODO: line widths for strings containing line breaks aren't supported yet
+		uint32_t c = ReadNextCodepointFromUTF8(&utftext);
+
+		if (c == '\n')		// TODO: line widths for strings containing line breaks aren't supported yet
 			continue;
 
-		x += gAtlasGlyphs[(uint8_t)*c].xadv;
+		x += GetGlyphFromCodepoint(c)->xadv;
 	}
 	return x;
 }
