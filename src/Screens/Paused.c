@@ -41,6 +41,7 @@ void DoPaused(void)
 	menuStyle.inactiveColor = gPausedMenuNoHiliteColor;
 	menuStyle.standardScale = 1.0f;
 	menuStyle.rowHeight = 24;
+	menuStyle.uniformXExtent = 100;
 	menuStyle.darkenPane = true;
 	menuStyle.darkenPaneScaleY = 64;
 	menuStyle.darkenPaneOpacity = .3f;

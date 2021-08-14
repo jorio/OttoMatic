@@ -62,6 +62,7 @@ const MenuStyle kDefaultMenuStyle =
 	.titleScale			= 1.25f,
 	.subtitleScale		= .5f,
 	.rowHeight			= 13*1.5f,
+	.uniformXExtent		= 0,
 	.playMenuChangeSounds	= true,
 	.startButtonExits	= false,
 };
@@ -78,7 +79,7 @@ static int					gMenuRow = 0;
 static int					gLastRowOnRootMenu = -1;
 static int					gKeyColumn = 0;
 static int					gPadColumn = 0;
-static float				gMenuColXs[MAX_MENU_COLS] = { 0, 170, 300, 330, 360 };
+static float				gMenuColXs[MAX_MENU_COLS] = { 0, 170, 300, 430, 560 };
 static float				gMenuRowYs[MAX_MENU_ROWS];
 static float				gMenuFadeAlpha = 0;
 static int					gMenuState = kMenuStateOff;
@@ -945,6 +946,21 @@ static ObjNode* MakeTextAtRowCol(const char* text, int row, int col)
 		node->SpecialCol = col;
 		node->StatusBits |= STATUS_BIT_MOVEINPAUSE;
 		gMenuObjects[row][col] = node;
+	}
+
+	if (!gMenuStyle->centeredText)
+	{
+		int paddedRightOff = ((gMenuColXs[col+1]-170) - node->Coord.x) / node->Scale.x;
+		if (paddedRightOff > node->RightOff)
+			node->RightOff = paddedRightOff;
+	}
+
+	if (gMenuStyle->uniformXExtent)
+	{
+		if (-gMenuStyle->uniformXExtent < node->LeftOff)
+			node->LeftOff = -gMenuStyle->uniformXExtent;
+		if (gMenuStyle->uniformXExtent > node->RightOff)
+			node->RightOff = gMenuStyle->uniformXExtent;
 	}
 
 	return node;

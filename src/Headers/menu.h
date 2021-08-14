@@ -72,6 +72,7 @@ typedef struct MenuStyle
 	float			titleScale;
 	float			subtitleScale;
 	float			rowHeight;
+	float			uniformXExtent;
 	bool			playMenuChangeSounds;
 	float			darkenPaneScaleY;
 	float			darkenPaneOpacity;
