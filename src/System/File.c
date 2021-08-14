@@ -1171,6 +1171,8 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			(*gSplineList)[i].bBox.right = SwizzleShort(&splinePtr[i].bBox.right);
 		}
 
+		ReleaseResource(hand);
+		hand = nil;
 	}
 	else
 		gNumSplines = 0;
