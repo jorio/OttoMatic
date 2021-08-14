@@ -57,7 +57,7 @@ OGLSetupInputType	viewDef;
 
 			/* CREATE BACKGROUND OBJECT */
 
-	gBackgroundPicture = MO_CreateNewObjectOfType(MO_TYPE_PICTURE, 0, path);
+	gBackgroundPicture = MO_CreateNewObjectOfType(MO_TYPE_PICTURE, 0, (void*) path);
 	GAME_ASSERT(gBackgroundPicture);
 
 

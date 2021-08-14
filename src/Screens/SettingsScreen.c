@@ -78,7 +78,7 @@ static uint8_t GenerateNumDisplays(void)
 
 static const char* GenerateVideoSettingsSubtitle(void)
 {
-	return glGetString(GL_RENDERER);
+	return (const char*) glGetString(GL_RENDERER);
 }
 
 static const char* GenerateDisplayName(char* buf, int bufSize, Byte value)

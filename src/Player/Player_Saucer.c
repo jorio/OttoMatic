@@ -168,7 +168,7 @@ float	e;
 static void MovePlayer_Saucer(ObjNode *theNode)
 {
 float	fps = gFramesPerSecondFrac;
-OGLPoint2D	dropZonePt;
+OGLPoint2D	dropZonePt = {1e9f, 1e9f};
 
 	GetObjectInfo(theNode);
 
@@ -230,18 +230,16 @@ OGLPoint2D	dropZonePt;
 
 		/* SEE IF @ DROP-OFF ZONE */
 
-	if (CalcRocketDropZone(&dropZonePt))													// calc coord of zone
+	if (CalcRocketDropZone(&dropZonePt)													// calc coord of zone
+		&& CalcQuickDistance(dropZonePt.x, dropZonePt.y, gCoord.x, gCoord.z) < 200.0f)	// see if in the zone
 	{
-		if (CalcQuickDistance(dropZonePt.x, dropZonePt.y, gCoord.x, gCoord.z) < 200.0f)		// see if in the zone
+		if (gNumHumansInSaucer > 0)														// see if there is anyone to put down there
 		{
-			if (gNumHumansInSaucer > 0)														// see if there is anyone to put down there
-			{
-				theNode->MoveCall = MovePlayer_Saucer_ToDropZone;
-				DisableHelpType(HELP_MESSAGE_SAUCEREMPTY);									// won't need to help player on this again
-			}
-			else
-				DisplayHelpMessage(HELP_MESSAGE_SAUCEREMPTY,1,false);
+			theNode->MoveCall = MovePlayer_Saucer_ToDropZone;
+			DisableHelpType(HELP_MESSAGE_SAUCEREMPTY);									// won't need to help player on this again
 		}
+		else
+			DisplayHelpMessage(HELP_MESSAGE_SAUCEREMPTY, 1, false);
 	}
 
 
@@ -388,6 +386,7 @@ static Boolean CalcRocketDropZone(OGLPoint2D *where)
 		where->y = gExitRocket->Coord.z + cos(r) * 400.0f;
 		return(true);
 	}
+
 	return(false);
 }
 
@@ -455,10 +454,10 @@ float fps = gFramesPerSecondFrac;
 
 	if ((gPlayerInfo.fuel >= 1.0f) && (!gBeamIsCharging) && (!gBeamIsDischarging) && (gNumHumansInTransit == 0) && (gNumHumansInSaucer == 0) && (gPlayerInfo.objNode == gPlayerSaucer))	// see if fueled up & ready
 	{
-		OGLPoint2D	where;
+		OGLPoint2D	where = {1e9, 1e9};
 
-		CalcRocketDropZone(&where);
-		if (CalcQuickDistance(gCoord.x, gCoord.z, where.x, where.y) < 400.0f)			// see if in range of rocket
+		if (CalcRocketDropZone(&where)
+			&& CalcQuickDistance(gCoord.x, gCoord.z, where.x, where.y) < 400.0f)			// see if in range of rocket
 		{
 			DisplayHelpMessage(HELP_MESSAGE_PRESSJUMPTOLEAVE, 1, true);
 
