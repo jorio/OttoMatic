@@ -84,7 +84,6 @@ if(WIN32)
 	add_executable(${GAME_TARGET} WIN32
 		${GAME_ALL_SOURCES}
 		"${CMAKE_CURRENT_SOURCE_DIR}/packaging/${GAME_TARGET}.exe.rc"
-        "${CMAKE_CURRENT_SOURCE_DIR}/packaging/${GAME_TARGET}.exe.manifest"
 	)
 elseif(APPLE)
 	# Add required frameworks for KillMacMouseAcceleration
@@ -172,34 +171,51 @@ endif()
 # PLATFORM-SPECIFIC PACKAGING
 #------------------------------------------------------------------------------
 
+set_target_properties(${GAME_TARGET} PROPERTIES
+	#--------------------------------------------------------------------------
+	# MSVC/WIN32
+	#--------------------------------------------------------------------------
+
+	VS_DEBUGGER_WORKING_DIRECTORY		"${CMAKE_SOURCE_DIR}"
+	VS_DPI_AWARE						"PerMonitor"
+
+	#--------------------------------------------------------------------------
+	# APPLE
+	#--------------------------------------------------------------------------
+
+	# Set framework search path to (App bundle)/Contents/Frameworks so the game can use its embedded SDL2.framework
+	XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "@executable_path/../Frameworks"
+
+	# Explicitly turn off code signing, otherwise downloaded app will be quarantined forever
+	XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
+
+	# Set up Info.plist values
+	MACOSX_BUNDLE_ICON_FILE				"${GAME_TARGET}.icns"	# CFBundleIconFile
+	MACOSX_BUNDLE_EXECUTABLE_NAME		${GAME_TARGET}			# CFBundleExecutable - executable name inside the bundle
+	MACOSX_BUNDLE_SHORT_VERSION_STRING	${PROJECT_VERSION}		# CFBundleShortVersionString
+	MACOSX_BUNDLE_COPYRIGHT				${GAME_MAC_COPYRIGHT}	# NSHumanReadableCopyright (supersedes CFBundleGetInfoString (MACOSX_BUNDLE_INFO_STRING))
+	MACOSX_BUNDLE_BUNDLE_NAME			${GAME_TARGET}			# CFBundleName - user-visible (where??) short name for the bundle, up to 15 characters
+	MACOSX_BUNDLE_GUI_IDENTIFIER		${GAME_MAC_BUNDLE_ID}	# CFBundleIdentifier - unique bundle ID in reverse-DNS format
+
+	# Bundle ID required for code signing - must match CFBundleIdentifier otherwise xcode will complain
+	XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER ${GAME_MAC_BUNDLE_ID}
+
+	# Don't bother with universal builds when we're working on the debug version
+	XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=Debug] "YES"
+
+	XCODE_EMBED_FRAMEWORKS							"${SDL2_LIBRARIES}"
+	XCODE_EMBED_FRAMEWORKS_CODE_SIGN_ON_COPY		"YES"		# frameworks must be signed by the same developer as the binary
+	XCODE_EMBED_FRAMEWORKS_REMOVE_HEADERS_ON_COPY	"YES"		# not strictly necessary, but that's cleaner
+	XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME			"YES"		# required for notarization to pass
+)
+
 if(APPLE)
-	set_target_properties(${GAME_TARGET} PROPERTIES
-		# Set framework search path to (App bundle)/Contents/Frameworks so the game can use its embedded SDL2.framework
-		XCODE_ATTRIBUTE_LD_RUNPATH_SEARCH_PATHS "@executable_path/../Frameworks"
-
-		# Explicitly turn off code signing, otherwise downloaded app will be quarantined forever
-		XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
-
-		# Set up Info.plist values
-		MACOSX_BUNDLE_ICON_FILE				"${GAME_TARGET}.icns"	# CFBundleIconFile
-		MACOSX_BUNDLE_EXECUTABLE_NAME		${GAME_TARGET}			# CFBundleExecutable - executable name inside the bundle
-		MACOSX_BUNDLE_SHORT_VERSION_STRING	${PROJECT_VERSION}		# CFBundleShortVersionString
-		MACOSX_BUNDLE_COPYRIGHT				${GAME_MAC_COPYRIGHT}	# NSHumanReadableCopyright (supersedes CFBundleGetInfoString (MACOSX_BUNDLE_INFO_STRING))
-		MACOSX_BUNDLE_BUNDLE_NAME			${GAME_TARGET}			# CFBundleName - user-visible (where??) short name for the bundle, up to 15 characters
-		MACOSX_BUNDLE_GUI_IDENTIFIER		${GAME_MAC_BUNDLE_ID}	# CFBundleIdentifier - unique bundle ID in reverse-DNS format
-
-		# Bundle ID required for code signing - must match CFBundleIdentifier otherwise xcode will complain
-		XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER ${GAME_MAC_BUNDLE_ID}
-
-		# Don't bother with universal builds when we're working on the debug version
-		XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH[variant=Debug] "YES"
-	)
-
 	# If we have a code signing identity (CODE_SIGN_IDENTITY environment variable),
 	# set up the release build for proper code signing
 	if(NOT "$ENV{CODE_SIGN_IDENTITY}" STREQUAL "")
 		set_target_properties(${GAME_TARGET} PROPERTIES
 			XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY[variant=Release] "$ENV{CODE_SIGN_IDENTITY}"
+			XCODE_ATTRIBUTE_DEVELOPMENT_TEAM[variant=Release] "$ENV{CODE_SIGN_IDENTITY}"
 
 			# The following is to pass notarization requirements
 			XCODE_ATTRIBUTE_CODE_SIGN_INJECT_BASE_ENTITLEMENTS[variant=Release] "NO"
@@ -210,7 +226,7 @@ if(APPLE)
 
 	# Copy stuff to app bundle contents
 	set_source_files_properties(${GAME_MAC_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-	set_source_files_properties(${SDL2_LIBRARIES} PROPERTIES MACOSX_PACKAGE_LOCATION "Frameworks")
+	#set_source_files_properties(${SDL2_LIBRARIES} PROPERTIES MACOSX_PACKAGE_LOCATION "Frameworks")
 
 	set(BUNDLE_CONTENTS_DIR "$<TARGET_FILE_DIR:${PROJECT_NAME}>/..")
 	set(APP_PARENT_DIR "${BUNDLE_CONTENTS_DIR}/../..")
@@ -236,8 +252,6 @@ if(WIN32)
 		add_custom_command(TARGET ${GAME_TARGET} POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL} ${APP_PARENT_DIR})
 	endforeach()
-
-	set_target_properties(${GAME_TARGET} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 endif()
 
 # Copy documentation to output folder
