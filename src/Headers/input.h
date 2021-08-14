@@ -68,6 +68,7 @@ enum
 	kNeed_UIPrev,
 	kNeed_UINext,
 	kNeed_UIConfirm,
+	kNeed_UIDelete,
 	kNeed_UIStart,
 	kNeed_UIBack,
 	kNeed_UIPause,

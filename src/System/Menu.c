@@ -556,8 +556,7 @@ static void NavigateKeyBinding(const MenuItem* entry)
 		return;
 	}
 
-	if (GetNewKeyState(SDL_SCANCODE_DELETE)
-		|| GetNewKeyState(SDL_SCANCODE_BACKSPACE)
+	if (GetNewNeedState(kNeed_UIDelete)
 		|| (gMouseHoverValidRow && FlushMouseButtonPress(SDL_BUTTON_MIDDLE)))
 	{
 		gGamePrefs.keys[entry->kb].key[gKeyColumn] = 0;
@@ -600,8 +599,7 @@ static void NavigatePadBinding(const MenuItem* entry)
 		return;
 	}
 
-	if (GetNewKeyState(SDL_SCANCODE_DELETE)
-		|| GetNewKeyState(SDL_SCANCODE_BACKSPACE)
+	if (GetNewNeedState(kNeed_UIDelete)
 		|| (gMouseHoverValidRow && FlushMouseButtonPress(SDL_BUTTON_MIDDLE)))
 	{
 		gGamePrefs.keys[entry->kb].gamepad[gPadColumn].type = kInputTypeUnbound;
@@ -631,8 +629,7 @@ static void NavigatePadBinding(const MenuItem* entry)
 
 static void NavigateMouseBinding(const MenuItem* entry)
 {
-	if (GetNewKeyState(SDL_SCANCODE_DELETE)
-		|| GetNewKeyState(SDL_SCANCODE_BACKSPACE)
+	if (GetNewNeedState(kNeed_UIDelete)
 		|| (gMouseHoverValidRow && FlushMouseButtonPress(SDL_BUTTON_MIDDLE)))
 	{
 		gGamePrefs.keys[entry->kb].mouseButton = 0;

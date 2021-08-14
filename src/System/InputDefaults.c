@@ -43,6 +43,7 @@ const KeyBinding kDefaultKeyBindings[NUM_CONTROL_NEEDS] =
 [kNeed_UIPrev			] = { { 0			, 0				}, 0			, { CB(LEFTSHOULDER)	, CBNULL()				} },
 [kNeed_UINext			] = { { 0			, 0				}, 0			, { CB(RIGHTSHOULDER)	, CBNULL()				} },
 [kNeed_UIConfirm		] = { { SC(RETURN)	, SC(SPACE)		}, 0			, { CB(A)				, CBNULL()				} },
+[kNeed_UIDelete			] = { { SC(DELETE)	, SC(BACKSPACE)	}, 0			, { CB(X)				, CBNULL()				} },
 [kNeed_UIStart			] = { { 0			, 0				}, 0			, { CB(START)			, CBNULL()				} },
 [kNeed_UIBack			] = { { SC(ESCAPE)	, 0				}, MB(X1)		, { CB(B)				, CB(BACK)				} },
 [kNeed_UIPause			] = { { SC(ESCAPE)	, 0				}, 0			, { CB(START)			, CBNULL()				} },
