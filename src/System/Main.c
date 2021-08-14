@@ -919,8 +919,47 @@ static void CleanupLevel(void)
 	gPlayerInfo.rightHandObj = nil;
 }
 
+/************ CHEAT KEYS CHECKED AFTER LEGAL SCREEN ******************/
 
+static void CheckBootCheats(void)
+{
+		/* TEST HIGH SCORE SCREEN: HOLD DOWN MINUS KEY AFTER LEGAL SCREEN */
 
+	if (GetKeyState(SDL_SCANCODE_MINUS))
+	{
+		gScore = RandomRange(100, 65535);
+		NewScore();
+		return;
+	}
+
+		/* TEST WIN SCREEN */
+
+	if (GetKeyState(SDL_SCANCODE_W))
+	{
+		DoWinScreen();
+		return;
+	}
+
+		/* TEST LOSE SCREEN */
+
+	if (GetKeyState(SDL_SCANCODE_L))
+	{
+		DoLoseScreen();
+		return;
+	}
+
+		/* LEVEL CHEAT: HOLD DOWN NUMBER KEY AFTER LEGAL SCREEN */
+
+	for (int i = 0; i < 10; i++)
+	{
+		if (GetKeyState(SDL_SCANCODE_1 + i))	// scancodes 1,2,...,9,0 are contiguous
+		{
+			gLevelNum = i;
+			PlayGame();
+			return;
+		}
+	}
+}
 
 /************************************************************/
 /******************** PROGRAM MAIN ENTRY  *******************/
@@ -966,17 +1005,9 @@ unsigned long	someLong;
 
 	DoLegalScreen();
 
-		/* LEVEL CHEAT: HOLD DOWN NUMBER KEY AFTER LEGAL SCREEN */
+		/* DO BOOT CHEATS */
 
-	for (int i = 0; i < 10; i++)
-	{
-		if (GetKeyState(SDL_SCANCODE_1 + i))	// scancodes 1,2,...,9,0 are contiguous
-		{
-			gLevelNum = i;
-			PlayGame();
-			break;
-		}
-	}
+	CheckBootCheats();
 
 		/* MAIN LOOP */
 

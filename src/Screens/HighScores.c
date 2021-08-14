@@ -170,7 +170,10 @@ static void DoTextEntry(char* myName)
 	}
 	else if (GetNewNeedState(kNeed_TextEntry_End))
 	{
-		gCursorIndex = myLength;
+		gCursorIndex = myLength-1;
+		while (gCursorIndex > 0 && myName[gCursorIndex] == ' ')
+			gCursorIndex--;
+		gCursorIndex++;
 		UpdateCursorPos();
 		gTimeSinceAutoAdvance = kCancelAutoAdvance;
 	}
