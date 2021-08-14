@@ -1662,8 +1662,12 @@ static MOTriangleIndecies triangles[9*2] =
 
 			/* SEE IF DONE */
 
-	gPlayerInfo.superNovaCharge -= fps * .2f;						// fade out	just a little
-	gDischargeTimer -= fps;
+	if (!gGamePaused)
+	{
+		gPlayerInfo.superNovaCharge -= fps * .2f;						// fade out	just a little
+		gDischargeTimer -= fps;
+	}
+
 	if ((gDischargeTimer <= 0.0f) || (gPlayerInfo.superNovaCharge <= 0.0f))
 	{
 		DeleteObject(theNode);
