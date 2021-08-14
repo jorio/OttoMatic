@@ -359,6 +359,9 @@ void DrawArea(OGLSetupOutputType *setupInfo)
 
 	DrawObjects(setupInfo);												// draw objNodes which includes fences, terrain, etc.
 
+	// Don't draw stuff on top of the UI if the game is paused
+	if (gGamePaused)
+		return;
 
 			/* DRAW MISC */
 
