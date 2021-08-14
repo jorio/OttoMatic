@@ -56,6 +56,7 @@ typedef struct
 typedef struct
 {
 	Boolean	fullscreen;
+	Byte	preferredDisplay;
 	Byte	antialiasingLevel;
 	Boolean	music;
 	Byte	language;

@@ -25,7 +25,7 @@ typedef struct MenuItem
 
 	LocStrID				text;
 	const char*				rawText;
-	const char*				(*textGenerator)(void);
+	const char*				(*generateText)(void);
 
 	union
 	{
@@ -48,6 +48,9 @@ typedef struct MenuItem
 
 			uint8_t			numChoices;
 			LocStrID		choices[MAX_MENU_CYCLER_CHOICES];	// localizable strings
+
+			uint8_t			(*generateNumChoices)(void);
+			const char*		(*generateChoiceString)(char* buf, int bufSize, Byte value);
 		} cycler;
 
 		int					pick;

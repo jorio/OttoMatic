@@ -94,6 +94,7 @@ enum
 void InitInput(void);
 void UpdateInput(void);
 void CaptureMouse(Boolean doCapture);
+void EatMouseEvents(void);
 Boolean GetNewKeyState(unsigned short sdlScanCode);
 Boolean GetKeyState(unsigned short sdlScanCode);
 Boolean GetNewNeedState(int needID);

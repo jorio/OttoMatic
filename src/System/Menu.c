@@ -14,6 +14,7 @@
 
 static ObjNode* MakeTextAtRowCol(const char* text, int row, int col);
 static void LayOutMenu(const MenuItem* menu);
+static ObjNode* LayOutCyclerValueText(int row);
 
 #define SpecialRow					Special[0]
 #define SpecialCol					Special[1]
@@ -184,7 +185,7 @@ static const char* GetPadBindingName(int row, int col)
 
 static const char* GetMouseBindingName(int row)
 {
-	static char extraButtonBuf[256];
+	DECLARE_STATIC_WORKBUF(buf, bufSize);
 
 	KeyBinding* kb = GetBindingAtRow(row);
 
@@ -197,8 +198,8 @@ static const char* GetMouseBindingName(int row)
 		case SDL_BUTTON_WHEELUP:		return Localize(STR_MOUSE_WHEEL_UP);
 		case SDL_BUTTON_WHEELDOWN:		return Localize(STR_MOUSE_WHEEL_DOWN);
 		default:
-			snprintf(extraButtonBuf, sizeof(extraButtonBuf), "%s %d", Localize(STR_BUTTON), kb->mouseButton);
-			return extraButtonBuf;
+			snprintf(buf, bufSize, "%s %d", Localize(STR_BUTTON), kb->mouseButton);
+			return buf;
 	}
 }
 
@@ -506,18 +507,14 @@ static void NavigateCycler(const MenuItem* entry)
 		if (entry->cycler.valuePtr && !entry->cycler.callbackSetsValue)
 		{
 			unsigned int value = (unsigned int)*entry->cycler.valuePtr;
-			value = PositiveModulo(value + delta, entry->cycler.numChoices);
+			value = PositiveModulo(value + delta, entry->cycler.generateNumChoices? entry->cycler.generateNumChoices(): entry->cycler.numChoices);
 			*entry->cycler.valuePtr = value;
 		}
 
 		if (entry->cycler.callback)
 			entry->cycler.callback();
 
-		if (entry->cycler.numChoices > 0)
-		{
-			int newChoice = entry->cycler.choices[*entry->cycler.valuePtr];
-			MakeTextAtRowCol(Localize(newChoice), gMenuRow, 1);
-		}
+		LayOutCyclerValueText(gMenuRow);
 	}
 }
 
@@ -956,9 +953,67 @@ static const float kMenuItemHeightMultipliers[kMenuItem_NUM_ITEM_TYPES] =
 	[kMenuItem_MouseBinding] = 1,
 };
 
+static const char* GetMenuItemLabel(const MenuItem* entry)
+{
+	if (entry->rawText)
+		return entry->rawText;
+	else if (entry->generateText)
+		return entry->generateText();
+	else
+		return Localize(entry->text);
+}
+
+static ObjNode* LayOutCyclerValueText(int row)
+{
+	DECLARE_WORKBUF(buf, bufSize);
+	const MenuItem* entry = &gMenu[row];
+
+	int numChoices = entry->cycler.numChoices;
+	if (entry->cycler.generateNumChoices)
+		numChoices = entry->cycler.generateNumChoices();
+
+	if (numChoices <= 0)
+		return NULL;
+
+	Byte value = *entry->cycler.valuePtr;
+	const char* valueText = NULL;
+
+	if (entry->cycler.generateChoiceString)
+	{
+		valueText = entry->cycler.generateChoiceString(buf, bufSize, value);
+	}
+	else
+	{
+		GAME_ASSERT(numChoices <= MAX_MENU_CYCLER_CHOICES);
+		valueText = Localize(entry->cycler.choices[value]);
+	}
+
+	ObjNode* node2 = MakeTextAtRowCol(valueText, row, 1);
+	node2->MoveCall = MoveAction;
+	return node2;
+}
+
+static void LayOutCycler(
+		int row,
+		float sweepFactor)
+{
+	DECLARE_WORKBUF(buf, bufSize);
+
+	const MenuItem* entry = &gMenu[row];
+
+	snprintf(buf, bufSize, "%s:", GetMenuItemLabel(entry));
+
+	ObjNode* node1 = MakeTextAtRowCol(buf, row, 0);
+	node1->MoveCall = MoveAction;
+	node1->SpecialSweepTimer = sweepFactor;
+
+	ObjNode* node2 = LayOutCyclerValueText(row);
+	node2->SpecialSweepTimer = sweepFactor;
+}
+
 static void LayOutMenu(const MenuItem* menu)
 {
-	char buf[256];
+	DECLARE_WORKBUF(buf, bufSize);
 
 	bool enteringNewMenu = menu != gMenu;
 
@@ -999,12 +1054,6 @@ static void LayOutMenu(const MenuItem* menu)
 
 		const MenuItem* entry = &menu[row];
 
-		const char* text = entry->rawText;
-		if (entry->text >= 0)
-			text = Localize(entry->text);
-		if (entry->textGenerator)
-			text = entry->textGenerator();
-
 		gNewObjectDefinition.scale = gMenuStyle->standardScale;
 
 		switch (entry->type)
@@ -1015,7 +1064,7 @@ static void LayOutMenu(const MenuItem* menu)
 			case kMenuItem_Title:
 			{
 				gNewObjectDefinition.scale = gMenuStyle->titleScale;
-				ObjNode* label = MakeTextAtRowCol(text, row, 0);
+				ObjNode* label = MakeTextAtRowCol(GetMenuItemLabel(entry), row, 0);
 				label->ColorFilter = gMenuStyle->titleColor;
 				label->MoveCall = MoveLabel;
 				label->SpecialSweepTimer = .5f;		// Title appears sooner than the rest
@@ -1025,7 +1074,7 @@ static void LayOutMenu(const MenuItem* menu)
 			case kMenuItem_Subtitle:
 			{
 				gNewObjectDefinition.scale = gMenuStyle->subtitleScale;
-				ObjNode* label = MakeTextAtRowCol(text, row, 0);
+				ObjNode* label = MakeTextAtRowCol(GetMenuItemLabel(entry), row, 0);
 				label->ColorFilter = gMenuStyle->titleColor;
 				label->MoveCall = MoveLabel;
 				label->SpecialSweepTimer = .5f;		// Title appears sooner than the rest
@@ -1034,7 +1083,7 @@ static void LayOutMenu(const MenuItem* menu)
 
 			case kMenuItem_Label:
 			{
-				ObjNode* label = MakeTextAtRowCol(text, row, 0);
+				ObjNode* label = MakeTextAtRowCol(GetMenuItemLabel(entry), row, 0);
 				label->ColorFilter = gMenuStyle->inactiveColor;
 				label->MoveCall = MoveLabel;
 				label->SpecialSweepTimer = sweepFactor;
@@ -1045,7 +1094,7 @@ static void LayOutMenu(const MenuItem* menu)
 			case kMenuItem_Pick:
 			case kMenuItem_Submenu:
 			{
-				ObjNode* node = MakeTextAtRowCol(text, row, 0);
+				ObjNode* node = MakeTextAtRowCol(GetMenuItemLabel(entry), row, 0);
 				node->MoveCall = MoveAction;
 				node->SpecialSweepTimer = sweepFactor;
 				break;
@@ -1053,25 +1102,13 @@ static void LayOutMenu(const MenuItem* menu)
 
 			case kMenuItem_Cycler:
 			{
-				snprintf(buf, sizeof(buf), "%s:", text);
-
-				ObjNode* node1 = MakeTextAtRowCol(buf, row, 0);
-				node1->MoveCall = MoveAction;
-				node1->SpecialSweepTimer = sweepFactor;
-
-				if (entry->cycler.numChoices > 0)
-				{
-					const char* choiceCaption = Localize(entry->cycler.choices[*entry->cycler.valuePtr]);
-					ObjNode* node2 = MakeTextAtRowCol(choiceCaption, row, 1);
-					node2->MoveCall = MoveAction;
-					node2->SpecialSweepTimer = sweepFactor;
-				}
+				LayOutCycler(row, sweepFactor);
 				break;
 			}
 
 			case kMenuItem_KeyBinding:
 			{
-				snprintf(buf, sizeof(buf), "%s:", Localize(STR_KEYBINDING_DESCRIPTION_0 + entry->kb));
+				snprintf(buf, bufSize, "%s:", Localize(STR_KEYBINDING_DESCRIPTION_0 + entry->kb));
 
 				gNewObjectDefinition.scale = 0.6f;
 				ObjNode* label = MakeTextAtRowCol(buf, row, 0);
@@ -1090,7 +1127,7 @@ static void LayOutMenu(const MenuItem* menu)
 
 			case kMenuItem_PadBinding:
 			{
-				snprintf(buf, sizeof(buf), "%s:", Localize(STR_KEYBINDING_DESCRIPTION_0 + entry->kb));
+				snprintf(buf, bufSize, "%s:", Localize(STR_KEYBINDING_DESCRIPTION_0 + entry->kb));
 
 				ObjNode* label = MakeTextAtRowCol(buf, row, 0);
 				label->ColorFilter = gMenuStyle->inactiveColor2;
@@ -1108,7 +1145,7 @@ static void LayOutMenu(const MenuItem* menu)
 
 			case kMenuItem_MouseBinding:
 			{
-				snprintf(buf, sizeof(buf), "%s:", Localize(STR_KEYBINDING_DESCRIPTION_0 + entry->kb));
+				snprintf(buf, bufSize, "%s:", Localize(STR_KEYBINDING_DESCRIPTION_0 + entry->kb));
 
 				ObjNode* label = MakeTextAtRowCol(buf, row, 0);
 				label->ColorFilter = gMenuStyle->inactiveColor2;

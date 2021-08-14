@@ -359,7 +359,7 @@ void CaptureMouse(Boolean doCapture)
 	SDL_SetRelativeMouseMode(doCapture ? SDL_TRUE : SDL_FALSE);
 	SDL_ShowCursor(doCapture ? 0 : 1);
 //	ClearMouseState();
-//	EatMouseEvents();
+	EatMouseEvents();
 
 #if __APPLE__
 	if (doCapture)
@@ -367,6 +367,11 @@ void CaptureMouse(Boolean doCapture)
     else
         RestoreMacMouseAcceleration();
 #endif
+}
+
+void EatMouseEvents(void)
+{
+	gEatMouse = true;
 }
 
 Boolean GetNewKeyState(unsigned short sdlScanCode)

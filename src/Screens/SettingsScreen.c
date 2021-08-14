@@ -70,6 +70,28 @@ static const char* GenerateGamepadLabel(void)
 		return Localize(STR_NO_GAMEPAD_DETECTED);
 }
 
+static uint8_t GenerateNumDisplays(void)
+{
+	int numDisplays = SDL_GetNumVideoDisplays();
+	return CLAMP(numDisplays, 1, 255);
+}
+
+static const char* GenerateVideoSettingsSubtitle(void)
+{
+	return glGetString(GL_RENDERER);
+}
+
+static const char* GenerateDisplayName(char* buf, int bufSize, Byte value)
+{
+	snprintf(buf, bufSize,
+		"%s %d (%s)",
+		Localize(STR_DISPLAY),
+		1 + (int)value,
+		SDL_GetDisplayName(value));
+
+	return buf;
+}
+
 /***************************************************************/
 /*                     MENU DEFINITIONS                        */
 /***************************************************************/
@@ -120,7 +142,7 @@ static const MenuItem gKeybindingMenu[] =
 static const MenuItem gGamepadMenu[] =
 {
 	{.type = kMenuItem_Title, .text = STR_CONFIGURE_GAMEPAD},
-	{.type = kMenuItem_Subtitle, .textGenerator = GenerateGamepadLabel },
+	{.type = kMenuItem_Subtitle, .generateText = GenerateGamepadLabel },
 	{.type = kMenuItem_Spacer },
 
 	{
@@ -229,6 +251,7 @@ static const MenuItem gMouseMenu[] =
 static const MenuItem gVideoMenu[] =
 {
 	{.type = kMenuItem_Title, .text = STR_VIDEO_SETTINGS},
+	{.type = kMenuItem_Subtitle, .generateText = GenerateVideoSettingsSubtitle},
 	{ .type = kMenuItem_Spacer },
 
 	{
@@ -240,6 +263,18 @@ static const MenuItem gVideoMenu[] =
 			.valuePtr = &gGamePrefs.fullscreen,
 			.numChoices = 2,
 			.choices = {STR_OFF, STR_ON},
+		},
+	},
+
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_PREFERRED_DISPLAY,
+		.cycler =
+		{
+			.callback = SetFullscreenModeFromPrefs,
+			.valuePtr = &gGamePrefs.preferredDisplay,
+			.generateNumChoices = GenerateNumDisplays,
+			.generateChoiceString = GenerateDisplayName,
 		},
 	},
 
@@ -290,6 +325,8 @@ static const MenuItem gSettingsMenu[] =
 			.callback = cb_SetLanguage,
 			.valuePtr = &gGamePrefs.language,
 			.numChoices = MAX_LANGUAGES,
+			// The choices array is all 0's, which makes the menu
+			// display the current language as the localized value.
 		},
 	},
 
@@ -305,6 +342,7 @@ static const MenuItem gSettingsMenu[] =
 		},
 	},
 
+	{ .type = kMenuItem_Spacer },
 
 	{
 		.type = kMenuItem_Submenu,
@@ -332,13 +370,10 @@ static const MenuItem gSettingsMenu[] =
 		.submenu = {.menu = gGamepadMenu},
 	},
 
-
-
 #if _DEBUG
 	{.type = kMenuItem_Spacer},
 	{
 		.type = kMenuItem_Cycler,
-		.text = -1,
 		.rawText = "Tank controls",
 		.cycler =
 		{
@@ -389,7 +424,7 @@ static const MenuItem kAnaglyphWarning[] =
 void DoSettingsOverlay(void (*updateRoutine)(void),
 					   void (*backgroundDrawRoutine)(OGLSetupOutputType *))
 {
-	gAllowAudioKeys = false;					// dont interfere with keyboard binding
+	gAllowAudioKeys = false;					// don't interfere with keyboard binding
 
 //	PlayEffect(MyRandomLong()&1? EFFECT_ACCENTDRONE1: EFFECT_ACCENTDRONE2);
 

@@ -291,21 +291,38 @@ void SetFullscreenModeFromPrefs(void)
 	if (!gGamePrefs.fullscreen)
 	{
 		SDL_SetWindowFullscreen(gSDLWindow, 0);
-	}
-	else if (gCommandLine.fullscreenWidth > 0 && gCommandLine.fullscreenHeight > 0)
-	{
-
-		SDL_DisplayMode mode;
-		mode.w = gCommandLine.fullscreenWidth;
-		mode.h = gCommandLine.fullscreenHeight;
-		mode.refresh_rate = gCommandLine.fullscreenRefreshRate;
-		mode.driverdata = nil;
-		mode.format = SDL_PIXELFORMAT_UNKNOWN;
-		SDL_SetWindowDisplayMode(gSDLWindow, &mode);
-		SDL_SetWindowFullscreen(gSDLWindow, SDL_WINDOW_FULLSCREEN);
+		SDL_SetWindowPosition(gSDLWindow,
+							  SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.preferredDisplay),
+							  SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.preferredDisplay));
 	}
 	else
 	{
-		SDL_SetWindowFullscreen(gSDLWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		// We must switch back to windowed mode for the preferred monitor to take effect
+		SDL_SetWindowFullscreen(gSDLWindow, 0);
+		SDL_SetWindowPosition(gSDLWindow,
+							  SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.preferredDisplay),
+							  SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.preferredDisplay));
+
+		if (gCommandLine.fullscreenWidth <= 0 || gCommandLine.fullscreenHeight <= 0)
+		{
+			// No custom fullscreen resolution specified.
+			// Enter windowed fullscreen mode.
+			SDL_SetWindowFullscreen(gSDLWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		}
+		else
+		{
+			SDL_DisplayMode mode =
+			{
+					.w = gCommandLine.fullscreenWidth,
+					.h = gCommandLine.fullscreenHeight,
+					.refresh_rate = gCommandLine.fullscreenRefreshRate,
+					.format = SDL_PIXELFORMAT_UNKNOWN,
+					.driverdata = NULL,
+			};
+			SDL_SetWindowDisplayMode(gSDLWindow, &mode);
+			SDL_SetWindowFullscreen(gSDLWindow, SDL_WINDOW_FULLSCREEN);
+		}
 	}
+
+	EatMouseEvents();
 }

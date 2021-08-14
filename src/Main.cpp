@@ -130,6 +130,9 @@ retry:
 		throw std::runtime_error("Couldn't initialize SDL video subsystem.");
 	}
 
+	if (gGamePrefs.preferredDisplay >= SDL_GetNumVideoDisplays())
+		gGamePrefs.preferredDisplay = 0;
+
 	// Create window
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
@@ -142,8 +145,8 @@ retry:
 
 	gSDLWindow = SDL_CreateWindow(
 			GetWindowTitle(),
-			SDL_WINDOWPOS_UNDEFINED,
-			SDL_WINDOWPOS_UNDEFINED,
+			SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.preferredDisplay),
+			SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.preferredDisplay),
 			1280,
 			720,
 			SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
