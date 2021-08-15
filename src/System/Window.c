@@ -266,7 +266,9 @@ static void DrawFadePane(ObjNode* theNode, const OGLSetupOutputType* setupInfo)
 
 void Enter2D(void)
 {
-#if !__APPLE__ && !_WIN32		// Linux: work around game window sent to background after showing a dialog box
+	// Linux: work around game window sent to background after showing a dialog box
+	// Windows: work around alert box appearing behind game
+#if !__APPLE__
 	SDL_SetWindowFullscreen(gSDLWindow, false);
 	SDL_HideWindow(gSDLWindow);
 	SDL_PumpEvents();
@@ -278,7 +280,7 @@ void Enter2D(void)
 
 void Exit2D(void)
 {
-#if !__APPLE__ && !_WIN32		// Linux: work around game window sent to background after showing a dialog box
+#if !__APPLE__
 	SDL_PumpEvents();
 	SDL_ShowWindow(gSDLWindow);
 	SetFullscreenModeFromPrefs();
