@@ -126,6 +126,9 @@ GameLanguageID GetBestLanguageIDFromSystemLocale(void)
 {
 	GameLanguageID languageID = LANGUAGE_ENGLISH;
 
+#if !(SDL_VERSION_ATLEAST(2,0,14))
+	#warning Please upgrade to SDL 2.0.14 or later for SDL_GetPreferredLocales. Will default to English for now.
+#else
 	SDL_Locale* localeList = SDL_GetPreferredLocales();
 	if (!localeList)
 		return languageID;
@@ -144,6 +147,7 @@ GameLanguageID GetBestLanguageIDFromSystemLocale(void)
 
 foundLocale:
 	SDL_free(localeList);
+#endif
 
 	return languageID;
 }
