@@ -474,6 +474,18 @@ float	fps = gFramesPerSecondFrac;
 		}
 	}
 
+			/* SNAP ANALOG ANGLE AGGRESSIVELY */
+
+	{
+		float angle = atan2f(gPlayerInfo.analogControlZ, gPlayerInfo.analogControlX);
+		float magnitude = sqrtf(gPlayerInfo.analogControlZ*gPlayerInfo.analogControlZ + gPlayerInfo.analogControlX*gPlayerInfo.analogControlX);
+
+		angle = SnapAngle(angle, OGLMath_DegreesToRadians(45/2.0f));
+
+		gPlayerInfo.analogControlX = cosf(angle) * magnitude;
+		gPlayerInfo.analogControlZ = sinf(angle) * magnitude;
+	}
+
 
 			/* CHECK USER CONTROLS FOR ROTATION */
 
