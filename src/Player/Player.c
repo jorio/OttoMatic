@@ -287,6 +287,10 @@ Boolean	killed = false;
 		KillPlayer(deathType);
 		killed = true;
 	}
+	else
+	{
+		Rumble(0.8f, 300);
+	}
 
 
 	return(killed);
