@@ -40,7 +40,6 @@ enum
 Boolean				gUserPrefersGamepad = false;
 
 SDL_GameController	*gSDLController = NULL;
-SDL_Haptic			*gSDLHaptic = NULL;
 SDL_JoystickID		gSDLJoystickInstanceID = -1;		// ID of the joystick bound to gSDLController
 
 Byte				gRawKeyboardState[SDL_NUM_SCANCODES];
@@ -462,19 +461,19 @@ SDL_GameController* TryOpenController(bool showMessage)
 
 	printf("Opened joystick %d as controller: %s\n", gSDLJoystickInstanceID, SDL_GameControllerName(gSDLController));
 
-	gSDLHaptic = SDL_HapticOpenFromJoystick(SDL_GameControllerGetJoystick(gSDLController));
-	if (gSDLHaptic)
-		SDL_HapticRumbleInit(gSDLHaptic);
-
 	return gSDLController;
 }
 
 void Rumble(float strength, uint32_t ms)
 {
-	if (NULL == gSDLHaptic || !gGamePrefs.gamepadRumble)
+	if (NULL == gSDLController || !gGamePrefs.gamepadRumble)
 		return;
 
-	SDL_HapticRumblePlay(gSDLHaptic, strength, ms);
+#if !(SDL_VERSION_ATLEAST(2,0,9))
+	#warning Rumble support requires SDL 2.0.9 or later
+#else
+	SDL_GameControllerRumble(gSDLController, (Uint16)(strength * 65535), (Uint16)(strength * 65535), ms);
+#endif
 }
 
 void OnJoystickRemoved(SDL_JoystickID which)
@@ -486,12 +485,6 @@ void OnJoystickRemoved(SDL_JoystickID which)
 		return;
 
 	printf("Current joystick was removed: %d\n", which);
-
-	if (gSDLHaptic)
-	{
-		SDL_HapticClose(gSDLHaptic);
-		gSDLHaptic = NULL;
-	}
 
 	// Nuke reference to this controller+joystick
 	SDL_GameControllerClose(gSDLController);
