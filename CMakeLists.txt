@@ -84,6 +84,7 @@ if(WIN32)
 	add_executable(${GAME_TARGET} WIN32
 		${GAME_ALL_SOURCES}
 		"${CMAKE_CURRENT_SOURCE_DIR}/packaging/${GAME_TARGET}.exe.rc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/packaging/${GAME_TARGET}.exe.manifest"
 	)
 elseif(APPLE)
 	# Add required frameworks for KillMacMouseAcceleration
