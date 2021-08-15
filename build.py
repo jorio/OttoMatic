@@ -237,6 +237,7 @@ def copy_documentation(proj, appdir, full=True):
 
     if full:
         shutil.copytree("docs", F"{appdir}/Documentation")
+        os.remove(F"{appdir}/Documentation/logo.png")
         os.remove(F"{appdir}/Documentation/screenshot.webp")
         for docfile in ["CHANGELOG.md", "CHEATS.md", "COMMANDLINE.md"]:
             shutil.copy(docfile, F"{appdir}/Documentation")
