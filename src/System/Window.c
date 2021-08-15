@@ -340,10 +340,5 @@ void SetFullscreenModeFromPrefs(void)
 		}
 	}
 
-	// Some systems may not display textures properly in the first GL context created by the game
-	// unless we flush SDL events immediately after entering fullscreen mode.
-	SDL_PumpEvents();
-	SDL_FlushEvents(0, 0xFFFFFFFF);
-
 	EatMouseEvents();
 }
