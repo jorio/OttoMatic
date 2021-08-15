@@ -274,6 +274,7 @@ static const MenuItem gVideoMenu[] =
 		},
 	},
 
+#if !(__APPLE__)	// hot-switching the preferred display if the game started as fullscreen is buggy on macOS for now
 	{
 		.type = kMenuItem_Cycler,
 		.text = STR_PREFERRED_DISPLAY,
@@ -285,7 +286,9 @@ static const MenuItem gVideoMenu[] =
 			.generateChoiceString = GenerateDisplayName,
 		},
 	},
+#endif
 
+#if !(__APPLE__)
 	{
 		.type = kMenuItem_Cycler,
 		.text = STR_ANTIALIASING,
@@ -296,6 +299,7 @@ static const MenuItem gVideoMenu[] =
 			.choices = {STR_OFF, STR_MSAA_2X, STR_MSAA_4X, STR_MSAA_8X},
 		}
 	},
+#endif
 
 	{
 		.type = kMenuItem_Cycler,
