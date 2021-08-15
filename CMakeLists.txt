@@ -241,4 +241,8 @@ if(WIN32)
 endif()
 
 # Copy documentation to output folder
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/packaging/ReadMe.txt.in ${CMAKE_CURRENT_BINARY_DIR}/ReadMe.txt)
+if(WIN32)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/packaging/ReadMe-Win32.txt.in ${CMAKE_CURRENT_BINARY_DIR}/ReadMe.txt)
+else()
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/packaging/ReadMe.txt.in ${CMAKE_CURRENT_BINARY_DIR}/ReadMe.txt)
+endif()
