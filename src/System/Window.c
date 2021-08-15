@@ -1,7 +1,8 @@
 /****************************/
-/*        WINDOWS           */
-/* (c)2005 Pangea Software  */
+/*        WINDOW            */
 /* By Brian Greenstone      */
+/* (c)2005 Pangea Software  */
+/* (c)2021 Iliyas Jorio     */
 /****************************/
 
 
@@ -37,6 +38,17 @@ int				gGameWindowWidth, gGameWindowHeight;
 
 void InitWindowStuff(void)
 {
+		/* SHOW A COUPLE BLACK FRAMES BEFORE WE BEGIN */
+
+	OGLSetupInputType viewDef;
+	OGL_NewViewDef(&viewDef);
+	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	for (int i = 0; i < 45; i++)
+	{
+		OGL_DrawScene(gGameViewInfoPtr, nil);
+		UpdateInput();  // will flush SDL events
+	}
+	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
 }
 
 
@@ -327,6 +339,11 @@ void SetFullscreenModeFromPrefs(void)
 			SDL_SetWindowFullscreen(gSDLWindow, SDL_WINDOW_FULLSCREEN);
 		}
 	}
+
+	// Some systems may not display textures properly in the first GL context created by the game
+	// unless we flush SDL events immediately after entering fullscreen mode.
+	SDL_PumpEvents();
+	SDL_FlushEvents(0, 0xFFFFFFFF);
 
 	EatMouseEvents();
 }
