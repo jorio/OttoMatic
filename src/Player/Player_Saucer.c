@@ -444,7 +444,7 @@ float fps = gFramesPerSecondFrac;
 	if (theNode->EffectChannel != -1)
 		Update3DSoundChannel(EFFECT_SAUCER, &theNode->EffectChannel, &theNode->Coord);
 	else
-		theNode->EffectChannel = PlayEffect3D(EFFECT_SAUCER, &theNode->Coord);
+		theNode->EffectChannel = PlayEffect_Parms3D(EFFECT_SAUCER, &theNode->Coord, NORMAL_CHANNEL_RATE, 0.5f);
 
 
 
@@ -927,7 +927,7 @@ float	fps = gFramesPerSecondFrac;
 		if (beam->EffectChannel != -1)
 			Update3DSoundChannel(EFFECT_BEAMHUM, &beam->EffectChannel, &beam->Coord);
 		else
-			beam->EffectChannel = PlayEffect_Parms3D(EFFECT_BEAMHUM, &beam->Coord, NORMAL_CHANNEL_RATE * 1.2f, 1.2);
+			beam->EffectChannel = PlayEffect_Parms3D(EFFECT_BEAMHUM, &beam->Coord, NORMAL_CHANNEL_RATE * 1.2f, 0.6f);
 
 
 

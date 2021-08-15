@@ -607,7 +607,7 @@ int		i;
 	if (gAlienSaucer->EffectChannel != -1)
 		Update3DSoundChannel(EFFECT_SAUCER, &gAlienSaucer->EffectChannel, &gAlienSaucer->Coord);
 	else
-		gAlienSaucer->EffectChannel = PlayEffect3D(EFFECT_SAUCER, &gAlienSaucer->Coord);
+		gAlienSaucer->EffectChannel = PlayEffect_Parms3D(EFFECT_SAUCER, &gAlienSaucer->Coord, NORMAL_CHANNEL_RATE, 0.9f);
 
 }
 
@@ -824,7 +824,7 @@ OGLColorRGBA	beamColor;
 			Update3DSoundChannel(EFFECT_BEAMHUM, &beam->EffectChannel, &beam->Coord);
 		}
 		else
-			beam->EffectChannel = PlayEffect_Parms3D(EFFECT_BEAMHUM, &beam->Coord, NORMAL_CHANNEL_RATE * 1.2f, 1.2);
+			beam->EffectChannel = PlayEffect_Parms3D(EFFECT_BEAMHUM, &beam->Coord, NORMAL_CHANNEL_RATE * 1.2f, 0.6f);
 	}
 }
 
