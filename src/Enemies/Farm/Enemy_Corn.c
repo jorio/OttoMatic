@@ -81,6 +81,19 @@ enum
 #define	ButtTimer		SpecialF[3]
 
 
+
+/************** FINALIZE CORN SCALE AND BOUNDING BOX *****************/
+
+static void FinalizeCornScaleAndBBox(ObjNode* theNode, float scale)
+{
+	theNode->Scale = (OGLVector3D) {scale, scale, scale};
+
+	UpdateObjectTransforms(theNode);					// apply final scale
+	UpdateSkinnedGeometry(theNode);						// this will update BBox
+	CreateCollisionBoxFromBoundingBox(theNode, 1,1);	// uses BBox to update XxyyzzOffsets and CollisionBoxes[0]
+}
+
+
 /************************ ADD CORN ENEMY *************************/
 //
 // A skeleton character
@@ -327,17 +340,18 @@ float	scale;
 
 	scale = theNode->Scale.x += gFramesPerSecondFrac;
 
-	if (scale >= CORN_SCALE)
+	if (scale >= CORN_SCALE)								// done growing?
 	{
-		scale = CORN_SCALE;
-		CreateCollisionBoxFromBoundingBox(theNode, 1,1);
-		MorphToSkeletonAnim(theNode->Skeleton, CORN_ANIM_STAND, 2);
-		gDelta.y = 700.0f;
-	}
+		FinalizeCornScaleAndBBox(theNode, CORN_SCALE);		// make final bounding box so corn won't drop underground
 
-	theNode->Scale.x =
-	theNode->Scale.y =
-	theNode->Scale.z = scale;
+		MorphToSkeletonAnim(theNode->Skeleton, CORN_ANIM_STAND, 2);
+
+		gDelta.y = 700.0f;									// bump upwards
+	}
+	else
+	{
+		theNode->Scale = (OGLVector3D) {scale, scale, scale};
+	}
 
 	if (DoEnemyCollisionDetect(theNode,0, true))			// just do ground
 		return;
@@ -658,10 +672,23 @@ static Boolean HurtCorn(ObjNode *enemy, float damage)
 	}
 	else
 	{
+					/* FINALIZE SCALE & BOUNDING BOX */
+					//
+					// If we don't do this, a corn that hasn't fully grown will keep the giant bbox
+					// that was reserved for it to grow, and it'll hover above the ground.
+					//
+
+		if (enemy->Skeleton->AnimNum == CORN_ANIM_GROW)
+		{
+			FinalizeCornScaleAndBBox(enemy, MAX(0.3f, enemy->Scale.y));
+		}
+
 					/* GO INTO HIT ANIM */
 
 		if (enemy->Skeleton->AnimNum != CORN_ANIM_GETHIT)
+		{
 			MorphToSkeletonAnim(enemy->Skeleton, CORN_ANIM_GETHIT, 5);
+		}
 
 		enemy->ButtTimer = 3.0f;
 	}

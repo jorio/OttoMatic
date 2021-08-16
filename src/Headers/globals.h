@@ -15,6 +15,8 @@
 #define	IS_ZERO(_x)  (fabs(_x) < EPS)
 
 #define CLAMP(x, lo, hi) ( (x) < (lo) ? (lo) : ( (x) > (hi) ? (hi) : (x) ) )
+#define MIN(a, b) ( (a) < (b) ? (a) : (b) )
+#define MAX(a, b) ( (a) > (b) ? (a) : (b) )
 
 
 

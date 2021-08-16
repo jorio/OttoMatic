@@ -193,7 +193,7 @@ static const EffectDef kEffectsTable[] =
 	[EFFECT_TOMATOSPLAT]      = {SOUNDBANK_FARM   , "tomatosplat"     , 3000, 0	},
 	[EFFECT_WOODDOORHIT]      = {SOUNDBANK_FARM   , "wooddoorhit"     , 2000, 0	},
 	[EFFECT_ONIONSPLAT]       = {SOUNDBANK_FARM   , "onionsplat"      , 3000, 0	},
-	[EFFECT_CORNCRUNCH]       = {SOUNDBANK_FARM   , "corncrunch"      , 3000, 0	},
+	[EFFECT_CORNCRUNCH]       = {SOUNDBANK_FARM   , "corncrunch"      , 3000, kSoundFlag_Unique	},
 
 	[EFFECT_BUBBLEPOP]        = {SOUNDBANK_SLIME  , "bubblepop"       , 3000, 0	},
 	[EFFECT_BLOBMOVE]         = {SOUNDBANK_SLIME  , "slimemonster"    , 400 , 0	},

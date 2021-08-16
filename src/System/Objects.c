@@ -863,9 +863,12 @@ int					n,i;
 CollisionBoxType	*c;
 float				left,right,top,bottom,front,back;
 
+	OGL_PushState();
+
 			/* SET LINE MATERIAL */
 
 	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_LIGHTING);
 
 
 		/* SCAN EACH COLLISION BOX */
@@ -946,6 +949,8 @@ float				left,right,top,bottom,front,back;
 		glEnd();
 
 	}
+
+	OGL_PopState();
 }
 
 /************************ DRAW BOUNDING BOXES ****************************/
