@@ -349,19 +349,34 @@ void FreeSkeletonBaseData(SkeletonObjDataType *data)
 }
 
 
+/************* FINALIZE SKELETON OBJECT SCALE AND COLLISION BOX ************/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void FinalizeSkeletonObjectScale(ObjNode* theNode, float scale, long collisionReferenceAnim)
+{
+	GAME_ASSERT(theNode->Genre == SKELETON_GENRE);
+	
+	SkeletonObjDataType* skeleton = theNode->Skeleton;
+	
+	theNode->Scale = (OGLVector3D) {scale, scale, scale};
+	
+	// Back up current animation
+	long animNumBackup = skeleton->AnimNum;
+	float animTimeBackup = 0;
+	if (skeleton->MaxAnimTime != 0.0f)
+		animTimeBackup = skeleton->CurrentAnimTime / skeleton->MaxAnimTime;
+	
+	// Enter reference anim for collision box
+	SetSkeletonAnim(skeleton, collisionReferenceAnim);
+	
+	// Finalize collision box
+	UpdateObjectTransforms(theNode);					// apply final scale
+	UpdateSkinnedGeometry(theNode);						// this will update BBox
+	CreateCollisionBoxFromBoundingBox(theNode, 1,1);	// uses BBox to update XxyyzzOffsets and CollisionBoxes[0]
+	
+	// Restore animation
+	SetSkeletonAnim(skeleton, animNumBackup);
+	SetSkeletonAnimTime(skeleton, animTimeBackup);
+	UpdateSkeletonAnimation(theNode);
+	UpdateSkinnedGeometry(theNode);
+}
 

@@ -2,8 +2,7 @@
 // SkeletonObj.h
 //
 
-#ifndef __SKELOBJ
-#define __SKELOBJ
+#pragma once
 
 enum
 {
@@ -50,6 +49,4 @@ void LoadASkeleton(Byte num, OGLSetupOutputType *setupInfo);
 extern	void FreeSkeletonFile(Byte skeletonType);
 extern	void FreeAllSkeletonFiles(short skipMe);
 extern	void FreeSkeletonBaseData(SkeletonObjDataType *data);
-
-
-#endif
+void FinalizeSkeletonObjectScale(ObjNode* theNode, float scale, long collisionReferenceAnim);

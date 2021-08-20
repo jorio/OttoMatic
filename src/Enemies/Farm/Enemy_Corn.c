@@ -45,6 +45,7 @@ static Boolean CornGotPunched(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *fistC
 #define	MAX_CORNS					8
 
 #define	CORN_SCALE					1.7f
+#define	CORN_SCALE_MIN				0.3f
 
 #define	CORN_CHASE_DIST				3000.0f
 #define	CORN_DETACH_DIST			(CORN_CHASE_DIST/2.0f)
@@ -80,18 +81,6 @@ enum
 #define	ShotCounter		Special[0]
 #define	ButtTimer		SpecialF[3]
 
-
-
-/************** FINALIZE CORN SCALE AND BOUNDING BOX *****************/
-
-static void FinalizeCornScaleAndBBox(ObjNode* theNode, float scale)
-{
-	theNode->Scale = (OGLVector3D) {scale, scale, scale};
-
-	UpdateObjectTransforms(theNode);					// apply final scale
-	UpdateSkinnedGeometry(theNode);						// this will update BBox
-	CreateCollisionBoxFromBoundingBox(theNode, 1,1);	// uses BBox to update XxyyzzOffsets and CollisionBoxes[0]
-}
 
 
 /************************ ADD CORN ENEMY *************************/
@@ -342,7 +331,7 @@ float	scale;
 
 	if (scale >= CORN_SCALE)								// done growing?
 	{
-		FinalizeCornScaleAndBBox(theNode, CORN_SCALE);		// make final bounding box so corn won't drop underground
+		FinalizeSkeletonObjectScale(theNode, CORN_SCALE, CORN_ANIM_STAND);		// make final collision box so corn won't drop underground
 
 		MorphToSkeletonAnim(theNode->Skeleton, CORN_ANIM_STAND, 2);
 
@@ -672,15 +661,16 @@ static Boolean HurtCorn(ObjNode *enemy, float damage)
 	}
 	else
 	{
-					/* FINALIZE SCALE & BOUNDING BOX */
+					/* FINALIZE SCALE & COLLISION BOX */
 					//
-					// If we don't do this, a corn that hasn't fully grown will keep the giant bbox
+					// If we don't do this, a miniature corn will keep the giant collision box
 					// that was reserved for it to grow, and it'll hover above the ground.
 					//
 
 		if (enemy->Skeleton->AnimNum == CORN_ANIM_GROW)
 		{
-			FinalizeCornScaleAndBBox(enemy, GAME_MAX(0.3f, enemy->Scale.y));
+			float finalScale = GAME_MAX(CORN_SCALE_MIN, enemy->Scale.y);
+			FinalizeSkeletonObjectScale(enemy, finalScale, CORN_ANIM_STAND);
 		}
 
 					/* GO INTO HIT ANIM */

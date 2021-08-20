@@ -45,6 +45,7 @@ static void MoveOnionSlice(ObjNode *theNode);
 #define	MAX_ONIONS					8
 
 #define	ONION_SCALE					2.0f
+#define	ONION_SCALE_MIN				0.7f
 
 #define	ONION_CHASE_DIST			3000.0f
 #define	ONION_DETACH_DIST			(ONION_CHASE_DIST / 2.0f)
@@ -459,12 +460,10 @@ float	scale;
 
 	scale = theNode->Scale.x += gFramesPerSecondFrac;
 
-	if (scale >= ONION_SCALE)
+	if (scale >= ONION_SCALE)								// don't overgrow
 		scale = ONION_SCALE;
 
-	theNode->Scale.x =
-	theNode->Scale.y =
-	theNode->Scale.z = scale;
+	theNode->Scale = (OGLVector3D) {scale, scale, scale};
 
 	if (DoEnemyCollisionDetect(theNode,0, true))			// just do ground
 		return;
@@ -474,6 +473,8 @@ float	scale;
 
 	if (theNode->Skeleton->AnimHasStopped)
 	{
+		FinalizeSkeletonObjectScale(theNode, ONION_SCALE, ONION_ANIM_STAND);
+
 		MorphToSkeletonAnim(theNode->Skeleton, ONION_ANIM_STAND, 2);
 		gDelta.y = 700.0f;
 	}
@@ -491,7 +492,7 @@ float		scale;
 
 			/* CALC SCALE MATRIX */
 
-	scale = PLAYER_DEFAULT_SCALE/ONION_SCALE;							// to adjust from onion's scale to player's
+	scale = PLAYER_DEFAULT_SCALE/onion->Scale.y;							// to adjust from onion's scale to player's
 	OGLMatrix4x4_SetScale(&m2, scale, scale, scale);
 
 
@@ -837,6 +838,15 @@ static Boolean HurtOnion(ObjNode *enemy, float damage)
 	if (enemy->StatusBits & STATUS_BIT_ONSPLINE)
 		DetachEnemyFromSpline(enemy, MoveOnion);
 
+		
+			/* FINALIZE SCALE IF NOT DONE GROWING */
+	
+	if (enemy->Skeleton->AnimNum == ONION_ANIM_GROW)
+	{
+		float finalScale = GAME_MAX(ONION_SCALE_MIN, enemy->Scale.y);
+		FinalizeSkeletonObjectScale(enemy, finalScale, ONION_ANIM_STAND);
+	}
+	
 
 				/* HURT ENEMY & SEE IF KILL */
 
