@@ -680,7 +680,7 @@ static Boolean HurtCorn(ObjNode *enemy, float damage)
 
 		if (enemy->Skeleton->AnimNum == CORN_ANIM_GROW)
 		{
-			FinalizeCornScaleAndBBox(enemy, MAX(0.3f, enemy->Scale.y));
+			FinalizeCornScaleAndBBox(enemy, GAME_MAX(0.3f, enemy->Scale.y));
 		}
 
 					/* GO INTO HIT ANIM */

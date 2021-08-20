@@ -14,9 +14,9 @@
 #define EPS .0001					// a very small number which is useful for FP compares close to 0
 #define	IS_ZERO(_x)  (fabs(_x) < EPS)
 
-#define CLAMP(x, lo, hi) ( (x) < (lo) ? (lo) : ( (x) > (hi) ? (hi) : (x) ) )
-#define MIN(a, b) ( (a) < (b) ? (a) : (b) )
-#define MAX(a, b) ( (a) > (b) ? (a) : (b) )
+#define GAME_CLAMP(x, lo, hi) ( (x) < (lo) ? (lo) : ( (x) > (hi) ? (hi) : (x) ) )
+#define GAME_MIN(a, b) ( (a) < (b) ? (a) : (b) )
+#define GAME_MAX(a, b) ( (a) > (b) ? (a) : (b) )
 
 
 

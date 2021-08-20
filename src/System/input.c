@@ -321,8 +321,8 @@ void UpdateInput(void)
 		float mouseDX = mdx * mouseSensitivityFrac * .1f;
 		float mouseDY = mdy * mouseSensitivityFrac * .1f;
 
-		mouseDX = CLAMP(mouseDX, -1.0f, 1.0f);						// keep values pinned
-		mouseDY = CLAMP(mouseDY, -1.0f, 1.0f);
+		mouseDX = GAME_CLAMP(mouseDX, -1.0f, 1.0f);					// keep values pinned
+		mouseDY = GAME_CLAMP(mouseDY, -1.0f, 1.0f);
 
 		if (fabsf(mouseDX) > fabsf(gPlayerInfo.analogControlX))		// is the mouse delta better than what we've got from the other devices?
 			gPlayerInfo.analogControlX = mouseDX;
