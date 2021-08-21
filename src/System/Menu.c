@@ -65,6 +65,7 @@ const MenuStyle kDefaultMenuStyle =
 	.uniformXExtent		= 0,
 	.playMenuChangeSounds	= true,
 	.startButtonExits	= false,
+	.isInteractive		= true,
 };
 
 /*********************/
@@ -654,6 +655,8 @@ static void NavigateMouseBinding(const MenuItem* entry)
 
 static void NavigateMenu(void)
 {
+	GAME_ASSERT(gMenuStyle->isInteractive);
+
 	if (GetNewNeedState(kNeed_UIBack))
 		MenuCallback_Back();
 
@@ -1282,7 +1285,14 @@ int StartMenu(
 				break;
 
 			case kMenuStateReady:
-				NavigateMenu();
+				if (gMenuStyle->isInteractive)
+				{
+					NavigateMenu();
+				}
+				else if (UserWantsOut())
+				{
+					MenuCallback_Back();
+				}
 				break;
 
 			case kMenuStateAwaitingKeyPress:

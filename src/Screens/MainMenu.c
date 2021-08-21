@@ -1667,7 +1667,6 @@ static void DoCredits(void)
 {
 static const MenuItem kCreditsMenu[] =
 {
-	{ .type = kMenuItem_Label, .text = -1, .rawText = " " },  // make up for invisible OK button
 	{ .type = kMenuItem_Title, .text = STR_CREDITS },
 	{ .type = kMenuItem_Spacer },
 	{ .type = kMenuItem_Label, .text = STR_CREDITS_GAME_DESIGN },
@@ -1685,7 +1684,6 @@ static const MenuItem kCreditsMenu[] =
 	{ .type = kMenuItem_Spacer },
 	{ .type = kMenuItem_Label, .text = STR_CREDITS_ADDITIONAL_PROGRAMMING },
 	{ .type = kMenuItem_Label, .text = -1, .rawText = "      Iliyas Jorio" },
-	{ .type = kMenuItem_Action, .text = -1, .rawText = " ", .action = { .callback = MenuCallback_Back } },
 	{ .type = kMenuItem_END_SENTINEL },
 };
 
@@ -1694,10 +1692,10 @@ static const MenuItem kCreditsMenu[] =
 	else
 		PlayEffect(EFFECT_ACCENTDRONE2);
 
+	MenuStyle creditsMenuStyle = kDefaultMenuStyle;
+	creditsMenuStyle.isInteractive = false;
 
-
-
-	StartMenu(kCreditsMenu, nil, nil, DrawMainMenuCallback);
+	StartMenu(kCreditsMenu, &creditsMenuStyle, nil, DrawMainMenuCallback);
 }
 
 
