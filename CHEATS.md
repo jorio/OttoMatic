@@ -10,6 +10,28 @@
 
 ## In game
 
+- \` + F1 = Fill rocket fuel
+
+- \` + F2 = Set lives to five
+
+- \` + F3 = Full health
+
+- \` + F4 = Full jump jet
+
+- \` + 1 = Ray gun
+
+- \` + 2 = Freeze gun
+
+- \` + 3 = Flame gun
+
+- \` + 4 = Growth potion
+
+- \` + 5 = Flare gun
+
+- \` + 6 = Supernova
+
+- \` + 7 = Darts
+
 - Press B, R, I simultaneously to fill up your inventory.
 
 - Press F8 to bring up debug mode.
