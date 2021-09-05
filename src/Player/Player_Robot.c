@@ -2824,12 +2824,96 @@ static void CheckPlayerActionControls(ObjNode *theNode)
 		gPlayerInfo.health 	= 1.0;
 		gPlayerInfo.fuel 	= 1.0;
 		gPlayerInfo.jumpJet = 1.0;
+
+		gPlayerInfo.weaponInventory[1].type = WEAPON_TYPE_STUNPULSE;
+		gPlayerInfo.weaponInventory[1].quantity = 99;
+		gPlayerInfo.weaponInventory[2].type = WEAPON_TYPE_FREEZE;
+		gPlayerInfo.weaponInventory[2].quantity = 99;
+		gPlayerInfo.weaponInventory[3].type = WEAPON_TYPE_FLAME;
+		gPlayerInfo.weaponInventory[3].quantity = 99;
+		gPlayerInfo.weaponInventory[4].type = WEAPON_TYPE_GROWTH;
+		gPlayerInfo.weaponInventory[4].quantity = 99;
+		gPlayerInfo.weaponInventory[5].type = WEAPON_TYPE_FLARE;
+		gPlayerInfo.weaponInventory[5].quantity = 99;
 		gPlayerInfo.weaponInventory[6].type = WEAPON_TYPE_SUPERNOVA;
 		gPlayerInfo.weaponInventory[6].quantity = 99;
-		gPlayerInfo.weaponInventory[7].type = WEAPON_TYPE_STUNPULSE;
+		gPlayerInfo.weaponInventory[7].type = WEAPON_TYPE_DART;
 		gPlayerInfo.weaponInventory[7].quantity = 99;
 	}
-
+	
+	if (GetKeyState(SDL_SCANCODE_GRAVE) &&
+	GetKeyState(SDL_SCANCODE_F1))
+	{
+		gPlayerInfo.fuel 	= 1.0;
+	}
+	
+	if (GetKeyState(SDL_SCANCODE_GRAVE) &&
+	GetKeyState(SDL_SCANCODE_F2))
+	{
+		if (gPlayerInfo.lives < 5)
+			gPlayerInfo.lives 	= 5;
+	}
+	
+	if (GetKeyState(SDL_SCANCODE_GRAVE) &&
+	GetKeyState(SDL_SCANCODE_F3))
+	{
+		gPlayerInfo.health 	= 1.0;
+	}
+	
+	if (GetKeyState(SDL_SCANCODE_GRAVE) &&
+	GetKeyState(SDL_SCANCODE_F4))
+	{
+		gPlayerInfo.jumpJet = 1.0;
+	}
+	
+	if (GetKeyState(SDL_SCANCODE_GRAVE) &&
+	GetKeyState(SDL_SCANCODE_1))
+	{
+		gPlayerInfo.weaponInventory[1].type = WEAPON_TYPE_STUNPULSE;
+		gPlayerInfo.weaponInventory[1].quantity = 99;
+	}
+	
+	if (GetKeyState(SDL_SCANCODE_GRAVE) &&
+	GetKeyState(SDL_SCANCODE_2))
+	{
+		gPlayerInfo.weaponInventory[2].type = WEAPON_TYPE_FREEZE;
+		gPlayerInfo.weaponInventory[2].quantity = 99;
+	}
+	
+	if (GetKeyState(SDL_SCANCODE_GRAVE) &&
+	GetKeyState(SDL_SCANCODE_3))
+	{
+		gPlayerInfo.weaponInventory[3].type = WEAPON_TYPE_FLAME;
+		gPlayerInfo.weaponInventory[3].quantity = 99;
+	}
+	
+	if (GetKeyState(SDL_SCANCODE_GRAVE) &&
+	GetKeyState(SDL_SCANCODE_4))
+	{
+		gPlayerInfo.weaponInventory[4].type = WEAPON_TYPE_GROWTH;
+		gPlayerInfo.weaponInventory[4].quantity = 99;
+	}
+	
+	if (GetKeyState(SDL_SCANCODE_GRAVE) &&
+	GetKeyState(SDL_SCANCODE_5))
+	{
+		gPlayerInfo.weaponInventory[5].type = WEAPON_TYPE_FLARE;
+		gPlayerInfo.weaponInventory[5].quantity = 99;
+	}
+	
+	if (GetKeyState(SDL_SCANCODE_GRAVE) &&
+	GetKeyState(SDL_SCANCODE_6))
+	{
+		gPlayerInfo.weaponInventory[6].type = WEAPON_TYPE_SUPERNOVA;
+		gPlayerInfo.weaponInventory[6].quantity = 99;
+	}
+	
+	if (GetKeyState(SDL_SCANCODE_GRAVE) &&
+	GetKeyState(SDL_SCANCODE_7))
+	{
+		gPlayerInfo.weaponInventory[7].type = WEAPON_TYPE_DART;
+		gPlayerInfo.weaponInventory[7].quantity = 99;
+	}
 			/***************/
 			/* SEE IF JUMP */
 			/***************/
@@ -3349,24 +3433,3 @@ ObjNode		*magMonster;
 
 	gTargetPickup = nil;										// no longer a target
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
