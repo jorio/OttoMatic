@@ -2,13 +2,11 @@
 // Terrain.h
 //
 
-#ifndef TERRAIN_H
-#define TERRAIN_H
+#pragma once
 
 #include "main.h"
 
 
-#define REDUCE_SUPERTILE_MESH	0
 
 
 enum
@@ -36,7 +34,6 @@ enum
 #define	SUPERTILE_TEXMAP_SIZE		128												// the width & height of a supertile's texture
 
 #define	OREOMAP_TILE_SIZE			16 												// pixel w/h of texture tile
-#define TILE_DATA_SIZE16			(OREOMAP_TILE_SIZE*OREOMAP_TILE_SIZE*2)
 
 #define	TERRAIN_POLYGON_SIZE		225.0f 											// size in world units of terrain polygon
 
@@ -44,10 +41,8 @@ enum
 
 #define	SUPERTILE_SIZE				8  												// size of a super-tile / terrain object zone
 
-#define	NUM_TRIS_IN_SUPERTILE		(SUPERTILE_SIZE * SUPERTILE_SIZE * 2)			// 2 triangles per tile
-#define	NUM_VERTICES_IN_SUPERTILE	((SUPERTILE_SIZE+1)*(SUPERTILE_SIZE+1))			// # vertices in a supertile
-
-#define	TEMP_TEXTURE_BUFF_SIZE		(OREOMAP_TILE_SIZE * SUPERTILE_SIZE)
+#define	NUM_TRIS_IN_SUPERTILE		(SQUARED(SUPERTILE_SIZE) * 2)					// 2 triangles per tile
+#define	NUM_VERTICES_IN_SUPERTILE	(SQUARED(SUPERTILE_SIZE + 1))					// # vertices in a supertile
 
 #define	MAP2UNIT_VALUE				((float)TERRAIN_POLYGON_SIZE/OREOMAP_TILE_SIZE)	//value to xlate Oreo map pixel coords to 3-space unit coords
 
@@ -64,14 +59,13 @@ enum
 								// We need the x2 buffer because we dont free unused supertiles
 								// until after we've allocated new supertiles, so we'll always
 								// need more supertiles than are actually ever used.
-	
-#define	MAX_SUPERTILES			((SUPERTILE_ACTIVE_RANGE*2 * SUPERTILE_ACTIVE_RANGE*2)*2)	// the final *2 is because the old supertiles are not deleted until
-																											// after new ones are created, thus we need some extas - worst case
-																											// scenario is twice as many.
-	
+								// (Source port note: "2 players" here is probably a remnant from CMR)
+
+#define	MAX_SUPERTILES			(SQUARED(SUPERTILE_ACTIVE_RANGE*2) * 2)	// the final *2 is because the old supertiles are not deleted until
+																		// after new ones are created, thus we need some extas - worst case
+																		// scenario is twice as many.
 
 
-#define	MAX_TERRAIN_TILES		0x10000	
 
 #define	MAX_TERRAIN_WIDTH		400
 #define	MAX_TERRAIN_DEPTH		400
@@ -225,12 +219,4 @@ u_short	GetTileAttribsAtRowCol(int row, int col);
 short NewSuperTileDeformation(DeformationType *data);
 void DeleteTerrainDeformation(short	i);
 void UpdateDeformationCoords(short defNum, float x, float z);
-
-
-#endif
-
-
-
-
-
 

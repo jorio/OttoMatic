@@ -17,6 +17,7 @@
 #define GAME_CLAMP(x, lo, hi) ( (x) < (lo) ? (lo) : ( (x) > (hi) ? (hi) : (x) ) )
 #define GAME_MIN(a, b) ( (a) < (b) ? (a) : (b) )
 #define GAME_MAX(a, b) ( (a) > (b) ? (a) : (b) )
+#define	SQUARED(x)					((x)*(x))
 
 
 

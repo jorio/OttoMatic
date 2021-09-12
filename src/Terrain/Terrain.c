@@ -215,11 +215,11 @@ int		r,c,i;
 
 void DisposeTerrain(void)
 {
-int	i;
-
 			/* FREE ALL TEXTURE OBJECTS */
 
-	for (i = 0; i < gNumUniqueSuperTiles; i++)
+	GAME_ASSERT_MESSAGE(gSuperTileTextureObjects[0] == nil, "supertile 0's texture is supposed to be blank!");
+
+	for (int i = 1; i < gNumUniqueSuperTiles; i++)
 	{
 		MO_DisposeObjectReference(gSuperTileTextureObjects[i]);
 		gSuperTileTextureObjects[i] = nil;
@@ -284,7 +284,7 @@ int	i;
 
 	if (gSplineList)
 	{
-		for (i = 0; i < gNumSplines; i++)
+		for (int i = 0; i < gNumSplines; i++)
 		{
 			DisposeHandle((Handle)(*gSplineList)[i].pointList);		// nuke point list
 			DisposeHandle((Handle)(*gSplineList)[i].itemList);		// nuke item list
@@ -407,6 +407,10 @@ int	u,v,i,j;
 
 				/* SET UV & COLOR VALUES */
 
+		const float seamlessTexmapSize	= (2.0f + SUPERTILE_TEXMAP_SIZE);
+		const float seamlessUVScale		= SUPERTILE_TEXMAP_SIZE / seamlessTexmapSize;
+		const float seamlessUVTranslate	= 1.0f / seamlessTexmapSize;
+
 		j = 0;
 		for (v = 0; v <= SUPERTILE_SIZE; v++)
 		{
@@ -414,6 +418,12 @@ int	u,v,i,j;
 			{
 				uvPtr[j].u = (float)u / (float)SUPERTILE_SIZE;		// sets uv's 0.0 -> 1.0 for single texture map
 				uvPtr[j].v = (float)v / (float)SUPERTILE_SIZE;
+
+				if (gG4)											// do seamless texturing if we're in high-detail mode
+				{
+					uvPtr[j].u = (uvPtr[j].u * seamlessUVScale) + seamlessUVTranslate;
+					uvPtr[j].v = (uvPtr[j].v * seamlessUVScale) + seamlessUVTranslate;
+				}
 
 				j++;
 			}

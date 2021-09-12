@@ -20,6 +20,19 @@
 static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType, OGLSetupOutputType *setupInfo);
 static void ReadDataFromPlayfieldFile(FSSpec *specPtr, OGLSetupOutputType *setupInfo);
 static void	ConvertTexture16To16(uint16_t *textureBuffer, int width, int height);
+static inline void Blit16(
+		const char*			src,
+		int					srcWidth,
+		int					srcHeight,
+		int					srcRectX,
+		int					srcRectY,
+		int					srcRectWidth,
+		int					srcRectHeight,
+		char* 				dst,
+		int 				dstWidth,
+		int 				dstHeight,
+		int					dstRectX,
+		int					dstRectY);
 
 
 /****************************/
@@ -966,11 +979,9 @@ static void ReadDataFromPlayfieldFile(FSSpec *specPtr, OGLSetupOutputType *setup
 {
 Handle					hand;
 PlayfieldHeaderType		**header;
-long					row,col,j,i,size;
 float					yScale;
 short					fRefNum;
 OSErr					iErr;
-Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 				/* OPEN THE REZ-FORK */
 
@@ -1046,8 +1057,8 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	{																							// copy rez into 2D array
 		SuperTileGridType *src = (SuperTileGridType *)*hand;
 
-		for (row = 0; row < gNumSuperTilesDeep; row++)
-			for (col = 0; col < gNumSuperTilesWide; col++)
+		for (int row = 0; row < gNumSuperTilesDeep; row++)
+			for (int col = 0; col < gNumSuperTilesWide; col++)
 			{
 				gSuperTileTextureGrid[row][col].isEmpty = src->isEmpty;
 				gSuperTileTextureGrid[row][col].superTileID = SwizzleUShort(&src->superTileID);
@@ -1079,9 +1090,9 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			Alloc_2d_array(u_short, gTileGrid, gTerrainTileDepth, gTerrainTileWidth);
 
 			src = (u_short *)*hand;
-			for (row = 0; row < gTerrainTileDepth; row++)
+			for (int row = 0; row < gTerrainTileDepth; row++)
 			{
-				for (col = 0; col < gTerrainTileWidth; col++)
+				for (int col = 0; col < gTerrainTileWidth; col++)
 				{
 					gTileGrid[row][col] = SwizzleUShort(src);
 					src++;
@@ -1103,8 +1114,8 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 	GAME_ASSERT_MESSAGE(hand, "Error reading height data resource!");
 	{
 		float* src = (float *)*hand;
-		for (row = 0; row <= gTerrainTileDepth; row++)
-			for (col = 0; col <= gTerrainTileWidth; col++)
+		for (int row = 0; row <= gTerrainTileDepth; row++)
+			for (int col = 0; col <= gTerrainTileWidth; col++)
 				gMapYCoordsOriginal[row][col] = gMapYCoords[row][col] = SwizzleFloat(src++) * yScale;
 		ReleaseResource(hand);
 	}
@@ -1127,7 +1138,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 					/* CONVERT COORDINATES */
 
-		for (i = 0; i < gNumTerrainItems; i++)
+		for (int i = 0; i < gNumTerrainItems; i++)
 		{
 			(*gMasterItemList)[i].x = SwizzleULong(&rezItems[i].x) * MAP2UNIT_VALUE;								// convert coordinates
 			(*gMasterItemList)[i].y = SwizzleULong(&rezItems[i].y) * MAP2UNIT_VALUE;
@@ -1159,7 +1170,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		HLockHi(hand);
 		gSplineList = (SplineDefType **) NewHandleClear(gNumSplines * sizeof(SplineDefType));
 
-		for (i = 0; i < gNumSplines; i++)
+		for (int i = 0; i < gNumSplines; i++)
 		{
 			(*gSplineList)[i].numNubs = SwizzleShort(&splinePtr[i].numNubs);
 			(*gSplineList)[i].numPoints = SwizzleLong(&splinePtr[i].numPoints);
@@ -1179,7 +1190,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 			/* READ SPLINE POINT LIST */
 
-	for (i = 0; i < gNumSplines; i++)
+	for (int i = 0; i < gNumSplines; i++)
 	{
 		SplineDefType	*spline = &(*gSplineList)[i];									// point to Nth spline
 
@@ -1195,7 +1206,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			HLockHi(hand);
 			(*gSplineList)[i].pointList = (SplinePointType **)hand;
 
-			for (j = 0; j < spline->numPoints; j++)			// swizzle
+			for (int j = 0; j < spline->numPoints; j++)			// swizzle
 			{
 				(*spline->pointList)[j].x = SwizzleFloat(&ptList[j].x);
 				(*spline->pointList)[j].z = SwizzleFloat(&ptList[j].z);
@@ -1206,7 +1217,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 			/* READ SPLINE ITEM LIST */
 
-	for (i = 0; i < gNumSplines; i++)
+	for (int i = 0; i < gNumSplines; i++)
 	{
 		SplineDefType	*spline = &(*gSplineList)[i];									// point to Nth spline
 
@@ -1219,7 +1230,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			HLockHi(hand);
 			(*gSplineList)[i].itemList = (SplineItemType **)hand;
 
-			for (j = 0; j < spline->numItems; j++)			// swizzle
+			for (int j = 0; j < spline->numItems; j++)			// swizzle
 			{
 				(*spline->itemList)[j].placement = SwizzleFloat(&itemList[j].placement);
 				(*spline->itemList)[j].type	= SwizzleUShort(&itemList[j].type);
@@ -1244,7 +1255,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 		inData = (FileFenceDefType *)*hand;								// get ptr to input fence list
 
-		for (i = 0; i < gNumFences; i++)								// copy data from rez to new list
+		for (int i = 0; i < gNumFences; i++)							// copy data from rez to new list
 		{
 			gFenceList[i].type 		= SwizzleUShort(&inData[i].type);
 			gFenceList[i].numNubs 	= SwizzleShort(&inData[i].numNubs);
@@ -1260,7 +1271,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 			/* READ FENCE NUB LIST */
 
-	for (i = 0; i < gNumFences; i++)
+	for (int i = 0; i < gNumFences; i++)
 	{
 		hand = GetResource('FnNb',1000+i);					// get rez
 		GAME_ASSERT_MESSAGE(hand, "cant get fence nub rez");
@@ -1271,7 +1282,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			gFenceList[i].nubList = (OGLPoint3D *)AllocPtr(sizeof(FenceDefType) * gFenceList[i].numNubs);	// alloc new ptr for nub array
 			GAME_ASSERT(gFenceList[i].nubList);
 
-			for (j = 0; j < gFenceList[i].numNubs; j++)		// convert x,z to x,y,z
+			for (int j = 0; j < gFenceList[i].numNubs; j++)		// convert x,z to x,y,z
 			{
 				gFenceList[i].nubList[j].x = SwizzleLong(&fileFencePoints[j].x);
 				gFenceList[i].nubList[j].z = SwizzleLong(&fileFencePoints[j].z);
@@ -1296,7 +1307,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 		gWaterListHandle = (WaterDefType **)hand;
 		gWaterList = *gWaterListHandle;
 
-		for (i = 0; i < gNumWaterPatches; i++)						// swizzle
+		for (int i = 0; i < gNumWaterPatches; i++)						// swizzle
 		{
 			gWaterList[i].type = SwizzleUShort(&gWaterList[i].type);
 			gWaterList[i].flags = SwizzleULong(&gWaterList[i].flags);
@@ -1311,7 +1322,7 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 			gWaterList[i].bBox.left = SwizzleShort(&gWaterList[i].bBox.left);
 			gWaterList[i].bBox.right = SwizzleShort(&gWaterList[i].bBox.right);
 
-			for (j = 0; j < gWaterList[i].numNubs; j++)
+			for (int j = 0; j < gWaterList[i].numNubs; j++)
 			{
 				gWaterList[i].nubList[j].x = SwizzleFloat(&gWaterList[i].nubList[j].x);
 				gWaterList[i].nubList[j].y = SwizzleFloat(&gWaterList[i].nubList[j].y);
@@ -1339,61 +1350,112 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 				/* ALLOC BUFFERS */
 
-	size = SUPERTILE_TEXMAP_SIZE * SUPERTILE_TEXMAP_SIZE * 2;						// calc size of supertile 16-bit texture
-	tempBuffer16 = AllocPtr(size);
-	if (tempBuffer16 == nil)
-		DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed!");
+	int size = SQUARED(SUPERTILE_TEXMAP_SIZE) * sizeof(uint16_t);						// calc size of supertile 16-bit texture
 
-	tempBuffer24 = AllocPtr(SUPERTILE_TEXMAP_SIZE * SUPERTILE_TEXMAP_SIZE * 3);		// alloc for 24bit pixels
-	if (tempBuffer24 == nil)
-		DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed!");
+	int seamlessCanvasSize = SQUARED(SUPERTILE_TEXMAP_SIZE + 2) * sizeof(uint16_t);		// seamless texture needs 1px border around supertile image
 
-	tempBuffer32 = AllocPtr(SUPERTILE_TEXMAP_SIZE * SUPERTILE_TEXMAP_SIZE * 4);		// alloc for 32bit pixels
-	if (tempBuffer32 == nil)
-		DoFatalAlert("ReadDataFromPlayfieldFile: AllocPtr failed!");
+	Ptr allImages = AllocPtrClear(gNumUniqueSuperTiles * size);							// all supertile images from .ter data fork
+	Ptr canvas = AllocPtrClear(seamlessCanvasSize);										// we'll assemble the final supertile texture in there
+
+	memset(gSuperTileTextureObjects, 0, sizeof(gSuperTileTextureObjects));				// clear all supertile texture pointers
 
 
-
-				/* OPEN THE DATA FORK */
+				/* READ ALL SUPERTILE IMAGES FROM DATA FORK */
 
 	iErr = FSpOpenDF(specPtr, fsRdPerm, &fRefNum);
-	if (iErr)
-		DoFatalAlert("ReadDataFromPlayfieldFile: FSpOpenDF failed!");
+	GAME_ASSERT_MESSAGE(!iErr, "Couldn't open terrain data fork!");
 
-
-
-	for (i = 0; i < gNumUniqueSuperTiles; i++)
+	for (int i = 0; i < gNumUniqueSuperTiles; i++)
 	{
-		long	width,height;
-		MOMaterialData	matData;
-
+		Ptr image = allImages + i * size;
 
 				/* READ THE SIZE OF THE NEXT COMPRESSED SUPERTILE TEXTURE */
 
 		int32_t compressedSize = FSReadBELong(fRefNum);
 
-
 				/* READ & DECOMPRESS IT */
 
-		long decompressedSize = LZSS_Decode(fRefNum, tempBuffer16, compressedSize);
+		long decompressedSize = LZSS_Decode(fRefNum, image, compressedSize);
 		GAME_ASSERT_MESSAGE(decompressedSize == size, "LZSS_Decode size is wrong!");
 
-		width = SUPERTILE_TEXMAP_SIZE;
-		height = SUPERTILE_TEXMAP_SIZE;
+				/* CONVERT PIXEL FORMAT */
+
+		ConvertTexture16To16((uint16_t*) image, SUPERTILE_TEXMAP_SIZE, SUPERTILE_TEXMAP_SIZE);
+	}
+
+
+				/* CREATE SUPERTILE MATERIALS */
+
+	for (int row = 0; row < gNumSuperTilesDeep; row++)
+	for (int col = 0; col < gNumSuperTilesWide; col++)
+	{
+		int unique = gSuperTileTextureGrid[row][col].superTileID;
+		if (unique == 0)																// if 0 then it's a blank
+		{
+			continue;
+		}
+
+		GAME_ASSERT_MESSAGE(gSuperTileTextureObjects[unique] == NULL, "supertile isn't unique!");
+
+				/******************************/
+				/* ASSEMBLE SUPERTILE TEXTURE */
+				/******************************/
+
+#define TILEIMAGE(col, row) (allImages + gSuperTileTextureGrid[(row)][(col)].superTileID * size)
+
+		int cw, ch;	// canvas width & height
+
+		if (!gG4)	// No seamless texturing if we're in low-detail mode (requires NPOT textures)
+		{
+			cw = SUPERTILE_TEXMAP_SIZE;
+			ch = SUPERTILE_TEXMAP_SIZE;
+			memcpy(canvas, TILEIMAGE(col, row), size);
+		}
+		else		// Do seamless texturing
+		{
+			int tw = SUPERTILE_TEXMAP_SIZE;		// supertile width & height
+			int th = SUPERTILE_TEXMAP_SIZE;
+			cw = tw + 2;
+			ch = th + 2;
+
+			// Clear canvas to black
+			memset(canvas, 0, seamlessCanvasSize);
+
+			// Blit supertile image to middle of canvas
+			Blit16(TILEIMAGE(col, row), tw, th, 0, 0, tw, th, canvas, cw, ch, 1, 1);
+
+			// Scan for neighboring supertiles
+			bool hasN = row > 0;
+			bool hasS = row < gNumSuperTilesDeep-1;
+			bool hasW = col > 0;
+			bool hasE = col < gNumSuperTilesWide-1;
+
+			// Stitch edges from neighboring supertiles on each side and copy 1px corners from diagonal neighbors
+			//                       srcBuf                   sW  sH    sX    sY  rW  rH  dstBuf  dW  dH    dX    dY
+			if (hasN)         Blit16(TILEIMAGE(col  , row-1), tw, th,    0, th-1, tw,  1, canvas, cw, ch,    1,    0);
+			if (hasS)         Blit16(TILEIMAGE(col  , row+1), tw, th,    0,    0, tw,  1, canvas, cw, ch,    1, ch-1);
+			if (hasW)         Blit16(TILEIMAGE(col-1, row  ), tw, th, tw-1,    0,  1, th, canvas, cw, ch,    0,    1);
+			if (hasE)         Blit16(TILEIMAGE(col+1, row  ), tw, th,    0,    0,  1, th, canvas, cw, ch, cw-1,    1);
+			if (hasE && hasN) Blit16(TILEIMAGE(col+1, row-1), tw, th,    0, th-1,  1,  1, canvas, cw, ch, cw-1,    0);
+			if (hasW && hasN) Blit16(TILEIMAGE(col-1, row-1), tw, th, tw-1, th-1,  1,  1, canvas, cw, ch,    0,    0);
+			if (hasW && hasS) Blit16(TILEIMAGE(col-1, row+1), tw, th, tw-1,    0,  1,  1, canvas, cw, ch,    0, ch-1);
+			if (hasE && hasS) Blit16(TILEIMAGE(col+1, row+1), tw, th,    0,    0,  1,  1, canvas, cw, ch, cw-1, ch-1);
+		}
+
+#undef TILEIMAGE
 
 
 				/**************************/
 				/* CREATE MATERIAL OBJECT */
 				/**************************/
 
+		MOMaterialData	matData;
 
 			/* USE PACKED PIXEL TYPE */
 
-		ConvertTexture16To16((uint16_t *)tempBuffer16, width, height);
 		matData.pixelSrcFormat 	= GL_BGRA_EXT;
 		matData.pixelDstFormat 	= GL_RGBA;
-		matData.textureName[0] 	= OGL_TextureMap_Load(tempBuffer16, width, height,
-												 GL_BGRA_EXT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV);
+		matData.textureName[0] 	= OGL_TextureMap_Load(canvas, cw, ch, GL_BGRA_EXT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV);
 
 			/* INIT NEW MATERIAL DATA */
 
@@ -1402,45 +1464,28 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 											BG3D_MATERIALFLAG_CLAMP_V|
 											BG3D_MATERIALFLAG_TEXTURED;
 
-		switch(gLevelNum)
+		if (gG4 && gLevelNum == LEVEL_NUM_BLOBBOSS)
 		{
-			case	LEVEL_NUM_BLOBBOSS:
-					if (gG4)
-					{
-						matData.flags |= BG3D_MATERIALFLAG_MULTITEXTURE;
-						matData.envMapNum	= SPHEREMAP_SObjType_Red;
-					}
-					break;
-
+			matData.flags |= BG3D_MATERIALFLAG_MULTITEXTURE;
+			matData.envMapNum	= SPHEREMAP_SObjType_Red;
 		}
 
 		matData.multiTextureMode		= MULTI_TEXTURE_MODE_REFLECTIONSPHERE;
 		matData.multiTextureCombine		= MULTI_TEXTURE_COMBINE_ADD;
-		matData.diffuseColor.r			= 1;
-		matData.diffuseColor.g			= 1;
-		matData.diffuseColor.b			= 1;
-		matData.diffuseColor.a			= 1;
+		matData.diffuseColor			= (OGLColorRGBA) {1,1,1,1};
 		matData.numMipmaps				= 1;										// 1 texture
-		matData.width					= width;
-		matData.height					= height;
+		matData.width					= cw;
+		matData.height					= ch;
 		matData.texturePixels[0] 		= nil;										// the original pixels are gone (or will be soon)
-		gSuperTileTextureObjects[i] 	= MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);		// create the new object
+		gSuperTileTextureObjects[unique]= MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);		// create the new object
 	}
 
-			/* CLOSE THE FILE */
+			/* CLOSE THE FILE AND CLEAN UP */
 
 	FSClose(fRefNum);
-	if (tempBuffer16)
-		SafeDisposePtr(tempBuffer16);
-	if (tempBuffer24)
-		SafeDisposePtr(tempBuffer24);
-	if (tempBuffer32)
-		SafeDisposePtr(tempBuffer32);
+	SafeDisposePtr(allImages);
+	SafeDisposePtr(canvas);
 }
-
-
-
-
 
 
 /*********************** CONVERT TEXTURE; 16 TO 16 ***********************************/
@@ -1467,6 +1512,41 @@ static void	ConvertTexture16To16(uint16_t *textureBuffer, int width, int height)
 	}
 }
 
+
+/****************** COPY REGION BETWEEN 16-BIT PIXEL BUFFERS **********************/
+
+static inline void Blit16(
+		const char*			src,
+		int					srcWidth,
+		int					srcHeight,
+		int					srcRectX,
+		int					srcRectY,
+		int					srcRectWidth,
+		int					srcRectHeight,
+		char*				dst,
+		int 				dstWidth,
+		int 				dstHeight,
+		int					dstRectX,
+		int					dstRectY
+)
+{
+	const int bytesPerPixel = 2;
+
+	GAME_ASSERT(srcRectX + srcRectWidth <= srcWidth);
+	GAME_ASSERT(srcRectY + srcRectHeight <= srcHeight);
+	GAME_ASSERT(dstRectX + srcRectWidth <= dstWidth);
+	GAME_ASSERT(dstRectY + srcRectHeight <= dstHeight);
+
+	src += bytesPerPixel * (srcRectX + srcWidth * srcRectY);
+	dst += bytesPerPixel * (dstRectX + dstWidth * dstRectY);
+
+	for (int row = 0; row < srcRectHeight; row++)
+	{
+		memcpy(dst, src, bytesPerPixel * srcRectWidth);
+		src += bytesPerPixel * srcWidth;
+		dst += bytesPerPixel * dstWidth;
+	}
+}
 
 
 #pragma mark -
