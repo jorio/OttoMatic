@@ -19,7 +19,7 @@
 
 static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType, OGLSetupOutputType *setupInfo);
 static void ReadDataFromPlayfieldFile(FSSpec *specPtr, OGLSetupOutputType *setupInfo);
-static void	ConvertTexture16To16(u_short *textureBuffer, int width, int height);
+static void	ConvertTexture16To16(uint16_t *textureBuffer, int width, int height);
 
 
 /****************************/
@@ -1445,60 +1445,25 @@ Ptr						tempBuffer16 = nil,tempBuffer24 = nil, tempBuffer32 = nil;
 
 /*********************** CONVERT TEXTURE; 16 TO 16 ***********************************/
 //
-// Simply flips Y since OGL Textures are screwey
+// Converts big-endian 1-5-5-5 to native endianness and cleans up the alpha bit.
 //
 
-static void	ConvertTexture16To16(u_short *textureBuffer, int width, int height)
+static void	ConvertTexture16To16(uint16_t *textureBuffer, int width, int height)
 {
-int		x,y;
-u_short	pixel,*bottom;
-u_short	*dest;
-Boolean	blackOpaq;
+	bool blackOpaq = (gLevelNum != LEVEL_NUM_CLOUD);		// make black transparent on cloud
 
-	blackOpaq = (gLevelNum != LEVEL_NUM_CLOUD);			// make black transparent on cloud
-
-	bottom = textureBuffer + ((height - 1) * width);
-
-	for (y = 0; y < height / 2; y++)
+	for (int p = 0; p < width*height; p++)
 	{
-		dest = bottom;
+		uint16_t pixel = SwizzleUShort(textureBuffer);
 
-		for (x = 0; x < width; x++)
-		{
-			pixel = textureBuffer[x];						// get 16bit pixel from top
-#if __BIG_ENDIAN__
-			if ((pixel & 0x7fff) || blackOpaq)				// check/set alpha
-				pixel |= 0x8000;
-			else
-				pixel &= 0x7fff;
-#else
-			pixel = SwizzleUShort(&pixel);
+		if (blackOpaq || (pixel & 0x7fff))
+			pixel |= 0x8000;
+		else
+			pixel &= 0x7fff;
 
-			if ((pixel & 0x7fff) || blackOpaq)				// check/set alpha
-				pixel |= 0x8000;
-			else
-				pixel &= 0x7fff;
-#endif
+		*textureBuffer = pixel;
 
-			textureBuffer[x] = bottom[x];					// copy bottom to top
-#if __BIG_ENDIAN__
-			if ((textureBuffer[x] & 0x7fff) || blackOpaq)				// check/set alpha
-				textureBuffer[x] |= 0x8000;
-			else
-				textureBuffer[x] &= 0x7fff;
-#else
-			textureBuffer[x] = SwizzleUShort(&textureBuffer[x]);
-			if ((textureBuffer[x] & 0x7fff) || blackOpaq)				// check/set alpha
-				textureBuffer[x] |= 0x8000;
-			else
-				textureBuffer[x] &= 0x7fff;
-#endif
-
-			bottom[x] = pixel;								// save top into bottom
-		}
-
-		textureBuffer += width;
-		bottom -= width;
+		textureBuffer++;
 	}
 }
 

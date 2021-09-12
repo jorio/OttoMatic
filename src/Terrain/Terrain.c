@@ -413,7 +413,7 @@ int	u,v,i,j;
 			for (u = 0; u <= SUPERTILE_SIZE; u++)
 			{
 				uvPtr[j].u = (float)u / (float)SUPERTILE_SIZE;		// sets uv's 0.0 -> 1.0 for single texture map
-				uvPtr[j].v = 1.0f - ((float)v / (float)SUPERTILE_SIZE);
+				uvPtr[j].v = (float)v / (float)SUPERTILE_SIZE;
 
 				j++;
 			}
