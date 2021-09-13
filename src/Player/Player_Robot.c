@@ -2859,12 +2859,9 @@ static void CheckPlayerActionControls(ObjNode *theNode)
 		gPlayerInfo.weaponInventory[5].quantity = 99;
 		gPlayerInfo.weaponInventory[6].type = WEAPON_TYPE_DART;
 		gPlayerInfo.weaponInventory[6].quantity = 99;
-		if (gLevelNum == LEVEL_NUM_JUNGLE)
-		{
-			// Growth Potion should not be given outside of jungle level
-			gPlayerInfo.weaponInventory[7].type = WEAPON_TYPE_GROWTH;
-			gPlayerInfo.weaponInventory[7].quantity = 99;
-		}
+		gPlayerInfo.weaponInventory[7].type = WEAPON_TYPE_GROWTH;
+		gPlayerInfo.weaponInventory[7].quantity = 99;
+		LoadSoundEffect(EFFECT_GIANTFOOTSTEP);
 	}
 
 			/***************/
