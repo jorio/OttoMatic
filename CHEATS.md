@@ -10,7 +10,15 @@
 
 ## In game
 
-- Press B, R, I simultaneously to fill up your inventory.
+- Press B, R, I simultaneously to fill heealth and fuel.
+
+- \` + F1 = Fill rocket fuel
+
+- \` + F2 = Full health
+
+- \` + F3 = Full jump jet
+
+- \` + F4 = Fill weapons
 
 - Press F8 to bring up debug mode.
 
