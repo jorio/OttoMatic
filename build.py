@@ -26,13 +26,13 @@ game_name           = "OttoMatic"  # no spaces
 game_name_human     = "Otto Matic"  # spaces and other special characters allowed
 game_ver            = "4.0.0"
 
-sdl_ver             = "2.0.16"
+sdl_ver             = "2.0.22"
 appimagetool_ver    = "13"
 
 lib_hashes = {  # sha-256
-    "SDL2-2.0.16.tar.gz":            "65be9ff6004034b5b2ce9927b5a4db1814930f169c4b2dae0a1e4697075f287b",
-    "SDL2-2.0.16.dmg":               "315a4c6d23800b59051ab25300527d94ae18149b15ad210290cff03d1ac78452",
-    "SDL2-devel-2.0.16-VC.zip":      "f83651227229e059a570aac26be24f5070352c0d23aaf3d2cfbd3eb2c9599334",
+    "SDL2-2.0.22.tar.gz":            "fe7cbf3127882e3fc7259a75a0cb585620272c51745d3852ab9dd87960697f2e",
+    "SDL2-2.0.22.dmg":               "72974672b8359057aa2f6d467c8adae8182a6caedd660e3936e23c3c683c3801",
+    "SDL2-devel-2.0.22-VC.zip":      "32adc96d8b25e5671189f1f38a4fc7deb105fbb1b3ed78ffcb23f5b8f36b3922",
     "appimagetool-x86_64.AppImage":  "df3baf5ca5facbecfc2f3fa6713c29ab9cefa8fd8c1eac5d283b79cab33e4acb", # appimagetool v13
     "appimagetool-aarch64.AppImage": "334e77beb67fc1e71856c29d5f3f324ca77b0fde7a840fdd14bd3b88c25c341f",
 }
