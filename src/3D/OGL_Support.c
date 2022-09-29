@@ -723,7 +723,7 @@ void OGL_GetCurrentViewport(const OGLSetupOutputType *setupInfo, int *x, int *y,
 {
 int	t,b,l,r;
 
-	SDL_GetWindowSize(gSDLWindow, &gGameWindowWidth, &gGameWindowHeight);
+	SDL_GL_GetDrawableSize(gSDLWindow, &gGameWindowWidth, &gGameWindowHeight);
 
 	t = setupInfo->clip.top;
 	b = setupInfo->clip.bottom;

@@ -392,8 +392,15 @@ static void NavigateSettingEntriesMouseHover(void)
 	int mxRaw, myRaw;
 	SDL_GetMouseState(&mxRaw, &myRaw);
 
-	float mx = (mxRaw - gGameWindowWidth/2.0f) * g2DLogicalWidth / gGameWindowWidth;
-	float my = (myRaw - gGameWindowHeight/2.0f) * g2DLogicalHeight / gGameWindowHeight;
+	// On macOS, the mouse position is relative to the window's "point size" on Retina screens.
+	int windowW = 1;
+	int windowH = 1;
+	SDL_GetWindowSize(gSDLWindow, &windowW, &windowH);
+	float dpiScaleX = (float) gGameWindowWidth / (float) windowW;		// gGameWindowWidth is in actual pixels
+	float dpiScaleY = (float) gGameWindowHeight / (float) windowH;		// gGameWindowHeight is in actual pixels
+
+	float mx = (mxRaw*dpiScaleX - gGameWindowWidth*0.5f) * g2DLogicalWidth / gGameWindowWidth;
+	float my = (myRaw*dpiScaleY - gGameWindowHeight*0.5f) * g2DLogicalHeight / gGameWindowHeight;
 
 	gMouseHoverValidRow = false;
 	gMouseHoverColumn = -1;
