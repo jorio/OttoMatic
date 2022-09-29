@@ -1229,7 +1229,7 @@ int StartMenu(
 		const MenuItem* menu,
 		const MenuStyle* style,
 		void (*updateRoutine)(void),
-		void (*backgroundDrawRoutine)(OGLSetupOutputType *))
+		void (*backgroundDrawRoutine)(void))
 {
 	int cursorStateBeforeMenu = SDL_ShowCursor(-1);
 	gStandardCursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
@@ -1324,7 +1324,7 @@ int StartMenu(
 		MoveObjects();
 		if (updateRoutine)
 			updateRoutine();
-		OGL_DrawScene(gGameViewInfoPtr, backgroundDrawRoutine);
+		OGL_DrawScene(backgroundDrawRoutine);
 	}
 
 

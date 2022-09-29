@@ -1478,12 +1478,12 @@ void OGLMatrix4x4_SetTranslate(OGLMatrix4x4 *m, float x, float y, float z)
 
 /***************** MATRIX 4X4: GET FRUSTUM TO WINDOW *****************/
 
-void OGLMatrix4x4_GetFrustumToWindow(const OGLSetupOutputType *setupInfo, OGLMatrix4x4 *m)
+void OGLMatrix4x4_GetFrustumToWindow(OGLMatrix4x4 *m)
 {
 int		x,y,w,h;
 float	width, height;
 
-	OGL_GetCurrentViewport(setupInfo, &x, &y, &w, &h);
+	OGL_GetCurrentViewport(&x, &y, &w, &h);
 
 	width = w;
 	height = h;

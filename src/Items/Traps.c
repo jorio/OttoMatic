@@ -29,7 +29,7 @@ static void MoveBubblePump(ObjNode *pump);
 static void MakeSoapBubble(float x, float y, float z);
 
 static void MoveMagnetMonsterOnSpline(ObjNode *theNode);
-static void DrawMagnetMonsterProp(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawMagnetMonsterProp(ObjNode *theNode);
 
 static void MoveCrunchDoor(ObjNode *bottom);
 static void MoveCrunchDoorTop(ObjNode *top);
@@ -1023,7 +1023,7 @@ float	fps = gFramesPerSecondFrac;
 
 /*********************** DRAW MAGNET MONSTER PROPELLER ****************************/
 
-static void DrawMagnetMonsterProp(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawMagnetMonsterProp(ObjNode *theNode)
 {
 OGLPoint3D	targetCoord,points[10*2];
 float		dx,dy,dz,x,y,z,u;
@@ -1048,7 +1048,7 @@ MOVertexArrayData	mesh;
 
 	if (theNode->BaseGroup)
 	{
-		MO_DrawObject(theNode->BaseGroup, setupInfo);
+		MO_DrawObject(theNode->BaseGroup);
 	}
 
 
@@ -1135,8 +1135,8 @@ MOVertexArrayData	mesh;
 
 
 	gGlobalTransparency = .3;
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_MagnetRay].materialObject, setupInfo);
-	MO_DrawGeometry_VertexArray(&mesh, setupInfo);
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_MagnetRay].materialObject);
+	MO_DrawGeometry_VertexArray(&mesh);
 	gGlobalTransparency = 1.0f;
 
 

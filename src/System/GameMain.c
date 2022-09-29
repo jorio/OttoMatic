@@ -297,7 +297,7 @@ static void PlayArea(void)
 			/* DRAW IT ALL */
 
 
-		OGL_DrawScene(gGameViewInfoPtr,DrawArea);
+		OGL_DrawScene(DrawArea);
 
 
 
@@ -354,11 +354,11 @@ static void PlayArea(void)
 
 /****************** DRAW AREA *******************************/
 
-void DrawArea(OGLSetupOutputType *setupInfo)
+void DrawArea(void)
 {
 		/* DRAW OBJECTS & TERAIN */
 
-	DrawObjects(setupInfo);												// draw objNodes which includes fences, terrain, etc.
+	DrawObjects();												// draw objNodes which includes fences, terrain, etc.
 
 	// Don't draw stuff on top of the UI if the game is paused
 	if (gGamePaused)
@@ -366,12 +366,12 @@ void DrawArea(OGLSetupOutputType *setupInfo)
 
 			/* DRAW MISC */
 
-	DrawShards(setupInfo);												// draw shards
-	DrawVaporTrails(setupInfo);											// draw vapor trails
-	DrawSparkles(setupInfo);											// draw light sparkles
-	DrawInfobar(setupInfo);												// draw infobar last
-	DrawLensFlare(setupInfo);											// draw lens flare
-	DrawDeathExit(setupInfo);											// draw death exit stuff
+	DrawShards();												// draw shards
+	DrawVaporTrails();											// draw vapor trails
+	DrawSparkles();											// draw light sparkles
+	DrawInfobar();												// draw infobar last
+	DrawLensFlare();											// draw lens flare
+	DrawDeathExit();											// draw death exit stuff
 
 
 }
@@ -708,7 +708,7 @@ DeformationType		defData;
 
 
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef);
 
 
 			/**********************/
@@ -760,19 +760,19 @@ DeformationType		defData;
 			// NOTE: only call this *after* draw context is created!
 			//
 
-	LoadLevelArt(gGameViewInfoPtr);
-	InitInfobar(gGameViewInfoPtr);
+	LoadLevelArt();
+	InitInfobar();
 	gAlienSaucer = nil;
 
 			/* INIT OTHER MANAGERS */
 
 	InitEnemyManager();
 	InitHumans();
-	InitEffects(gGameViewInfoPtr);
+	InitEffects();
 	InitVaporTrails();
 	InitSparkles();
 	InitItemsManager();
-	InitSky(gGameViewInfoPtr);
+	InitSky();
 
 
 
@@ -911,7 +911,7 @@ static void CleanupLevel(void)
 
 	DisposeSoundBank(kLevelSoundBanks[gLevelNum]);
 
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);	// do this last!
+	OGL_DisposeWindowSetup();	// do this last!
 
 	Pomme_FlushPtrTracking(true);
 

@@ -17,7 +17,7 @@
 /****************************/
 
 static void MoveFadeEvent(ObjNode *theNode);
-static void DrawFadePane(ObjNode* theNode, const OGLSetupOutputType* setupInfo);
+static void DrawFadePane(ObjNode *theNode);
 
 
 /****************************/
@@ -42,13 +42,13 @@ void InitWindowStuff(void)
 
 	OGLSetupInputType viewDef;
 	OGL_NewViewDef(&viewDef);
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef);
 	for (int i = 0; i < 45; i++)
 	{
-		OGL_DrawScene(gGameViewInfoPtr, nil);
+		OGL_DrawScene(nil);
 		UpdateInput();  // will flush SDL events
 	}
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup();
 }
 
 
@@ -253,7 +253,7 @@ float	speed = theNode->Speed * fps;
 
 /******************** DRAW FADE PANE *********************/
 
-static void DrawFadePane(ObjNode* theNode, const OGLSetupOutputType* setupInfo)
+static void DrawFadePane(ObjNode* theNode)
 {
 	OGL_PushState();
 

@@ -16,7 +16,7 @@
 /****************************/
 
 static void MoveZigZagSlats(ObjNode *theNode);
-static void DrawCloudPlatform(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawCloudPlatform(ObjNode *theNode);
 static void MoveCloudPlatform(ObjNode *theNode);
 static void MoveNeuronStrand(ObjNode *theNode);
 static void MoveRadarDish(ObjNode *base);
@@ -210,7 +210,7 @@ float	fps = gFramesPerSecondFrac;
 
 /********************** DRAW CLOUD PLATFORM *************************/
 
-static void DrawCloudPlatform(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawCloudPlatform(ObjNode *theNode)
 {
 float	x,y,z;
 OGLMatrix4x4	m;
@@ -223,7 +223,7 @@ static const float	scale[4] = {.5, .7, .9, .6};
 	z = theNode->Coord.z;
 
 
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][CLOUD_SObjType_Cloud].materialObject, setupInfo);
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][CLOUD_SObjType_Cloud].materialObject);
 
 			/*******************/
 			/* DRAW ALL LAYERS */

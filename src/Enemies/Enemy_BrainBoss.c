@@ -26,10 +26,10 @@ static Boolean HurtBrainBoss(ObjNode *enemy, float damage);
 
 static void SetBrainStaticLocation(ObjNode *stat);
 static void MoveBrainStatic(ObjNode *theNode);
-static void DrawBrainStatic(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawBrainStatic(ObjNode *theNode);
 
 static void MoveBrainAlienPort(ObjNode *theNode);
-static void DrawPortalBeams(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawPortalBeams(ObjNode *theNode);
 static Boolean PortalHitByWeapon(ObjNode *weapon, ObjNode *portal, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta);
 
 static void SeeIfBrainBossShoot(ObjNode *core);
@@ -368,7 +368,7 @@ static void MoveBrainStatic(ObjNode *theNode)
 
 /********************** DRAW BRAIN STATIC *****************************/
 
-static void DrawBrainStatic(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawBrainStatic(ObjNode *theNode)
 {
 OGLMatrix4x4	m;
 OGLPoint3D		pts[4];
@@ -417,7 +417,7 @@ OGLPoint3D		pts[4];
 
 	gGlobalTransparency = .6;
 
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][BRAINBOSS_SObjType_Static1+(MyRandomLong()&0x3)].materialObject, setupInfo);
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][BRAINBOSS_SObjType_Static1+(MyRandomLong()&0x3)].materialObject);
 
 
 			/* DRAW QUAD */
@@ -1128,7 +1128,7 @@ ObjNode	*newObj;
 
 /******************** DRAW PORTAL BEAMS *************************/
 
-static void DrawPortalBeams(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawPortalBeams(ObjNode *theNode)
 {
 short	i,i2;
 float	x,y,z,x2,y2,z2,u,u2,yo;
@@ -1165,7 +1165,7 @@ float	x,y,z,x2,y2,z2,u,u2,yo;
 			u = RandomFloat() * 5.0f;
 			u2 = u + 3.0f;
 
-			MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][BRAINBOSS_SObjType_RedZap].materialObject, setupInfo);
+			MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][BRAINBOSS_SObjType_RedZap].materialObject);
 
 			glBegin(GL_QUADS);
 			glTexCoord2f(u,0);			glVertex3f(x,y+yo,z);

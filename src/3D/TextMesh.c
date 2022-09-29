@@ -221,14 +221,14 @@ void TextMesh_LoadMetrics(void)
 	gFontMetricsLoaded = true;
 }
 
-void TextMesh_InitMaterial(OGLSetupOutputType* setupInfo, bool redFont)
+void TextMesh_InitMaterial(bool redFont)
 {
 		/* CREATE FONT MATERIAL */
 
 	GAME_ASSERT_MESSAGE(!gFontMaterial, "gFontMaterial already created");
 	MOMaterialData matData;
 	memset(&matData, 0, sizeof(matData));
-	matData.setupInfo		= setupInfo;
+	matData.setupInfo		= gGameViewInfoPtr;
 	matData.flags			= BG3D_MATERIALFLAG_ALWAYSBLEND | BG3D_MATERIALFLAG_TEXTURED | BG3D_MATERIALFLAG_CLAMP_U | BG3D_MATERIALFLAG_CLAMP_V;
 	matData.diffuseColor	= (OGLColorRGBA) {1, 1, 1, 1};
 	matData.numMipmaps		= 1;

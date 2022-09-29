@@ -38,7 +38,7 @@ static void DoHelp(void);
 static void MakeCreditsIcon(void);
 static void MakeSavedGameIcon(void);
 static void MakeExitIcon(void);
-static void DrawOttoLogo(OGLSetupOutputType *info);
+static void DrawOttoLogo(void);
 static void MakeIconString(void);
 static void MoveIconString(ObjNode *theNode);
 
@@ -156,7 +156,7 @@ void DoMainMenuScreen(void)
 
 		CalcFramesPerSecond();
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);
+		OGL_DrawScene(DrawMainMenuCallback);
 
 			/* SEE IF SPAWN SAUCER */
 
@@ -183,21 +183,21 @@ void DoMainMenuScreen(void)
 
 /***************** DRAW MAINMENU CALLBACK *******************/
 
-void DrawMainMenuCallback(OGLSetupOutputType *info)
+void DrawMainMenuCallback(void)
 {
 
-	DrawObjects(info);
-	DrawSparkles(info);											// draw light sparkles
+	DrawObjects();
+	DrawSparkles();											// draw light sparkles
 
 			/* DRAW LOGO */
 
-	DrawOttoLogo(info);
+	DrawOttoLogo();
 }
 
 
 /****************** DRAW OTTO LOGO ***********************/
 
-static void DrawOttoLogo(OGLSetupOutputType *info)
+static void DrawOttoLogo(void)
 {
 			/* SET STATE */
 
@@ -221,7 +221,7 @@ static void DrawOttoLogo(OGLSetupOutputType *info)
 	if (gGlobalTransparency > 0.0f)
 	{
 		gGlobalTransparency = gMenuLogoFadeAlpha;
-		MO_DrawObject(gBG3DGroupList[MODEL_GROUP_MAINMENU][MAINMENU_ObjType_LogoNoPlanet], info);
+		MO_DrawObject(gBG3DGroupList[MODEL_GROUP_MAINMENU][MAINMENU_ObjType_LogoNoPlanet]);
 	}
 
 	gGlobalTransparency = 1;
@@ -285,7 +285,7 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 	}
 
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef);
 
 
 	InitSparkles();
@@ -297,7 +297,7 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:mainmenu.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_MAINMENU, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_MAINMENU);
 
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_MAINMENU, MAINMENU_ObjType_HelpIcon,
 							 -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
@@ -310,30 +310,30 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:global.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_GLOBAL, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_GLOBAL);
 
 
 			/* LOAD SPRITES */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
-	InitParticleSystem(gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
+	InitParticleSystem();
 
 
 			/* LOAD SKELETONS */
 
-	LoadASkeleton(SKELETON_TYPE_OTTO, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_OTTO);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_OTTO,
 								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
-	LoadASkeleton(SKELETON_TYPE_FARMER, gGameViewInfoPtr);
-	LoadASkeleton(SKELETON_TYPE_BEEWOMAN, gGameViewInfoPtr);
-	LoadASkeleton(SKELETON_TYPE_CLOWN, gGameViewInfoPtr);
-	LoadASkeleton(SKELETON_TYPE_MANTIS, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_FARMER);
+	LoadASkeleton(SKELETON_TYPE_BEEWOMAN);
+	LoadASkeleton(SKELETON_TYPE_CLOWN);
+	LoadASkeleton(SKELETON_TYPE_MANTIS);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_MANTIS,
 								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
-	LoadASkeleton(SKELETON_TYPE_BRAINALIEN, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_BRAINALIEN);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_BRAINALIEN,
 								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
@@ -496,7 +496,7 @@ static void FreeMainMenuScreen(void)
 	DisposeParticleSystem();
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup();
 	Pomme_FlushPtrTracking(true);
 }
 
@@ -1552,7 +1552,7 @@ ObjNode	*glow, *text, *pane;
 
 		CalcFramesPerSecond();
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);
+		OGL_DrawScene(DrawMainMenuCallback);
 	}
 
 
@@ -1642,7 +1642,7 @@ ObjNode	*pane;
 
 		CalcFramesPerSecond();
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawMainMenuCallback);
+		OGL_DrawScene(DrawMainMenuCallback);
 	}
 
 
@@ -1744,7 +1744,7 @@ ObjNode *mainText = glow->ChainNode;
 
 /********************** DRAW DARKEN PANE *****************************/
 
-void DrawDarkenPane(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+void DrawDarkenPane(ObjNode *theNode)
 {
 	OGL_PushState();
 	SetInfobarSpriteState(true);

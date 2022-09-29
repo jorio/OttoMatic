@@ -36,7 +36,7 @@ void PausedUpdateCallback(void);
 void DoPaused(void);
 
 void DoLegalScreen(void);
-int DoLevelCheatDialog(void (*backgroundDrawRoutine)(OGLSetupOutputType *));
+int DoLevelCheatDialog(void (*backgroundDrawRoutine)(void));
 void DoLevelIntro(void);
 void DoBonusScreen(void);
 
@@ -48,13 +48,13 @@ void ClearHighScores(void);
 void DoLoseScreen(void);
 void DoWinScreen(void);
 
-void DrawDarkenPane(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+void DrawDarkenPane(ObjNode *theNode);
 void MoveCredits(ObjNode *text);
 
 void DoSettingsOverlay(void (*updateRoutine)(void),
-					   void (*backgroundDrawRoutine)(OGLSetupOutputType *));
+					   void (*backgroundDrawRoutine)(void));
 
-bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(OGLSetupOutputType *));
+bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(void));
 
 void DoWarpCheat(void);
 

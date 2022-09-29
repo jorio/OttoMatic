@@ -15,12 +15,12 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void DrawSlimeFlow(ObjNode *slime, const OGLSetupOutputType *setupInfo);
+static void DrawSlimeFlow(ObjNode *slime);
 static void RadiateSprout(ObjNode *theNode);
 static void MoveSprout(ObjNode *theNode);
 static void MoveWindmill(ObjNode *base);
 
-static void DrawCyclorama(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawCyclorama(ObjNode *theNode);
 
 static void MoveSlimeMech_Boiler(ObjNode *theNode);
 static void MoveSlimePipe_Valve(ObjNode *theNode);
@@ -104,9 +104,9 @@ ObjNode	*newObj;
 
 /********************** DRAW CYCLORAMA *************************/
 
-static void DrawCyclorama(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawCyclorama(ObjNode *theNode)
 {
-OGLPoint3D cameraCoord = setupInfo->cameraPlacement.cameraLocation;
+OGLPoint3D cameraCoord = gGameViewInfoPtr->cameraPlacement.cameraLocation;
 
 		/* UPDATE CYCLORAMA COORD INFO */
 
@@ -117,7 +117,7 @@ OGLPoint3D cameraCoord = setupInfo->cameraPlacement.cameraLocation;
 
 			/* DRAW THE OBJECT */
 
-	MO_DrawObject(theNode->BaseGroup, setupInfo);
+	MO_DrawObject(theNode->BaseGroup);
 }
 
 #pragma mark -
@@ -1064,7 +1064,7 @@ OGLPoint3D			p;
 
 /********************** DRAW SLIME FLOW *****************************/
 
-static void DrawSlimeFlow(ObjNode *slime, const OGLSetupOutputType *setupInfo)
+static void DrawSlimeFlow(ObjNode *slime)
 {
 float	x,y,z,r,s,y2;
 float	v;
@@ -1110,7 +1110,7 @@ static const float heights[] =
 			/* SUBMIT TEXTURE */
 
 	gGlobalMaterialFlags = BG3D_MATERIALFLAG_CLAMP_U;
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][SLIME_SObjType_GreenSlime + slime->OozeColor].materialObject, setupInfo);
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][SLIME_SObjType_GreenSlime + slime->OozeColor].materialObject);
 
 
 			/* CALC COORDS OF VERTICES */
@@ -1120,7 +1120,7 @@ static const float heights[] =
 	coords[2].x = r;	coords[2].y = y2;
 	coords[3].x = -r;	coords[3].y = y2;
 
-	SetLookAtMatrixAndTranslate(&m, &up, &slime->Coord, &setupInfo->cameraPlacement.cameraLocation);		// aim at camera & translate
+	SetLookAtMatrixAndTranslate(&m, &up, &slime->Coord, &gGameViewInfoPtr->cameraPlacement.cameraLocation);		// aim at camera & translate
 	OGLPoint3D_TransformArray(&coords[0], &m, tc, 4);
 
 

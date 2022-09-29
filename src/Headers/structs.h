@@ -260,7 +260,7 @@ struct ObjNode
 	
 	void			(*MoveCall)(struct ObjNode *);			// pointer to object's move routine
 	void			(*SplineMoveCall)(struct ObjNode *);	// pointer to object's spline move routine
-	void			(*CustomDrawFunction)(struct ObjNode *, const OGLSetupOutputType *setupInfo);// pointer to object's custom draw function
+	void			(*CustomDrawFunction)(struct ObjNode *);// pointer to object's custom draw function
 	uint32_t			StatusBits;			// various status bits
 	
 	OGLPoint3D		Coord;				// coord of object

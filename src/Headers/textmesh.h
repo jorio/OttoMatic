@@ -9,7 +9,7 @@ enum
 
 void TextMesh_LoadMetrics(void);
 void TextMesh_DisposeMetrics(void);
-void TextMesh_InitMaterial(OGLSetupOutputType* setupInfo, bool redFont);
+void TextMesh_InitMaterial(bool redFont);
 void TextMesh_DisposeMaterial(void);
 ObjNode* TextMesh_NewEmpty(int capacity, NewObjectDefinitionType *newObjDef);
 ObjNode* TextMesh_New(const char *text, int align, NewObjectDefinitionType *newObjDef);

@@ -5,7 +5,7 @@
 #include "game.h"
 #include <time.h>
 
-bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(OGLSetupOutputType *))
+bool DoFileScreen(int fileScreenType, void (*backgroundDrawRoutine)(void))
 {
 	bool isSave = fileScreenType == FILE_SCREEN_TYPE_SAVE;
 

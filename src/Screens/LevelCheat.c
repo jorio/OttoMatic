@@ -4,7 +4,7 @@
 
 #include "game.h"
 
-int DoLevelCheatDialog(void (*backgroundDrawRoutine)(OGLSetupOutputType *))
+int DoLevelCheatDialog(void (*backgroundDrawRoutine)(void))
 {
 	static const MenuItem kLevelCheatMenu[] =
 	{

@@ -17,9 +17,9 @@
 
 static void SetupScoreScreen(void);
 static void FreeScoreScreen(void);
-static void DrawHighScoresCallback(OGLSetupOutputType *info);
-static void DrawScoreVerbage(OGLSetupOutputType *info);
-static void DrawHighScoresAndCursor(OGLSetupOutputType *info);
+static void DrawHighScoresCallback(void);
+static void DrawScoreVerbage(void);
+static void DrawHighScoresAndCursor(void);
 static void SetHighScoresSpriteState(void);
 static void StartEnterName(void);
 static void MoveHighScoresCyc(ObjNode *theNode);
@@ -336,7 +336,7 @@ void NewScore(void)
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawHighScoresCallback);
+		OGL_DrawScene(DrawHighScoresCallback);
 
 				/*****************************/
 				/* SEE IF USER ENTERING NAME */
@@ -486,7 +486,7 @@ Str255				scoreString;
 		gAnaglyphEyeSeparation 	= 10.0f;
 	}
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef);
 
 
 				/************/
@@ -498,22 +498,22 @@ Str255				scoreString;
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:highscores.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_HIGHSCORES, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_HIGHSCORES);
 
 
 			/* LOAD SKELETONS */
 
-	LoadASkeleton(SKELETON_TYPE_OTTO, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_OTTO);
 
 
 			/* LOAD SPRITES */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:highscores.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_HIGHSCORES, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_HIGHSCORES);
 
 
 
@@ -558,17 +558,17 @@ static void FreeScoreScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUNDBANK_BONUS);
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup();
 }
 
 
 
 /***************** DRAW HIGHSCORES CALLBACK *******************/
 
-static void DrawHighScoresCallback(OGLSetupOutputType *info)
+static void DrawHighScoresCallback(void)
 {
-	DrawObjects(info);
-	DrawSparkles(info);											// draw light sparkles
+	DrawObjects();
+	DrawSparkles();											// draw light sparkles
 
 
 			/* DRAW SPRITES */
@@ -578,9 +578,9 @@ static void DrawHighScoresCallback(OGLSetupOutputType *info)
 	SetHighScoresSpriteState();
 
 	if (gDrawScoreVerbage)
-		DrawScoreVerbage(info);
+		DrawScoreVerbage();
 	else
-		DrawHighScoresAndCursor(info);
+		DrawHighScoresAndCursor();
 
 
 	OGL_PopState();
@@ -611,7 +611,7 @@ static void SetHighScoresSpriteState(void)
 
 /********************* DRAW SCORE VERBAGE ****************************/
 
-static void DrawScoreVerbage(OGLSetupOutputType *info)
+static void DrawScoreVerbage(void)
 {
 				/* SEE IF DONE */
 
@@ -641,13 +641,13 @@ static void DrawScoreVerbage(OGLSetupOutputType *info)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gFinalScoreAlpha;
-	DrawInfobarSprite2(-150, -70, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreTextGlow, info);
+	DrawInfobarSprite2(-150, -70, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreTextGlow);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gFinalScoreAlpha;
-	DrawInfobarSprite2(-150, -70, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreText, info);
+	DrawInfobarSprite2(-150, -70, 300, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_ScoreText);
 
 			/* RESTORE GLOBAL TRANSPARENCY */
 
@@ -657,7 +657,7 @@ static void DrawScoreVerbage(OGLSetupOutputType *info)
 
 /****************** DRAW HIGH SCORES AND CURSOR ***********************/
 
-static void DrawHighScoresAndCursor(OGLSetupOutputType *info)
+static void DrawHighScoresAndCursor(void)
 {
 	gFinalScoreAlpha += gFramesPerSecondFrac;						// fade in
 	if (gFinalScoreAlpha > .99f)
@@ -675,13 +675,13 @@ static void DrawHighScoresAndCursor(OGLSetupOutputType *info)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gFinalScoreAlpha;
-	DrawInfobarSprite2(-250, -240+10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameGlow, info);
+	DrawInfobarSprite2(-250, -240+10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameGlow);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gFinalScoreAlpha;
-	DrawInfobarSprite2(-250, -240+10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameText, info);
+	DrawInfobarSprite2(-250, -240+10, 500, SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_EnterNameText);
 
 
 		/*******************/

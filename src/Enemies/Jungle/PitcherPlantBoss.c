@@ -18,7 +18,7 @@
 static void MoveTentacleGenerator(ObjNode *theNode);
 static Boolean StartTentacle(ObjNode *generator);
 static void UpdateTentacles(ObjNode *theNode);
-static void DrawTentacles(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawTentacles(ObjNode *theNode);
 static Boolean TentacleGeneratorHitByFire(ObjNode *weapon, ObjNode *enemy, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta);
 static void KillTentacleGenerator(ObjNode *theNode);
 
@@ -519,7 +519,7 @@ next_i:;
 
 /******************** DRAW TENTACLES ****************************/
 
-static void DrawTentacles(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawTentacles(ObjNode *theNode)
 {
 int				i,p,j,numSplinePoints,pointNum,numRings;
 float			u,v,s;
@@ -653,7 +653,7 @@ MOTriangleIndecies	*triPtr;
 				/* SUBMIT VERTEX ARRAY */
 				/***********************/
 
-		MO_DrawGeometry_VertexArray(&gTentacleMesh, setupInfo);
+		MO_DrawGeometry_VertexArray(&gTentacleMesh);
 
 
 	}

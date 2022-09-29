@@ -4,7 +4,7 @@
 
 
 
-void InitSky(OGLSetupOutputType *setupInfo);
+void InitSky(void);
 void DisposeSky(void);
 
 

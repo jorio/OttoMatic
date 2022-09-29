@@ -18,7 +18,7 @@
 static void DeleteParticleGroup(long groupNum);
 static void MoveParticleGroups(ObjNode *theNode);
 
-static void DrawParticleGroup(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawParticleGroup(ObjNode *theNode);
 
 
 static void MoveBlobDroplet(ObjNode *theNode);
@@ -64,10 +64,10 @@ static	float	gDeathExitDelay;
 
 /************************* INIT EFFECTS ***************************/
 
-void InitEffects(OGLSetupOutputType *setupInfo)
+void InitEffects(void)
 {
 
-	InitParticleSystem(setupInfo);
+	InitParticleSystem();
 	InitShardSystem();
 
 
@@ -144,7 +144,7 @@ float	fps = gFramesPerSecondFrac;
 
 /************************ INIT PARTICLE SYSTEM **************************/
 
-void InitParticleSystem(OGLSetupOutputType *setupInfo)
+void InitParticleSystem(void)
 {
 short	i;
 FSSpec	spec;
@@ -163,7 +163,7 @@ ObjNode	*obj;
 			/* LOAD SPRITES */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, setupInfo);
+	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
 
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
@@ -628,7 +628,7 @@ OGLVector3D	*delta;
 
 /**************** DRAW PARTICLE GROUPS *********************/
 
-static void DrawParticleGroup(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawParticleGroup(ObjNode *theNode)
 {
 float				scale,baseScale;
 long				g,p,n,i;
@@ -784,7 +784,7 @@ OGLBoundingBox	bbox;
 
 				glBlendFunc(src, dst);								// set blending mode
 
-				if (setupInfo->useFog)
+				if (gGameViewInfoPtr->useFog)
 				{
 					if (dst == GL_ONE)
 						glDisable(GL_FOG);	// fog screws up in this mode??
@@ -792,7 +792,7 @@ OGLBoundingBox	bbox;
 						glEnable(GL_FOG);
 				}
 
-				MO_DrawObject(gParticleGroups[g]->geometryObj, setupInfo);						// draw geometry
+				MO_DrawObject(gParticleGroups[g]->geometryObj);						// draw geometry
 			}
 		}
 	}
@@ -1488,7 +1488,7 @@ void StartDeathExit(float delay)
 
 /********************** DRAW DEATH EXIT **************************/
 
-void DrawDeathExit(OGLSetupOutputType *setupInfo)
+void DrawDeathExit(void)
 {
 float	s = 2.0;
 
@@ -1540,7 +1540,7 @@ float	s = 2.0;
 
 	OGL_PushState();
 
-	if (setupInfo->useFog)
+	if (gGameViewInfoPtr->useFog)
 		glDisable(GL_FOG);
 	OGL_DisableLighting();
 	glDisable(GL_CULL_FACE);
@@ -1557,7 +1557,7 @@ float	s = 2.0;
 
 	glTranslatef(gDeathExitX, 0, 0);
 	glScalef(s,-s,s);
-	MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_DeathExitLeft]  ,setupInfo);
+	MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_DeathExitLeft]);
 
 
 		/* DRAW RIGHT */
@@ -1565,7 +1565,7 @@ float	s = 2.0;
 	glLoadIdentity();
 	glTranslatef(640-gDeathExitX, 0, 0);
 	glScalef(s,-s,s);
-	MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_DeathExitRight]  ,setupInfo);
+	MO_DrawObject(gBG3DGroupList[MODEL_GROUP_GLOBAL][GLOBAL_ObjType_DeathExitRight]);
 
 
 			/***********/

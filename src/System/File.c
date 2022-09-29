@@ -17,8 +17,8 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType, OGLSetupOutputType *setupInfo);
-static void ReadDataFromPlayfieldFile(FSSpec *specPtr, OGLSetupOutputType *setupInfo);
+static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType);
+static void ReadDataFromPlayfieldFile(FSSpec *specPtr);
 static void	ConvertTexture16To16(uint16_t *textureBuffer, int width, int height);
 static inline void Blit16(
 		const char*			src,
@@ -110,7 +110,7 @@ float	g3DTileSize, g3DMinY, g3DMaxY;
 // OUTPUT:	Ptr to skeleton data
 //
 
-SkeletonDefType *LoadSkeletonFile(short skeletonType, OGLSetupOutputType *setupInfo)
+SkeletonDefType *LoadSkeletonFile(short skeletonType)
 {
 QDErr		iErr;
 short		fRefNum;
@@ -177,7 +177,7 @@ const char *fileNames[MAX_SKELETON_TYPES] =
 
 			/* READ SKELETON RESOURCES */
 
-	ReadDataFromSkeletonFile(skeleton,&fsSpec,skeletonType,setupInfo);
+	ReadDataFromSkeletonFile(skeleton,&fsSpec,skeletonType);
 	PrimeBoneData(skeleton);
 
 			/* CLOSE REZ FILE */
@@ -194,7 +194,7 @@ const char *fileNames[MAX_SKELETON_TYPES] =
 // Current rez file is set to the file.
 //
 
-static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType, OGLSetupOutputType *setupInfo)
+static void ReadDataFromSkeletonFile(SkeletonDefType *skeleton, FSSpec *fsSpec, int skeletonType)
 {
 Handle				hand;
 int					i,k,j;
@@ -248,7 +248,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 	{
 		iErr = ResolveAlias(fsSpec, alias, &target, &wasChanged);	// try to resolve alias
 		if (!iErr)
-			LoadBonesReferenceModel(&target,skeleton, skeletonType, setupInfo);
+			LoadBonesReferenceModel(&target,skeleton, skeletonType);
 		else
 			DoFatalAlert("ReadDataFromSkeletonFile: Cannot find Skeleton's 3DMF file!");
 		ReleaseResource((Handle)alias);
@@ -570,7 +570,7 @@ long				count;
 
 /************************** LOAD LEVEL ART ***************************/
 
-void LoadLevelArt(OGLSetupOutputType *setupInfo)
+void LoadLevelArt(void)
 {
 FSSpec	spec;
 
@@ -629,10 +629,10 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 			/* LOAD BG3D GEOMETRY */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:global.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_GLOBAL, setupInfo);
+	ImportBG3D(&spec, MODEL_GROUP_GLOBAL);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, levelModelFiles[gLevelNum], &spec);
-	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC, setupInfo);
+	ImportBG3D(&spec, MODEL_GROUP_LEVELSPECIFIC);
 
 	if (gG4)
 	{
@@ -644,11 +644,11 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 
 			/* LOAD SKELETONS */
 
-	LoadASkeleton(SKELETON_TYPE_OTTO, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_OTTO);
 	BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_OTTO,
 								 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
-	LoadASkeleton(SKELETON_TYPE_BRAINALIEN, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_BRAINALIEN);
 
 	if (gG4)
 	{
@@ -657,28 +657,28 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 	}
 
 
-	LoadASkeleton(SKELETON_TYPE_FARMER, setupInfo);
-	LoadASkeleton(SKELETON_TYPE_BEEWOMAN, setupInfo);
-	LoadASkeleton(SKELETON_TYPE_SCIENTIST, setupInfo);
-	LoadASkeleton(SKELETON_TYPE_SKIRTLADY, setupInfo);
+	LoadASkeleton(SKELETON_TYPE_FARMER);
+	LoadASkeleton(SKELETON_TYPE_BEEWOMAN);
+	LoadASkeleton(SKELETON_TYPE_SCIENTIST);
+	LoadASkeleton(SKELETON_TYPE_SKIRTLADY);
 
 			/* LOAD LEVEL-SPECIFIC SKELETONS & APPLY REFLECTION MAPS */
 
 	switch(gLevelNum)
 	{
 		case	LEVEL_NUM_FARM:
-				LoadASkeleton(SKELETON_TYPE_ONION, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_ONION);
 				if (gG4)
 					BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_ONION,
 												 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
 
-				LoadASkeleton(SKELETON_TYPE_CORN, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_CORN);
 				if (gG4)
 					BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_CORN,
 												 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
 
 
-				LoadASkeleton(SKELETON_TYPE_TOMATO, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_TOMATO);
 				if (gG4)
 					BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_TOMATO,
 												 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
@@ -690,15 +690,15 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 				break;
 
 		case	LEVEL_NUM_BLOB:
-				LoadASkeleton(SKELETON_TYPE_BLOB, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_BLOB);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_BLOB,
 											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
-				LoadASkeleton(SKELETON_TYPE_SQUOOSHY, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_SQUOOSHY);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SQUOOSHY,
 											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
-				LoadASkeleton(SKELETON_TYPE_SLIMETREE, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_SLIMETREE);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SLIMETREE,
 											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 				BG3D_SetContainerMaterialFlags(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SLIMETREE, 0, 1,			// no wrapping on the leaves
@@ -753,11 +753,11 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 				break;
 
 		case	LEVEL_NUM_APOCALYPSE:
-				LoadASkeleton(SKELETON_TYPE_PODWORM, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_PODWORM);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_PODWORM,
 											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
-				LoadASkeleton(SKELETON_TYPE_MUTANT, setupInfo);
-				LoadASkeleton(SKELETON_TYPE_MUTANTROBOT, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_MUTANT);
+				LoadASkeleton(SKELETON_TYPE_MUTANTROBOT);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_MUTANTROBOT,
 											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Blue);
 
@@ -769,9 +769,9 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 
 
 		case	LEVEL_NUM_CLOUD:
-				LoadASkeleton(SKELETON_TYPE_CLOWN, setupInfo);
-				LoadASkeleton(SKELETON_TYPE_CLOWNFISH, setupInfo);
-				LoadASkeleton(SKELETON_TYPE_STRONGMAN, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_CLOWN);
+				LoadASkeleton(SKELETON_TYPE_CLOWNFISH);
+				LoadASkeleton(SKELETON_TYPE_STRONGMAN);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_CLOWNFISH,
 											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
@@ -792,22 +792,22 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 
 
 		case	LEVEL_NUM_JUNGLE:
-				LoadASkeleton(SKELETON_TYPE_GIANTLIZARD, setupInfo);
-				LoadASkeleton(SKELETON_TYPE_FLYTRAP, setupInfo);
-				LoadASkeleton(SKELETON_TYPE_MANTIS, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_GIANTLIZARD);
+				LoadASkeleton(SKELETON_TYPE_FLYTRAP);
+				LoadASkeleton(SKELETON_TYPE_MANTIS);
 				if (gG4)
 					BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_MANTIS,
 											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
-				LoadASkeleton(SKELETON_TYPE_TURTLE, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_TURTLE);
 				if (gG4)
 					BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_TURTLE,
 											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 				break;
 
 		case	LEVEL_NUM_JUNGLEBOSS:
-				LoadASkeleton(SKELETON_TYPE_TURTLE, setupInfo);
-				LoadASkeleton(SKELETON_TYPE_FLYTRAP, setupInfo);
-				LoadASkeleton(SKELETON_TYPE_PITCHERPLANT, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_TURTLE);
+				LoadASkeleton(SKELETON_TYPE_FLYTRAP);
+				LoadASkeleton(SKELETON_TYPE_PITCHERPLANT);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_PITCHERPLANT,
 											 0, 0, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_GreenSheen);
 
@@ -835,11 +835,11 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 				break;
 
 		case	LEVEL_NUM_FIREICE:
-				LoadASkeleton(SKELETON_TYPE_FLAMESTER, setupInfo);
-				LoadASkeleton(SKELETON_TYPE_ICECUBE, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_FLAMESTER);
+				LoadASkeleton(SKELETON_TYPE_ICECUBE);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_ICECUBE,
 											 0, 0, MULTI_TEXTURE_COMBINE_MODULATE, SPHEREMAP_SObjType_Tundra);
-				LoadASkeleton(SKELETON_TYPE_SQUOOSHY, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_SQUOOSHY);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_SQUOOSHY,
 											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
@@ -894,7 +894,7 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 				break;
 
 		case	LEVEL_NUM_BRAINBOSS:
-				LoadASkeleton(SKELETON_TYPE_ELITEBRAINALIEN, setupInfo);
+				LoadASkeleton(SKELETON_TYPE_ELITEBRAINALIEN);
 				BG3D_SphereMapGeomteryMaterial(MODEL_GROUP_SKELETONBASE + SKELETON_TYPE_ELITEBRAINALIEN,
 											 0, -1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_DarkDusk);
 
@@ -919,20 +919,20 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 	if (levelSpriteFiles[gLevelNum][0] > 0)
 	{
 		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, levelSpriteFiles[gLevelNum], &spec);
-		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC, setupInfo);
+		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC);
 	}
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:infobar.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_INFOBAR, setupInfo);
+	LoadSpriteFile(&spec, SPRITE_GROUP_INFOBAR);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:fence.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_FENCES, setupInfo);
+	LoadSpriteFile(&spec, SPRITE_GROUP_FENCES);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL, setupInfo);
+	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, setupInfo);
+	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 
 			/* LOAD TERRAIN */
@@ -941,7 +941,7 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 			//
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, terrainFiles[gLevelNum], &spec);
-	LoadPlayfield(&spec, setupInfo);
+	LoadPlayfield(&spec);
 
 }
 
@@ -950,13 +950,13 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 
 /******************* LOAD PLAYFIELD *******************/
 
-void LoadPlayfield(FSSpec *specPtr, OGLSetupOutputType *setupInfo)
+void LoadPlayfield(FSSpec *specPtr)
 {
 
 
 			/* READ PLAYFIELD RESOURCES */
 
-	ReadDataFromPlayfieldFile(specPtr, setupInfo);
+	ReadDataFromPlayfieldFile(specPtr);
 
 
 
@@ -975,7 +975,7 @@ void LoadPlayfield(FSSpec *specPtr, OGLSetupOutputType *setupInfo)
 
 /********************** READ DATA FROM PLAYFIELD FILE ************************/
 
-static void ReadDataFromPlayfieldFile(FSSpec *specPtr, OGLSetupOutputType *setupInfo)
+static void ReadDataFromPlayfieldFile(FSSpec *specPtr)
 {
 Handle					hand;
 PlayfieldHeaderType		**header;
@@ -1459,7 +1459,7 @@ OSErr					iErr;
 
 			/* INIT NEW MATERIAL DATA */
 
-		matData.setupInfo				= setupInfo;								// remember which draw context this material is assigned to
+		matData.setupInfo				=	gGameViewInfoPtr;						// remember which draw context this material is assigned to
 		matData.flags 					= 	BG3D_MATERIALFLAG_CLAMP_U|
 											BG3D_MATERIALFLAG_CLAMP_V|
 											BG3D_MATERIALFLAG_TEXTURED;

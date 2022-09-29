@@ -21,7 +21,7 @@ static u_short	BuildTerrainSuperTile(long	startCol, long startRow);
 static void ReleaseAllSuperTiles(void);
 static void DoSuperTileDeformation(SuperTileMemoryType *superTile);
 static void UpdateTerrainDeformationFunctions(void);
-static void DrawTerrain(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawTerrain(ObjNode *theNode);
 
 
 /****************************/
@@ -888,7 +888,7 @@ long	i;
 // This is the main call to update the screen.  It draws all ObjNode's and the terrain itself
 //
 
-static void DrawTerrain(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawTerrain(ObjNode *theNode)
 {
 int				r,c;
 u_short			i,unique;
@@ -956,12 +956,12 @@ Boolean			superTileVisible;
 
 					/* SUBMIT THE TEXTURE */
 
-				MO_DrawMaterial(gSuperTileTextureObjects[unique], setupInfo);
+				MO_DrawMaterial(gSuperTileTextureObjects[unique]);
 
 
 					/* SUBMIT THE GEOMETRY */
 
-				MO_DrawGeometry_VertexArray(gSuperTileMemoryList[i].meshData, setupInfo);
+				MO_DrawGeometry_VertexArray(gSuperTileMemoryList[i].meshData);
 				gNumSuperTilesDrawn++;
 			}
 		}

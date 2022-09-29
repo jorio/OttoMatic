@@ -26,7 +26,7 @@ static Boolean SeeIfDoPickup(ObjNode *player);
 static void MoveDisposedWeapon(ObjNode *theNode);
 static void ChangeWeapons(int startIndex, int delta, bool tryStartSlotFirst);
 static void StartSuperNovaCharge(ObjNode *player);
-static void DrawSuperNovaCharge(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawSuperNovaCharge(ObjNode *theNode);
 static void ShootFreezeGun(ObjNode *theNode, OGLPoint3D *where, OGLVector3D *aim);
 static void MoveFreezeBullet(ObjNode *theNode);
 static void ExplodeFreeze(ObjNode *bullet);
@@ -1403,7 +1403,7 @@ OGLPoint3D	antennaL,antennaR;
 
 /******************* DRAW SUPERNOVA CHARGE ******************/
 
-static void DrawSuperNovaCharge(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawSuperNovaCharge(ObjNode *theNode)
 {
 OGLPoint3D	points[7*2],antennaL,antennaR,base;
 float		dx,dy,dz,x,y,z,u;
@@ -1496,8 +1496,8 @@ static MOTriangleIndecies triangles[6*2] =
 			/***********/
 
 	gGlobalTransparency = gPlayerInfo.superNovaCharge;
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_NovaCharge].materialObject, setupInfo);
-	MO_DrawGeometry_VertexArray(&gNovaChargeMesh, setupInfo);
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_NovaCharge].materialObject);
+	MO_DrawGeometry_VertexArray(&gNovaChargeMesh);
 	gGlobalTransparency = 1.0f;
 
 
@@ -1533,7 +1533,7 @@ static MOTriangleIndecies triangles[6*2] =
 
 /******************* DRAW SUPERNOVA DISCHARGE ******************/
 
-void DrawSuperNovaDischarge(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+void DrawSuperNovaDischarge(ObjNode *theNode)
 {
 float	fps = gFramesPerSecondFrac;
 OGLPoint3D	targetCoord,points[10*2],base;
@@ -1639,8 +1639,8 @@ static MOTriangleIndecies triangles[9*2] =
 				/***********/
 
 		gGlobalTransparency = gPlayerInfo.superNovaCharge;
-		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_NovaCharge].materialObject, setupInfo);
-		MO_DrawGeometry_VertexArray(&gNovaChargeMesh, setupInfo);
+		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_NovaCharge].materialObject);
+		MO_DrawGeometry_VertexArray(&gNovaChargeMesh);
 		gGlobalTransparency = 1.0f;
 	}
 

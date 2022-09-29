@@ -248,14 +248,14 @@ extern	Byte					gAnaglyphPass;
 
 void OGL_Boot(void);
 void OGL_NewViewDef(OGLSetupInputType *viewDef);
-void OGL_SetupWindow(OGLSetupInputType *setupDefPtr, OGLSetupOutputType **outputHandle);
-void OGL_DisposeWindowSetup(OGLSetupOutputType **dataHandle);
-void OGL_DrawScene(OGLSetupOutputType *setupInfo, void (*drawRoutine)(OGLSetupOutputType *));
-void OGL_Camera_SetPlacementAndUpdateMatrices(OGLSetupOutputType *setupInfo);
-void OGL_MoveCameraFromTo(OGLSetupOutputType *setupInfo, float fromDX, float fromDY, float fromDZ, float toDX, float toDY, float toDZ);
-void OGL_MoveCameraFrom(OGLSetupOutputType *setupInfo, float fromDX, float fromDY, float fromDZ);
-void OGL_UpdateCameraFromToUp(OGLSetupOutputType *setupInfo, OGLPoint3D *from, OGLPoint3D *to, OGLVector3D *up);
-void OGL_UpdateCameraFromTo(OGLSetupOutputType *setupInfo, const OGLPoint3D *from, const OGLPoint3D *to);
+void OGL_SetupWindow(OGLSetupInputType *viewDef);
+void OGL_DisposeWindowSetup(void);
+void OGL_DrawScene(void (*drawRoutine)(void));
+void OGL_Camera_SetPlacementAndUpdateMatrices(void);
+void OGL_MoveCameraFromTo(float fromDX, float fromDY, float fromDZ, float toDX, float toDY, float toDZ);
+void OGL_MoveCameraFrom(float fromDX, float fromDY, float fromDZ);
+void OGL_UpdateCameraFromToUp(OGLPoint3D *from, OGLPoint3D *to, OGLVector3D *up);
+void OGL_UpdateCameraFromTo(const OGLPoint3D *from, const OGLPoint3D *to);
 void OGL_Texture_SetOpenGLTexture(GLuint textureName);
 GLuint OGL_TextureMap_Load(void *imageMemory, int width, int height,
 							GLint srcFormat,  GLint destFormat, GLint dataType);
@@ -263,7 +263,7 @@ GLuint OGL_TextureMap_LoadTGA(const char* path, int flags, int* width, int* heig
 GLenum _OGL_CheckError(const char* file, int line);
 #define OGL_CheckError() _OGL_CheckError(__FILE__, __LINE__)
 
-void OGL_GetCurrentViewport(const OGLSetupOutputType *setupInfo, int *x, int *y, int *w, int *h);
+void OGL_GetCurrentViewport(int *x, int *y, int *w, int *h);
 
 void OGL_PushState(void);
 void OGL_PopState(void);

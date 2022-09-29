@@ -90,7 +90,7 @@ static const Byte	gFlareImageTable[]=
 
 /*********************** DRAW LENS FLARE ***************************/
 
-void DrawLensFlare(OGLSetupOutputType *setupInfo)
+void DrawLensFlare(void)
 {
 short			i;
 float			x,y,dot;
@@ -120,10 +120,10 @@ int				px,py,pw,ph;
 
 			/* CALC SUN COORD */
 
-	from = setupInfo->cameraPlacement.cameraLocation;
-	gSunCoord.x = from.x - (gWorldSunDirection.x * setupInfo->yon);
-	gSunCoord.y = from.y - (gWorldSunDirection.y * setupInfo->yon);
-	gSunCoord.z = from.z - (gWorldSunDirection.z * setupInfo->yon);
+	from = gGameViewInfoPtr->cameraPlacement.cameraLocation;
+	gSunCoord.x = from.x - (gWorldSunDirection.x * gGameViewInfoPtr->yon);
+	gSunCoord.y = from.y - (gWorldSunDirection.y * gGameViewInfoPtr->yon);
+	gSunCoord.z = from.z - (gWorldSunDirection.z * gGameViewInfoPtr->yon);
 
 
 
@@ -134,9 +134,9 @@ int				px,py,pw,ph;
 						from.z - gSunCoord.z,
 						&sunVector);
 
-	FastNormalizeVector(setupInfo->cameraPlacement.pointOfInterest.x - from.x,
-						setupInfo->cameraPlacement.pointOfInterest.y - from.y,
-						setupInfo->cameraPlacement.pointOfInterest.z - from.z,
+	FastNormalizeVector(gGameViewInfoPtr->cameraPlacement.pointOfInterest.x - from.x,
+						gGameViewInfoPtr->cameraPlacement.pointOfInterest.y - from.y,
+						gGameViewInfoPtr->cameraPlacement.pointOfInterest.z - from.z,
 						&lookAtVector);
 
 	dot = OGLVector3D_Dot(&lookAtVector, &sunVector);
@@ -154,7 +154,7 @@ int				px,py,pw,ph;
 
 			/* CALC CENTER OF VIEWPORT */
 
-	OGL_GetCurrentViewport(setupInfo, &px, &py, &pw, &ph);
+	OGL_GetCurrentViewport(&px, &py, &pw, &ph);
 	cx = pw/2 + px;
 	cy = ph/2 + py;
 
@@ -188,7 +188,7 @@ int				px,py,pw,ph;
 		else
 			gGlobalTransparency = transColor.a;
 
-		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_PARTICLES][gFlareImageTable[i]].materialObject, setupInfo);		// activate material
+		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_PARTICLES][gFlareImageTable[i]].materialObject);		// activate material
 
 
 
@@ -633,7 +633,7 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 	}
 
 
-	OGL_UpdateCameraFromTo(gGameViewInfoPtr,&from,&to);
+	OGL_UpdateCameraFromTo(&from, &to);
 
 
 				/* UPDATE PLAYER'S CAMERA INFO */
@@ -732,7 +732,7 @@ OGLMatrix4x4	m;
 	to.y = oldPOI->y + v.y;
 	to.z = oldPOI->z + v.z;
 
-	OGL_UpdateCameraFromTo(gGameViewInfoPtr,&from,&to);
+	OGL_UpdateCameraFromTo(&from,&to);
 
 
 				/* UPDATE PLAYER'S CAMERA INFO */
@@ -1005,7 +1005,7 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 	}
 
 
-	OGL_UpdateCameraFromTo(gGameViewInfoPtr,&from,&to);
+	OGL_UpdateCameraFromTo(&from,&to);
 
 
 				/* UPDATE PLAYER'S CAMERA INFO */

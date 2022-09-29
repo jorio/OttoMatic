@@ -28,5 +28,5 @@ enum
 extern	void ToolBoxInit(void);
 void MoveEverything(void);
 void InitDefaultPrefs(void);
-void DrawArea(OGLSetupOutputType *setupInfo);
+void DrawArea(void);
 void GameMain(void);

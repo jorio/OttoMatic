@@ -13,7 +13,7 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void DrawWater(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawWater(ObjNode *theNode);
 static void MakeWaterGeometry(void);
 
 
@@ -317,7 +317,7 @@ double					x,y,z;
 
 /********************* DRAW WATER ***********************/
 
-static void DrawWater(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawWater(ObjNode *theNode)
 {
 long	f,i;
 float	fps = gFramesPerSecondFrac;
@@ -350,7 +350,7 @@ float	ud1, uv1, ud2, uv2;
 			else
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-			MO_DrawGeometry_VertexArray(&gWaterTriMeshData[f], setupInfo);
+			MO_DrawGeometry_VertexArray(&gWaterTriMeshData[f]);
 			gNumWaterDrawn++;
 		}
 

@@ -17,9 +17,9 @@
 
 static void SetupBonusScreen(void);
 static void FreeBonusScreen(void);
-static void DrawBonusCallback(OGLSetupOutputType *info);
-static void DrawHumanBonus(OGLSetupOutputType *info);
-static void DrawInventoryBonus(OGLSetupOutputType *info);
+static void DrawBonusCallback(void);
+static void DrawHumanBonus(void);
+static void DrawInventoryBonus(void);
 static void MoveBonusHuman(ObjNode *theNode);
 static void MoveBonusHuman_WalkOff(ObjNode *theNode);
 static void CreateBonusHumans(void);
@@ -33,7 +33,7 @@ static void DoInventoryBonusTally(void);
 static void DoBonusShipDissolve(void);
 static void MoveBonusInventoryIcon(ObjNode *theNode);
 static void DoTotalBonusTally(void);
-static void DrawBonusToScore(OGLSetupOutputType *info);
+static void DrawBonusToScore(void);
 static int DoSaveGamePrompt(void);
 static void DoTractorBeam(void);
 static void InitBonusTractorBeam(void);
@@ -299,7 +299,7 @@ static const OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 	}
 
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef);
 
 
 				/************/
@@ -311,28 +311,28 @@ static const OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 			/* LOAD MODELS */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Models:bonus.bg3d", &spec);
-	ImportBG3D(&spec, MODEL_GROUP_BONUS, gGameViewInfoPtr);
+	ImportBG3D(&spec, MODEL_GROUP_BONUS);
 
 
 			/* LOAD SKELETONS */
 
-	LoadASkeleton(SKELETON_TYPE_FARMER, gGameViewInfoPtr);
-	LoadASkeleton(SKELETON_TYPE_BEEWOMAN, gGameViewInfoPtr);
-	LoadASkeleton(SKELETON_TYPE_SCIENTIST, gGameViewInfoPtr);
-	LoadASkeleton(SKELETON_TYPE_SKIRTLADY, gGameViewInfoPtr);
+	LoadASkeleton(SKELETON_TYPE_FARMER);
+	LoadASkeleton(SKELETON_TYPE_BEEWOMAN);
+	LoadASkeleton(SKELETON_TYPE_SCIENTIST);
+	LoadASkeleton(SKELETON_TYPE_SKIRTLADY);
 
 
 			/* LOAD SPRITES */
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:bonus.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_BONUS, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_BONUS);
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS, gGameViewInfoPtr);
+	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 
 				/* LOAD AUDIO */
@@ -444,7 +444,7 @@ static void FreeBonusScreen(void)
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUNDBANK_BONUS);
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup();
 	Pomme_FlushPtrTracking(true);
 }
 
@@ -465,9 +465,9 @@ static void DoBonusShipDissolve(void)
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+		OGL_DrawScene(DrawBonusCallback);
 
-		OGL_MoveCameraFromTo(gGameViewInfoPtr, fps * 5.0f, 0,0, 0,fps * -80.0f,0);
+		OGL_MoveCameraFromTo(fps * 5.0f, 0,0, 0,fps * -80.0f,0);
 	}
 }
 
@@ -551,10 +551,10 @@ static void DoHumansBonusTally(void)
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+		OGL_DrawScene(DrawBonusCallback);
 
 		if (gGameViewInfoPtr->cameraPlacement.cameraLocation.x < 0.0f)				// keep @ 0 for icon alignment
-			OGL_MoveCameraFrom(gGameViewInfoPtr, fps * 5.0f, 0, 0);	// slowly move camera
+			OGL_MoveCameraFrom(fps * 5.0f, 0, 0);	// slowly move camera
 
 		gBonusTimer -= fps;
 		if (gBonusTimer < 0.0f)
@@ -605,7 +605,7 @@ static void DoInventoryBonusTally(void)
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+		OGL_DrawScene(DrawBonusCallback);
 
 		gBonusTimer -= fps;
 		if (gBonusTimer < 0.0f)
@@ -661,7 +661,7 @@ float	tick;
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawBonusCallback);
+		OGL_DrawScene(DrawBonusCallback);
 
 
 
@@ -781,7 +781,7 @@ static void DoTractorBeam(void)
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
-		OGL_DrawScene(gGameViewInfoPtr, DrawObjects);
+		OGL_DrawScene(DrawObjects);
 	}
 
 }
@@ -836,7 +836,7 @@ ObjNode	*newObj;
 
 			/* SET CAMERA */
 
-	OGL_UpdateCameraFromTo(gGameViewInfoPtr, &from, &to);
+	OGL_UpdateCameraFromTo(&from, &to);
 }
 
 /***************** MOVE BONUS ROCKET: TRACTOR BEAM ********************/
@@ -930,29 +930,29 @@ float	oldTime = gBonusBeamTimer;
 
 /***************** DRAW BONUS CALLBACK *******************/
 
-static void DrawBonusCallback(OGLSetupOutputType *info)
+static void DrawBonusCallback(void)
 {
-	DrawObjects(info);
-	DrawSparkles(info);											// draw light sparkles
+	DrawObjects();
+	DrawSparkles();											// draw light sparkles
 
 	switch(gShowScoreMode)
 	{
 				/* DRAW HUMAN BONUS */
 
 		case	SHOW_SCORE_MODE_HUMANBONUS:
-				DrawHumanBonus(info);
+				DrawHumanBonus();
 				break;
 
 				/* DRAW INVENTORY BONUS */
 
 		case	SHOW_SCORE_MODE_INVENTORY:
-				DrawInventoryBonus(info);
+				DrawInventoryBonus();
 				break;
 
 				/* DRAW TOTALS */
 
 		case	SHOW_SCORE_MODE_ADDTOSCORE:
-				DrawBonusToScore(info);
+				DrawBonusToScore();
 				break;
 
 	}
@@ -961,7 +961,7 @@ static void DrawBonusCallback(OGLSetupOutputType *info)
 
 /************************ DRAW HUMAN BONUS *************************/
 
-static void DrawHumanBonus(OGLSetupOutputType *info)
+static void DrawHumanBonus(void)
 {
 
 		/************/
@@ -986,13 +986,13 @@ static void DrawHumanBonus(OGLSetupOutputType *info)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
-	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_BonusGlow, info);
+	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_BonusGlow);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gScoreAlpha;
-	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_BonusText, info);
+	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_BonusText);
 
 
 
@@ -1010,7 +1010,7 @@ static void DrawHumanBonus(OGLSetupOutputType *info)
 
 /************************ DRAW INVENTORY BONUS *************************/
 
-static void DrawInventoryBonus(OGLSetupOutputType *info)
+static void DrawInventoryBonus(void)
 {
 		/************/
 		/* SET TAGS */
@@ -1032,13 +1032,13 @@ static void DrawInventoryBonus(OGLSetupOutputType *info)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
-	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_InventoryGlow, info);
+	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_InventoryGlow);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gScoreAlpha;
-	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_InventoryText, info);
+	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_InventoryText);
 
 
 			/***********/
@@ -1054,7 +1054,7 @@ static void DrawInventoryBonus(OGLSetupOutputType *info)
 
 /************************ DRAW BONUS TO SCORE *************************/
 
-static void DrawBonusToScore(OGLSetupOutputType *info)
+static void DrawBonusToScore(void)
 {
 		/************/
 		/* SET TAGS */
@@ -1076,13 +1076,13 @@ static void DrawBonusToScore(OGLSetupOutputType *info)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
-	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusGlow, info);
+	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusGlow);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gScoreAlpha;
-	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusText, info);
+	DrawInfobarSprite2(-150, 95, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_TotalBonusText);
 
 
 
@@ -1094,13 +1094,13 @@ static void DrawBonusToScore(OGLSetupOutputType *info)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	gGlobalTransparency = (.7f + RandomFloat()*.1f) * gScoreAlpha;
-	DrawInfobarSprite2(-150, -35, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreGlow, info);
+	DrawInfobarSprite2(-150, -35, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreGlow);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			/* DRAW TEXT */
 
 	gGlobalTransparency = gScoreAlpha;
-	DrawInfobarSprite2(-150, -35, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreText, info);
+	DrawInfobarSprite2(-150, -35, 300, SPRITE_GROUP_BONUS, BONUS_SObjType_ScoreText);
 
 
 

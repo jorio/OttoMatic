@@ -15,7 +15,7 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void DrawSky(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawSky(ObjNode *theNode);
 
 
 /****************************/
@@ -24,7 +24,7 @@ static void DrawSky(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
 
 #define	SKY_GRID_SIZE		10			// # verts x / z
 
-#define	SKY_GRID_SCALE		(setupInfo->yon / (SKY_GRID_SIZE / 2.0f))		// scale of each grid segment
+#define	SKY_GRID_SCALE		(gGameViewInfoPtr->yon / (SKY_GRID_SIZE / 2.0f))		// scale of each grid segment
 
 #define	NUM_SKY_TRIANGLES	((SKY_GRID_SIZE-1) * (SKY_GRID_SIZE-1) * 2)
 
@@ -72,7 +72,7 @@ const SkyStyle kSkyTable[NUM_LEVELS] =
 // Called at the beginning of each level to prime the sky
 //
 
-void InitSky(OGLSetupOutputType *setupInfo)
+void InitSky(void)
 {
 int					r,c;
 float				cornerX,cornerZ,dist,alpha;
@@ -102,7 +102,7 @@ ObjNode				*obj;
 			dist = CalcDistance3D(0,0,0, gSkyPoints[r][c].x,gSkyPoints[r][c].y, gSkyPoints[r][c].z);
 			if (mySky->fadeEdges)
 			{
-				alpha = 1.0f - (dist / (setupInfo->yon * .7f));
+				alpha = 1.0f - (dist / (gGameViewInfoPtr->yon * .7f));
 				if (alpha < 0.0f)
 					alpha = 0.0f;
 				else
@@ -176,7 +176,7 @@ void DisposeSky(void)
 
 /**************** DRAW SKY *****************/
 
-static void DrawSky(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawSky(ObjNode *theNode)
 {
 #pragma unused(theNode)
 
@@ -256,7 +256,7 @@ float			u,v;
 
 			/* SUBMIT IT */
 
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][0].materialObject, setupInfo);
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][0].materialObject);
 
 	glDrawElements(GL_TRIANGLES,NUM_SKY_TRIANGLES*3,GL_UNSIGNED_INT,&gSkyTriangles[0]);
 	if (OGL_CheckError())

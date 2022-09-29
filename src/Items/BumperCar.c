@@ -19,7 +19,7 @@ static void MoveEnemyBumperCar(ObjNode *theNode);
 static void PlayerMoveBumperCar(ObjNode *player);
 static void DoBumperCarCollision(ObjNode *theNode);
 static void UpdateBumperCar(ObjNode *theNode);
-static void DrawGeneratorBeams(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawGeneratorBeams(ObjNode *theNode);
 static void MoveBumperCarPowerPost(ObjNode *theNode);
 static void MoveBumperCarGate(ObjNode *posts);
 
@@ -1136,7 +1136,7 @@ short	area = theNode->AreaNum;
 
 /******************** DRAW GENERATOR BEAMS *************************/
 
-static void DrawGeneratorBeams(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawGeneratorBeams(ObjNode *theNode)
 {
 short	i,i2;
 float	x,y,z,x2,y2,z2,u,u2,yo;
@@ -1176,7 +1176,7 @@ short	a;
 				u = RandomFloat() * 5.0f;
 				u2 = u + 5.0f;
 
-				MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][CLOUD_SObjType_BlueBeam].materialObject, setupInfo);
+				MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_LEVELSPECIFIC][CLOUD_SObjType_BlueBeam].materialObject);
 
 				glBegin(GL_QUADS);
 				glTexCoord2f(u,0);			glVertex3f(x,y+yo,z);

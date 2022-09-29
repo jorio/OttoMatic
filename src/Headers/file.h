@@ -95,12 +95,12 @@ typedef struct
 
 //=================================================
 
-SkeletonDefType *LoadSkeletonFile(short skeletonType, OGLSetupOutputType *setupInfo);
+SkeletonDefType *LoadSkeletonFile(short skeletonType);
 extern	OSErr LoadPrefs(PrefsType *prefBlock);
 void SavePrefs(void);
 
-void LoadPlayfield(FSSpec *specPtr, OGLSetupOutputType *setupInfo);
-void LoadLevelArt(OGLSetupOutputType *setupInfo);
+void LoadPlayfield(FSSpec *specPtr);
+void LoadLevelArt(void);
 
 bool SaveGame(int saveSlot);
 bool LoadSaveGameStruct(int saveSlot, SaveGameType* saveData);

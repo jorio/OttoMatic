@@ -92,7 +92,7 @@ int 		i,n;
 //			because all imported textures are named with OpenGL and loaded into OpenGL!
 //
 
-void LoadSpriteFile(FSSpec *spec, int groupNum, OGLSetupOutputType *setupInfo)
+void LoadSpriteFile(FSSpec *spec, int groupNum)
 {
 short			refNum;
 int				i,w,h;
@@ -164,7 +164,7 @@ MOMaterialData	matData;
 				/* CREATE NEW TEXTURE OBJECT */
 				/*****************************/
 
-		matData.setupInfo		= setupInfo;
+		matData.setupInfo		= gGameViewInfoPtr;
 		matData.flags			= BG3D_MATERIALFLAG_TEXTURED;
 		matData.diffuseColor.r	= 1;
 		matData.diffuseColor.g	= 1;
@@ -235,7 +235,7 @@ MOMaterialData	matData;
 
 /************* MAKE NEW SRITE OBJECT *************/
 
-ObjNode *MakeSpriteObject(NewObjectDefinitionType *newObjDef, OGLSetupOutputType *setupInfo)
+ObjNode *MakeSpriteObject(NewObjectDefinitionType *newObjDef)
 {
 ObjNode				*newObj;
 MOSpriteObject		*spriteMO;
@@ -285,7 +285,7 @@ MOSpriteSetupData	spriteData;
 
 /*********************** MODIFY SPRITE OBJECT IMAGE ******************************/
 
-void ModifySpriteObjectFrame(ObjNode *theNode, short type, OGLSetupOutputType *setupInfo)
+void ModifySpriteObjectFrame(ObjNode *theNode, short type)
 {
 MOSpriteSetupData	spriteData;
 MOSpriteObject		*spriteMO;
@@ -379,7 +379,7 @@ MOMaterialObject	*m;
 
 /************************** DRAW SPRITE ************************/
 
-void DrawSprite(int	group, int type, float x, float y, float scale, float rot, u_long flags, const OGLSetupOutputType *setupInfo)
+void DrawSprite(int	group, int type, float x, float y, float scale, float rot, u_long flags)
 {
 			/* SET STATE */
 
@@ -406,7 +406,7 @@ void DrawSprite(int	group, int type, float x, float y, float scale, float rot, u
 
 		/* ACTIVATE THE MATERIAL */
 
-	MO_DrawMaterial(gSpriteGroupList[group][type].materialObject, setupInfo);
+	MO_DrawMaterial(gSpriteGroupList[group][type].materialObject);
 
 
 			/* DRAW IT */

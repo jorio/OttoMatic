@@ -15,7 +15,7 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void DisplayPicture_Draw(OGLSetupOutputType *info);
+static void DisplayPicture_Draw(void);
 
 
 /****************************/
@@ -52,7 +52,7 @@ OGLSetupInputType	viewDef;
 	viewDef.view.clearColor.b		= 0;
 	viewDef.styles.useFog			= false;
 
-	OGL_SetupWindow(&viewDef, &gGameViewInfoPtr);
+	OGL_SetupWindow(&viewDef);
 
 
 			/* CREATE BACKGROUND OBJECT */
@@ -77,7 +77,7 @@ OGLSetupInputType	viewDef;
 		{
 			CalcFramesPerSecond();
 			MoveObjects();
-			OGL_DrawScene(gGameViewInfoPtr, DisplayPicture_Draw);
+			OGL_DrawScene(DisplayPicture_Draw);
 
 			UpdateInput();
 
@@ -99,16 +99,16 @@ OGLSetupInputType	viewDef;
 	GammaFadeOut();
 
 
-	OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+	OGL_DisposeWindowSetup();
 }
 
 
 /***************** DISPLAY PICTURE: DRAW *******************/
 
-static void DisplayPicture_Draw(OGLSetupOutputType *info)
+static void DisplayPicture_Draw(void)
 {
-	MO_DrawObject(gBackgroundPicture, info);
-	DrawObjects(info);
+	MO_DrawObject(gBackgroundPicture);
+	DrawObjects();
 }
 
 

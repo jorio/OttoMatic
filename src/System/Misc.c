@@ -130,7 +130,7 @@ static Boolean	beenHere = false;
 		DisposeAllSpriteGroups();						// nuke all sprites
 
 		if (gGameViewInfoPtr)							// see if need to dispose this
-			OGL_DisposeWindowSetup(&gGameViewInfoPtr);
+			OGL_DisposeWindowSetup();
 
 		TextMesh_DisposeMetrics();
 	}

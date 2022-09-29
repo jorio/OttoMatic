@@ -58,7 +58,7 @@ void OGLMatrix4x4_SetRotate_Y(OGLMatrix4x4	*m, float angle);
 void OGLMatrix4x4_SetRotate_Z(OGLMatrix4x4	*m, float angle);
 void OGLMatrix4x4_SetRotateAboutPoint(OGLMatrix4x4 *matrix4x4, const OGLPoint3D	*origin,
 									float xAngle, float yAngle, float zAngle);
-void OGLMatrix4x4_GetFrustumToWindow(const OGLSetupOutputType *setupInfo, OGLMatrix4x4 *m);
+void OGLMatrix4x4_GetFrustumToWindow(OGLMatrix4x4 *m);
 
 void OGLMatrix4x4_Multiply(const OGLMatrix4x4	*mA, const OGLMatrix4x4 *mB, OGLMatrix4x4	*result);
 void OGLMatrix4x4_SetRotate_XYZ(OGLMatrix4x4 *m, float rx, float ry, float rz);

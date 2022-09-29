@@ -405,7 +405,7 @@ next:
 
 /**************************** DRAW OBJECTS ***************************/
 
-void DrawObjects(OGLSetupOutputType *setupInfo)
+void DrawObjects(void)
 {
 ObjNode		*theNode;
 short		i,numTriMeshes;
@@ -434,8 +434,8 @@ short			skelType;
 
 			/* GET CAMERA COORDS */
 
-	cameraX = setupInfo->cameraPlacement.cameraLocation.x;
-	cameraZ = setupInfo->cameraPlacement.cameraLocation.z;
+	cameraX = gGameViewInfoPtr->cameraPlacement.cameraLocation.x;
+	cameraZ = gGameViewInfoPtr->cameraPlacement.cameraLocation.z;
 
 			/***********************/
 			/* MAIN NODE TASK LOOP */
@@ -536,7 +536,7 @@ short			skelType;
 			/* CHECK NO FOG */
 			/****************/
 
-		if (setupInfo->useFog)
+		if (gGameViewInfoPtr->useFog)
 		{
 			if (statusBits & STATUS_BIT_NOFOG)
 			{
@@ -736,7 +736,7 @@ short			skelType;
 							}
 						}
 
-						MO_DrawGeometry_VertexArray(&gLocalTriMeshesOfSkelType[skelType][i], setupInfo);
+						MO_DrawGeometry_VertexArray(&gLocalTriMeshesOfSkelType[skelType][i]);
 
 						if (overrideTexture && oldTexture)											// see if need to set texture back to normal
 							gLocalTriMeshesOfSkelType[skelType][i].materials[0] = oldTexture;
@@ -746,7 +746,7 @@ short			skelType;
 			case	DISPLAY_GROUP_GENRE:
 					if (theNode->BaseGroup)
 					{
-						MO_DrawObject(theNode->BaseGroup, setupInfo);
+						MO_DrawObject(theNode->BaseGroup);
 					}
 					break;
 
@@ -761,7 +761,7 @@ short			skelType;
 						theNode->SpriteMO->objectData.scaleX = theNode->Scale.x;
 						theNode->SpriteMO->objectData.scaleY = theNode->Scale.y;
 
-						MO_DrawObject(theNode->SpriteMO, setupInfo);
+						MO_DrawObject(theNode->SpriteMO);
 						OGL_PopState();									// restore state
 					}
 					break;
@@ -771,7 +771,7 @@ short			skelType;
 					{
 						OGL_PushState();								// keep state
 						SetInfobarSpriteState(true);
-						MO_DrawObject(theNode->BaseGroup, setupInfo);
+						MO_DrawObject(theNode->BaseGroup);
 
 						if (gDebugMode == 1)
 						{
@@ -786,7 +786,7 @@ short			skelType;
 custom_draw:
 					if (theNode->CustomDrawFunction)
 					{
-						theNode->CustomDrawFunction(theNode, setupInfo);
+						theNode->CustomDrawFunction(theNode);
 					}
 					break;
 		}
@@ -818,7 +818,7 @@ next:
 	if (noLighting)
 		OGL_EnableLighting();
 
-	if (setupInfo->useFog)
+	if (gGameViewInfoPtr->useFog)
 	{
 		if (noFog)
 			glEnable(GL_FOG);

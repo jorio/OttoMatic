@@ -7,7 +7,7 @@
 
 void InitCamera(void);
 void UpdateCamera(void);
-	void DrawLensFlare(OGLSetupOutputType *setupInfo);
+	void DrawLensFlare(void);
 
 
 

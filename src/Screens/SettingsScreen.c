@@ -433,7 +433,7 @@ static const MenuItem kAnaglyphWarning[] =
 /***************************************************************/
 
 void DoSettingsOverlay(void (*updateRoutine)(void),
-					   void (*backgroundDrawRoutine)(OGLSetupOutputType *))
+					   void (*backgroundDrawRoutine)(void))
 {
 	gAllowAudioKeys = false;					// don't interfere with keyboard binding
 

@@ -16,7 +16,7 @@
 /****************************/
 
 static void MakeBlobBoss_Beams(float x, float z);
-static void DrawBeamsDischarge(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawBeamsDischarge(ObjNode *theNode);
 static void MakeBlobBoss_Platforms(float centerX, float centerZ);
 static void MoveBlobBossPlatform(ObjNode *theNode);
 static void MoveBlobBossBeams(ObjNode *theNode);
@@ -314,7 +314,7 @@ short	beamNum;
 
 /******************* DRAW BEAMS DISCHARGE ******************/
 
-static void DrawBeamsDischarge(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawBeamsDischarge(ObjNode *theNode)
 {
 float		fps = gFramesPerSecondFrac;
 OGLPoint3D	targetCoord,points[NUM_BEAM_POINTS];
@@ -419,8 +419,8 @@ float		disruptionSize,thickness;
 				/***********/
 
 		gGlobalTransparency = .7f;
-		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_NovaCharge].materialObject, setupInfo);
-		MO_DrawGeometry_VertexArray(&mesh, setupInfo);
+		MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_NovaCharge].materialObject);
+		MO_DrawGeometry_VertexArray(&mesh);
 		gGlobalTransparency = 1.0f;
 	}
 }

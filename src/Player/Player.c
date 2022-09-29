@@ -664,7 +664,7 @@ int		i;
 
 /******************* DRAW ROCKET FLAME ************************/
 
-void DrawRocketFlame(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+void DrawRocketFlame(ObjNode *theNode)
 {
 float		x,y,z,r,s;
 OGLMatrix4x4	m;
@@ -685,7 +685,7 @@ ObjNode			*rocket;
 
 			/* SUBMIT FLAME TEXTURE */
 
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_PARTICLES][PARTICLE_SObjType_RocketFlame0+theNode->Special[0]].materialObject, setupInfo);
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_PARTICLES][PARTICLE_SObjType_RocketFlame0+theNode->Special[0]].materialObject);
 
 
 		/* CALC COORDS */
@@ -695,8 +695,8 @@ ObjNode			*rocket;
 	z = rocket->Coord.z;
 
 	r = theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, x, z,
-												setupInfo->cameraPlacement.cameraLocation.x,
-												setupInfo->cameraPlacement.cameraLocation.z);
+												gGameViewInfoPtr->cameraPlacement.cameraLocation.x,
+												gGameViewInfoPtr->cameraPlacement.cameraLocation.z);
 	OGLMatrix4x4_SetRotate_Y(&m, r);
 
 	OGLPoint3D_TransformArray(vOff, &m, verts, 4);

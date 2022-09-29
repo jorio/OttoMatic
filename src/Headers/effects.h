@@ -102,8 +102,8 @@ typedef struct
 #define	FULL_ALPHA	1.0f
 
 
-void InitEffects(OGLSetupOutputType *setupInfo);
-void InitParticleSystem(OGLSetupOutputType *setupInfo);
+void InitEffects(void);
+void InitParticleSystem(void);
 
 
 void DeleteAllParticleGroups(void);
@@ -126,7 +126,7 @@ void BurnFire(ObjNode *theNode, float x, float y, float z, Boolean doSmoke, shor
 void MakeFireExplosion(float x, float z, OGLVector3D *delta);
 
 void StartDeathExit(float delay);
-void DrawDeathExit(OGLSetupOutputType *setupInfo);
+void DrawDeathExit(void);
 
 void MakeSplatter(OGLPoint3D *where, short modelObjType);
 

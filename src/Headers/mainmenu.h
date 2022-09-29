@@ -3,4 +3,4 @@
 //
 
 void DoMainMenuScreen(void);
-void DrawMainMenuCallback(OGLSetupOutputType *info);
+void DrawMainMenuCallback(void);

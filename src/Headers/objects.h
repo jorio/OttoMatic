@@ -46,7 +46,7 @@ enum
 extern	void InitObjectManager(void);
 extern	ObjNode	*MakeNewObject(NewObjectDefinitionType *newObjDef);
 extern	void MoveObjects(void);
-void DrawObjects(OGLSetupOutputType *setupInfo);
+void DrawObjects(void);
 
 extern	void DeleteAllObjects(void);
 extern	void DeleteObject(ObjNode	*theNode);

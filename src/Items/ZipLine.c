@@ -16,7 +16,7 @@
 /****************************/
 
 static void GenerateZipSpline(short zipNum, OGLPoint3D *nubPoints);
-static void DrawZipLines(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawZipLines(ObjNode *theNode);
 static void BuildZipGeometry(short zipNum);
 static void AttachPullyToZip(short zipNum);
 static void MoveZipPully_Waiting(ObjNode *theNode);
@@ -543,7 +543,7 @@ static const OGLVector3D	up = {0,1,0};
 
 /******************** DRAW ZIP LINES *************************/
 
-static void DrawZipLines(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawZipLines(ObjNode *theNode)
 {
 short	i;
 
@@ -555,7 +555,7 @@ short	i;
 			continue;
 
 		if (OGL_IsBBoxVisible(&gZipLines[i].bbox, nil))				// draw if not culled
-			MO_DrawGeometry_VertexArray(&gZipLines[i].mesh, setupInfo);
+			MO_DrawGeometry_VertexArray(&gZipLines[i].mesh);
 	}
 }
 

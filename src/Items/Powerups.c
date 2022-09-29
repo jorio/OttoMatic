@@ -21,7 +21,7 @@ static void MoveOrbDebris(ObjNode *theNode);
 
 static ObjNode *MakeAtom(float x, float y, float z, int atomType);
 static void MoveAtom(ObjNode *theNode);
-static void DrawAtom(ObjNode *theNode, const OGLSetupOutputType *setupInfo);
+static void DrawAtom(ObjNode *theNode);
 static void PlayerGotAtom(ObjNode *theNode);
 static void CheckIfRegenerateAtom(ObjNode *theNode);
 static void CheckIfRegeneratePOW(ObjNode *theNode);
@@ -368,7 +368,7 @@ Boolean	reGen = false;			// assume no re-gen
 
 /******************** DRAW ATOM ****************************/
 
-static void DrawAtom(ObjNode *theNode, const OGLSetupOutputType *setupInfo)
+static void DrawAtom(ObjNode *theNode)
 {
 int			atomType = theNode->Type;
 static const OGLVector3D 	up = {0,1,0};
@@ -391,7 +391,7 @@ static OGLPoint3D		nucleusCoords[4] =
 
 			/* SUBMIT TEXTURE */
 
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_AtomicNucleus_Red+atomType].materialObject, setupInfo);
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_AtomicNucleus_Red+atomType].materialObject);
 
 
 			/* CALC COORDS OF VERTICES */
@@ -402,7 +402,7 @@ static OGLPoint3D		nucleusCoords[4] =
 	nucleusCoords[2].x = s;		nucleusCoords[2].y = -s;
 	nucleusCoords[3].x = -s;	nucleusCoords[3].y = -s;
 
-	SetLookAtMatrixAndTranslate(&m, &up, &theNode->Coord, &setupInfo->cameraPlacement.cameraLocation);		// aim at camera & translate
+	SetLookAtMatrixAndTranslate(&m, &up, &theNode->Coord, &gGameViewInfoPtr->cameraPlacement.cameraLocation);		// aim at camera & translate
 	OGLPoint3D_TransformArray(&nucleusCoords[0], &m, tc, 4);
 
 			/* DRAW IT */
@@ -433,7 +433,7 @@ static OGLPoint3D		nucleusCoords[4] =
 
 			/* DRAW IT */
 
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_AtomicRing_Red+atomType].materialObject, setupInfo);
+	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_AtomicRing_Red+atomType].materialObject);
 	SetColor4f(1,1,1, .5);
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,0);	glVertex3f(-60,0,-60);
