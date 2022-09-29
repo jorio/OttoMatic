@@ -174,7 +174,7 @@ void DoMainMenuScreen(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawMainMenuCallback, NULL);
 	FreeMainMenuScreen();
 
 	gDoCompanyLogos = false;						// dont do these again

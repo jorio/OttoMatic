@@ -2,16 +2,15 @@
 // windows.h
 //
 
-extern	float			gGammaFadePercent;
+extern	float			gGammaFadeFrac;
 
 //=================================
 
 
 extern void	InitWindowStuff(void);
-void MakeFadeEvent(Boolean fadeIn, float fadeSpeed);
+ObjNode* MakeFadeEvent(Boolean fadeIn, float fadeSpeed);
 
-extern	void GammaFadeOut(void);
-extern	void GammaOn(void);
+void OGL_FadeOutScene(void (*drawCall)(void), void (*moveCall)(void));
 
 void Enter2D(void);
 void Exit2D(void);

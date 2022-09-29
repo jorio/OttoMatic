@@ -119,7 +119,7 @@ float	timer = 43.0f;
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawLoseCallback, NULL);
 	FreeLoseScreen();
 }
 

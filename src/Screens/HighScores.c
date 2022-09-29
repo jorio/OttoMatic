@@ -354,7 +354,7 @@ void NewScore(void)
 	if (gNewScoreSlot != -1)						// if a new score was added then update the high scores file
 		SaveHighScores();
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawHighScoresCallback, NULL);
 
 	FreeScoreScreen();
 

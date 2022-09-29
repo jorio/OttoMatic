@@ -87,6 +87,11 @@ OGLSetupInputType	viewDef;
 		} while (!UserWantsOut());
 
 
+			/* FADE OUT */
+
+	OGL_FadeOutScene(DisplayPicture_Draw, NULL);
+
+
 			/* CLEANUP */
 
 	DeleteAllObjects();
@@ -94,9 +99,6 @@ OGLSetupInputType	viewDef;
 	DisposeAllSpriteGroups();
 
 
-			/* FADE OUT */
-
-	GammaFadeOut();
 
 
 	OGL_DisposeWindowSetup();

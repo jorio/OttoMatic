@@ -57,8 +57,6 @@ void DoWinScreen(void)
 float	timer = 90.0f;
 float	delayToTabloid = 6.0f;
 
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupWinScreen();
@@ -110,7 +108,7 @@ float	delayToTabloid = 6.0f;
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawObjects, NULL);
 	FreeWinScreen();
 }
 

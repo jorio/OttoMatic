@@ -135,14 +135,20 @@ float	oldTime,maxTime = 11.0f;
 			MakeFadeEvent(false, 1.0);
 		}
 
-		if (gGammaFadePercent <= 0.0f)
+		if (gGammaFadeFrac <= 0.0f)
 			break;
 	}
 
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	if (gGammaFadeFrac > 0.0f)
+	{
+		float backupGamma = gGammaFadeFrac;
+		OGL_FadeOutScene(DrawIntroCallback, NULL);
+		gGammaFadeFrac = backupGamma;
+	}
+
 	FreeIntroScreen();
 }
 

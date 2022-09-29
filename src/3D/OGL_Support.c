@@ -474,7 +474,7 @@ void OGL_DrawScene(void (*drawRoutine)(void))
 	GAME_ASSERT_MESSAGE(makeCurrentRC == 0, SDL_GetError());
 
 
-	if (gGammaFadePercent <= 0)							// if we just finished fading out and haven't started fading in yet, just show black
+	if (gGammaFadeFrac <= 0)							// if we just finished fading out and haven't started fading in yet, just show black
 	{
 		glClearColor(0, 0, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT);

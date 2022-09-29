@@ -20,7 +20,7 @@ void DoPaused(void)
 {
 	int pick = 0;
 
-	GammaOn();
+	gGammaFadeFrac = 1;//GammaOn();
 
 	gGamePaused = true;
 	PauseAllChannels(true);

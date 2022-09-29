@@ -177,8 +177,6 @@ static	float	gBonusBeamTimer;
 
 void DoBonusScreen(void)
 {
-	GammaFadeOut();
-
 			/* SETUP */
 
 	SetupBonusScreen();
@@ -227,7 +225,7 @@ void DoBonusScreen(void)
 
 			/* CLEANUP */
 
-	GammaFadeOut();
+	OGL_FadeOutScene(DrawBonusCallback, NULL);
 	FreeBonusScreen();
 }
 
@@ -765,8 +763,6 @@ static const OGLColorRGBA noHiliteColor = {.3,.5,.2,1};
 
 static void DoTractorBeam(void)
 {
-	GammaFadeOut();
-
 	InitBonusTractorBeam();
 
 
@@ -878,7 +874,7 @@ u_long	vol;
 
 			/* UPDATE AUDIO */
 
-	vol = gGammaFadePercent * FULL_CHANNEL_VOLUME / 2;
+	vol = gGammaFadeFrac * FULL_CHANNEL_VOLUME / 2;
 	if (rocket->EffectChannel == -1)
 		rocket->EffectChannel = PlayEffect_Parms(EFFECT_BONUSROCKET, vol, vol, NORMAL_CHANNEL_RATE);
 	else
@@ -1587,7 +1583,7 @@ u_long	vol;
 
 			/* UPDATE AUDIO */
 
-	vol = gGammaFadePercent * FULL_CHANNEL_VOLUME / 2;
+	vol = gGammaFadeFrac * FULL_CHANNEL_VOLUME / 2;
 	if (rocket->EffectChannel == -1)
 		rocket->EffectChannel = PlayEffect_Parms(EFFECT_BONUSROCKET, vol, vol, NORMAL_CHANNEL_RATE);
 	else

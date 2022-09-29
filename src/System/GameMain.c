@@ -216,7 +216,6 @@ static void PlayGame(void)
 			/* CLEANUP LEVEL */
 
 		MyFlushEvents();
-		GammaFadeOut();
 		CleanupLevel();
 
 
@@ -345,6 +344,9 @@ static void PlayArea(void)
 		gDisableHiccupTimer = false;									// reenable this after the 1st frame
 
 	}
+
+
+	OGL_FadeOutScene(DrawArea, PausedUpdateCallback);
 
 
 	CaptureMouse(false);
@@ -883,8 +885,6 @@ DeformationType		defData;
 	InitCamera();
 
 	SDL_ShowCursor(0);							// do this again to be sure!
-
-	GammaFadeOut();
  }
 
 

@@ -72,7 +72,6 @@ Str255		numStr;
 
 void DoAlert(const char* s)
 {
-	GammaOn();
 	Enter2D();
 
 	printf("OTTO MATIC Alert: %s\n", s);
@@ -87,7 +86,6 @@ void DoAlert(const char* s)
 
 void DoFatalAlert(const char* s)
 {
-	GammaOn();
 	Enter2D();
 
 	printf("OTTO MATIC Fatal Alert: %s\n", s);
@@ -102,7 +100,6 @@ void DoFatalAlert(const char* s)
 
 void DoAssert(const char* msg, const char* file, int line)
 {
-	GammaOn();
 	Enter2D();
 	printf("GAME ASSERTION FAILED: %s - %s:%d\n", msg, file, line);
 	static char alertbuf[1024];
