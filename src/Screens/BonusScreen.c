@@ -215,17 +215,22 @@ void DoBonusScreen(void)
 		}
 	}
 
+			/* FADE OUT */
+
+	OGL_FadeOutScene(DrawBonusCallback, NULL);
 
 		/* DO TRACTOR BEAM FOR JUNGLE-BOSS */
 
 	if (gLevelNum == LEVEL_NUM_JUNGLE)
+	{
 		DoTractorBeam();
+		// Tractor beam does its own async fadeout
+	}
 
 
 
 			/* CLEANUP */
 
-	OGL_FadeOutScene(DrawBonusCallback, NULL);
 	FreeBonusScreen();
 }
 
@@ -929,7 +934,6 @@ float	oldTime = gBonusBeamTimer;
 static void DrawBonusCallback(void)
 {
 	DrawObjects();
-	DrawSparkles();											// draw light sparkles
 
 	switch(gShowScoreMode)
 	{

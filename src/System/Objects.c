@@ -110,6 +110,7 @@ unsigned long flags = newObjDef->flags;
 	newNodePtr->Type 		= newObjDef->type;
 	newNodePtr->Group 		= newObjDef->group;
 	newNodePtr->MoveCall 	= newObjDef->moveCall;
+	newNodePtr->CustomDrawFunction = newObjDef->drawCall;
 
 	if (flags & STATUS_BIT_ONSPLINE)
 		newNodePtr->SplineMoveCall = newObjDef->moveCall;				// save spline move routine

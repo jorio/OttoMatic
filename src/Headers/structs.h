@@ -350,6 +350,7 @@ typedef struct
 	uint32_t	flags;
 	short		slot;
 	void		(*moveCall)(ObjNode *);
+	void		(*drawCall)(ObjNode *);
 	float		rot,scale;
 	ObjNode		*autoChain;
 }NewObjectDefinitionType;

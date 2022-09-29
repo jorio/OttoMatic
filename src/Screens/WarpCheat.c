@@ -48,7 +48,7 @@ void DoWarpCheat(void)
 
 	gGamePaused = true;
 
-	int pick = StartMenu(menu, nil, PausedUpdateCallback, DrawArea);
+	int pick = StartMenu(menu, nil, PausedUpdateCallback, DrawObjects);
 
 	gGamePaused = false;
 

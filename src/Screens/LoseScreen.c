@@ -17,7 +17,7 @@
 
 static void FreeLoseScreen(void);
 static void SetupLoseScreen(void);
-static void DrawLoseCallback(void);
+static void DrawGameOverLogo(ObjNode* theNode);
 static void UpdateConveyorBelt(void);
 static ObjNode *PutNewHumanOnBelt(float xoff);
 static void PrimeInitialHumansOnBelt(void);
@@ -108,7 +108,7 @@ float	timer = 43.0f;
 
 			/* DRAW */
 
-		OGL_DrawScene(DrawLoseCallback);
+		OGL_DrawScene(DrawObjects);
 
 		timer -= gFramesPerSecondFrac;
 		if (timer <= 0.0f)
@@ -119,7 +119,7 @@ float	timer = 43.0f;
 
 			/* CLEANUP */
 
-	OGL_FadeOutScene(DrawLoseCallback, NULL);
+	OGL_FadeOutScene(DrawObjects, NULL);
 	FreeLoseScreen();
 }
 
@@ -288,6 +288,17 @@ static const OGLVector3D	fillDirection1 = { -1, -.2, -.6 };
 	PrimeInitialHumansOnBelt();
 
 
+			/* LOGO */
+
+	NewObjectDefinitionType gameOverLogoDef =
+	{
+		.genre = CUSTOM_GENRE,
+		.slot = DRAWEXTRA_SLOT,
+		.scale = 1,
+		.flags = STATUS_BIT_DONTCULL,
+		.drawCall = DrawGameOverLogo,
+	};
+	MakeNewObject(&gameOverLogoDef);
 }
 
 
@@ -306,17 +317,11 @@ static void FreeLoseScreen(void)
 	Pomme_FlushPtrTracking(true);
 }
 
-/***************** DRAW LOSE CALLBACK *******************/
+/***************** DRAW GAME OVER LOGO *******************/
 
-static void DrawLoseCallback(void)
+static void DrawGameOverLogo(ObjNode* theNode)
 {
-	DrawObjects();
-	DrawSparkles();											// draw light sparkles
-
-
-			/****************/
-			/* DRAW SPRITES */
-			/****************/
+	(void) theNode;
 
 	OGL_PushState();
 

@@ -36,6 +36,7 @@ void PausedUpdateCallback(void);
 void DoPaused(void);
 
 void DoLegalScreen(void);
+void DoMainMenuScreen(void);
 int DoLevelCheatDialog(void (*backgroundDrawRoutine)(void));
 void DoLevelIntro(void);
 void DoBonusScreen(void);

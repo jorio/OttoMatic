@@ -29,7 +29,6 @@ typedef struct
 void InitSparkles(void);
 short GetFreeSparkle(ObjNode *theNode);
 void DeleteSparkle(short i);
-void DrawSparkles(void);
 
 void CreatePlayerSparkles(ObjNode *theNode);
 void UpdatePlayerSparkles(ObjNode *theNode);

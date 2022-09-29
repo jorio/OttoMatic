@@ -15,6 +15,7 @@
 /*    PROTOTYPES            */
 /****************************/
 
+static void DrawSparkles(ObjNode*);
 
 
 /****************************/
@@ -47,6 +48,16 @@ int		i;
 	gPlayerSparkleColor = 0;
 
 	gNumSparkles = 0;
+
+	NewObjectDefinitionType sparkleDrawerDef =
+	{
+		.genre = CUSTOM_GENRE,
+		.slot = SPARKLE_SLOT,
+		.scale = 1,
+		.flags = STATUS_BIT_DONTCULL,
+		.drawCall = DrawSparkles,
+	};
+	MakeNewObject(&sparkleDrawerDef);
 }
 
 
@@ -100,7 +111,7 @@ void DeleteSparkle(short i)
 
 /*************************** DRAW SPARKLES ******************************/
 
-void DrawSparkles(void)
+static void DrawSparkles(ObjNode* theNode)
 {
 u_long	flags;
 int		i;
@@ -117,6 +128,8 @@ static OGLPoint3D		frame[4] =
 	{130,	-130,	0},
 	{-130,	-130,	0},
 };
+
+	(void) theNode;
 
 
 	OGL_PushState();

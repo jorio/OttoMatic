@@ -17,7 +17,7 @@
 
 static void SetupScoreScreen(void);
 static void FreeScoreScreen(void);
-static void DrawHighScoresCallback(void);
+static void DrawHighScoresSprites(ObjNode* theNode);
 static void DrawScoreVerbage(void);
 static void DrawHighScoresAndCursor(void);
 static void SetHighScoresSpriteState(void);
@@ -336,7 +336,7 @@ void NewScore(void)
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
-		OGL_DrawScene(DrawHighScoresCallback);
+		OGL_DrawScene(DrawObjects);
 
 				/*****************************/
 				/* SEE IF USER ENTERING NAME */
@@ -354,7 +354,7 @@ void NewScore(void)
 	if (gNewScoreSlot != -1)						// if a new score was added then update the high scores file
 		SaveHighScores();
 
-	OGL_FadeOutScene(DrawHighScoresCallback, NULL);
+	OGL_FadeOutScene(DrawObjects, NULL);
 
 	FreeScoreScreen();
 
@@ -517,9 +517,7 @@ Str255				scoreString;
 
 
 
-			/************/
 			/* MAKE CYC */
-			/************/
 
 	gNewObjectDefinition.group 		= MODEL_GROUP_HIGHSCORES;
 	gNewObjectDefinition.type 		= HIGHSCORES_SObjType_Cyc;
@@ -532,6 +530,7 @@ Str255				scoreString;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 
+			/* SCORE STRING */
 
 	NumToStringC(gScore, scoreString);
 	gNewObjectDefinition.flags		= 0;
@@ -541,6 +540,19 @@ Str255				scoreString;
 	gNewObjectDefinition.coord.z	= 0;
 	gNewObjectDefinition.moveCall	= MoveScoreVerbageTally;
 	TextMesh_New(scoreString, 1, &gNewObjectDefinition);
+
+
+			/* SPRITES DRIVER */
+
+	NewObjectDefinitionType spritesDriverDef =
+	{
+		.genre = CUSTOM_GENRE,
+		.slot = DRAWEXTRA_SLOT,
+		.scale = 1,
+		.flags = STATUS_BIT_DONTCULL,
+		.drawCall = DrawHighScoresSprites,
+	};
+	MakeNewObject(&spritesDriverDef);
 }
 
 
@@ -563,15 +575,11 @@ static void FreeScoreScreen(void)
 
 
 
-/***************** DRAW HIGHSCORES CALLBACK *******************/
+/***************** DRAW HIGHSCORES SPRITES *******************/
 
-static void DrawHighScoresCallback(void)
+static void DrawHighScoresSprites(ObjNode* theNode)
 {
-	DrawObjects();
-	DrawSparkles();											// draw light sparkles
-
-
-			/* DRAW SPRITES */
+	(void) theNode;
 
 	OGL_PushState();
 

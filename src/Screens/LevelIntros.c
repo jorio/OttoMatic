@@ -15,7 +15,6 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void DrawIntroCallback(void);
 static void SetupIntroScreen(void);
 static void FreeIntroScreen(void);
 static void CreateIntroSaucers(void);
@@ -120,7 +119,7 @@ float	oldTime,maxTime = 11.0f;
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
-		OGL_DrawScene(DrawIntroCallback);
+		OGL_DrawScene(DrawObjects);
 
 		if (UserWantsOut())
 			break;
@@ -145,7 +144,7 @@ float	oldTime,maxTime = 11.0f;
 	if (gGammaFadeFrac > 0.0f)
 	{
 		float backupGamma = gGammaFadeFrac;
-		OGL_FadeOutScene(DrawIntroCallback, NULL);
+		OGL_FadeOutScene(DrawObjects, NULL);
 		gGammaFadeFrac = backupGamma;
 	}
 
@@ -154,14 +153,6 @@ float	oldTime,maxTime = 11.0f;
 
 
 /***************** DRAW INTRO CALLBACK *******************/
-
-static void DrawIntroCallback(void)
-{
-			/* DRAW OBJECTS */
-
-	DrawObjects();
-	DrawSparkles();
-}
 
 
 static void MoveLevelName(ObjNode* theNode)

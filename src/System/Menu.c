@@ -909,7 +909,7 @@ static ObjNode* MakeDarkenPane(void)
 	gNewObjectDefinition.genre		= CUSTOM_GENRE;
 	gNewObjectDefinition.flags		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_NOTEXTUREWRAP|
 										STATUS_BIT_KEEPBACKFACES|STATUS_BIT_MOVEINPAUSE;
-	gNewObjectDefinition.slot		= SLOT_OF_DUMB+100-1;
+	gNewObjectDefinition.slot		= MENU_SLOT-1;
 	gNewObjectDefinition.scale		= 1;
 	gNewObjectDefinition.moveCall 	= nil;
 
@@ -1075,7 +1075,7 @@ static void LayOutMenu(const MenuItem* menu)
 
 	memset(&gNewObjectDefinition, 0, sizeof(gNewObjectDefinition));
 	gNewObjectDefinition.scale		= gMenuStyle->standardScale;
-	gNewObjectDefinition.slot		= SLOT_OF_DUMB+100;
+	gNewObjectDefinition.slot		= MENU_SLOT;
 
 	float totalHeight = 0;
 	for (int row = 0; menu[row].type != kMenuItem_END_SENTINEL; row++)

@@ -108,7 +108,7 @@ float	delayToTabloid = 6.0f;
 
 			/* CLEANUP */
 
-	OGL_FadeOutScene(DrawObjects, NULL);
+	OGL_FadeOutScene(DrawWinCallback, NULL);
 	FreeWinScreen();
 }
 
@@ -207,7 +207,7 @@ float	timer;
 
 		CalcFramesPerSecond();
 		MoveObjects();
-		OGL_DrawScene(DrawObjects);
+		OGL_DrawScene(DrawWinCallback);
 	}
 
 }
@@ -501,7 +501,6 @@ static void DrawWinCallback(void)
 	UpdatePlayerSparkles(gPlayerInfo.objNode);
 
 	DrawObjects();
-	DrawSparkles();											// draw light sparkles
 }
 
 

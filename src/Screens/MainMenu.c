@@ -38,7 +38,7 @@ static void DoHelp(void);
 static void MakeCreditsIcon(void);
 static void MakeSavedGameIcon(void);
 static void MakeExitIcon(void);
-static void DrawOttoLogo(void);
+static void DrawOttoLogo(ObjNode* theNode);
 static void MakeIconString(void);
 static void MoveIconString(ObjNode *theNode);
 
@@ -156,7 +156,7 @@ void DoMainMenuScreen(void)
 
 		CalcFramesPerSecond();
 		MoveObjects();
-		OGL_DrawScene(DrawMainMenuCallback);
+		OGL_DrawScene(DrawObjects);
 
 			/* SEE IF SPAWN SAUCER */
 
@@ -174,31 +174,19 @@ void DoMainMenuScreen(void)
 
 			/* CLEANUP */
 
-	OGL_FadeOutScene(DrawMainMenuCallback, NULL);
+	OGL_FadeOutScene(DrawObjects, NULL);
 	FreeMainMenuScreen();
 
 	gDoCompanyLogos = false;						// dont do these again
 }
 
 
-/***************** DRAW MAINMENU CALLBACK *******************/
-
-void DrawMainMenuCallback(void)
-{
-
-	DrawObjects();
-	DrawSparkles();											// draw light sparkles
-
-			/* DRAW LOGO */
-
-	DrawOttoLogo();
-}
-
-
 /****************** DRAW OTTO LOGO ***********************/
 
-static void DrawOttoLogo(void)
+static void DrawOttoLogo(ObjNode* theNode)
 {
+	(void) theNode;
+
 			/* SET STATE */
 
 	OGL_PushState();
@@ -380,6 +368,19 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 
 		newObj->Delta.x = 5.0f + RandomFloat() * 15.0f;
 	}
+
+
+			/* MAKE CORNER LOGO */
+
+	NewObjectDefinitionType cornerLogoDef =
+	{
+		.genre = CUSTOM_GENRE,
+		.slot = DRAWEXTRA_SLOT,
+		.scale = 1,
+		.flags = STATUS_BIT_DONTCULL,
+		.drawCall = DrawOttoLogo
+	};
+	MakeNewObject(&cornerLogoDef);
 
 
 				/* START W/ GAME LOGO */
@@ -1139,7 +1140,7 @@ static Boolean DoMainMenuControl(void)
 						if (GetKeyState(SDL_SCANCODE_F10) ||	// see if do Level cheat
 							(GetNeedState(kNeed_UIBack) && GetNeedState(kNeed_UIStart)))
 						{
-							int cheatLevel = DoLevelCheatDialog(DrawMainMenuCallback);
+							int cheatLevel = DoLevelCheatDialog(DrawObjects);
 							if (cheatLevel < 0)
 								break;
 							gLevelNum = cheatLevel;
@@ -1165,7 +1166,7 @@ static Boolean DoMainMenuControl(void)
 						break;
 
 				case	SELECT_OPTIONS:
-						DoSettingsOverlay(nil, DrawMainMenuCallback);
+						DoSettingsOverlay(nil, DrawObjects);
 						break;
 
 				case	SELECT_CREDITS:
@@ -1173,7 +1174,7 @@ static Boolean DoMainMenuControl(void)
 						break;
 
 				case	SELECT_LOADSAVEDGAME:
-						if (DoFileScreen(FILE_SCREEN_TYPE_LOAD, DrawMainMenuCallback))
+						if (DoFileScreen(FILE_SCREEN_TYPE_LOAD, DrawObjects))
 						{
 							gPlayingFromSavedGame = true;
 							return true;
@@ -1552,7 +1553,7 @@ ObjNode	*glow, *text, *pane;
 
 		CalcFramesPerSecond();
 		MoveObjects();
-		OGL_DrawScene(DrawMainMenuCallback);
+		OGL_DrawScene(DrawObjects);
 	}
 
 
@@ -1642,7 +1643,7 @@ ObjNode	*pane;
 
 		CalcFramesPerSecond();
 		MoveObjects();
-		OGL_DrawScene(DrawMainMenuCallback);
+		OGL_DrawScene(DrawObjects);
 	}
 
 
@@ -1695,7 +1696,7 @@ static const MenuItem kCreditsMenu[] =
 	MenuStyle creditsMenuStyle = kDefaultMenuStyle;
 	creditsMenuStyle.isInteractive = false;
 
-	StartMenu(kCreditsMenu, &creditsMenuStyle, nil, DrawMainMenuCallback);
+	StartMenu(kCreditsMenu, &creditsMenuStyle, nil, DrawObjects);
 }
 
 

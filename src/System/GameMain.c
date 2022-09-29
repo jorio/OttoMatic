@@ -296,7 +296,7 @@ static void PlayArea(void)
 			/* DRAW IT ALL */
 
 
-		OGL_DrawScene(DrawArea);
+		OGL_DrawScene(DrawObjects);
 
 
 
@@ -346,7 +346,7 @@ static void PlayArea(void)
 	}
 
 
-	OGL_FadeOutScene(DrawArea, PausedUpdateCallback);
+	OGL_FadeOutScene(DrawObjects, PausedUpdateCallback);
 
 
 	CaptureMouse(false);
@@ -354,28 +354,20 @@ static void PlayArea(void)
 }
 
 
-/****************** DRAW AREA *******************************/
+/****************** DRAW AREA EXTRA STUFF *******************************/
 
-void DrawArea(void)
+static void DrawAreaExtraStuff(ObjNode* theNode)
 {
-		/* DRAW OBJECTS & TERAIN */
-
-	DrawObjects();												// draw objNodes which includes fences, terrain, etc.
-
-	// Don't draw stuff on top of the UI if the game is paused
-	if (gGamePaused)
-		return;
+	(void) theNode;
 
 			/* DRAW MISC */
 
 	DrawShards();												// draw shards
 	DrawVaporTrails();											// draw vapor trails
-	DrawSparkles();											// draw light sparkles
-	DrawInfobar();												// draw infobar last
+	if (!gGamePaused)
+		DrawInfobar();												// draw infobar last
 	DrawLensFlare();											// draw lens flare
 	DrawDeathExit();											// draw death exit stuff
-
-
 }
 
 
@@ -775,6 +767,19 @@ DeformationType		defData;
 	InitSparkles();
 	InitItemsManager();
 	InitSky();
+
+
+			/* DRAW SHARDS, THE INFOBAR, ETC. AFTER ALL GAMEPLAY OBJECTS */
+
+	NewObjectDefinitionType drawExtraDef =
+	{
+		.scale = 1,
+		.genre = CUSTOM_GENRE,
+		.flags = STATUS_BIT_DONTCULL,
+		.slot = DRAWEXTRA_SLOT,
+		.drawCall = DrawAreaExtraStuff
+	};
+	MakeNewObject(&drawExtraDef);
 
 
 

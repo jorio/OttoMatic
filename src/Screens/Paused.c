@@ -49,13 +49,13 @@ void DoPaused(void)
 	menuStyle.startButtonExits = true;
 
 again:
-	pick = StartMenu(pauseMenu, &menuStyle, PausedUpdateCallback, DrawArea);
+	pick = StartMenu(pauseMenu, &menuStyle, PausedUpdateCallback, DrawObjects);
 
 
 	switch (pick)
 	{
 		case 1:
-			DoSettingsOverlay(PausedUpdateCallback, DrawArea);
+			DoSettingsOverlay(PausedUpdateCallback, DrawObjects);
 			goto again;
 			break;
 
