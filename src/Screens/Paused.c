@@ -23,7 +23,7 @@ void DoPaused(void)
 	GammaOn();
 
 	gGamePaused = true;
-	Pomme_PauseAllChannels(true);
+	PauseAllChannels(true);
 
 	static const MenuItem pauseMenu[] =
 	{
@@ -73,6 +73,6 @@ again:
 
 	gGamePaused = false;
 
-	Pomme_PauseAllChannels(false);
+	PauseAllChannels(false);
 	EnforceMusicPausePref();
 }

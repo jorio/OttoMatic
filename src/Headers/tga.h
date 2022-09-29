@@ -30,7 +30,4 @@ enum
 	TGA_IMAGETYPE_CONVERTED_ARGB = 255,	// doesn't appear in actual files; set in memory header when pixel data was converted
 };
 
-// Note: the TGA header is little-endian, so we don't need to byteswap on LE systems.
-#define STRUCTFORMAT_TGAHeader "8B4H2B"
-
 OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, bool forceARGB);

@@ -285,6 +285,7 @@ void DisposeSoundEffect(int effectNum);
 void LoadSoundBank(int bankNum);
 void DisposeSoundBank(int bankNum);
 short PlayEffect_Parms(int effectNum, u_long leftVolume, u_long rightVolume, unsigned long rateMultiplier);
+void PauseAllChannels(Boolean pause);
 void ChangeChannelVolume(short channel, u_long leftVol, u_long rightVol);
 short PlayEffect3D(short effectNum, OGLPoint3D *where);
 Boolean Update3DSoundChannel(short effectNum, short *channel, OGLPoint3D *where);

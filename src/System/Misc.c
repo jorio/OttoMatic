@@ -495,10 +495,10 @@ int32_t	theLong = *longPtr;
 
 #if __LITTLE_ENDIAN__
 
-	Byte	b1 = theLong & 0xff;
-	Byte	b2 = (theLong & 0xff00) >> 8;
-	Byte	b3 = (theLong & 0xff0000) >> 16;
-	Byte	b4 = (theLong & 0xff000000) >> 24;
+	int32_t	b1 = theLong & 0xff;
+	int32_t	b2 = (theLong & 0xff00) >> 8;
+	int32_t	b3 = (theLong & 0xff0000) >> 16;
+	int32_t	b4 = (theLong & 0xff000000) >> 24;
 
 	theLong = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
 
@@ -516,10 +516,10 @@ uint32_t	theLong = *longPtr;
 
 #if __LITTLE_ENDIAN__
 
-	Byte	b1 = theLong & 0xff;
-	Byte	b2 = (theLong & 0xff00) >> 8;
-	Byte	b3 = (theLong & 0xff0000) >> 16;
-	Byte	b4 = (theLong & 0xff000000) >> 24;
+	uint32_t	b1 = theLong & 0xff;
+	uint32_t	b2 = (theLong & 0xff00) >> 8;
+	uint32_t	b3 = (theLong & 0xff0000) >> 16;
+	uint32_t	b4 = (theLong & 0xff000000) >> 24;
 
 	theLong = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
 
