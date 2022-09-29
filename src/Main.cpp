@@ -75,13 +75,6 @@ static fs::path FindGameData()
 	return dataPath;
 }
 
-static const char* GetWindowTitle()
-{
-	static char windowTitle[256];
-	snprintf(windowTitle, sizeof(windowTitle), "Otto Matic %s", PROJECT_VERSION);
-	return windowTitle;
-}
-
 void ParseCommandLine(int argc, const char** argv)
 {
 	memset(&gCommandLine, 0, sizeof(gCommandLine));
@@ -146,7 +139,7 @@ retry:
 	}
 
 	gSDLWindow = SDL_CreateWindow(
-			GetWindowTitle(),
+			"Otto Matic " PROJECT_VERSION,
 			SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.preferredDisplay),
 			SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.preferredDisplay),
 			1280,

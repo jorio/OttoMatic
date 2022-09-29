@@ -26,13 +26,15 @@ game_name           = "OttoMatic"  # no spaces
 game_name_human     = "Otto Matic"  # spaces and other special characters allowed
 game_ver            = "4.0.0"
 
-sdl_ver             = "2.0.22"
+source_check        = "src/Enemies/Enemy_BrainAlien.c"  # some file that's likely to be from the game's source tree
+
+sdl_ver             = "2.24.0"
 appimagetool_ver    = "13"
 
 lib_hashes = {  # sha-256
-    "SDL2-2.0.22.tar.gz":            "fe7cbf3127882e3fc7259a75a0cb585620272c51745d3852ab9dd87960697f2e",
-    "SDL2-2.0.22.dmg":               "72974672b8359057aa2f6d467c8adae8182a6caedd660e3936e23c3c683c3801",
-    "SDL2-devel-2.0.22-VC.zip":      "32adc96d8b25e5671189f1f38a4fc7deb105fbb1b3ed78ffcb23f5b8f36b3922",
+    "SDL2-2.24.0.tar.gz":            "91e4c34b1768f92d399b078e171448c6af18cafda743987ed2064a28954d6d97",
+    "SDL2-2.24.0.dmg":               "c3f3315d07372f261cf8393767799e84b7b81b232fa2317629ad1a624493e7bd",
+    "SDL2-devel-2.24.0-VC.zip":      "97c6e2d17c0baebf4c84ede27ec42e211358f3694b9f558ead3a9c542c4a004e",
     "appimagetool-x86_64.AppImage":  "df3baf5ca5facbecfc2f3fa6713c29ab9cefa8fd8c1eac5d283b79cab33e4acb", # appimagetool v13
     "appimagetool-aarch64.AppImage": "334e77beb67fc1e71856c29d5f3f324ca77b0fde7a840fdd14bd3b88c25c341f",
 }
@@ -55,7 +57,7 @@ if SYSTEM == "Darwin":
     help_build = "build app from Xcode project"
     help_package = "package up the game into a DMG"
 elif SYSTEM == "Windows":
-    default_generator = "Visual Studio 16 2019"
+    default_generator = "Visual Studio 17 2022"
     default_architecture = "x64"
     help_configure = F"generate {default_generator} solution"
     help_build = F"build exe from {default_generator} solution"
@@ -176,7 +178,7 @@ def zipdir(zipname, topleveldir, arc_topleveldir):
             for file in files:
                 filepath = os.path.join(root, file)
                 arcpath = os.path.join(arc_topleveldir, filepath[len(topleveldir)+1:])
-                log(F"Zipping: {filepath} --> {arcpath}")
+                log(F"Zipping: {arcpath}")
                 zipf.write(filepath, arcpath)
 
 #----------------------------------------------------------------
@@ -203,7 +205,6 @@ def prepare_dependencies_macos():
 
     if "CODE_SIGN_IDENTITY" in os.environ:
         call(["codesign", "--force", "--timestamp", "--sign", os.environ["CODE_SIGN_IDENTITY"], sdl2_framework_target_path])
-        call(["codesign", "--force", "--timestamp", "--sign", os.environ["CODE_SIGN_IDENTITY"], F"{sdl2_framework_target_path}/Versions/Current/Frameworks/hidapi.framework"])
     else:
         print("SDL will not be codesigned. Set the CODE_SIGN_IDENTITY environment variable if you want to sign it.")
 
@@ -244,22 +245,31 @@ def copy_documentation(proj, appdir, full=True):
         for docfile in ["CHANGELOG.md", "CHEATS.md", "COMMANDLINE.md"]:
             shutil.copy(docfile, F"{appdir}/Documentation")
 
-def package_windows(proj):
+def package_windows(proj: Project):
+    release_config = proj.build_configs[0]
+    windows_dlls = ["SDL2.dll", "msvcp140.dll", "vcruntime140.dll", "vcruntime140_1.dll"]
+
+    # Prep DLLs with cmake (copied to {cache_dir}/install/bin)
+    call(["cmake", "--install", proj.dir_name, "--prefix", F"{cache_dir}/install"])
+
     appdir = F"{cache_dir}/{game_name}-{game_ver}"
     rmtree_if_exists(appdir)
     os.makedirs(F"{appdir}", exist_ok=True)
 
-    # Copy executable, libs and assets
-    shutil.copy(F"{proj.dir_name}/Release/{game_name}.exe", appdir)
-    shutil.copy(F"extern/SDL2-{sdl_ver}/lib/x64/SDL2.dll", appdir)
+    # Copy executable, PDB, assets and libs
+    shutil.copy(F"{proj.dir_name}/{release_config}/{game_name}.exe", appdir)
+    shutil.copy(F"{proj.dir_name}/{release_config}/{game_name}.pdb", appdir)
     shutil.copytree("Data", F"{appdir}/Data")
+    for dll in windows_dlls:
+        shutil.copy(F"{cache_dir}/install/bin/{dll}", appdir)
 
     copy_documentation(proj, appdir)
 
     zipdir(F"{dist_dir}/{get_artifact_name()}", appdir, F"{game_name}-{game_ver}")
 
-def package_macos(proj):
-    appdir = F"{proj.dir_name}/Release"
+def package_macos(proj: Project):
+    release_config = proj.build_configs[0]
+    appdir = F"{proj.dir_name}/{release_config}"
 
     # Human-friendly name for .app
     os.rename(F"{appdir}/{game_name}.app", F"{appdir}/{game_name_human}.app")
@@ -322,7 +332,7 @@ if not (args.dependencies or args.configure or args.build or args.package):
     args.package = True
 
 # Make sure we're running from the correct directory...
-if not os.path.exists("src/Enemies/Enemy_BrainAlien.c"):  # some file that's likely to be from the game's source tree
+if not os.path.exists(source_check):  # some file that's likely to be from the game's source tree
     die(F"STOP - Please run this script from the root of the {game_name} source repo")
 
 #----------------------------------------------------------------
@@ -337,7 +347,8 @@ if args.A:
     common_gen_args += ["-A", args.A]
 
 if SYSTEM == "Windows":
-
+    # On Windows, ship a PDB file along with the Release build.
+    # Avoid RelWithDebInfo because bottom-of-the-barrel AVs may raise a false positive with such builds.
     projects = [Project(
         dir_name="build-msvc",
         gen_args=common_gen_args,
@@ -349,18 +360,20 @@ elif SYSTEM == "Darwin":
     projects = [Project(
         dir_name="build-xcode",
         gen_args=common_gen_args,
-        build_configs=["Release"],
+        build_configs=["RelWithDebInfo"],
         build_args=["-j", str(NPROC), "-quiet"]
     )]
 
 elif SYSTEM == "Linux":
+    release_config = "RelWithDebInfo"
+
     gen_env = {}
     if not args.system_sdl:
         gen_env["SDL2DIR"] = F"{libs_dir}/SDL2-{sdl_ver}/build"
 
     projects.append(Project(
-        dir_name="build-release",
-        gen_args=common_gen_args + ["-DCMAKE_BUILD_TYPE=Release"],
+        dir_name=F"build-{release_config.lower()}",
+        gen_args=common_gen_args + [F"-DCMAKE_BUILD_TYPE={release_config}"],
         gen_env=gen_env,
         build_args=["-j", str(NPROC)]
     ))

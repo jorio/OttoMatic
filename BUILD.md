@@ -15,7 +15,7 @@ build.py is the script that is used by the CI setup to produce builds. If you wa
     ```
     git clone --recurse-submodules https://github.com/jorio/OttoMatic
     ```
-1. Download [SDL2-2.0.22.dmg](https://libsdl.org/release/SDL2-2.0.22.dmg), open it, and copy **SDL2.framework** to the **extern** folder
+1. Download [SDL2-2.24.0.dmg](https://libsdl.org/release/SDL2-2.24.0.dmg), open it, and copy **SDL2.framework** to the **extern** folder
 1. Prep the Xcode project:
     ```
     cmake -G Xcode -S . -B build
@@ -29,13 +29,13 @@ build.py is the script that is used by the CI setup to produce builds. If you wa
 ## How to build the game on Windows
 
 1. Install the prerequisites:
-    - Visual Studio 2019 with the C++ toolchain
+    - Visual Studio 2022 with the C++ toolchain
     - [CMake](https://cmake.org/download/) 3.20+
 1. Clone the repo **recursively**:
     ```
     git clone --recurse-submodules https://github.com/jorio/OttoMatic
     ```
-1. Download [SDL2-devel-2.0.22-VC.zip](https://libsdl.org/release/SDL2-devel-2.0.22-VC.zip) and extract the contents into the **extern** folder
+1. Download [SDL2-devel-2.24.0-VC.zip](https://libsdl.org/release/SDL2-devel-2.24.0-VC.zip) and extract the contents into the **extern** folder
 1. Prep the Visual Studio solution:
     ```
     cmake -G "Visual Studio 16 2019" -A x64 -S . -B build

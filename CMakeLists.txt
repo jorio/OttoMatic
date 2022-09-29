@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.16)
 
 set(GAME_TARGET				"OttoMatic")
 set(GAME_VERSION			"4.0.0")
@@ -7,8 +7,14 @@ set(GAME_MAC_COPYRIGHT		"© 2001 Pangea Software, Inc.\n© 2021 Iliyas Jorio.")
 set(GAME_MAC_BUNDLE_ID		"io.jor.ottomatic")
 
 set(CMAKE_MODULE_PATH		"${CMAKE_SOURCE_DIR}/cmake")
-set(CMAKE_C_STANDARD		11)
+
 set(CMAKE_CXX_STANDARD		20)
+
+if (${CMAKE_VERSION} VERSION_LESS "3.21")
+	set(CMAKE_C_STANDARD	11)
+else()
+	set(CMAKE_C_STANDARD	17)
+endif()
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE STRING "Minimum OS X deployment version")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Target macOS architectures")
@@ -17,6 +23,14 @@ project(${GAME_TARGET}
 	VERSION ${GAME_VERSION}
 	LANGUAGES C CXX
 )
+
+option(SANITIZE "Build with asan/ubsan" OFF)
+
+if(SANITIZE)
+	message("Sanitizers enabled")
+else()
+	message("Sanitizers disabled (pass -DSANITIZE=1 to enable)")
+endif()
 
 #------------------------------------------------------------------------------
 # GLOBAL OPTIONS (BEFORE ADDING SUBDIRECTORIES)
@@ -29,12 +43,17 @@ if(MSVC)
 	add_compile_definitions(UNICODE _UNICODE)
 
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${GAME_TARGET})
+elseif(APPLE)
+	# Let the game (and Pomme) find header files within SDL2.framework
+	set(CMAKE_XCODE_ATTRIBUTE_FRAMEWORK_SEARCH_PATHS extern)
+	add_compile_options("-F${CMAKE_SOURCE_DIR}/extern")  # for non-xcode IDEs
 endif()
 
 set(POMME_NO_VIDEO true)
 set(POMME_NO_INPUT true)
 set(POMME_NO_GRAPHICS true)
 set(POMME_NO_QD3D true)
+set(POMME_NO_MP3 true)
 
 #------------------------------------------------------------------------------
 # DEPENDENCIES
@@ -63,10 +82,7 @@ set(GAME_ALL_SOURCES
 	${GAME_HEADERS}
 )
 
-#------------------------------------------------------------------------------
-# SOURCE GROUPS
-#------------------------------------------------------------------------------
-
+# Make source groups match file tree
 source_group(TREE ${GAME_SRCDIR} PREFIX "" FILES ${GAME_ALL_SOURCES})
 
 #------------------------------------------------------------------------------
@@ -76,7 +92,7 @@ source_group(TREE ${GAME_SRCDIR} PREFIX "" FILES ${GAME_ALL_SOURCES})
 set(GAME_LIBRARIES
 	Pomme
 	${SDL2_LIBRARIES}
-	${OPENGL_LIBRARIES}
+	OpenGL::GL
 )
 
 if(WIN32)
@@ -105,34 +121,20 @@ target_include_directories(${GAME_TARGET} PRIVATE
 	${SDL2_INCLUDE_DIRS}
 	${OPENGL_INCLUDE_DIR}
 	extern/Pomme/src
-	${GAME_SRCDIR}
 	${GAME_SRCDIR}/Headers
 )
 
-target_link_libraries(${GAME_TARGET} ${GAME_LIBRARIES})
 
 #------------------------------------------------------------------------------
-# DEFINES
+# COMPILER/LINKER OPTIONS
 #------------------------------------------------------------------------------
 
 add_compile_definitions(
 	"$<$<CONFIG:DEBUG>:_DEBUG>"
 )
 
-if(WIN32)
-	# On Win32, we need NOGDI and NOUSER to be able to define some Mac functions
-	# whose names are otherwise taken by Windows APIs.
-	target_compile_definitions(${GAME_TARGET} PRIVATE
-		WIN32_LEAN_AND_MEAN
-		NOGDI
-		NOUSER
-		_CRT_SECURE_NO_WARNINGS  # quit whining about snprintf_s
-	)
-endif()
-
-#------------------------------------------------------------------------------
-# COMPILER OPTIONS
-#------------------------------------------------------------------------------
+target_compile_definitions(${GAME_TARGET} PRIVATE
+	GL_SILENCE_DEPRECATION)
 
 if(NOT MSVC)
 	target_compile_options(${GAME_TARGET} PRIVATE
@@ -140,20 +142,36 @@ if(NOT MSVC)
 		-Wall
 		-Wextra
 		-Wshadow
+		-Wstrict-aliasing=2
 		-Wno-multichar
 		-Wno-unknown-pragmas
 		$<$<CXX_COMPILER_ID:GNU>:-Wno-unused-but-set-variable>
 		-Werror=return-type
+		-Wno-unused-function
 		-Wno-unused-parameter
 	)
-else()
-	# By default, MSVC may add /EHsc to CMAKE_CXX_FLAGS, which we don't want (we use /EHs below)
-	string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 
-	# By default, MSVC may add /W3 to CMAKE_CXX_FLAGS, which we don't want (we use /W4 below)
-	# Note that this is not required with "cmake_minimum_required(VERSION 3.15)" or later
-	string(REPLACE "/W3" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-	string(REPLACE "/W3" "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+	# Sanitizers in debug mode (Linux only)
+	# When using a debugger, you should export LSAN_OPTIONS=detect_leaks=0
+	if(SANITIZE)
+		list(INSERT GAME_LIBRARIES 0 asan ubsan)
+		target_compile_options(${GAME_TARGET} PRIVATE
+			-fsanitize=alignment
+			-fsanitize=address
+			-fsanitize=leak
+			-fsanitize=undefined
+			-fno-omit-frame-pointer
+		)
+	endif()
+else()
+	# On Win32, we need NOGDI and NOUSER to be able to define some Mac functions
+	# whose names are otherwise taken by Windows APIs.
+	target_compile_definitions(${GAME_TARGET} PRIVATE
+		WIN32_LEAN_AND_MEAN
+		NOGDI						# avoid name clashes with Mac functions
+		NOUSER						# avoid name clashes with Mac functions
+		_CRT_SECURE_NO_WARNINGS		# quit whining about snprintf_s
+	)
 
 	target_compile_options(${GAME_TARGET} PRIVATE
 		/EHs	# synchronous exceptions; also, extern "C" functions may throw exceptions
@@ -164,8 +182,19 @@ else()
 		/wd4244 # conversion from double to float
 		/wd4305 # truncation from double to float
 		/wd5105 # see https://developercommunity.visualstudio.com/t/1249671
+		/MP		# multiprocessor build
+		/Zi		# output info to PDB
 	)
+
+	# Let executable be debugged with PDB, even in Release builds
+	target_link_options(${GAME_TARGET} PRIVATE /DEBUG)
+
+	# Enable console for debug builds
+	set_target_properties(${GAME_TARGET} PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
+	set_target_properties(${GAME_TARGET} PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
 endif()
+
+target_link_libraries(${GAME_TARGET} ${GAME_LIBRARIES})
 
 #------------------------------------------------------------------------------
 # PLATFORM-SPECIFIC PACKAGING
@@ -206,6 +235,7 @@ set_target_properties(${GAME_TARGET} PROPERTIES
 	XCODE_EMBED_FRAMEWORKS							"${SDL2_LIBRARIES}"
 	XCODE_EMBED_FRAMEWORKS_CODE_SIGN_ON_COPY		"YES"		# frameworks must be signed by the same developer as the binary
 	XCODE_EMBED_FRAMEWORKS_REMOVE_HEADERS_ON_COPY	"YES"		# not strictly necessary, but that's cleaner
+	XCODE_ATTRIBUTE_COPY_PHASE_STRIP[variant=Debug]	"NO"		# avoid "skipping copy phase strip" warning while working on Debug config
 	XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME			"YES"		# required for notarization to pass
 )
 
@@ -215,18 +245,21 @@ if(APPLE)
 	if(NOT "$ENV{CODE_SIGN_IDENTITY}" STREQUAL "")
 		set_target_properties(${GAME_TARGET} PROPERTIES
 			XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY[variant=Release] "$ENV{CODE_SIGN_IDENTITY}"
+			XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY[variant=RelWithDebInfo] "$ENV{CODE_SIGN_IDENTITY}"
 			XCODE_ATTRIBUTE_DEVELOPMENT_TEAM[variant=Release] "$ENV{CODE_SIGN_IDENTITY}"
+			XCODE_ATTRIBUTE_DEVELOPMENT_TEAM[variant=RelWithDebInfo] "$ENV{CODE_SIGN_IDENTITY}"
 
 			# The following is to pass notarization requirements
 			XCODE_ATTRIBUTE_CODE_SIGN_INJECT_BASE_ENTITLEMENTS[variant=Release] "NO"
+			XCODE_ATTRIBUTE_CODE_SIGN_INJECT_BASE_ENTITLEMENTS[variant=RelWithDebInfo] "NO"
 			XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS[variant=Release] "--options=runtime --timestamp"
+			XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS[variant=RelWithDebInfo] "--options=runtime --timestamp"
 		)
 		message("Release build will be code signed!")
 	endif()
 
 	# Copy stuff to app bundle contents
 	set_source_files_properties(${GAME_MAC_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-	#set_source_files_properties(${SDL2_LIBRARIES} PROPERTIES MACOSX_PACKAGE_LOCATION "Frameworks")
 
 	set(BUNDLE_CONTENTS_DIR "$<TARGET_FILE_DIR:${PROJECT_NAME}>/..")
 	set(APP_PARENT_DIR "${BUNDLE_CONTENTS_DIR}/../..")
@@ -236,7 +269,7 @@ if(APPLE)
 		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Data ${BUNDLE_CONTENTS_DIR}/Resources
 
 		# High-DPI support in Info.plist
-#		plutil -replace NSHighResolutionCapable -bool true ${BUNDLE_CONTENTS_DIR}/Info.plist
+		COMMAND plutil -replace NSHighResolutionCapable -bool true ${BUNDLE_CONTENTS_DIR}/Info.plist
 	)
 else()
 	set(APP_PARENT_DIR "$<TARGET_FILE_DIR:${GAME_TARGET}>")
@@ -246,17 +279,17 @@ else()
 		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Data ${APP_PARENT_DIR}/Data)
 endif()
 
-# Copy SDL2 DLLs to output folder on Windows
+# Windows-specific libraries
 if(WIN32)
+	# Copy SDL2 DLLs to output folder on Windows for convenience
 	foreach(DLL ${SDL2_DLLS})
 		add_custom_command(TARGET ${GAME_TARGET} POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL} ${APP_PARENT_DIR})
 	endforeach()
+
+	# When installing (cmake --install), copy Visual Studio redistributable DLLs to install location
+	include(InstallRequiredSystemLibraries)
 endif()
 
 # Copy documentation to output folder
-if(WIN32)
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/packaging/ReadMe-Win32.txt.in ${CMAKE_CURRENT_BINARY_DIR}/ReadMe.txt)
-else()
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/packaging/ReadMe.txt.in ${CMAKE_CURRENT_BINARY_DIR}/ReadMe.txt)
-endif()
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/packaging/ReadMe.txt.in ${CMAKE_CURRENT_BINARY_DIR}/ReadMe.txt)
