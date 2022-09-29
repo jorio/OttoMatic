@@ -29,3 +29,4 @@ extern	void ToolBoxInit(void);
 void MoveEverything(void);
 void InitDefaultPrefs(void);
 void DrawArea(OGLSetupOutputType *setupInfo);
+void GameMain(void);

@@ -967,7 +967,7 @@ static void CheckBootCheats(void)
 /************************************************************/
 
 
-int GameMain(void)
+void GameMain(void)
 {
 unsigned long	someLong;
 
