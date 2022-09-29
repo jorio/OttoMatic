@@ -129,6 +129,8 @@ static Boolean	beenHere = false;
 		if (gGameViewInfoPtr)							// see if need to dispose this
 			OGL_DisposeWindowSetup();
 
+		OGL_Shutdown();
+
 		TextMesh_DisposeMetrics();
 	}
 

@@ -1,7 +1,8 @@
 /****************************/
 /*   OPENGL SUPPORT.C	    */
-/* (c)2001 Pangea Software  */
 /*   By Brian Greenstone    */
+/* (c)2001 Pangea Software  */
+/* (c)2022 Iliyas Jorio     */
 /****************************/
 
 
@@ -16,8 +17,9 @@
 /****************************/
 
 static void OGL_InitFont(void);
-
-static void OGL_CreateDrawContext(OGLViewDefType *viewDefPtr);
+static void OGL_CreateDrawContext(void);
+static void OGL_DisposeDrawContext(void);
+static void OGL_InitDrawContext(OGLViewDefType *viewDefPtr);
 static void OGL_SetStyles(OGLSetupInputType *setupDefPtr);
 static void OGL_CreateLights(OGLLightDefType *lightDefPtr);
 
@@ -100,6 +102,18 @@ float	f;
 		f += (PI/2.0) / 255.0f;
 	}
 
+
+		/* CREATE DRAW CONTEXT THAT WILL BE USED THROUGHOUT THE GAME */
+
+	OGL_CreateDrawContext();
+}
+
+
+/******************** OGL SHUTDOWN *****************/
+
+void OGL_Shutdown(void)
+{
+	OGL_DisposeDrawContext();
 }
 
 
@@ -173,7 +187,7 @@ void OGL_SetupWindow(OGLSetupInputType *setupDefPtr)
 
 				/* SETUP */
 
-	OGL_CreateDrawContext(&setupDefPtr->view);
+	OGL_InitDrawContext(&setupDefPtr->view);
 	OGL_CheckError();
 
 	OGL_SetStyles(setupDefPtr);
@@ -188,7 +202,7 @@ void OGL_SetupWindow(OGLSetupInputType *setupDefPtr)
 
 				/* PASS BACK INFO */
 
-	gGameViewInfoPtr->drawContext 		= gAGLContext;
+//	gGameViewInfoPtr->drawContext 		= gAGLContext;
 	gGameViewInfoPtr->clip 				= setupDefPtr->view.clip;
 	gGameViewInfoPtr->hither 			= setupDefPtr->camera.hither;			// remember hither/yon
 	gGameViewInfoPtr->yon 				= setupDefPtr->camera.yon;
@@ -220,31 +234,75 @@ void OGL_DisposeWindowSetup(void)
 
 	TextMesh_DisposeMaterial();
 
-			/* KILL GL CONTEXT */
-
-	SDL_GL_MakeCurrent(gSDLWindow, NULL);					// make context not current
-	SDL_GL_DeleteContext(gGameViewInfoPtr->drawContext);	// nuke the AGL context
-
-
 		/* FREE MEMORY & NIL POINTER */
 
 	gGameViewInfoPtr->isActive = false;						// now inactive
 	SafeDisposePtr((Ptr) gGameViewInfoPtr);
 	gGameViewInfoPtr = nil;
-
-	gAGLContext = nil;
 }
-
 
 
 
 /**************** OGL: CREATE DRAW CONTEXT *********************/
 
-static void OGL_CreateDrawContext(OGLViewDefType *viewDefPtr)
+static void OGL_CreateDrawContext(void)
 {
-GLint			maxTexSize;
-static char			*s;
+	GAME_ASSERT_MESSAGE(!gAGLContext, "GL context already exists");
+	GAME_ASSERT_MESSAGE(gSDLWindow, "Window must be created before the DC!");
 
+			/* CREATE AGL CONTEXT & ATTACH TO WINDOW */
+
+	gAGLContext = SDL_GL_CreateContext(gSDLWindow);
+	GAME_ASSERT_MESSAGE(gAGLContext, SDL_GetError());
+	GAME_ASSERT(glGetError() == GL_NO_ERROR);
+
+			/* ACTIVATE CONTEXT */
+
+	int mkc = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);
+	GAME_ASSERT_MESSAGE(mkc == 0, SDL_GetError());
+
+
+			/* GET OPENGL EXTENSIONS */
+			//
+			// On Mac/Linux, we only need to do this once.
+			// But on Windows, we must do it whenever we create a draw context.
+			//
+
+	OGL_InitFunctions();
+
+
+			/* SEE IF SUPPORT 1024x1024 TEXTURES */
+
+	GLint maxTexSize = 0;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
+	if (maxTexSize < 1024)
+		DoFatalAlert("Your video card cannot do 1024x1024 textures, so it is below the game's minimum system requirements.");
+}
+
+
+/**************** OGL: NUKE DRAW CONTEXT *********************/
+//
+// Do this when QUITTING the game!
+// The game reuses the same draw context for all scenes!
+//
+
+static void OGL_DisposeDrawContext(void)
+{
+	if (!gAGLContext)
+	{
+		return;
+	}
+
+	SDL_GL_MakeCurrent(gSDLWindow, NULL);		// make context not current
+	SDL_GL_DeleteContext(gAGLContext);			// nuke context
+	gAGLContext = nil;
+}
+
+
+/**************** OGL: INIT DRAW CONTEXT *********************/
+
+static void OGL_InitDrawContext(OGLViewDefType* viewDefPtr)
+{
 			/* FIX FOG FOR FOR B&W ANAGLYPH */
 			//
 			// The NTSC luminance standard where grayscale = .299r + .587g + .114b
@@ -281,27 +339,6 @@ static char			*s;
 		}
 	}
 
-			/* CREATE AGL CONTEXT & ATTACH TO WINDOW */
-
-	gAGLContext = SDL_GL_CreateContext(gSDLWindow);
-	GAME_ASSERT_MESSAGE(gAGLContext, SDL_GetError());
-	GAME_ASSERT(glGetError() == GL_NO_ERROR);
-
-
-			/* ACTIVATE CONTEXT */
-
-	int mkc = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);
-	GAME_ASSERT_MESSAGE(mkc == 0, SDL_GetError());
-
-
-			/* GET OPENGL EXTENSIONS */
-			//
-			// On Mac/Linux, we only need to do this once.
-			// But on Windows, we must do it whenever we create a draw context.
-			//
-
-	OGL_InitFunctions();
-
 
 				/* SET VARIOUS STATE INFO */
 
@@ -318,21 +355,6 @@ static char			*s;
 
   	glEnable(GL_NORMALIZE);
 
-
-
- 		/***************************/
-		/* GET OPENGL CAPABILITIES */
- 		/***************************/
-
-	s = (char *)glGetString(GL_EXTENSIONS);					// get extensions list
-
-
-
-			/* SEE IF SUPPORT 1024x1024 TEXTURES */
-
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
-	if (maxTexSize < 1024)
-		DoFatalAlert("Your video card cannot do 1024x1024 textures, so it is below the game's minimum system requirements.");
 
 
 				/* CLEAR BACK BUFFER ENTIRELY */
@@ -405,7 +427,6 @@ OGLStyleDefType *styleDefPtr = &setupDefPtr->styles;
 
 static void OGL_CreateLights(OGLLightDefType *lightDefPtr)
 {
-int		i;
 GLfloat	ambient[4];
 
 	OGL_EnableLighting();
@@ -426,7 +447,7 @@ GLfloat	ambient[4];
 			/* CREATE FILL LIGHTS */
 			/**********************/
 
-	for (i=0; i < lightDefPtr->numFillLights; i++)
+	for (int i = 0; i < lightDefPtr->numFillLights; i++)
 	{
 		static GLfloat lightamb[4] = { 0.0, 0.0, 0.0, 1.0 };
 		GLfloat lightVec[4];
@@ -457,6 +478,15 @@ GLfloat	ambient[4];
 		glEnable(GL_LIGHT0+i);								// enable the light
 	}
 
+
+
+
+			/* KILL OTHER LIGHTS THAT MIGHT STILL BE ACTIVE FROM PREVIOUS SCENE */
+
+	for (int i = lightDefPtr->numFillLights; i < MAX_FILL_LIGHTS; i++)
+	{
+		glDisable(GL_LIGHT0 + i);
+	}
 }
 
 #pragma mark -
@@ -465,12 +495,10 @@ GLfloat	ambient[4];
 
 void OGL_DrawScene(void (*drawRoutine)(void))
 {
-	if (gGameViewInfoPtr == nil)						// make sure it's legit
-		DoFatalAlert("OGL_DrawScene setupInfo == nil");
-	if (!gGameViewInfoPtr->isActive)
-		DoFatalAlert("OGL_DrawScene isActive == false");
+	GAME_ASSERT(gGameViewInfoPtr);						// make sure it's legit
+	GAME_ASSERT(gGameViewInfoPtr->isActive);
 
-	int makeCurrentRC = SDL_GL_MakeCurrent(gSDLWindow, gGameViewInfoPtr->drawContext);		// make context active
+	int makeCurrentRC = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);		// make context active
 	GAME_ASSERT_MESSAGE(makeCurrentRC == 0, SDL_GetError());
 
 

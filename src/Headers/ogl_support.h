@@ -200,7 +200,7 @@ typedef struct
 typedef	struct
 {
 	OGLColorRGBA		ambientColor;
-	long				numFillLights;
+	int					numFillLights;
 	OGLVector3D			fillDirection[MAX_FILL_LIGHTS];
 	OGLColorRGBA		fillColor[MAX_FILL_LIGHTS];
 }OGLLightDefType;
@@ -222,7 +222,6 @@ typedef struct
 typedef struct
 {
 	Boolean					isActive;
-	SDL_GLContext			drawContext;
 	Rect					clip;				// not pane size, but clip:  left = amount to clip off left
 	OGLLightDefType			lightList;
 	OGLCameraPlacement		cameraPlacement;	
@@ -247,6 +246,7 @@ extern	Byte					gAnaglyphPass;
 //=====================================================================
 
 void OGL_Boot(void);
+void OGL_Shutdown(void);
 void OGL_NewViewDef(OGLSetupInputType *viewDef);
 void OGL_SetupWindow(OGLSetupInputType *viewDef);
 void OGL_DisposeWindowSetup(void);
