@@ -901,7 +901,8 @@ void PatchSplineLoop(SplineDefType* spline)
 #if _DEBUG
 		/* MAKE SURE NEW SPLINE HASN'T STRAYED TOO FAR FROM FILE VALUES */
 
-	GAME_ASSERT(abs(newNumPoints - oldNumPoints) <= 5);		// tolerate some wiggle room
+	GAME_ASSERT(abs(newNumPoints - oldNumPoints) <= 10);		// tolerate some wiggle room
+	// (note: level 3 will be especially bad here since I edited the nubs in the .ter.rsrc file)
 
 	int currentSpan = 0;
 	int currentSpanPoints = 0;
