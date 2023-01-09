@@ -544,3 +544,92 @@ void DetachObjectFromSpline(ObjNode *theNode, void (*moveCall)(ObjNode*))
 
 
 
+/******************* DRAW SPLINES FOR DEBUGGING *********************/
+
+void DrawSplines(void)
+{
+	for (int i = 0; i < gNumSplines; i++)
+	{
+		const SplineDefType* spline = &(*gSplineList)[i];
+
+		if (spline->numPoints == 0)
+		{
+			continue;
+		}
+
+		const SplinePointType* points = *spline->pointList;
+		const SplinePointType* nubs = *spline->nubList;
+		const int halfway = spline->numPoints / 2;
+
+		if (SeeIfCoordsOutOfRange(points[0].x, points[0].z)
+			&& SeeIfCoordsOutOfRange(points[halfway].x, points[halfway].z))
+		{
+			continue;
+		}
+
+		Boolean flat = false;
+		float flatY = 0;
+
+		if (gLevelNum == 2)
+		{
+			flat = true;
+			flatY = 500;
+		}
+		else
+		{
+			flat = GetWaterY(points[halfway].x, points[halfway].z, &flatY);
+		}
+
+		glBegin(GL_LINE_STRIP);
+		for (int j = 0; j < spline->numPoints; j++)
+		{
+			float x = points[j].x;
+			float z = points[j].z;
+			float y = flat? flatY: GetTerrainY2(x, z) + 10;
+			glVertex3f(x, y + (j&1) * 5, z);
+			glVertex3f(x, y + (!(j&1)) * 5, z);
+		}
+		glEnd();
+
+		glBegin(GL_LINES);
+		for (int nub = 0; nub < spline->numNubs; nub++)
+		{
+			float flagSize = nub == 0 ? 150 : 30;
+			float poleSize = flagSize;
+
+			float x = nubs[nub].x * MAP2UNIT_VALUE;
+			float z = nubs[nub].z * MAP2UNIT_VALUE;
+			float y1 = flat ? flatY : GetTerrainY2(x, z) + 17;
+			float y2 = y1 + poleSize;
+			glVertex3f(x, y1, z);
+			glVertex3f(x, y2, z);
+
+			if (nub < spline->numNubs - 1)
+			{
+				OGLVector3D flagDir = { nubs[nub+1].x * MAP2UNIT_VALUE - x, 0, nubs[nub+1].z * MAP2UNIT_VALUE - z };
+				FastNormalizeVector(flagDir.x, flagDir.y, flagDir.z, &flagDir);
+
+				float y3 = y2 - flagSize * 0.25f;
+				float y4 = y2 - flagSize * 0.5f;
+
+				glVertex3f(x, y2, z);
+				glVertex3f(x + flagDir.x * flagSize, y3, z + flagDir.z * flagSize);
+				glVertex3f(x + flagDir.x * flagSize, y3, z + flagDir.z * flagSize);
+				glVertex3f(x, y4, z);
+
+				if (nub == 0)
+				{
+					for (int baton = 0; baton < i + 1; baton++)
+					{
+						float x2 = x + ((2 + baton) * 4) * flagDir.x;
+						float z2 = z + ((2 + baton) * 4) * flagDir.z;
+						glVertex3f(x2, y3-10, z2);
+						glVertex3f(x2, y3+10, z2);
+					}
+				}
+			}
+		}
+		glEnd();
+	}
+}
+

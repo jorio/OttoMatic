@@ -286,12 +286,14 @@ void DisposeTerrain(void)
 	{
 		for (int i = 0; i < gNumSplines; i++)
 		{
+			DisposeHandle((Handle)(*gSplineList)[i].nubList);		// nuke nub list
 			DisposeHandle((Handle)(*gSplineList)[i].pointList);		// nuke point list
 			DisposeHandle((Handle)(*gSplineList)[i].itemList);		// nuke item list
 		}
 		DisposeHandle((Handle)gSplineList);
 		gSplineList = nil;
 	}
+	gNumSplines = 0;
 
 				/* NUKE WATER PATCH */
 
@@ -967,6 +969,15 @@ Boolean			superTileVisible;
 		}
 	}
 	gCleanupDeformation = false;							// reset this now
+
+
+	if (gDebugMode == 2)
+	{
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_LIGHTING);
+		glColor4f(1,1,1,1);
+		DrawSplines();
+	}
 
 	OGL_PopState();
 

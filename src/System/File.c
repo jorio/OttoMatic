@@ -1188,17 +1188,35 @@ OSErr					iErr;
 	else
 		gNumSplines = 0;
 
-			/* READ SPLINE POINT LIST */
+			/* READ SPLINE NUB, POINT, AND ITEM LISTS */
 
 	for (int i = 0; i < gNumSplines; i++)
 	{
 		SplineDefType	*spline = &(*gSplineList)[i];									// point to Nth spline
 
-		// (Bugdom's) Level 2's spline #16 has 0 points. Skip the byteswapping, but do alloc an empty handle, which the game expects.
-		GAME_ASSERT(spline->numPoints != 0);
+		// make sure it's not an empty spline
+		GAME_ASSERT(spline->numNubs >= 2);
+		GAME_ASSERT(spline->numPoints >= 2);
+//		GAME_ASSERT(spline->numItems >= 1);
+
+		hand = GetResource('SpNb',1000+i);
+		GAME_ASSERT(hand);
+		{
+			SplinePointType	*nubList = (SplinePointType *)*hand;
+
+			DetachResource(hand);
+			HLockHi(hand);
+			(*gSplineList)[i].nubList = (SplinePointType **)hand;
+
+			for (int j = 0; j < spline->numNubs; j++)			// swizzle
+			{
+				(*spline->nubList)[j].x = SwizzleFloat(&nubList[j].x);
+				(*spline->nubList)[j].z = SwizzleFloat(&nubList[j].z);
+			}
+		}
 
 		hand = GetResource('SpPt',1000+i);
-		GAME_ASSERT_MESSAGE(hand, "can't get spline points rez");
+		GAME_ASSERT(hand);
 		{
 			SplinePointType	*ptList = (SplinePointType *)*hand;
 
@@ -1212,17 +1230,9 @@ OSErr					iErr;
 				(*spline->pointList)[j].z = SwizzleFloat(&ptList[j].z);
 			}
 		}
-	}
-
-
-			/* READ SPLINE ITEM LIST */
-
-	for (int i = 0; i < gNumSplines; i++)
-	{
-		SplineDefType	*spline = &(*gSplineList)[i];									// point to Nth spline
 
 		hand = GetResource('SpIt',1000+i);
-		GAME_ASSERT_MESSAGE(hand, "ReadDataFromPlayfieldFile: cant get spline items rez");
+		GAME_ASSERT(hand);
 		{
 			SplineItemType	*itemList = (SplineItemType *)*hand;
 
