@@ -22,3 +22,4 @@ void DetachObjectFromSpline(ObjNode *theNode, void (*moveCall)(ObjNode*));
 void SetSplineAim(ObjNode *theNode);
 
 void DrawSplines(void);
+void PatchSplineLoop(SplineDefType* splinePtr);

@@ -1247,6 +1247,11 @@ OSErr					iErr;
 				(*spline->itemList)[j].flags	= SwizzleUShort(&itemList[j].flags);
 			}
 		}
+
+
+				/* MAKE SPLINE LOOP SMOOTHLY */
+
+		PatchSplineLoop(spline);
 	}
 
 			/****************************/
