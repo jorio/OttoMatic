@@ -1,5 +1,7 @@
 /****************************/
 /*   	SPLINE ITEMS.C      */
+/* (C)2001 Pangea Software  */
+/* (C)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -21,6 +23,7 @@ static Boolean NilPrime(long splineNum, SplineItemType *itemPtr);
 /****************************/
 
 #define	MAX_SPLINE_OBJECTS		100
+#define	MAX_PLACEMENT			0.999f
 
 
 
@@ -223,19 +226,34 @@ static Boolean NilPrime(long splineNum, SplineItemType *itemPtr)
 
 /*********************** GET COORD ON SPLINE **********************/
 
-void GetCoordOnSpline(SplineDefType *splinePtr, float placement, float *x, float *z)
+int GetCoordOnSpline(const SplineDefType* spline, float placement, float* x, float* z)
 {
-float			numPointsInSpline;
-SplinePointType	*points;
-int				i;
+	int numPoints = spline->numPoints;
 
-	numPointsInSpline = splinePtr->numPoints;					// get # points in the spline
-	points = *splinePtr->pointList;								// point to point list
+	GAME_ASSERT(spline->numPoints > 0);
 
-	i = numPointsInSpline * placement;							// get index
+	// Clamp placement before accessing array to avoid overrun
+	placement = GAME_CLAMP(placement, 0, MAX_PLACEMENT);
 
-	*x = points[i].x;											// get coord
-	*z = points[i].z;
+	float scaledPlacement = placement * numPoints;
+
+	int index1 = (int)(scaledPlacement);
+	int index2 = (index1 < numPoints - 1) ? (index1 + 1) : (0);
+
+	GAME_ASSERT(index1 >= 0 && index1 <= numPoints);
+	GAME_ASSERT(index2 >= 0 && index2 <= numPoints);
+
+	const SplinePointType* point1 = &(*spline->pointList)[index1];
+	const SplinePointType* point2 = &(*spline->pointList)[index2];
+
+	// Fractional of progression from point1 to point2
+	float interpointFrac = scaledPlacement - (int)scaledPlacement;
+
+	// Lerp point1 -> point2
+	*x = point1->x * (1 - interpointFrac) + point2->x * interpointFrac;
+	*z = point1->z * (1 - interpointFrac) + point2->z * interpointFrac;
+
+	return index1;
 }
 
 /*********************** GET NEXT COORD ON SPLINE **********************/
@@ -418,32 +436,14 @@ ObjNode	*theNode;
 
 
 /*********************** GET OBJECT COORD ON SPLINE **********************/
-//
-// OUTPUT: 	x,y = coords
-//
 
 void GetObjectCoordOnSpline(ObjNode *theNode)
 {
-float			numPointsInSpline,placement;
-SplinePointType	*points;
-SplineDefType	*splinePtr;
-long			i;
-
-	placement = theNode->SplinePlacement;						// get placement
-	if (placement < 0.0f)
-		placement = 0;
-	else
-	if (placement >= 1.0f)
-		placement = .999f;
-
-	splinePtr = &(*gSplineList)[theNode->SplineNum];			// point to the spline
-
-	numPointsInSpline = splinePtr->numPoints;					// get # points in the spline
-	points = *splinePtr->pointList;								// point to point list
-
-	i = numPointsInSpline * placement;							// calc index
-	theNode->Coord.x = points[i].x;								// get coord
-	theNode->Coord.z = points[i].z;
+	GetCoordOnSpline(
+			&(*gSplineList)[theNode->SplineNum],
+			theNode->SplinePlacement,
+			&theNode->Coord.x,
+			&theNode->Coord.z);
 
 	theNode->Delta.x = (theNode->Coord.x - theNode->OldCoord.x) * gFramesPerSecond;	// calc delta
 	theNode->Delta.z = (theNode->Coord.z - theNode->OldCoord.z) * gFramesPerSecond;
@@ -455,23 +455,30 @@ long			i;
 // Moves objects on spline at given speed
 //
 
-void IncreaseSplineIndex(ObjNode *theNode, float speed)
+float IncreaseSplineIndex(ObjNode *theNode, float speed)
 {
-SplineDefType	*splinePtr;
-float			numPointsInSpline;
+	SplineDefType* spline = &(*gSplineList)[theNode->SplineNum];
 
-	speed *= gFramesPerSecondFrac;
+	float placement = theNode->SplinePlacement;
 
-	splinePtr = &(*gSplineList)[theNode->SplineNum];			// point to the spline
-	numPointsInSpline = splinePtr->numPoints;					// get # points in the spline
+	placement += speed * gFramesPerSecondFrac / spline->numPoints;
 
-	theNode->SplinePlacement += speed / numPointsInSpline;
-	if (theNode->SplinePlacement > .999f)
+	if (placement > MAX_PLACEMENT)
 	{
-		theNode->SplinePlacement -= .999f;
-		if (theNode->SplinePlacement > .999f)			// see if it wrapped somehow
-			theNode->SplinePlacement = 0;
+		// Loop to start
+		placement -= 1.0f;
+		placement = GAME_CLAMP(placement, 0, MAX_PLACEMENT);
 	}
+	else if (placement < 0)
+	{
+		// Loop to end
+		placement += 1.0f;
+		placement = GAME_CLAMP(placement, 0, MAX_PLACEMENT);
+	}
+
+	theNode->SplinePlacement = placement;
+
+	return placement;
 }
 
 
@@ -507,9 +514,9 @@ float			numPointsInSpline;
 	else
 	{
 		theNode->SplinePlacement += speed / numPointsInSpline;
-		if (theNode->SplinePlacement >= .999f)
+		if (theNode->SplinePlacement >= MAX_PLACEMENT)
 		{
-			theNode->SplinePlacement = .999f;
+			theNode->SplinePlacement = MAX_PLACEMENT;
 			theNode->StatusBits ^= STATUS_BIT_REVERSESPLINE;	// toggle direction
 		}
 	}
