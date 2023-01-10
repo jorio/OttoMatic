@@ -212,7 +212,8 @@ float	dist;
 				/* SEE IF CHASE */
 
 	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
-	if (dist < GIANTLIZARD_CHASE_DIST_MAX)
+	if (dist < GIANTLIZARD_CHASE_DIST_MAX
+		&& !SeeIfLineSegmentHitsAnything(&gCoord, &gPlayerInfo.coord, nil, CTYPE_FENCE | CTYPE_BLOCKRAYS))		// don't start chasing thru walls (spawn at item #202 to test)
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, GIANTLIZARD_ANIM_WALK, 2);
 	}
