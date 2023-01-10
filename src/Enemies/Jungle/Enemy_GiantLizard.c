@@ -46,7 +46,9 @@ static void GiantLizardHitByJumpJet(ObjNode *enemy);
 /*    CONSTANTS             */
 /****************************/
 
+#if !VIP_ENEMIES
 #define	MAX_GIANTLIZARDS					8
+#endif
 
 #define	GIANTLIZARD_SCALE					2.5f
 
@@ -111,6 +113,7 @@ Boolean AddEnemy_GiantLizard(TerrainItemEntryType *itemPtr, long x, long z)
 ObjNode	*newObj;
 int		i;
 
+#if !VIP_ENEMIES
 	if (gNumEnemies >= gMaxEnemies)								// keep from getting absurd
 		return(false);
 
@@ -119,6 +122,7 @@ int		i;
 		if (gNumEnemyOfKind[ENEMY_KIND_GIANTLIZARD] >= MAX_GIANTLIZARDS)
 			return(false);
 	}
+#endif
 
 
 
@@ -164,7 +168,9 @@ int		i;
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 20, 35,false);
 
 
+#if !VIP_ENEMIES	// these are important enemies, so they don't count towards the total enemy count
 	gNumEnemies++;
+#endif
 	gNumEnemyOfKind[ENEMY_KIND_GIANTLIZARD]++;
 	return(true);
 }

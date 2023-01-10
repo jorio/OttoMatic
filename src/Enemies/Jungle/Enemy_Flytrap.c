@@ -71,6 +71,7 @@ Boolean AddEnemy_FlyTrap(TerrainItemEntryType *itemPtr, long x, long z)
 {
 ObjNode	*newObj;
 
+#if !VIP_ENEMIES
 	if (gNumEnemies >= gMaxEnemies)								// keep from getting absurd
 		return(false);
 
@@ -79,6 +80,7 @@ ObjNode	*newObj;
 		if (gNumEnemyOfKind[ENEMY_KIND_FLYTRAP] >= MAX_FLYTRAPS)
 			return(false);
 	}
+#endif
 
 
 
@@ -117,7 +119,9 @@ ObjNode	*newObj;
 		newObj->CType &= ~CTYPE_AUTOTARGETWEAPON;
 
 
+#if !VIP_ENEMIES
 	gNumEnemies++;
+#endif
 	gNumEnemyOfKind[ENEMY_KIND_FLYTRAP]++;
 	return(true);
 }

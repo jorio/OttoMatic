@@ -662,16 +662,18 @@ do_anaglyph:
 			"\n"
 			"input x:\t%.3f\n"
 			"input y:\t%.3f\n"
-			"input a:\t%.0f\u00b0\n"
+			"input a:\t%.0f\xC2\xB0\n"
 			"\n"
 			"player x:\t%.0f\n"
 			"player z:\t%.0f\n"
 			"\n"
-			"enemies:\t%d\n"
+			"enemies:\t%d%s\n"
+#if 0
 			"t-defs:\t%d\n"
 			"sparkles:\t%d\n"
 			"h2o:\t\t%d\n"
 			"ground?\t%c\n"
+#endif
 			"\n"
 			"vram:\t\t%dK\n"
 #if 0
@@ -679,12 +681,14 @@ do_anaglyph:
 			"ptr mem:\t%ldK\n"
 #endif
 			"nodes:\t%d\n"
+#if 0
 			"\n"
 			"time since last thrust:\t%.3f\n"
 			"force cam align?\t\t%c\n"
 			"auto rotate cam?\t\t%c\n"
 			"cam user rot:\t\t%.3f\n"
 			"cam ctrl dX:\t\t%.3f\n"
+#endif
 			,
 			(int)(gFramesPerSecond+.5f),
 			gPolysThisFrame,
@@ -694,21 +698,26 @@ do_anaglyph:
 			gPlayerInfo.coord.x,
 			gPlayerInfo.coord.z,
 			gNumEnemies,
+			(gMaxEnemies > 0 && gNumEnemies >= gMaxEnemies) ? " (!!!)" : "",
+#if 0
 			gNumTerrainDeformations,
 			gNumSparkles,
 			gNumWaterDrawn,
 			gPlayerInfo.objNode && (gPlayerInfo.objNode->StatusBits & STATUS_BIT_ONGROUND)? 'Y': 'N',
+#endif
 			gVRAMUsedThisFrame/1024,
 #if 0
 			gNumPointers,
 			gMemAllocatedInPtrs/1024,
 #endif
-			gNumObjectNodes,
+			gNumObjectNodes
+#if 0
 			gTimeSinceLastThrust,
 			gForceCameraAlignment? 'Y': 'N',
 			gAutoRotateCamera? 'Y': 'N',
 			gCameraUserRotY,
 			gCameraControlDelta.x
+#endif
 		);
 		TextMesh_Update(debugString, 0, gDebugText);
 		gDebugText->StatusBits &= ~STATUS_BIT_HIDDEN;

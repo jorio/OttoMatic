@@ -16,6 +16,10 @@ extern "C"
 {
 #endif
 
+// If enabled, "VIP" enemies are always allowed to spawn and they don't count towards the global enemy budget.
+// VIP enemy kinds are: GiantLizard and Flytrap.
+#define VIP_ENEMIES 1
+
 		/* HEADERS */
 
 #include <SDL.h>
@@ -201,6 +205,9 @@ extern	float					gTimeSinceLastThrust;
 extern	int						gGameWindowHeight;
 extern	int						gGameWindowWidth;
 extern	int						gLevelNum;
+extern	int						gMaxEnemies;
+extern	int						gNumEnemies;
+extern	int						gNumEnemyOfKind[NUM_ENEMY_KINDS];
 extern	int						gNumHumansInTransit;
 extern	int						gNumHumansRescuedTotal;
 extern	int						gNumIceCracks;
@@ -228,7 +235,6 @@ extern	short					gDisplayedHelpMessage;
 extern	short					gMainAppRezFile;
 extern	short					gNumActiveParticleGroups;
 extern	short					gNumCollisions;
-extern	short					gNumEnemies;
 extern	short					gNumFencesDrawn;
 extern	short					gNumHumansInSaucer;
 extern	short					gNumHumansRescuedOfType[NUM_HUMAN_TYPES];
@@ -237,7 +243,6 @@ extern	short					gNumTerrainDeformations;
 extern	short					gNumTerrainItems;
 extern	short					gNumWaterDrawn;
 extern	short					gPrefsFolderVRefNum;
-extern	signed char				gNumEnemyOfKind[];
 extern	u_long					gAutoFadeStatusBits;
 extern	u_long					gGameFrameNum;
 extern	u_long					gGlobalMaterialFlags;
