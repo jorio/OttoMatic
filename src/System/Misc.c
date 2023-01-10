@@ -1,7 +1,8 @@
 /****************************/
 /*      MISC ROUTINES       */
-/* (c)2002 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2002 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -15,7 +16,8 @@
 /*    CONSTANTS             */
 /****************************/
 
-#define	DEFAULT_FPS			10
+#define	MIN_FPS				10
+#define MAX_FPS				130		// level 3 platforming physics start falling apart at 131+ fps
 
 /**********************/
 /*     VARIABLES      */
@@ -356,60 +358,64 @@ static u_long oldTick = 0;
 
 
 /************** CALC FRAMES PER SECOND *****************/
-//
-// This version uses UpTime() which is only available on PCI Macs.
-//
 
 void CalcFramesPerSecond(void)
 {
-	static UnsignedWide time;
-	UnsignedWide currTime;
-	unsigned long deltaTime;
+	static uint64_t performanceFrequency = 0;
+	static uint64_t prevTime = 0;
+	uint64_t currTime;
+
+	if (performanceFrequency == 0)
+	{
+		performanceFrequency = SDL_GetPerformanceFrequency();
+	}
 
 slow_down:
-	Microseconds(&currTime);
-	deltaTime = currTime.lo - time.lo;
+	currTime = SDL_GetPerformanceCounter();
+	uint64_t deltaTime = currTime - prevTime;
 
-	gFramesPerSecond = 1000000.0f / deltaTime;
+	if (deltaTime <= 0)
+	{
+		gFramesPerSecond = MIN_FPS;						// avoid divide by 0
+	}
+	else
+	{
+		gFramesPerSecond = performanceFrequency / (float)(deltaTime);
 
-#if 0
-AbsoluteTime currTime,deltaTime;
-static AbsoluteTime time = {0,0};
-Nanoseconds	nano;
+		if (gFramesPerSecond > MAX_FPS)					// keep from going over 100fps (there were problems in 2.0 of frame rate precision loss)
+		{
+			if (gFramesPerSecond - MAX_FPS > 1000)		// try to sneak in some sleep if we have 1 ms to spare
+			{
+				SDL_Delay(1);
+			}
+			goto slow_down;
+		}
 
-slow_down:
-	currTime = UpTime();
+		if (gFramesPerSecond < MIN_FPS)					// (avoid divide by 0's later)
+		{
+			gFramesPerSecond = MIN_FPS;
+		}
+	}
 
-	deltaTime = SubAbsoluteFromAbsolute(currTime, time);
-	nano = AbsoluteToNanoseconds(deltaTime);
-
-	gFramesPerSecond = 1000000.0f / (float)nano.lo;
-	gFramesPerSecond *= 1000.0f;
-#endif
-
-	if (gFramesPerSecond > 100)					// keep from going over 100fps (there were problems in 2.0 of frame rate precision loss)
-		goto slow_down;
-
-	if (gFramesPerSecond < DEFAULT_FPS)			// (avoid divide by 0's later)
-		gFramesPerSecond = DEFAULT_FPS;
-
-	if (GetKeyState(SDL_SCANCODE_GRAVE) && GetKeyState(SDL_SCANCODE_KP_PLUS))		// debug speed-up with `+KP_PLUS
-		gFramesPerSecond = 10;
-
+	// In debug builds, speed up with BACKTICK+KP_PLUS or LT on gamepad
+	if (GetKeyState(SDL_SCANCODE_GRAVE) && GetKeyState(SDL_SCANCODE_KP_PLUS))
+	{
+		gFramesPerSecond = MIN_FPS;
+	}
 #if _DEBUG
-	if (gSDLController)
+	else if (gSDLController)
 	{
 		float analogSpeedUp = SDL_GameControllerGetAxis(gSDLController, SDL_CONTROLLER_AXIS_TRIGGERLEFT) / 32767.0f;
 		if (analogSpeedUp > .25f)
-			gFramesPerSecond = 10;
+		{
+			gFramesPerSecond = MIN_FPS;
+		}
 	}
 #endif
 
-	gFramesPerSecondFrac = 1.0f/gFramesPerSecond;		// calc fractional for multiplication
+	gFramesPerSecondFrac = 1.0f / gFramesPerSecond;		// calc fractional for multiplication
 
-//printf("FPS: %f\n", gFramesPerSecond);
-
-	time = currTime;	// reset for next time interval
+	prevTime = currTime;								// reset for next time interval
 }
 
 
