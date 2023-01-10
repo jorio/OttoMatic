@@ -98,6 +98,7 @@ void InitPlayerInfo_Game(void)
 	gPlayerInfo.coord.y 		= 0;
 	gPlayerInfo.coord.z 		= 0;
 
+	gPlayerInfo.didCheat		= false;
 }
 
 

@@ -172,6 +172,7 @@ static const EffectDef kEffectsTable[] =
 	[EFFECT_FREEZEPOOF]       = {SOUNDBANK_MAIN   , "freezepoof"      , 300 , 0	},
 	[EFFECT_CHANGEWEAPON]     = {SOUNDBANK_MAIN   , "changeweapon"    , 300 , 0	},
 	[EFFECT_MENUCHANGE]       = {SOUNDBANK_MAIN   , "menuchange"      , 1200, 0	},
+	[EFFECT_GIANTFOOTSTEP]    = {SOUNDBANK_MAIN   , "giantfootstep"   , 1500, 0	},
 
 	[EFFECT_LOGOAMBIENCE]     = {SOUNDBANK_MENU   , "ambience"        , 1200, 0	},
 	[EFFECT_ACCENTDRONE1]     = {SOUNDBANK_MENU   , "accentdrone1"    , 1200, 0	},
@@ -247,7 +248,6 @@ static const EffectDef kEffectsTable[] =
 	[EFFECT_FIREBREATH]       = {SOUNDBANK_JUNGLE , "firebreath"      , 2000, 0	},
 	[EFFECT_LIZARDINHALE]     = {SOUNDBANK_JUNGLE , "inhale"          , 3000, 0	},
 	[EFFECT_MANTISSPIT]       = {SOUNDBANK_JUNGLE , "spit"            , 2000, 0	},
-	[EFFECT_GIANTFOOTSTEP]    = {SOUNDBANK_JUNGLE , "giantfootstep"   , 1500, 0	},
 	[EFFECT_BIGDOORSMASH]     = {SOUNDBANK_JUNGLE , "bigdoorsmash"    , 2000, 0	},
 	[EFFECT_TRACTORBEAM]      = {SOUNDBANK_JUNGLE , "tractorbeam"     , 2000, 0	},
 	[EFFECT_PITCHERPAIN]      = {SOUNDBANK_JUNGLE , "pitcherpain"     , 5000, 0	},

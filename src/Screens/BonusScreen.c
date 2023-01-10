@@ -196,8 +196,11 @@ void DoBonusScreen(void)
 
 			/* DO INVENTORY BONUS */
 
-	DoInventoryBonusTally();
-	gBonusTotal += gBonus;
+	if (!gPlayerInfo.didCheat)
+	{
+		DoInventoryBonusTally();
+		gBonusTotal += gBonus;
+	}
 
 			/* ADD BONUS TO TOTAL */
 

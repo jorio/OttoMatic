@@ -213,7 +213,8 @@ typedef struct
 				
 	float				superNovaCharge;
 	ObjNode				*superNovaStatic;
-				
+
+	Boolean				didCheat;
 }PlayerInfoType;
 
 

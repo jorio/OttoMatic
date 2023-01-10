@@ -2824,10 +2824,21 @@ static void CheckPlayerActionControls(ObjNode *theNode)
 		gPlayerInfo.health 	= 1.0;
 		gPlayerInfo.fuel 	= 1.0;
 		gPlayerInfo.jumpJet = 1.0;
+
+		gPlayerInfo.weaponInventory[1].type = WEAPON_TYPE_STUNPULSE;
+		gPlayerInfo.weaponInventory[2].type = WEAPON_TYPE_FREEZE;
+		gPlayerInfo.weaponInventory[3].type = WEAPON_TYPE_FLAME;
+		gPlayerInfo.weaponInventory[4].type = WEAPON_TYPE_GROWTH;
+		gPlayerInfo.weaponInventory[5].type = WEAPON_TYPE_FLARE;
 		gPlayerInfo.weaponInventory[6].type = WEAPON_TYPE_SUPERNOVA;
-		gPlayerInfo.weaponInventory[6].quantity = 99;
-		gPlayerInfo.weaponInventory[7].type = WEAPON_TYPE_STUNPULSE;
-		gPlayerInfo.weaponInventory[7].quantity = 99;
+		gPlayerInfo.weaponInventory[7].type = WEAPON_TYPE_DART;
+
+		for (int i = 1; i <= 7; i++)
+			gPlayerInfo.weaponInventory[i].quantity = 99;
+
+		gPlayerInfo.weaponInventory[4].quantity = 1;		// just one growth vial so we can test tossing it
+
+		gPlayerInfo.didCheat = true;
 	}
 
 			/***************/
