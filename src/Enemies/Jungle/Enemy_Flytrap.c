@@ -218,7 +218,7 @@ static void  MoveFlyTrap_Eat(ObjNode *theNode)
 		Boolean		overTop;
 		float		fenceTop;
 
-		if (!SeeIfLineSegmentHitsFence(&gPlayerInfo.coord, &gCoord, &intersect, &overTop, &fenceTop))			// dont grab if there's a fence between us
+		if (!SeeIfLineSegmentHitsFence(&gPlayerInfo.coord, &theNode->Coord, &intersect, &overTop, &fenceTop))			// dont grab if there's a fence between us
 		{
 			OGLPoint3D	p;
 
