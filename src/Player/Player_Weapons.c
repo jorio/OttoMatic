@@ -325,18 +325,23 @@ static const short weaponToModel[] =
 					/* MAKE IT FLY AWAY */
 
 			if (type == WEAPON_TYPE_GROWTH)			// special case the growth powerup
+			{
 				TossGrowthVial();
+			}
 			else
 			{
-				gNewObjectDefinition.group 		= MODEL_GROUP_GLOBAL;
-				gNewObjectDefinition.type 		= weaponToModel[type];
-				gNewObjectDefinition.coord		= gPlayerInfo.leftHandObj->Coord;
-				gNewObjectDefinition.flags 		= 0;
-				gNewObjectDefinition.slot 		= SLOT_OF_DUMB+1;
-				gNewObjectDefinition.moveCall 	= MoveDisposedWeapon;
-				gNewObjectDefinition.rot 		= gPlayerInfo.objNode->Rot.y;
-				gNewObjectDefinition.scale 		= gPlayerInfo.leftHandObj->Scale.x;
-				newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+				NewObjectDefinitionType def =
+				{
+					.group 		= MODEL_GROUP_GLOBAL,
+					.type 		= weaponToModel[type],
+					.coord		= gPlayerInfo.leftHandObj->Coord,
+					.flags 		= 0,
+					.slot 		= SLOT_OF_DUMB+1,
+					.moveCall 	= MoveDisposedWeapon,
+					.rot 		= gPlayerInfo.objNode->Rot.y,
+					.scale 		= gPlayerInfo.scaleRatio,
+				};
+				newObj = MakeNewDisplayGroupObject(&def);
 
 				newObj->Rot.x = -PI/2;
 				newObj->Delta.y = 600.0f;
@@ -347,7 +352,9 @@ static const short weaponToModel[] =
 			gPlayerInfo.holdingGun = false;
 		}
 		else
+		{
 			gPlayerInfo.wasHoldingGun = false;
+		}
 
 			/* CHANGE TO NEXT WEAPON IF ANY */
 
@@ -369,15 +376,27 @@ static void TossGrowthVial(void)
 float	r;
 ObjNode	*newObj;
 
-	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
-	gNewObjectDefinition.type 		= JUNGLE_ObjType_GrowthPOW;
-	gNewObjectDefinition.coord		= gPlayerInfo.leftHandObj->Coord;
-	gNewObjectDefinition.flags 		= 0;
-	gNewObjectDefinition.slot 		= SLOT_OF_DUMB+1;
-	gNewObjectDefinition.moveCall 	= MoveTossedGrowthVial;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= .25;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	NewObjectDefinitionType def =
+	{
+		.group		= MODEL_GROUP_GLOBAL,
+		.type		= GLOBAL_ObjType_GrowthHand,
+		.coord		= gPlayerInfo.leftHandObj->Coord,
+		.scale		= gPlayerInfo.scaleRatio,
+		.flags		= 0,
+		.slot		= SLOT_OF_DUMB+1,
+		.moveCall	= MoveTossedGrowthVial,
+		.rot		= 0,
+	};
+
+	if (gLevelNum == LEVEL_NUM_JUNGLE || gLevelNum == LEVEL_NUM_JUNGLEBOSS)
+	{
+		// We do have a better model of the vial for those levels
+		def.group = MODEL_GROUP_LEVELSPECIFIC;
+		def.type = JUNGLE_ObjType_GrowthPOW;
+		def.scale *= .25f;
+	}
+
+	newObj = MakeNewDisplayGroupObject(&def);
 
 	r = gPlayerInfo.objNode->Rot.y;
 	newObj->Delta.y = 600.0f;
