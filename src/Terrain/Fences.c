@@ -680,8 +680,8 @@ Boolean			hit = false;
 
 					/* CALC FROM-TO POINTS OF MOTION */
 
-			fromX = oldX - (lineNormal.x * radius);
-			fromZ = oldZ - (lineNormal.y * radius);
+			fromX = oldX; // - (lineNormal.x * radius);
+			fromZ = oldZ; // - (lineNormal.y * radius);
 			toX = newX - (lineNormal.x * radius);
 			toZ = newZ - (lineNormal.y * radius);
 
