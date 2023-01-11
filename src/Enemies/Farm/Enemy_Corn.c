@@ -669,7 +669,7 @@ static Boolean HurtCorn(ObjNode *enemy, float damage)
 
 		if (enemy->Skeleton->AnimNum == CORN_ANIM_GROW)
 		{
-			float finalScale = GAME_MAX(CORN_SCALE_MIN, enemy->Scale.y);
+			float finalScale = MaxFloat(CORN_SCALE_MIN, enemy->Scale.y);
 			FinalizeSkeletonObjectScale(enemy, finalScale, CORN_ANIM_STAND);
 		}
 

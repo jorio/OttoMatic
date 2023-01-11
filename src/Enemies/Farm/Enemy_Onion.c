@@ -843,7 +843,7 @@ static Boolean HurtOnion(ObjNode *enemy, float damage)
 	
 	if (enemy->Skeleton->AnimNum == ONION_ANIM_GROW)
 	{
-		float finalScale = GAME_MAX(ONION_SCALE_MIN, enemy->Scale.y);
+		float finalScale = MaxFloat(ONION_SCALE_MIN, enemy->Scale.y);
 		FinalizeSkeletonObjectScale(enemy, finalScale, ONION_ANIM_STAND);
 	}
 	

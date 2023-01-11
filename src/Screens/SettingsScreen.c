@@ -73,7 +73,7 @@ static const char* GenerateGamepadLabel(void)
 static uint8_t GenerateNumDisplays(void)
 {
 	int numDisplays = SDL_GetNumVideoDisplays();
-	return GAME_CLAMP(numDisplays, 1, 255);
+	return ClampInt(numDisplays, 1, 255);
 }
 
 static const char* GenerateVideoSettingsSubtitle(void)

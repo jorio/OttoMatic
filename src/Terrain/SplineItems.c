@@ -233,7 +233,7 @@ int GetCoordOnSpline(const SplineDefType* spline, float placement, float* x, flo
 	GAME_ASSERT(spline->numPoints > 0);
 
 	// Clamp placement before accessing array to avoid overrun
-	placement = GAME_CLAMP(placement, 0, MAX_PLACEMENT);
+	placement = ClampFloat(placement, 0, MAX_PLACEMENT);
 
 	float scaledPlacement = placement * numPoints;
 
@@ -467,13 +467,13 @@ float IncreaseSplineIndex(ObjNode *theNode, float speed)
 	{
 		// Loop to start
 		placement -= 1.0f;
-		placement = GAME_CLAMP(placement, 0, MAX_PLACEMENT);
+		placement = ClampFloat(placement, 0, MAX_PLACEMENT);
 	}
 	else if (placement < 0)
 	{
 		// Loop to end
 		placement += 1.0f;
-		placement = GAME_CLAMP(placement, 0, MAX_PLACEMENT);
+		placement = ClampFloat(placement, 0, MAX_PLACEMENT);
 	}
 
 	theNode->SplinePlacement = placement;
@@ -906,7 +906,7 @@ void PatchSplineLoop(SplineDefType* spline)
 
 	int currentSpan = 0;
 	int currentSpanPoints = 0;
-	for (int p = 0; p < GAME_MIN(newNumPoints, oldNumPoints); p++)
+	for (int p = 0; p < MinInt(newNumPoints, oldNumPoints); p++)
 	{
 		float dx = (*spline->pointList)[p].x - (*newPointList)[p].x;
 		float dz = (*spline->pointList)[p].z - (*newPointList)[p].z;

@@ -13,12 +13,15 @@
 
 #define EPS .0001					// a very small number which is useful for FP compares close to 0
 #define	IS_ZERO(_x)  (fabs(_x) < EPS)
-
-#define GAME_CLAMP(x, lo, hi) ( (x) < (lo) ? (lo) : ( (x) > (hi) ? (hi) : (x) ) )
-#define GAME_MIN(a, b) ( (a) < (b) ? (a) : (b) )
-#define GAME_MAX(a, b) ( (a) > (b) ? (a) : (b) )
 #define	SQUARED(x)					((x)*(x))
 
+static inline int MinInt(int a, int b) { return a < b ? a : b; }
+static inline int MaxInt(int a, int b) { return a < b ? b : a; }
+static inline int ClampInt(int x, int lo, int hi) { return x < lo ? lo : x > hi ? hi : x; }
+
+static inline float MinFloat(float a, float b) { return a < b ? a : b; }
+static inline float MaxFloat(float a, float b) { return a < b ? b : a; }
+static inline float ClampFloat(float x, float lo, float hi) { return x < lo ? lo : x > hi ? hi : x; }
 
 
 		/* CLOSE ENOUGH TO ZERO */
