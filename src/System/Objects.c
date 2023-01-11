@@ -860,8 +860,6 @@ next:
 
 static void DrawCollisionBoxes(ObjNode *theNode, Boolean old)
 {
-int					n,i;
-CollisionBoxType	*c;
 float				left,right,top,bottom,front,back;
 
 	OGL_PushState();
@@ -874,31 +872,18 @@ float				left,right,top,bottom,front,back;
 
 		/* SCAN EACH COLLISION BOX */
 
-	n = theNode->NumCollisionBoxes;							// get # collision boxes
-	c = &theNode->CollisionBoxes[0];						// pt to array
+	const CollisionBoxType* c = old ? theNode->OldCollisionBoxes : theNode->CollisionBoxes;
 
-	for (i = 0; i < n; i++)
+	for (int i = 0; i < theNode->NumCollisionBoxes; i++)
 	{
 			/* GET BOX PARAMS */
 
-		if (old)
-		{
-			left 	= c[i].oldLeft;
-			right 	= c[i].oldRight;
-			top 	= c[i].oldTop;
-			bottom 	= c[i].oldBottom;
-			front 	= c[i].oldFront;
-			back 	= c[i].oldBack;
-		}
-		else
-		{
-			left 	= c[i].left;
-			right 	= c[i].right;
-			top 	= c[i].top;
-			bottom 	= c[i].bottom;
-			front 	= c[i].front;
-			back 	= c[i].back;
-		}
+		left 	= c[i].left;
+		right 	= c[i].right;
+		top 	= c[i].top;
+		bottom 	= c[i].bottom;
+		front 	= c[i].front;
+		back 	= c[i].back;
 
 			/* DRAW TOP */
 

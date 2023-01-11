@@ -81,11 +81,10 @@ typedef struct
 
 
 		/* COLLISION BOX */
-		
+
 typedef struct
 {
 	long	left,right,front,back,top,bottom;
-	long	oldLeft,oldRight,oldFront,oldBack,oldTop,oldBottom;
 }CollisionBoxType;
 
 
@@ -285,7 +284,8 @@ struct ObjNode
 	uint32_t			CType;				// collision type bits
 	uint32_t			CBits;				// collision attribute bits
 	Byte				NumCollisionBoxes;
-	CollisionBoxType	CollisionBoxes[MAX_COLLISION_BOXES];// Array of collision rectangles
+	CollisionBoxType	CollisionBoxes[MAX_COLLISION_BOXES];		// Array of collision rectangles
+	CollisionBoxType	OldCollisionBoxes[MAX_COLLISION_BOXES];		// Array of collision rectangles (previous frame)
 	int					LeftOff,RightOff,FrontOff,BackOff,TopOff,BottomOff;		// box offsets (only used by simple objects with 1 collision box)	
 
 	float			BoundingSphereRadius;

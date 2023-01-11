@@ -290,16 +290,9 @@ float			minX,minZ,maxX,maxZ;
 
 void KeepOldCollisionBoxes(ObjNode *theNode)
 {
-long	i;
-
-	for (i = 0; i < theNode->NumCollisionBoxes; i++)
+	for (int i = 0; i < theNode->NumCollisionBoxes; i++)
 	{
-		theNode->CollisionBoxes[i].oldTop = theNode->CollisionBoxes[i].top;
-		theNode->CollisionBoxes[i].oldBottom = theNode->CollisionBoxes[i].bottom;
-		theNode->CollisionBoxes[i].oldLeft = theNode->CollisionBoxes[i].left;
-		theNode->CollisionBoxes[i].oldRight = theNode->CollisionBoxes[i].right;
-		theNode->CollisionBoxes[i].oldFront = theNode->CollisionBoxes[i].front;
-		theNode->CollisionBoxes[i].oldBack = theNode->CollisionBoxes[i].back;
+		theNode->OldCollisionBoxes[i] = theNode->CollisionBoxes[i];
 	}
 
 

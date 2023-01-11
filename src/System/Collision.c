@@ -1,7 +1,8 @@
 /****************************/
 /*   	COLLISION.c		    */
-/* (c)2001 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2001 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -41,20 +42,60 @@ short			gNumCollisions = 0;
 Byte			gTotalSides;
 
 
+/******************* BOX/BOX INTERSECTION *********************/
+
+static inline Boolean IntersectBoxes(const CollisionBoxType* a, const CollisionBoxType* b)
+{
+	Boolean outside
+		=  (a->right < b->left)
+		|| (a->left > b->right)
+		|| (a->front < b->back)
+		|| (a->back > b->front)
+		|| (a->bottom > b->top)
+		|| (a->top < b->bottom);
+
+	return !outside;
+}
+
+/******************* DOES BOX CONTAIN POINT *********************/
+
+static inline Boolean BoxContainsPoint(const CollisionBoxType* box, const OGLPoint3D* point)
+{
+	Boolean outside
+		=  (point->x < box->left)
+		|| (point->x > box->right)
+		|| (point->z < box->back)
+		|| (point->z > box->front)
+		|| (point->y > box->top)
+		|| (point->y < box->bottom);
+
+	return !outside;
+}
+
+/******************* DOES BOX CONTAIN POINT (XZ ONLY) *********************/
+
+static inline Boolean BoxContainsPoint_XZ(const CollisionBoxType* box, const OGLPoint3D* point)
+{
+	Boolean outside
+		= (point->x < box->left)
+		|| (point->x > box->right)
+		|| (point->z < box->back)
+		|| (point->z > box->front);
+
+	return !outside;
+}
+
 /******************* COLLISION DETECT *********************/
 //
 // INPUT: startNumCollisions = value to start gNumCollisions at should we need to keep existing data in collision list
 //
 
-void CollisionDetect(ObjNode *baseNode, u_long CType, short startNumCollisions)
+void CollisionDetect(ObjNode* baseNode, uint32_t CType, int startNumCollisions)
 {
 ObjNode 	*thisNode;
 long		sideBits,cBits;
-u_long		cType;
-short		numBaseBoxes,targetNumBoxes,target;
-CollisionBoxType *baseBoxList;
-CollisionBoxType *targetBoxList;
-long		leftSide,rightSide,frontSide,backSide,bottomSide,topSide;
+uint32_t	cType;
+short		numBaseBoxes,targetNumBoxes;
 
 	gNumCollisions = startNumCollisions;								// clear list
 
@@ -63,14 +104,9 @@ long		leftSide,rightSide,frontSide,backSide,bottomSide,topSide;
 	numBaseBoxes = baseNode->NumCollisionBoxes;
 	if (numBaseBoxes == 0)
 		return;
-	baseBoxList = baseNode->CollisionBoxes;
 
-	leftSide 		= baseBoxList->left;
-	rightSide 		= baseBoxList->right;
-	frontSide 		= baseBoxList->front;
-	backSide 		= baseBoxList->back;
-	bottomSide 		= baseBoxList->bottom;
-	topSide 		= baseBoxList->top;
+	const CollisionBoxType* baseBoxList = baseNode->CollisionBoxes;
+	const CollisionBoxType* baseBoxList_old = baseNode->OldCollisionBoxes;
 
 
 			/****************************/
@@ -108,173 +144,132 @@ long		leftSide,rightSide,frontSide,backSide,bottomSide,topSide;
 				/******************************/
 
 		targetNumBoxes = thisNode->NumCollisionBoxes;			// see if target has any boxes
-		if (targetNumBoxes)
-		{
-			targetBoxList = thisNode->CollisionBoxes;
+		if (targetNumBoxes == 0)
+			goto next;
+
+		const CollisionBoxType* targetBoxList = thisNode->CollisionBoxes;
+		const CollisionBoxType* targetBoxList_old = thisNode->OldCollisionBoxes;
 
 
 				/******************************************/
 				/* CHECK BASE BOX AGAINST EACH TARGET BOX */
 				/*******************************************/
 
-			for (target = 0; target < targetNumBoxes; target++)
+		for (int target = 0; target < targetNumBoxes; target++)
+		{
+					/* DO RECTANGLE INTERSECTION */
+
+			if (!IntersectBoxes(&baseBoxList[0], &targetBoxList[target]))
+				continue;
+
+
+					/* THERE HAS BEEN A COLLISION SO CHECK WHICH SIDE PASSED THRU */
+
+			sideBits = 0;
+			cBits = thisNode->CBits;					// get collision info bits
+
+			if (cBits & CBITS_TOUCHABLE)				// if it's generically touchable, then add it without side info
+				goto got_sides;
+
+
+							/* CHECK FRONT COLLISION */
+
+			if (cBits & SIDE_BITS_BACK											// see if target has solid back
+				&& baseBoxList_old->front < targetBoxList_old[target].back		// see if wasn't in target already
+				&& baseBoxList->front >= targetBoxList[target].back				// see if currently in target
+				&& baseBoxList->front <= targetBoxList[target].front)
 			{
-						/* DO RECTANGLE INTERSECTION */
+				sideBits = SIDE_BITS_FRONT;
+			}
 
-				if (rightSide < targetBoxList[target].left)
-					continue;
+							/* CHECK BACK COLLISION */
 
-				if (leftSide > targetBoxList[target].right)
-					continue;
+			if (cBits & SIDE_BITS_FRONT											// see if target has solid front
+				&& baseBoxList_old->back > targetBoxList_old[target].front		// see if wasn't in target already
+				&& baseBoxList->back <= targetBoxList[target].front				// see if currently in target
+				&& baseBoxList->back >= targetBoxList[target].back)
+			{
+				sideBits = SIDE_BITS_BACK;
+			}
 
-				if (frontSide < targetBoxList[target].back)
-					continue;
+							/* CHECK RIGHT COLLISION */
 
-				if (backSide > targetBoxList[target].front)
-					continue;
+			if (cBits & SIDE_BITS_LEFT											// see if target has solid left
+				&& baseBoxList_old->right < targetBoxList_old[target].left		// see if wasn't in target already
+				&& baseBoxList->right >= targetBoxList[target].left				// see if currently in target
+				&& baseBoxList->right <= targetBoxList[target].right)
+			{
+				sideBits |= SIDE_BITS_RIGHT;
+			}
 
-				if (bottomSide > targetBoxList[target].top)
-					continue;
+							/* CHECK LEFT COLLISION */
 
-				if (topSide < targetBoxList[target].bottom)
-					continue;
+			if (cBits & SIDE_BITS_RIGHT											// see if target has solid right
+				&& baseBoxList_old->left > targetBoxList_old[target].right		// see if wasn't in target already
+				&& baseBoxList->left <= targetBoxList[target].right				// see if currently in target
+				&& baseBoxList->left >= targetBoxList[target].left)
+			{
+				sideBits |= SIDE_BITS_LEFT;
+			}
 
+						/* CHECK TOP COLLISION */
 
-						/* THERE HAS BEEN A COLLISION SO CHECK WHICH SIDE PASSED THRU */
+			if (cBits & SIDE_BITS_BOTTOM										// see if target has solid bottom
+				&& baseBoxList_old->top < targetBoxList_old[target].bottom		// see if wasn't in target already
+				&& baseBoxList->top >= targetBoxList[target].bottom				// see if currently in target
+				&& baseBoxList->top <= targetBoxList[target].top)
+			{
+				sideBits |= SIDE_BITS_TOP;
+			}
 
-				sideBits = 0;
-				cBits = thisNode->CBits;					// get collision info bits
+						/* CHECK BOTTOM COLLISION */
 
-				if (cBits & CBITS_TOUCHABLE)				// if it's generically touchable, then add it without side info
+			if (cBits & SIDE_BITS_TOP											// see if target has solid top
+				&& baseBoxList_old->bottom > targetBoxList_old[target].top		// see if wasn't in target already
+				&& baseBoxList->bottom <= targetBoxList[target].top				// see if currently in target
+				&& baseBoxList->bottom >= targetBoxList[target].bottom)
+			{
+				sideBits |= SIDE_BITS_BOTTOM;
+			}
+
+				/*********************************************/
+				/* SEE IF ANYTHING TO ADD OR IF IMPENETRABLE */
+				/*********************************************/
+
+			if (!sideBits)														// if 0 then no new sides passed thru this time
+			{
+				if (cType & CTYPE_IMPENETRABLE)									// if its impenetrable, add to list regardless of sides
+				{
+					if (gCoord.x < thisNode->Coord.x)							// try to assume some side info based on which side we're on relative to the target
+						sideBits |= SIDE_BITS_RIGHT;
+					else
+						sideBits |= SIDE_BITS_LEFT;
+
+					if (gCoord.z < thisNode->Coord.z)
+						sideBits |= SIDE_BITS_FRONT;
+					else
+						sideBits |= SIDE_BITS_BACK;
+
+					goto got_sides;
+				}
+
+				if (cBits & CBITS_ALWAYSTRIGGER)								// also always add if always trigger
 					goto got_sides;
 
-
-								/* CHECK FRONT COLLISION */
-
-				if (cBits & SIDE_BITS_BACK)											// see if target has solid back
-				{
-					if (baseBoxList->oldFront < targetBoxList[target].oldBack)		// get old & see if already was in target (if so, skip)
-					{
-						if ((baseBoxList->front >= targetBoxList[target].back) &&	// see if currently in target
-							(baseBoxList->front <= targetBoxList[target].front))
-						{
-							sideBits = SIDE_BITS_FRONT;
-						}
-					}
-				}
-
-								/* CHECK BACK COLLISION */
-
-				if (cBits & SIDE_BITS_FRONT)										// see if target has solid front
-				{
-					if (baseBoxList->oldBack > targetBoxList[target].oldFront)		// get old & see if already was in target
-					{
-						if ((baseBoxList->back <= targetBoxList[target].front) &&	// see if currently in target
-							(baseBoxList->back >= targetBoxList[target].back))
-						{
-							sideBits = SIDE_BITS_BACK;
-						}
-					}
-				}
-
-
-								/* CHECK RIGHT COLLISION */
-
-
-				if (cBits & SIDE_BITS_LEFT)											// see if target has solid left
-				{
-					if (baseBoxList->oldRight < targetBoxList[target].oldLeft)		// get old & see if already was in target
-					{
-						if ((baseBoxList->right >= targetBoxList[target].left) &&	// see if currently in target
-							(baseBoxList->right <= targetBoxList[target].right))
-						{
-							sideBits |= SIDE_BITS_RIGHT;
-						}
-					}
-				}
-
-
-							/* CHECK COLLISION ON LEFT */
-
-				if (cBits & SIDE_BITS_RIGHT)										// see if target has solid right
-				{
-					if (baseBoxList->oldLeft > targetBoxList[target].oldRight)		// get old & see if already was in target
-					{
-						if ((baseBoxList->left <= targetBoxList[target].right) &&	// see if currently in target
-							(baseBoxList->left >= targetBoxList[target].left))
-						{
-							sideBits |= SIDE_BITS_LEFT;
-						}
-					}
-				}
-
-								/* CHECK TOP COLLISION */
-
-				if (cBits & SIDE_BITS_BOTTOM)										// see if target has solid bottom
-				{
-					if (baseBoxList->oldTop < targetBoxList[target].oldBottom)		// get old & see if already was in target
-					{
-						if ((baseBoxList->top >= targetBoxList[target].bottom) &&	// see if currently in target
-							(baseBoxList->top <= targetBoxList[target].top))
-						{
-							sideBits |= SIDE_BITS_TOP;
-						}
-					}
-				}
-
-							/* CHECK COLLISION ON BOTTOM */
-
-
-				if (cBits & SIDE_BITS_TOP)											// see if target has solid top
-				{
-					if (baseBoxList->oldBottom > targetBoxList[target].oldTop)		// get old & see if already was in target
-					{
-						if ((baseBoxList->bottom <= targetBoxList[target].top) &&	// see if currently in target
-							(baseBoxList->bottom >= targetBoxList[target].bottom))
-						{
-							sideBits |= SIDE_BITS_BOTTOM;
-						}
-					}
-				}
-
-					/*********************************************/
-					/* SEE IF ANYTHING TO ADD OR IF IMPENETRABLE */
-					/*********************************************/
-
-				if (!sideBits)														// if 0 then no new sides passed thru this time
-				{
-					if (cType & CTYPE_IMPENETRABLE)									// if its impenetrable, add to list regardless of sides
-					{
-						if (gCoord.x < thisNode->Coord.x)							// try to assume some side info based on which side we're on relative to the target
-							sideBits |= SIDE_BITS_RIGHT;
-						else
-							sideBits |= SIDE_BITS_LEFT;
-
-						if (gCoord.z < thisNode->Coord.z)
-							sideBits |= SIDE_BITS_FRONT;
-						else
-							sideBits |= SIDE_BITS_BACK;
-
-						goto got_sides;
-					}
-
-					if (cBits & CBITS_ALWAYSTRIGGER)								// also always add if always trigger
-						goto got_sides;
-
-					continue;
-				}
-
-						/* ADD TO COLLISION LIST */
-got_sides:
-				gCollisionList[gNumCollisions].baseBox 		= 0;
-				gCollisionList[gNumCollisions].targetBox 	= target;
-				gCollisionList[gNumCollisions].sides 		= sideBits;
-				gCollisionList[gNumCollisions].type 		= COLLISION_TYPE_OBJ;
-				gCollisionList[gNumCollisions].objectPtr 	= thisNode;
-				gNumCollisions++;
-				gTotalSides |= sideBits;											// remember total of this
+				continue;														// next target box
 			}
+
+					/* ADD TO COLLISION LIST */
+got_sides:
+			gCollisionList[gNumCollisions].baseBox 		= 0;
+			gCollisionList[gNumCollisions].targetBox 	= target;
+			gCollisionList[gNumCollisions].sides 		= sideBits;
+			gCollisionList[gNumCollisions].type 		= COLLISION_TYPE_OBJ;
+			gCollisionList[gNumCollisions].objectPtr 	= thisNode;
+			gNumCollisions++;
+			gTotalSides |= sideBits;											// remember total of this
 		}
+
 next:
 		thisNode = thisNode->NextNode;												// next target node
 	}while(thisNode != nil);
@@ -294,19 +289,17 @@ next:
 // OUTPUT: totalSides
 //
 
-Byte HandleCollisions(ObjNode *theNode, u_long cType, float deltaBounce)
+Byte HandleCollisions(ObjNode* theNode, uint32_t cType, float deltaBounce)
 {
 Byte		totalSides;
-short		i;
 float		originalX,originalY,originalZ;
 float		offset,maxOffsetX,maxOffsetZ,maxOffsetY;
 float		offXSign,offZSign,offYSign;
 Byte		base,target;
 ObjNode		*targetObj = nil;
-CollisionBoxType* baseBoxPtr = nil;
-CollisionBoxType* targetBoxPtr = nil;
-long		leftSide,rightSide,frontSide,backSide,bottomSide;
-CollisionBoxType *boxList = nil;
+const CollisionBoxType* baseBoxPtr = nil;
+const CollisionBoxType* targetBoxPtr = nil;
+const CollisionBoxType* boxList = nil;
 short		numSolidHits, numPasses = 0;
 Boolean		hitImpenetrable = false;
 short		oldNumCollisions;
@@ -352,17 +345,13 @@ again:
 	if (theNode->NumCollisionBoxes == 0)					// it's gotta have a collision box
 		return(0);
 	boxList 	= theNode->CollisionBoxes;
-	leftSide 	= boxList->left;
-	rightSide 	= boxList->right;
-	frontSide 	= boxList->front;
-	backSide 	= boxList->back;
-	bottomSide 	= boxList->bottom;
+//	bottomSide	= boxList->bottom;
 
 			/*************************************/
 			/* SCAN THRU ALL RETURNED COLLISIONS */
 			/*************************************/
 
-	for (i=oldNumCollisions; i < gNumCollisions; i++)		// handle all collisions
+	for (int i = oldNumCollisions; i < gNumCollisions; i++)	// handle all collisions
 	{
 
 		totalSides |= gCollisionList[i].sides;				// keep sides info
@@ -385,7 +374,7 @@ again:
 		{
 				/* SEE IF THIS OBJECT HAS SINCE BECOME INVALID */
 
-			u_long	targetCType = targetObj->CType;						// get ctype of hit obj
+			uint32_t	targetCType = targetObj->CType;						// get ctype of hit obj
 			if (targetCType == INVALID_NODE_FLAG)
 				continue;
 
@@ -502,7 +491,8 @@ again:
 						maxOffsetY = offset;
 						offYSign = 1;
 					}
-					gDelta.y = -100;					// keep some downward momentum!!
+
+					gDelta.y = -100;												// keep some downward momentum!!
 				}
 				else
 				if (gCollisionList[i].sides & SIDE_BITS_TOP)						// SEE IF HIT TOP
@@ -587,9 +577,9 @@ again:
 	{
 		float	y = GetTerrainY(gCoord.x, gCoord.z);
 
-		if (bottomSide < y)										// see if bottom is under ground
+		if (boxList[0].bottom < y)								// see if bottom is under ground
 		{
-			gCoord.y += y-bottomSide;
+			gCoord.y += y - boxList[0].bottom;
 
 			if (gDelta.y < 0.0f)								// if was going down then bounce y
 				gDelta.y *= deltaBounce;
@@ -629,7 +619,7 @@ again:
 //			polypts		:	ptr to array of 2D points
 //
 
-Boolean IsPointInPoly2D(float pt_x, float pt_y, Byte numVerts, OGLPoint2D *polypts)
+Boolean IsPointInPoly2D(float pt_x, float pt_y, Byte numVerts, const OGLPoint2D* polypts)
 {
 Byte 		oldquad,newquad;
 float 		thispt_x,thispt_y,lastpt_x,lastpt_y;
@@ -969,15 +959,11 @@ signed char	wind;										// current winding number
 // OUTPUT: # collisions detected
 //
 
-short DoSimplePointCollision(OGLPoint3D *thePoint, u_long cType, ObjNode *except)
+int DoSimplePointCollision(const OGLPoint3D* thePoint, uint32_t cType, const ObjNode* except)
 {
-ObjNode	*thisNode;
-short	targetNumBoxes,target;
-CollisionBoxType *targetBoxList;
-
 	gNumCollisions = 0;
 
-	thisNode = gFirstNodePtr;									// start on 1st node
+	ObjNode* thisNode = gFirstNodePtr;							// start on 1st node
 
 	do
 	{
@@ -990,7 +976,7 @@ CollisionBoxType *targetBoxList;
 		if (thisNode->Slot >= SLOT_OF_DUMB)						// see if reach end of usable list
 			break;
 
-		if (thisNode->StatusBits & STATUS_BIT_NOCOLLISION)	// don't collide against these
+		if (thisNode->StatusBits & STATUS_BIT_NOCOLLISION)		// don't collide against these
 			goto next;
 
 		if (!thisNode->CBits)									// see if this obj doesn't need collisioning
@@ -999,45 +985,30 @@ CollisionBoxType *targetBoxList;
 
 				/* GET BOX INFO FOR THIS NODE */
 
-		targetNumBoxes = thisNode->NumCollisionBoxes;			// if target has no boxes, then skip
+		int targetNumBoxes = thisNode->NumCollisionBoxes;		// if target has no boxes, then skip
 		if (targetNumBoxes == 0)
 			goto next;
-		targetBoxList = thisNode->CollisionBoxes;
+		
+		const CollisionBoxType* targetBoxList = thisNode->CollisionBoxes;
 
 
 			/***************************************/
 			/* CHECK POINT AGAINST EACH TARGET BOX */
 			/***************************************/
 
-		for (target = 0; target < targetNumBoxes; target++)
+		for (int target = 0; target < targetNumBoxes; target++)
 		{
 					/* DO RECTANGLE INTERSECTION */
 
-			if (thePoint->x < targetBoxList[target].left)
-				continue;
-
-			if (thePoint->x > targetBoxList[target].right)
-				continue;
-
-			if (thePoint->z < targetBoxList[target].back)
-				continue;
-
-			if (thePoint->z > targetBoxList[target].front)
-				continue;
-
-			if (thePoint->y > targetBoxList[target].top)
-				continue;
-
-			if (thePoint->y < targetBoxList[target].bottom)
-				continue;
-
-
+			if (BoxContainsPoint(&targetBoxList[target], thePoint))
+			{
 					/* THERE HAS BEEN A COLLISION */
 
-			gCollisionList[gNumCollisions].targetBox = target;
-			gCollisionList[gNumCollisions].type = COLLISION_TYPE_OBJ;
-			gCollisionList[gNumCollisions].objectPtr = thisNode;
-			gNumCollisions++;
+				gCollisionList[gNumCollisions].targetBox = target;
+				gCollisionList[gNumCollisions].type = COLLISION_TYPE_OBJ;
+				gCollisionList[gNumCollisions].objectPtr = thisNode;
+				gNumCollisions++;
+			}
 		}
 
 next:
@@ -1053,16 +1024,14 @@ next:
 // OUTPUT: # collisions detected
 //
 
-short DoSimpleBoxCollision(float top, float bottom, float left, float right,
-						float front, float back, u_long cType)
+int DoSimpleBoxCollision(float top, float bottom, float left, float right,
+						float front, float back, uint32_t cType)
 {
-ObjNode			*thisNode;
-short			targetNumBoxes,target;
-CollisionBoxType *targetBoxList;
+	const CollisionBoxType box = { .top = top, .bottom = bottom, .left = left, .right = right, .front = front, .back = back };
 
 	gNumCollisions = 0;
 
-	thisNode = gFirstNodePtr;									// start on 1st node
+	ObjNode* thisNode = gFirstNodePtr;							// start on 1st node
 
 	do
 	{
@@ -1072,7 +1041,7 @@ CollisionBoxType *targetBoxList;
 		if (thisNode->Slot >= SLOT_OF_DUMB)						// see if reach end of usable list
 			break;
 
-		if (thisNode->StatusBits & STATUS_BIT_NOCOLLISION)	// don't collide against these
+		if (thisNode->StatusBits & STATUS_BIT_NOCOLLISION)		// don't collide against these
 			goto next;
 
 		if (!thisNode->CBits)									// see if this obj doesn't need collisioning
@@ -1081,45 +1050,30 @@ CollisionBoxType *targetBoxList;
 
 				/* GET BOX INFO FOR THIS NODE */
 
-		targetNumBoxes = thisNode->NumCollisionBoxes;			// if target has no boxes, then skip
+		int targetNumBoxes = thisNode->NumCollisionBoxes;		// if target has no boxes, then skip
 		if (targetNumBoxes == 0)
 			goto next;
-		targetBoxList = thisNode->CollisionBoxes;
+
+		const CollisionBoxType* targetBoxList = thisNode->CollisionBoxes;
 
 
 			/*********************************/
 			/* CHECK AGAINST EACH TARGET BOX */
 			/*********************************/
 
-		for (target = 0; target < targetNumBoxes; target++)
+		for (int target = 0; target < targetNumBoxes; target++)
 		{
 					/* DO RECTANGLE INTERSECTION */
 
-			if (right < targetBoxList[target].left)
-				continue;
-
-			if (left > targetBoxList[target].right)
-				continue;
-
-			if (front < targetBoxList[target].back)
-				continue;
-
-			if (back > targetBoxList[target].front)
-				continue;
-
-			if (bottom > targetBoxList[target].top)
-				continue;
-
-			if (top < targetBoxList[target].bottom)
-				continue;
-
-
+			if (IntersectBoxes(&box, &targetBoxList[target]))
+			{
 					/* THERE HAS BEEN A COLLISION */
 
-			gCollisionList[gNumCollisions].targetBox = target;
-			gCollisionList[gNumCollisions].type = COLLISION_TYPE_OBJ;
-			gCollisionList[gNumCollisions].objectPtr = thisNode;
-			gNumCollisions++;
+				gCollisionList[gNumCollisions].targetBox = target;
+				gCollisionList[gNumCollisions].type = COLLISION_TYPE_OBJ;
+				gCollisionList[gNumCollisions].objectPtr = thisNode;
+				gNumCollisions++;
+			}
 		}
 
 next:
@@ -1135,150 +1089,98 @@ next:
 Boolean DoSimpleBoxCollisionAgainstPlayer(float top, float bottom, float left, float right,
 										float front, float back)
 {
-short			targetNumBoxes,target;
-CollisionBoxType *targetBoxList;
-
 	if (gPlayerIsDead)									// if dead then blown up and can't be hit
 		return(false);
 
 
 			/* GET BOX INFO FOR THIS NODE */
 
-	targetNumBoxes = gPlayerInfo.objNode->NumCollisionBoxes;			// if target has no boxes, then skip
+	int targetNumBoxes = gPlayerInfo.objNode->NumCollisionBoxes;			// if target has no boxes, then skip
 	if (targetNumBoxes == 0)
 		return(false);
-	targetBoxList = gPlayerInfo.objNode->CollisionBoxes;
+
+	const CollisionBoxType* targetBoxList = gPlayerInfo.objNode->CollisionBoxes;
+
+	const CollisionBoxType box = { .top = top, .bottom = bottom, .left = left, .right = right, .front = front, .back = back };
 
 
 		/***************************************/
 		/* CHECK POINT AGAINST EACH TARGET BOX */
 		/***************************************/
 
-	for (target = 0; target < targetNumBoxes; target++)
+	for (int target = 0; target < targetNumBoxes; target++)
 	{
 				/* DO RECTANGLE INTERSECTION */
 
-		if (right < targetBoxList[target].left)
-			continue;
-
-		if (left > targetBoxList[target].right)
-			continue;
-
-		if (front < targetBoxList[target].back)
-			continue;
-
-		if (back > targetBoxList[target].front)
-			continue;
-
-		if (bottom > targetBoxList[target].top)
-			continue;
-
-		if (top < targetBoxList[target].bottom)
-			continue;
-
-		return(true);
+		if (IntersectBoxes(&box, &targetBoxList[target]))
+			return true;
 	}
 
-	return(false);
+	return false;
 }
 
 
 
 /******************** DO SIMPLE POINT COLLISION AGAINST PLAYER *********************************/
 
-Boolean DoSimplePointCollisionAgainstPlayer(OGLPoint3D *thePoint)
+Boolean DoSimplePointCollisionAgainstPlayer(const OGLPoint3D* thePoint)
 {
-short	targetNumBoxes,target;
-CollisionBoxType *targetBoxList;
-
-
 	if (gPlayerIsDead)									// if dead then blown up and can't be hit
 		return(false);
 
 			/* GET BOX INFO FOR THIS NODE */
 
-	targetNumBoxes = gPlayerInfo.objNode->NumCollisionBoxes;			// if target has no boxes, then skip
+	int targetNumBoxes = gPlayerInfo.objNode->NumCollisionBoxes;		// if target has no boxes, then skip
 	if (targetNumBoxes == 0)
 		return(false);
-	targetBoxList = gPlayerInfo.objNode->CollisionBoxes;
+	
+	const CollisionBoxType* targetBoxList = gPlayerInfo.objNode->CollisionBoxes;
 
 
 		/***************************************/
 		/* CHECK POINT AGAINST EACH TARGET BOX */
 		/***************************************/
 
-	for (target = 0; target < targetNumBoxes; target++)
+	for (int target = 0; target < targetNumBoxes; target++)
 	{
 				/* DO RECTANGLE INTERSECTION */
 
-		if (thePoint->x < targetBoxList[target].left)
-			continue;
-
-		if (thePoint->x > targetBoxList[target].right)
-			continue;
-
-		if (thePoint->z < targetBoxList[target].back)
-			continue;
-
-		if (thePoint->z > targetBoxList[target].front)
-			continue;
-
-		if (thePoint->y > targetBoxList[target].top)
-			continue;
-
-		if (thePoint->y < targetBoxList[target].bottom)
-			continue;
-
-		return(true);
+		if (BoxContainsPoint(&targetBoxList[target], thePoint))
+		{
+			return true;
+		}
 	}
 
-	return(false);
+	return false;
 }
 
 /******************** DO SIMPLE BOX COLLISION AGAINST OBJECT *********************************/
 
 Boolean DoSimpleBoxCollisionAgainstObject(float top, float bottom, float left, float right,
-										float front, float back, ObjNode *targetNode)
+										float front, float back, const ObjNode* targetNode)
 {
-short			targetNumBoxes,target;
-CollisionBoxType *targetBoxList;
-
-
 			/* GET BOX INFO FOR THIS NODE */
 
-	targetNumBoxes = targetNode->NumCollisionBoxes;			// if target has no boxes, then skip
+	int targetNumBoxes = targetNode->NumCollisionBoxes;			// if target has no boxes, then skip
 	if (targetNumBoxes == 0)
 		return(false);
-	targetBoxList = targetNode->CollisionBoxes;
 
+	const CollisionBoxType* targetBoxList = targetNode->CollisionBoxes;
+
+	const CollisionBoxType box = { .top = top, .bottom = bottom, .left = left, .right = right, .front = front, .back = back };
 
 		/***************************************/
 		/* CHECK POINT AGAINST EACH TARGET BOX */
 		/***************************************/
 
-	for (target = 0; target < targetNumBoxes; target++)
+	for (int target = 0; target < targetNumBoxes; target++)
 	{
 				/* DO RECTANGLE INTERSECTION */
 
-		if (right < targetBoxList[target].left)
-			continue;
-
-		if (left > targetBoxList[target].right)
-			continue;
-
-		if (front < targetBoxList[target].back)
-			continue;
-
-		if (back > targetBoxList[target].front)
-			continue;
-
-		if (bottom > targetBoxList[target].top)
-			continue;
-
-		if (top < targetBoxList[target].bottom)
-			continue;
-
-		return(true);
+		if (IntersectBoxes(&box, &targetBoxList[target]))
+		{
+			return true;
+		}
 	}
 
 	return(false);
@@ -1292,12 +1194,10 @@ CollisionBoxType *targetBoxList;
 // box here.
 //
 
-float FindHighestCollisionAtXZ(float x, float z, u_long cType)
+float FindHighestCollisionAtXZ(float inX, float inZ, uint32_t cType)
 {
-ObjNode	*thisNode;
-short	targetNumBoxes,target;
-CollisionBoxType *targetBoxList;
-float	topY = -10000000;
+const ObjNode* thisNode;
+OGLPoint3D topPoint = { .x = inX, .y = -10000000, .z = inZ };
 
 	thisNode = gFirstNodePtr;									// start on 1st node
 
@@ -1315,37 +1215,28 @@ float	topY = -10000000;
 
 				/* GET BOX INFO FOR THIS NODE */
 
-		targetNumBoxes = thisNode->NumCollisionBoxes;			// if target has no boxes, then skip
+		int targetNumBoxes = thisNode->NumCollisionBoxes;		// if target has no boxes, then skip
 		if (targetNumBoxes == 0)
 			goto next;
-		targetBoxList = thisNode->CollisionBoxes;
+		
+		const CollisionBoxType* targetBoxList = thisNode->CollisionBoxes;
 
 
 			/***************************************/
 			/* CHECK POINT AGAINST EACH TARGET BOX */
 			/***************************************/
 
-		for (target = 0; target < targetNumBoxes; target++)
+		for (int target = 0; target < targetNumBoxes; target++)
 		{
-			if (targetBoxList[target].top < topY)				// check top
+			if (targetBoxList[target].top < topPoint.y)			// check top
 				continue;
 
 					/* DO RECTANGLE INTERSECTION */
 
-			if (x < targetBoxList[target].left)
-				continue;
-
-			if (x > targetBoxList[target].right)
-				continue;
-
-			if (z < targetBoxList[target].back)
-				continue;
-
-			if (z > targetBoxList[target].front)
-				continue;
-
-			topY = targetBoxList[target].top;					// save as highest Y
-
+			if (BoxContainsPoint_XZ(&targetBoxList[target], &topPoint))
+			{
+				topPoint.y = targetBoxList[target].top;			// save as highest Y
+			}
 		}
 
 next:
@@ -1358,10 +1249,10 @@ next:
 
 	if (cType & CTYPE_TERRAIN)
 	{
-		float	ty = GetTerrainY(x,z);
+		float	ty = GetTerrainY(topPoint.x, topPoint.z);
 
-		if (ty > topY)
-			topY = ty;
+		if (ty > topPoint.y)
+			topPoint.y = ty;
 	}
 
 			/*******************/
@@ -1372,15 +1263,15 @@ next:
 	{
 		float	wy;
 
-		if (GetWaterY(x, z, &wy))
+		if (GetWaterY(topPoint.x, topPoint.z, &wy))
 		{
-			if (wy > topY)
-				topY = wy;
+			if (wy > topPoint.y)
+				topPoint.y = wy;
 		}
 	}
 
 
-	return(topY);
+	return topPoint.y;
 }
 
 
@@ -1391,12 +1282,11 @@ next:
 
 /******************** SEE IF LINE SEGMENT HITS ANYTHING **************************/
 
-Boolean SeeIfLineSegmentHitsAnything(const OGLPoint3D *endPoint1, const OGLPoint3D *endPoint2, const ObjNode *except, u_long ctype)
+Boolean SeeIfLineSegmentHitsAnything(const OGLPoint3D* endPoint1, const OGLPoint3D* endPoint2, const ObjNode* except, uint32_t ctype)
 {
-ObjNode	*thisNode;
+const ObjNode	*thisNode;
 OGLPoint2D	p1,p2,crossBeamP1,crossBeamP2;
 short			targetNumBoxes;
-CollisionBoxType *targetBoxList;
 float	ix,iz,iy;
 
 			/* SEE IF HIT FENCE */
@@ -1440,16 +1330,17 @@ float	ix,iz,iy;
 		targetNumBoxes = thisNode->NumCollisionBoxes;			// if target has no boxes, then skip
 		if (targetNumBoxes == 0)
 			goto next;
-		targetBoxList = thisNode->CollisionBoxes;
+
+		const CollisionBoxType* targetBox = &thisNode->CollisionBoxes[0];
 
 
 				/* CREATE SEGMENT FROM CROSSBEAM */
 
-		crossBeamP1.x = targetBoxList[0].left;
-		crossBeamP1.y = targetBoxList[0].back;
+		crossBeamP1.x = targetBox->left;
+		crossBeamP1.y = targetBox->back;
 
-		crossBeamP2.x = targetBoxList[0].right;
-		crossBeamP2.y = targetBoxList[0].front;
+		crossBeamP2.x = targetBox->right;
+		crossBeamP2.y = targetBox->front;
 
 
 			/* SEE IF INPUT SEGMENT INTERSECTS THE CROSSBEAM SEGMENT */
@@ -1467,8 +1358,8 @@ float	ix,iz,iy;
 
 			iy = endPoint1->y + (dy * ratio);					// calc intersect y coord
 
-			if ((iy <= targetBoxList[0].top) &&					// if below top & above bottom, then HIT
-				(iy >= targetBoxList[0].bottom))
+			if ((iy <= targetBox->top) &&					// if below top & above bottom, then HIT
+				(iy >= targetBox->bottom))
 			{
 				return(true);
 			}
@@ -1487,11 +1378,11 @@ next:
 
 /******************** SEE IF LINE SEGMENT HITS PLAYER **************************/
 
-Boolean SeeIfLineSegmentHitsPlayer(const OGLPoint3D *endPoint1, const OGLPoint3D *endPoint2)
+Boolean SeeIfLineSegmentHitsPlayer(const OGLPoint3D* endPoint1, const OGLPoint3D* endPoint2)
 {
-ObjNode	*player = gPlayerInfo.objNode;
+const ObjNode	*player = gPlayerInfo.objNode;
 OGLPoint2D	p1,p2,crossBeamP1,crossBeamP2;
-CollisionBoxType *collisionBox;
+const CollisionBoxType *collisionBox;
 float	ix,iz,iy;
 
 	if (gPlayerIsDead)											// if player dead/gone then cant hit
@@ -1537,15 +1428,4 @@ float	ix,iz,iy;
 
 	return(false);
 }
-
-
-
-
-
-
-
-
-
-
-
 
