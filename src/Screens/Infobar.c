@@ -30,23 +30,23 @@ static void Infobar_DrawHumans(void);
 static void UpdateHelpMessage(void);
 static void MoveHelpBeacon(ObjNode *theNode);
 
+static inline float AnchorLeft(float x);
+static inline float AnchorRight(float x);
+static inline float AnchorTop(float y);
+static inline float AnchorBottom(float y);
+
 
 /****************************/
 /*    CONSTANTS             */
 /****************************/
 
-#define	HEALTH_X		23.0f
-#define	HEALTH_Y		19.0f
-#define	HEALTH_SIZE		50.0f
+#define	HEALTH_X			AnchorLeft(23.0f)
+#define	HEALTH_Y			AnchorTop(19.0f)
+#define	HEALTH_SIZE			50.0f
 
-#define FUEL_SIZE		HEALTH_SIZE
-#define	FUEL_XFROMRIGHT	(-FUEL_SIZE-HEALTH_X)
-#define	FUEL_Y			HEALTH_Y
-
-#define JUMP_SIZE		HEALTH_SIZE
-#define	JUMP_X			(HEALTH_X + HEALTH_SIZE +10)
-#define	JUMP_Y			HEALTH_Y
-
+#define JUMP_SIZE			HEALTH_SIZE
+#define	JUMP_X				(HEALTH_X + HEALTH_SIZE +10)
+#define	JUMP_Y				HEALTH_Y
 
 #define	WEAPON_X			(JUMP_X+JUMP_SIZE + 10)
 #define	WEAPON_Y			52
@@ -54,6 +54,10 @@ static void MoveHelpBeacon(ObjNode *theNode);
 #define	WEAPON_INACTIVE_Y	-30
 #define	WEAPON_SIZE			50
 #define	WEAPON_FRAME_SIZE	(WEAPON_SIZE * 3/2)
+
+#define FUEL_SIZE			HEALTH_SIZE
+#define	FUEL_X				AnchorRight(FUEL_SIZE+HEALTH_X)
+#define	FUEL_Y				HEALTH_Y
 
 #define	BEAM_CUP_X			190.0f
 #define	BEAM_CUP_Y			20.0f
@@ -67,7 +71,9 @@ static void MoveHelpBeacon(ObjNode *theNode);
 #define	BEAM_Y				(BEAM_CUP_Y - BEAM_SCALE/2)
 
 #define	HUMAN_SCALE			25.0f
-#define	HUMAN_XFROMRIGHT	(-10 - HUMAN_SCALE/2)
+#define HUMAN_XFROMRIGHT	(-10 - HUMAN_SCALE/2)
+#define HUMAN_OFFSCREEN_OFFSET_X (HUMAN_XFROMRIGHT + 60.0f)
+#define	HUMAN_X				AnchorRight(-HUMAN_XFROMRIGHT)
 #define	HUMAN_Y				150.0f
 #define	HUMAN_SPACING		(HUMAN_SCALE * 2.8f)
 
@@ -156,7 +162,40 @@ static ObjNode	*gHelpMessageObject;
 
 Boolean	gHelpMessageDisabled[NUM_HELP_MESSAGES];
 
-static	float	gHumanFrameXFromRight[NUM_HUMAN_TYPES];
+static	float	gHumanOffsetX[NUM_HUMAN_TYPES];
+
+
+/*************** ASPECT RATIO-INDEPENDENT ANCHORS ******************/
+
+static inline float AnchorLeft(float x)
+{
+	return x;
+}
+
+static inline float AnchorRight(float x)
+{
+	return g2DLogicalWidth - x;
+}
+
+static inline float AnchorTop(float y)
+{
+	return y;
+}
+
+static inline float AnchorBottom(float y)
+{
+	return g2DLogicalHeight - y;
+}
+
+static inline float AnchorCenterX(float x)
+{
+	return g2DLogicalWidth/2;
+}
+
+static inline float AnchorCenterY(float y)
+{
+	return g2DLogicalHeight/2;
+}
 
 
 /********************* INIT INFOBAR ****************************/
@@ -174,7 +213,7 @@ int	i;
 
 
 	for (i = 0; i < NUM_HUMAN_TYPES; i++)
-		gHumanFrameXFromRight[i] = 60.0f;
+		gHumanOffsetX[i] = HUMAN_OFFSCREEN_OFFSET_X;
 
 	gHealthOccilate = 0;
 	gHealthMeterRot = gFuelMeterRot = gJumpJetMeterRot = 0;
@@ -549,9 +588,9 @@ Str255	s;
 static void Infobar_DrawGirders(void)
 {
 
-	DrawInfobarSprite(0,0, 100, INFOBAR_SObjType_LeftGirder);
+	DrawInfobarSprite(AnchorLeft(0), AnchorTop(0), 100, INFOBAR_SObjType_LeftGirder);
 
-	DrawInfobarSprite(g2DLogicalWidth-100, 0, 100, INFOBAR_SObjType_RightGirder);
+	DrawInfobarSprite(AnchorRight(100), AnchorTop(0), 100, INFOBAR_SObjType_RightGirder);
 }
 
 
@@ -562,7 +601,7 @@ static void Infobar_DrawLives(void)
 short	i;
 
 	for (i = 0; i < gPlayerInfo.lives; i++)
-		DrawInfobarSprite(i * 30, 450, 40, INFOBAR_SObjType_OttoHead);
+		DrawInfobarSprite(AnchorLeft(i * 30), AnchorBottom(30), 40, INFOBAR_SObjType_OttoHead);
 
 }
 
@@ -589,20 +628,16 @@ static const float scales[NUM_HUMAN_TYPES] =
 
 				/* SCROLL INTO POSITION */
 
-		x = gHumanFrameXFromRight[i];							// get current scroll X
-		if (x > HUMAN_XFROMRIGHT)								// see if need to move it
+		x = HUMAN_X + gHumanOffsetX[i];							// get current scroll X
+		if (gHumanOffsetX[i] > 0.0f)							// see if need to move it
 		{
-			x -= gFramesPerSecondFrac * 150.0f;
-			if (x < HUMAN_XFROMRIGHT)
-				x = HUMAN_XFROMRIGHT;
-			gHumanFrameXFromRight[i] = x;
+			gHumanOffsetX[i] -= gFramesPerSecondFrac * 150.0f;
+			if (gHumanOffsetX[i] < 0)
+				gHumanOffsetX[i] = 0;
 		}
 
 		y = HUMAN_Y + HUMAN_SPACING * i;
 
-					/* ADJUST X */
-
-		x += g2DLogicalWidth;
 
 					/* DRAW FRAME */
 
@@ -703,7 +738,7 @@ static void Infobar_DrawFuel(void)
 {
 float	x,y,size;
 float	n, fps = gFramesPerSecondFrac;
-float	FUEL_X = g2DLogicalWidth + FUEL_XFROMRIGHT;
+//float	FUEL_X = g2DLogicalWidth + FUEL_XFROMRIGHT;
 
 			/* DRAW ROCKET ICON */
 
