@@ -17,7 +17,7 @@
 /****************************/
 
 #define	MIN_FPS				10
-#define MAX_FPS				130		// level 3 platforming physics start falling apart at 131+ fps
+#define MAX_FPS				500
 
 /**********************/
 /*     VARIABLES      */
