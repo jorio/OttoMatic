@@ -211,7 +211,8 @@ static void MoveTractor(ObjNode *theNode)
 	/* SEE IF HIT PLAYER */
 	/*********************/
 
-	if (OGLPoint3D_Distance(&gCoord, &gPlayerInfo.coord) < (theNode->BBox.max.z * theNode->Scale.x + gPlayerInfo.objNode->BBox.max.x))
+	if (!theNode->TractorIsDone
+		&& OGLPoint3D_Distance(&gCoord, &gPlayerInfo.coord) < (theNode->BBox.max.z * theNode->Scale.x + gPlayerInfo.objNode->BBox.max.x))
 	{
 		OGLVector2D	v1,v2;
 		float		r,a;
