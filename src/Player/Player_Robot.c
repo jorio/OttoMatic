@@ -71,6 +71,7 @@ static void DoPlayerMagnetSkiing(ObjNode *player);
 static void EndMagnetSkiing(ObjNode *player, Boolean crash);
 static void VerifyTargetPickup(void);
 
+static Boolean ShouldApplySlopesToPlayer(float newDistToFloor);
 
 /****************************/
 /*    CONSTANTS             */
@@ -2698,13 +2699,10 @@ Boolean		killed = false;
 			// Only apply slopes when on the ground (or really close to it)
 			//
 
-	if ((fabs(gPlayerInfo.analogControlX) < 0.5f) && (fabs(gPlayerInfo.analogControlZ) < 0.5f))			// only do slopes if player isn't controlling
+	if (ShouldApplySlopesToPlayer(distToFloor))
 	{
-		if ((distToFloor <= 0.0f) || (gPlayerInfo.distToFloor < 15.0f))
-		{
-			gDelta.x += gRecentTerrainNormal.x * (fps * PLAYER_SLOPE_ACCEL);
-			gDelta.z += gRecentTerrainNormal.z * (fps * PLAYER_SLOPE_ACCEL);
-		}
+		gDelta.x += gRecentTerrainNormal.x * (fps * PLAYER_SLOPE_ACCEL);
+		gDelta.z += gRecentTerrainNormal.z * (fps * PLAYER_SLOPE_ACCEL);
 	}
 
 			/**************************/
@@ -3363,21 +3361,37 @@ ObjNode		*magMonster;
 
 
 
+/******************** SHOULD APPLY SLOPES **************************/
 
+static Boolean ShouldApplySlopesToPlayer(float newDistToFloor)
+{
+	switch (gPlayerInfo.objNode->Skeleton->AnimNum)
+	{
+		case PLAYER_ANIM_WALK:
+		case PLAYER_ANIM_WALKWITHGUN:
+		case PLAYER_ANIM_BELLYSLIDE:
+		case PLAYER_ANIM_THROWN:
+			// allow slopes for these
+			break;
 
+		default:
+			// don't apply slopes this while standing
+			// otherwise some weird rotation may occur on steep slopes at high framerates
+			return false;
+	}
 
+	// only do slopes if player isn't controlling
+	if ((fabs(gPlayerInfo.analogControlX) >= 0.5f)
+		|| (fabs(gPlayerInfo.analogControlZ) >= 0.5f))
+	{
+		return false;
+	}
 
+	if ((newDistToFloor > 0.0f) && (gPlayerInfo.distToFloor >= 15.0f))
+	{
+		return false;
+	}
 
-
-
-
-
-
-
-
-
-
-
-
-
+	return true;
+}
 
