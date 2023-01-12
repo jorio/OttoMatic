@@ -84,7 +84,7 @@ typedef struct
 
 typedef struct
 {
-	long	left,right,front,back,top,bottom;
+	float	left,right,front,back,top,bottom;
 }CollisionBoxType;
 
 

@@ -305,6 +305,7 @@ Boolean		hitImpenetrable = false;
 short		oldNumCollisions;
 Boolean		previouslyOnGround, hitMPlatform = false;
 Boolean		hasTriggered = false;
+float		fps = gFramesPerSecondFrac;
 
 	if (deltaBounce > 0.0f)									// make sure Brian entered a (-) bounce value!
 		deltaBounce = -deltaBounce;
@@ -485,7 +486,14 @@ again:
 
 				if (gCollisionList[i].sides & SIDE_BITS_BOTTOM)						// SEE IF HIT BOTTOM
 				{
-					offset = (targetBoxPtr->top - baseBoxPtr->bottom)+1;			// see how far over it went
+					offset = (targetBoxPtr->top - baseBoxPtr->bottom);				// see how far over it went
+
+					// In order to prevent falling through the object, push our collision box upward
+					// by some epsilon distance so the boxes aren't perfectly flush.
+					// The epsilon distance must not be too large, because that would cause too much
+					// vertical jitter that our downward momentum won't be able to erase.
+					offset += fps;
+
 					if (offset > maxOffsetY)
 					{
 						maxOffsetY = offset;

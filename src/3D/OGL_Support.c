@@ -664,14 +664,14 @@ do_anaglyph:
 			"input y:\t%.3f\n"
 			"input a:\t%.0f\xC2\xB0\n"
 			"\n"
-			"player x:\t%.0f\n"
-			"player z:\t%.0f\n"
+			"player x:\t%.3f\n"
+			"player z:\t%.3f\n"
+			"player y:\t%.3f%s\n"
 			"\n"
 			"enemies:\t%d%s\n"
 #if 0
 			"t-defs:\t%d\n"
 			"h2o:\t\t%d\n"
-			"ground?\t%c\n"
 #endif
 			"shards:\t%d\n"
 			"sparkles:\t%d\n"
@@ -699,12 +699,13 @@ do_anaglyph:
 			(180/PI) * ( atan2f(gPlayerInfo.analogControlZ,gPlayerInfo.analogControlX) ),
 			gPlayerInfo.coord.x,
 			gPlayerInfo.coord.z,
+			gPlayerInfo.coord.y,
+			gPlayerInfo.objNode && (gPlayerInfo.objNode->StatusBits & STATUS_BIT_ONGROUND)? " G": "",
 			gNumEnemies,
 			(gMaxEnemies > 0 && gNumEnemies >= gMaxEnemies) ? " (!!!)" : "",
 #if 0
 			gNumTerrainDeformations,
 			gNumWaterDrawn,
-			gPlayerInfo.objNode && (gPlayerInfo.objNode->StatusBits & STATUS_BIT_ONGROUND)? 'Y': 'N',
 #endif
 			gNumShards,
 			gNumSparkles,
