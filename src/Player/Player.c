@@ -191,14 +191,15 @@ void InitPlayersAtStartOfLevel(void)
 //
 // Normally damage comes from byWhat, but if byWhat = nil, then use altDamage
 //
+// Returns true if player did take damage; false if player was invincible.
+//
 
-void PlayerGotHit(ObjNode *byWhat, float altDamage)
+Boolean PlayerGotHit(ObjNode *byWhat, float altDamage)
 {
-float	r;
 ObjNode	*player = gPlayerInfo.objNode;
 
 	if (gPlayerInfo.invincibilityTimer > 0.0f)							// cant get hit if invincible
-		return;
+		return false;
 
 	if (player->Skeleton == nil)									// make sure there's a skeleton
 		DoFatalAlert("PlayerGotHit: no skeleton on player");
@@ -236,6 +237,7 @@ ObjNode	*player = gPlayerInfo.objNode;
 					MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_GOTHIT, 7);
 		}
 
+		float r;
 		if (byWhat)
 		{
 			r = byWhat->Rot.y;
@@ -261,6 +263,8 @@ ObjNode	*player = gPlayerInfo.objNode;
 	}
 
 	gPlayerInfo.invincibilityTimer = 2.5;
+
+	return true;
 }
 
 

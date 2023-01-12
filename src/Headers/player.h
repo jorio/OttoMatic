@@ -2,11 +2,7 @@
 // player.h
 //
 
-#ifndef __PLAYER_H__
-#define __PLAYER_H__
-
-
-
+#pragma once
 
 #define	PLAYER_DEFAULT_SCALE	1.2f
 #define	PLAYER_GIANT_SCALE		(PLAYER_DEFAULT_SCALE * 3.0f)
@@ -232,7 +228,7 @@ void InitPlayerInfo_Game(void);
 void InitPlayersAtStartOfLevel(void);
 Boolean PlayerLoseHealth(float damage, Byte deathType);
 void PlayerEntersWater(ObjNode *theNode, int patchNum);
-void PlayerGotHit(ObjNode *byWhat, float altDamage);
+Boolean PlayerGotHit(ObjNode *byWhat, float altDamage);
 Boolean AddExitRocket(TerrainItemEntryType *itemPtr, long  x, long z);
 void DrawRocketFlame(ObjNode *theNode);
 void MakeRocketExhaust(ObjNode *rocket);
@@ -277,8 +273,3 @@ void BlowUpSaucer(ObjNode *saucer);
 void StopPlayerSaucerBeam(ObjNode *saucer);
 void ImpactPlayerSaucer(float x, float z, float damage, ObjNode *saucer, short particleLimit);
 
-
-		
-
-
-#endif

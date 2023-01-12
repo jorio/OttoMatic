@@ -906,9 +906,8 @@ int				i;
 
 			player->Rot.y = CalcYAngleFromPointToPoint(player->Rot.y,body->Coord.x,body->Coord.z,player->Coord.x, player->Coord.z);		// aim player direction of blast
 
-			PlayerGotHit(nil, SWINGERBOT_DAMAGE);									// hurt player
+			Boolean didHurt = PlayerGotHit(nil, SWINGERBOT_DAMAGE);					// hurt player
 			SetSkeletonAnim(player->Skeleton, PLAYER_ANIM_THROWN);
-			PlayEffect_Parms3D(EFFECT_THROWNSWOOSH, &player->Coord, NORMAL_CHANNEL_RATE, 2.0);
 
 					/* CALC VECTOR TO THROW PLAYER */
 
@@ -923,31 +922,22 @@ int				i;
 
 			player->Delta.x = v.x * throwFactor;
 			player->Delta.z = v.y * throwFactor;
-
 			player->Delta.y = 700.0f;
 
 			gCurrentMaxSpeed = CalcVectorLength(&player->Delta);						// set this so we can go flyin'
 
 					/* GOODIES */
 
-			PlayEffect_Parms3D(EFFECT_METALHIT2, &ballPt, NORMAL_CHANNEL_RATE * 2/3, 1.0);	// make clank sound
-			MakeSparkExplosion(ballPt.x, ballPt.y, ballPt.z, 300.0f, .5, PARTICLE_SObjType_WhiteSpark3,0);
+			if (didHurt)															// only do feedback if actually inflicted damage
+			{
+				PlayEffect_Parms3D(EFFECT_THROWNSWOOSH, &player->Coord, NORMAL_CHANNEL_RATE, 2.0);
+				PlayEffect_Parms3D(EFFECT_METALHIT2, &ballPt, NORMAL_CHANNEL_RATE * 2/3, 1.0);	// make clank sound
+				MakeSparkExplosion(ballPt.x, ballPt.y, ballPt.z, 300.0f, .5, PARTICLE_SObjType_WhiteSpark3,0);
+			}
 
 			break;
 		}
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

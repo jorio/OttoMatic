@@ -1160,7 +1160,7 @@ float	fps = gFramesPerSecondFrac;
 		gPlayerInfo.invincibilityTimer = 2.0f;
 		MorphToSkeletonAnim(theNode->Skeleton, PLAYER_ANIM_FLATTENED, 8.0);
 		gPlayerInfo.knockDownTimer = 1.5;
-		PlayEffect3D(EFFECT_PLAYERCLANG, &gCoord);
+		PlayEffect_Parms3D(EFFECT_PLAYERCLANG, &gCoord, NORMAL_CHANNEL_RATE, 0.8f);
 		PlayerLoseHealth(.2, PLAYER_DEATH_TYPE_EXPLODE);
 	}
 
@@ -1276,7 +1276,7 @@ u_long	wasOnGround = theNode->StatusBits & STATUS_BIT_ONGROUND;
 	if ((theNode->StatusBits & STATUS_BIT_ONGROUND) && (!wasOnGround))
 	{
 //		if (gDelta.y > 20.0f)
-			PlayEffect3D(EFFECT_PLAYERCLANG, &gCoord);
+			PlayEffect_Parms3D(EFFECT_PLAYERCLANG, &gCoord, NORMAL_CHANNEL_RATE, 0.8f);
 	}
 
 
@@ -1547,7 +1547,7 @@ float	fps = gFramesPerSecondFrac;
 	{
 		SetSkeletonAnim(theNode->Skeleton, PLAYER_ANIM_BELLYSLIDE);
 		gPlayerInfo.knockDownTimer = 1.0f;
-		PlayEffect3D(EFFECT_PLAYERCLANG, &gCoord);
+		PlayEffect_Parms3D(EFFECT_PLAYERCLANG, &gCoord, NORMAL_CHANNEL_RATE, 0.8f);
 	}
 
 
