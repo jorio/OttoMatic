@@ -26,6 +26,7 @@ static void DrawBoundingBoxes(ObjNode *theNode);
 
 #define	OBJ_DEL_Q_SIZE	200
 
+#define OBJ_BUDGET		700
 
 /**********************/
 /*     VARIABLES      */
@@ -35,6 +36,9 @@ static void DrawBoundingBoxes(ObjNode *theNode);
 ObjNode		*gFirstNodePtr = nil;
 
 ObjNode		*gCurrentNode,*gMostRecentlyAddedNode,*gNextNode;
+
+static Boolean	gPooledObjNodesInUse[OBJ_BUDGET];
+static ObjNode	gObjNodePool[OBJ_BUDGET];
 
 
 NewObjectDefinitionType	gNewObjectDefinition;
@@ -61,22 +65,25 @@ OGLMatrix4x4	*gCurrentObjMatrix;
 
 void InitObjectManager(void)
 {
-
-				/* INIT LINKED LIST */
-
+		/* INIT LINKED LIST */
 
 	gCurrentNode = nil;
-
-					/* CLEAR ENTIRE OBJECT LIST */
-
 	gFirstNodePtr = nil;									// no node yet
-
 	gNumObjectNodes = 0;
 
-				/* INIT NEW OBJ DEF */
+		/* INIT OBJECT POOL */
+
+	memset(gObjNodePool, 0, sizeof(gObjNodePool));
+	memset(gPooledObjNodesInUse, 0, sizeof(gPooledObjNodesInUse));
+
+		/* INIT NEW OBJ DEF */
 
 	memset(&gNewObjectDefinition, 0, sizeof(gNewObjectDefinition));
 	gNewObjectDefinition.scale = 1;
+
+#if _DEBUG
+	printf("ObjNode pool: %d KB\n", (int)(sizeof(gObjNodePool)/1024));
+#endif
 }
 
 
@@ -89,20 +96,36 @@ void InitObjectManager(void)
 
 ObjNode	*MakeNewObject(NewObjectDefinitionType *newObjDef)
 {
-ObjNode	*newNodePtr;
-long	slot,i;
+ObjNode	*newNodePtr = NULL;
+long	slot;
 unsigned long flags = newObjDef->flags;
 
-				/* ALLOCATE NEW NODE(CLEARED TO 0'S) */
+			/* TRY TO GET AN OBJECT FROM THE POOL */
 
-	newNodePtr = (ObjNode *)AllocPtrClear(sizeof(ObjNode));
-	if (newNodePtr == nil)
-		DoFatalAlert("MakeNewObject: Alloc Ptr failed!");
+	for (int i = 0; i < OBJ_BUDGET; i++)
+	{
+		if (!gPooledObjNodesInUse[i])
+		{
+			gPooledObjNodesInUse[i] = true;		// lock that one
+			newNodePtr = &gObjNodePool[i];		// point to pooled node
+			break;
+		}
+	}
 
+			/* POOL FULL, ALLOCATE NEW NODE ON HEAP */
 
+	if (newNodePtr == NULL)
+	{
+		newNodePtr = (ObjNode*) AllocPtr(sizeof(ObjNode));
+	}
 
+			/* MAKE SURE WE GOT ONE */
+
+	GAME_ASSERT(newNodePtr);
 
 			/* INITIALIZE ALL OF THE FIELDS */
+
+	memset(newNodePtr, 0, sizeof(ObjNode));
 
 	slot = newObjDef->slot;
 
@@ -121,7 +144,7 @@ unsigned long flags = newObjDef->flags;
 	newNodePtr->Coord = newNodePtr->InitCoord = newNodePtr->OldCoord = newObjDef->coord;		// save coords
 	newNodePtr->StatusBits = flags;
 
-	for (i = 0; i < MAX_NODE_SPARKLES; i++)								// no sparkles
+	for (int i = 0; i < MAX_NODE_SPARKLES; i++)							// no sparkles
 		newNodePtr->Sparkles[i] = -1;
 
 
@@ -166,7 +189,7 @@ unsigned long flags = newObjDef->flags;
 
 		/* NO VAPOR TRAILS YET */
 
-	for (i = 0; i < MAX_JOINTS; i++)
+	for (int i = 0; i < MAX_JOINTS; i++)
 		newNodePtr->VaporTrails[i] = -1;
 
 
@@ -1402,15 +1425,27 @@ out:
 
 static void FlushObjectDeleteQueue(void)
 {
-long	i,num;
+	for (int i = 0; i < gNumObjsInDeleteQueue; i++)
+	{
+		ObjNode* node = gObjectDeleteQueue[i];
+		GAME_ASSERT(node != NULL);
 
-	num = gNumObjsInDeleteQueue;
+		ptrdiff_t poolIndex = node - gObjNodePool;
 
-	gNumObjectNodes -= num;
+		if (poolIndex >= 0 && poolIndex < OBJ_BUDGET)
+		{
+			// node is pooled, put back into pool
+			GAME_ASSERT_MESSAGE(gPooledObjNodesInUse[poolIndex], "Pooled node freed twice");
+			gPooledObjNodesInUse[poolIndex] = false;
+		}
+		else
+		{
+			// node was allocated on heap
+			SafeDisposePtr((Ptr) node);
+		}
+	}
 
-
-	for (i = 0; i < num; i++)
-		SafeDisposePtr((Ptr)gObjectDeleteQueue[i]);
+	gNumObjectNodes -= gNumObjsInDeleteQueue;
 
 	gNumObjsInDeleteQueue = 0;
 }
