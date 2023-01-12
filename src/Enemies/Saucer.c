@@ -106,7 +106,8 @@ Boolean CallAlienSaucer(ObjNode *who)
 	if (CalcQuickDistance(who->Coord.x, who->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) > 4000.0f)	// see if too far away
 		return(false);
 
-	if (SeeIfLineSegmentHitsFence(&who->Coord, &gPlayerInfo.coord, nil, nil, nil))		// dont call if there's a fence between us
+	// Don't call if there's a fence or a gate between us
+	if (SeeIfLineSegmentHitsAnything(&who->Coord, &gPlayerInfo.coord, nil, CTYPE_FENCE | CTYPE_BLOCKRAYS))
 		return(false);
 
 

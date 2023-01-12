@@ -1391,6 +1391,9 @@ float	fps = gFramesPerSecondFrac;
 					gDelta.y = 0;
 
 					bottom->OneWay = false;						// no longer a 1-way door
+
+					top->CType &= ~CTYPE_BLOCKRAYS;				// stop blocking CallAlienSaucer raycasts
+					bottom->CType &= ~CTYPE_BLOCKRAYS;
 				}
 				else
 				{

@@ -676,7 +676,7 @@ static const short types[] =
 
 			/* SET COLLISION STUFF */
 
-	newObj->CType 			= CTYPE_MISC|CTYPE_BLOCKCAMERA;
+	newObj->CType 			= CTYPE_MISC | CTYPE_BLOCKCAMERA | CTYPE_BLOCKRAYS;
 
 	if (type != 1)			// hack for 1.0.2 update to fix tractor-barn metal fence go-thru problem
 		newObj->CType |= CTYPE_IMPENETRABLE;

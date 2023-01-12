@@ -105,7 +105,7 @@ enum
 {
 	CTYPE_PLAYER	=	1,			// Me
 	CTYPE_HUMAN		=	(1<<1),		// set if is a human
-	CTYPE_BLOCKRAYS	=	(1<<2),		// for objects we want to block certain ray-intersect checks
+	CTYPE_BLOCKRAYS	=	(1<<2),		// if should block certain ray-intersect checks (typically destructible gates)
 	CTYPE_TRIGGER2	=	(1<<3),		// Enemy Trigger
 	CTYPE_TRIGGER	=	(1<<4),		// Trigger
 	CTYPE_SKELETON	=	(1<<5),		// Skeleton

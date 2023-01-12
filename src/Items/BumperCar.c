@@ -1246,7 +1246,7 @@ static const OGLPoint3D	sparkles[10] =
 
 			/* SET COLLISION STUFF */
 
-	post->CType 		= CTYPE_MISC|CTYPE_IMPENETRABLE|CTYPE_BLOCKCAMERA;			// note: don't set to trigger quite yet (do that after lower bumper is blown off)
+	post->CType 		= CTYPE_MISC|CTYPE_IMPENETRABLE|CTYPE_BLOCKCAMERA|CTYPE_BLOCKRAYS;			// note: don't set to trigger quite yet (do that after lower bumper is blown off)
 	post->CBits			= CBITS_ALLSOLID;
 	CreateCollisionBoxFromBoundingBox_Rotated(post, 1.2, 1);
 
