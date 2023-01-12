@@ -1006,6 +1006,9 @@ unsigned long	someLong;
 
 	Pomme_FlushPtrTracking(false);
 
+#if _DEBUG
+	gDebugMode = 1;
+#endif
 
 		/* SHOW LEGAL SCREEN */
 

@@ -774,7 +774,7 @@ short			skelType;
 						SetInfobarSpriteState(true);
 						MO_DrawObject(theNode->BaseGroup);
 
-						if (gDebugMode == 1)
+						if (gDebugMode == 2)
 						{
 							TextMesh_DrawExtents(theNode);
 						}

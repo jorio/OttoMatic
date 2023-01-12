@@ -651,7 +651,7 @@ do_anaglyph:
 	{
 		// no-op
 	}
-	else if (gDebugMode > 0)
+	else if (gDebugMode == 1 || gDebugMode == 2)
 	{
 		char debugString[1024];
 		snprintf(
