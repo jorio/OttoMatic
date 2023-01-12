@@ -89,20 +89,15 @@ tryAgain:
 static void ParseCommandLine(int argc, char** argv)
 {
 	memset(&gCommandLine, 0, sizeof(gCommandLine));
-	gCommandLine.vsync = 1;
 
 	for (int i = 1; i < argc; i++)
 	{
 		std::string argument = argv[i];
 
 		if (argument == "--skip-fluff")
+		{
 			gCommandLine.skipFluff = true;
-		else if (argument == "--no-vsync")
-			gCommandLine.vsync = 0;
-		else if (argument == "--vsync")
-			gCommandLine.vsync = 1;
-		else if (argument == "--adaptive-vsync")
-			gCommandLine.vsync = -1;
+		}
 		else if (argument == "--fullscreen-resolution")
 		{
 			GAME_ASSERT_MESSAGE(i + 2 < argc, "fullscreen width & height unspecified");
@@ -139,14 +134,18 @@ static void GetInitialWindowSize(int display, int& width, int& height)
 	}
 }
 
-static void Boot(const char* executablePath)
+static void Boot(int argc, char** argv)
 {
+	const char* executablePath = argc > 0 ? argv[0] : NULL;
+
 	// Start our "machine"
 	Pomme::Init();
 
 	// Load game prefs before starting
 	InitDefaultPrefs();
 	LoadPrefs(&gGamePrefs);
+
+	ParseCommandLine(argc, argv);
 
 retryVideo:
 	// Initialize SDL video subsystem
@@ -241,12 +240,9 @@ int main(int argc, char** argv)
 	std::string		finalErrorMessage		= "";
 	bool			showFinalErrorMessage	= false;
 
-	const char* executablePath = argc > 0 ? argv[0] : NULL;
-
 	try
 	{
-		ParseCommandLine(argc, argv);
-		Boot(executablePath);
+		Boot(argc, argv);
 		GameMain();
 	}
 	catch (Pomme::QuitRequest&)

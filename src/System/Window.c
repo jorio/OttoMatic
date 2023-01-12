@@ -299,5 +299,7 @@ void SetFullscreenModeFromPrefs(void)
 		}
 	}
 
+	SDL_GL_SetSwapInterval(gGamePrefs.vsync);
+
 	EatMouseEvents();
 }

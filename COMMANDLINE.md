@@ -12,14 +12,6 @@ In true fullscreen mode, sets your display to the specified refresh rate.
 
 Example: --fullscreen-refresh-rate 75
 
-## --vsync
+## --skip-fluff
 
-Enable vertical synchronization (enabled by default).
-
-## --adaptive-vsync
-
-Enable adaptive v-sync. Your hardware's support for this may vary.
-
-## --no-vsync
-
-Disable vertical synchronization. Not recommended.
+Cut to the chase for quick testing.

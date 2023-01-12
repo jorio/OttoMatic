@@ -196,7 +196,7 @@ void OGL_SetupWindow(OGLSetupInputType *setupDefPtr)
 	OGL_CreateLights(&setupDefPtr->lights);
 	OGL_CheckError();
 
-	SDL_GL_SetSwapInterval(gCommandLine.vsync);
+	SDL_GL_SetSwapInterval((signed char) gGamePrefs.vsync);
 
 
 

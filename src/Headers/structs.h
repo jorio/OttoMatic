@@ -363,6 +363,5 @@ typedef struct
 	int		fullscreenWidth;
 	int		fullscreenHeight;
 	int		fullscreenRefreshRate;
-	int		vsync;
 	bool	skipFluff;
 } CommandLineOptions;

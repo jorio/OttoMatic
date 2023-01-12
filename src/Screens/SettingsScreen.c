@@ -273,6 +273,17 @@ static const MenuItem gVideoMenu[] =
 			.choices = {STR_OFF, STR_ON},
 		},
 	},
+	{
+		.type = kMenuItem_Cycler,
+		.rawText = "V-Sync",
+		.cycler =
+		{
+			.callback = SetFullscreenModeFromPrefs,
+			.valuePtr = &gGamePrefs.vsync,
+			.numChoices = 2,
+			.choices = {STR_OFF, STR_ON},
+		},
+	},
 
 #if !(__APPLE__)	// hot-switching the preferred display if the game started as fullscreen is buggy on macOS for now
 	{
