@@ -213,6 +213,7 @@ extern	int						gNumHumansRescuedTotal;
 extern	int						gNumIceCracks;
 extern	int						gNumObjectNodes;
 extern	int						gNumObjectsInBG3DGroupList[MAX_BG3D_GROUPS];
+extern	int						gNumShards;
 extern	int						gNumSparkles;
 extern	int						gPolysThisFrame;
 extern	int						gVRAMUsedThisFrame;

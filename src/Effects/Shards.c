@@ -60,13 +60,10 @@ static 	ObjNode		*gShardSrcObj;
 
 void InitShardSystem(void)
 {
-int	i;
-
 	gNumShards = 0;
 
-	for (i = 0; i < MAX_SHARDS; i++)
+	for (int i = 0; i < MAX_SHARDS; i++)
 		gShards[i].isUsed = false;
-
 }
 
 
@@ -79,13 +76,11 @@ int	i;
 
 static int FindFreeShard(void)
 {
-int	i;
-
 	if (gNumShards >= MAX_SHARDS)
 		return(-1);
 
-	for (i = 0; i < MAX_SHARDS; i++)
-		if (gShards[i].isUsed == false)
+	for (int i = 0; i < MAX_SHARDS; i++)
+		if (!gShards[i].isUsed)
 			return(i);
 
 	return(-1);
@@ -334,7 +329,6 @@ OGLPoint3D			origin = {0,0,0};
 void MoveShards(void)
 {
 float	ty,y,fps,x,z;
-long	i;
 OGLMatrix4x4	matrix,matrix2;
 
 	if (gNumShards == 0)												// quick check if any particles at all
@@ -342,8 +336,11 @@ OGLMatrix4x4	matrix,matrix2;
 
 	fps = gFramesPerSecondFrac;
 
-	for (i=0; i < MAX_SHARDS; i++)
+	for (int i = 0; i < MAX_SHARDS; i++)
 	{
+		if (!gShards[i].isUsed)
+			continue;
+
 				/* ROTATE IT */
 
 		gShards[i].rot.x += gShards[i].rotDelta.x * fps;

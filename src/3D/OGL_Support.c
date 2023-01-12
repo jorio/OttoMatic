@@ -670,10 +670,12 @@ do_anaglyph:
 			"enemies:\t%d%s\n"
 #if 0
 			"t-defs:\t%d\n"
-			"sparkles:\t%d\n"
 			"h2o:\t\t%d\n"
 			"ground?\t%c\n"
 #endif
+			"shards:\t%d\n"
+			"sparkles:\t%d\n"
+			"pgroups:\t%d\n"
 			"\n"
 			"vram:\t\t%dK\n"
 #if 0
@@ -701,10 +703,12 @@ do_anaglyph:
 			(gMaxEnemies > 0 && gNumEnemies >= gMaxEnemies) ? " (!!!)" : "",
 #if 0
 			gNumTerrainDeformations,
-			gNumSparkles,
 			gNumWaterDrawn,
 			gPlayerInfo.objNode && (gPlayerInfo.objNode->StatusBits & STATUS_BIT_ONGROUND)? 'Y': 'N',
 #endif
+			gNumShards,
+			gNumSparkles,
+			gNumActiveParticleGroups,
 			gVRAMUsedThisFrame/1024,
 #if 0
 			gNumPointers,
