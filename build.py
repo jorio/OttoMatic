@@ -28,13 +28,13 @@ game_ver            = "4.0.0"
 
 source_check        = "src/Enemies/Enemy_BrainAlien.c"  # some file that's likely to be from the game's source tree
 
-sdl_ver             = "2.24.0"
+sdl_ver             = "2.26.2"
 appimagetool_ver    = "13"
 
 lib_hashes = {  # sha-256
-    "SDL2-2.24.0.tar.gz":            "91e4c34b1768f92d399b078e171448c6af18cafda743987ed2064a28954d6d97",
-    "SDL2-2.24.0.dmg":               "c3f3315d07372f261cf8393767799e84b7b81b232fa2317629ad1a624493e7bd",
-    "SDL2-devel-2.24.0-VC.zip":      "97c6e2d17c0baebf4c84ede27ec42e211358f3694b9f558ead3a9c542c4a004e",
+    "SDL2-2.26.2.tar.gz":            "95d39bc3de037fbdfa722623737340648de4f180a601b0afad27645d150b99e0",
+    "SDL2-2.26.2.dmg":               "f56a95714c54d89b5d67e08a0362a5b53d4a8d405f7d63ec1bee0f57dc13c69c",
+    "SDL2-devel-2.26.2-VC.zip":      "8fcc6c2fbfabeddbf7872f994022aa40826ed82324e5a8671dfd4166c62c7e27",
     "appimagetool-x86_64.AppImage":  "df3baf5ca5facbecfc2f3fa6713c29ab9cefa8fd8c1eac5d283b79cab33e4acb", # appimagetool v13
     "appimagetool-aarch64.AppImage": "334e77beb67fc1e71856c29d5f3f324ca77b0fde7a840fdd14bd3b88c25c341f",
 }
