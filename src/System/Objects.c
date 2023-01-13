@@ -466,6 +466,8 @@ short			skelType;
 			/***********************/
 	do
 	{
+		ObjNode* nextNode = theNode->NextNode;					// save next node in case object deletes itself in custom draw call
+
 		statusBits = theNode->StatusBits;						// get obj's status bits
 
 		if (statusBits & (STATUS_BIT_ISCULLED|STATUS_BIT_HIDDEN))	// see if is culled or hidden
@@ -831,7 +833,7 @@ custom_draw:
 
 			/* NEXT NODE */
 next:
-		theNode = (ObjNode *)theNode->NextNode;
+		theNode = nextNode;
 	}while (theNode != nil);
 
 

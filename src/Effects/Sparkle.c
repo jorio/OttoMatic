@@ -102,10 +102,15 @@ void DeleteSparkle(short i)
 	if (gSparkles[i].isActive)
 	{
 		gSparkles[i].isActive = false;
+		gSparkles[i].owner = NULL;
 		gNumSparkles--;
 	}
-//	else
-//		DoAlert("DeleteSparkle: double delete sparkle");
+#if _DEBUG
+	else
+	{
+		DoAlert("DeleteSparkle: double delete sparkle");
+	}
+#endif
 }
 
 

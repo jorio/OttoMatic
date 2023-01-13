@@ -1175,10 +1175,11 @@ OGLPoint3D	base;
 		/* GET RID OF STATIC */
 
 	novaObj = gPlayerInfo.superNovaStatic;
+
+	gPlayerInfo.superNovaStatic = NULL;
+
 	if (novaObj)
 	{
-		gPlayerInfo.superNovaStatic = nil;
-
 		for (j = 0; j < 2; j++)							// delete the sparkle objects
 		{
 			i = novaObj->Sparkles[j];
