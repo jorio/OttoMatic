@@ -250,8 +250,8 @@ int GetCoordOnSpline(const SplineDefType* spline, float placement, float* x, flo
 	float interpointFrac = scaledPlacement - (int)scaledPlacement;
 
 	// Lerp point1 -> point2
-	*x = point1->x * (1 - interpointFrac) + point2->x * interpointFrac;
-	*z = point1->z * (1 - interpointFrac) + point2->z * interpointFrac;
+	*x = LerpFloat(point1->x, point2->x, interpointFrac);
+	*z = LerpFloat(point1->z, point2->z, interpointFrac);
 
 	return index1;
 }

@@ -22,6 +22,7 @@ static inline int ClampInt(int x, int lo, int hi) { return x < lo ? lo : x > hi 
 static inline float MinFloat(float a, float b) { return a < b ? a : b; }
 static inline float MaxFloat(float a, float b) { return a < b ? b : a; }
 static inline float ClampFloat(float x, float lo, float hi) { return x < lo ? lo : x > hi ? hi : x; }
+static inline float LerpFloat(float from, float to, float t) { return from * (1.0f - t) + to * t; }
 
 
 		/* CLOSE ENOUGH TO ZERO */
