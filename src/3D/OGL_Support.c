@@ -668,6 +668,7 @@ do_anaglyph:
 			"player z:\t%.3f\n"
 			"player y:\t%.3f%s\n"
 			"\n"
+			"nodes:\t%d\n"
 			"enemies:\t%d%s\n"
 #if 0
 			"t-defs:\t%d\n"
@@ -677,12 +678,8 @@ do_anaglyph:
 			"sparkles:\t%d\n"
 			"pgroups:\t%d\n"
 			"\n"
-			"vram:\t\t%dK\n"
-#if 0
 			"ptrs:\t\t%d\n"
-			"ptr mem:\t%ldK\n"
-#endif
-			"nodes:\t%d\n"
+			"vram:\t\t%dK\n"
 #if 0
 			"\n"
 			"time since last thrust:\t%.3f\n"
@@ -701,6 +698,7 @@ do_anaglyph:
 			gPlayerInfo.coord.z,
 			gPlayerInfo.coord.y,
 			gPlayerInfo.objNode && (gPlayerInfo.objNode->StatusBits & STATUS_BIT_ONGROUND)? " G": "",
+			gNumObjectNodes,
 			gNumEnemies,
 			(gMaxEnemies > 0 && gNumEnemies >= gMaxEnemies) ? " (!!!)" : "",
 #if 0
@@ -710,12 +708,8 @@ do_anaglyph:
 			gNumShards,
 			gNumSparkles,
 			gNumActiveParticleGroups,
-			gVRAMUsedThisFrame/1024,
-#if 0
 			gNumPointers,
-			gMemAllocatedInPtrs/1024,
-#endif
-			gNumObjectNodes
+			gVRAMUsedThisFrame/1024
 #if 0
 			gTimeSinceLastThrust,
 			gForceCameraAlignment? 'Y': 'N',

@@ -17,7 +17,7 @@ static void DecompressRLE(short refNum, TGAHeader* header, uint8_t* out)
 	compressedLength = eof - pos;
 
 	// Prep compressed data buffer
-	Ptr compressedData = NewPtr(compressedLength);
+	Ptr compressedData = AllocPtr(compressedLength);
 
 	// Read rest of file into compressed data buffer
 	err = FSRead(refNum, &compressedLength, compressedData);
@@ -63,7 +63,7 @@ static void DecompressRLE(short refNum, TGAHeader* header, uint8_t* out)
 		}
 	}
 
-	DisposePtr(compressedData);
+	SafeDisposePtr(compressedData);
 }
 
 static uint8_t* ConvertColormappedToBGR(const uint8_t* in, const TGAHeader* header, const uint8_t* palette)
@@ -72,7 +72,7 @@ static uint8_t* ConvertColormappedToBGR(const uint8_t* in, const TGAHeader* head
 	const int bytesPerColor				= header->paletteBitsPerColor / 8;
 	const uint16_t paletteColorCount	= header->paletteColorCountLo	| ((uint16_t)header->paletteColorCountHi	<< 8);
 
-	uint8_t* remapped = (uint8_t*) NewPtr(pixelCount * (header->paletteBitsPerColor / 8));
+	uint8_t* remapped = (uint8_t*) AllocPtr(pixelCount * (header->paletteBitsPerColor / 8));
 	uint8_t* out = remapped;
 
 	GAME_ASSERT(bytesPerColor == 3);
@@ -96,7 +96,7 @@ static uint8_t* ConvertColormappedToBGR(const uint8_t* in, const TGAHeader* head
 
 static uint8_t* ConvertToARGB(const uint8_t* in, const TGAHeader* header)
 {
-	uint8_t* converted = (uint8_t*) NewPtr(header->width * header->height * 4);
+	uint8_t* converted = (uint8_t*) AllocPtr(header->width * header->height * 4);
 	uint8_t* argbOut = converted;
 
 	const int pixelCount = header->width * header->height;
@@ -182,7 +182,7 @@ static void FlipPixelData(uint8_t* data, TGAHeader* header)
 
 	uint8_t* topRow = data;
 	uint8_t* bottomRow = topRow + rowBytes * (header->height - 1);
-	uint8_t* topRowCopy = (uint8_t*) NewPtr(rowBytes);
+	uint8_t* topRowCopy = (uint8_t*) AllocPtr(rowBytes);
 	while (topRow < bottomRow)
 	{
 		BlockMove(topRow, topRowCopy, rowBytes);
@@ -191,7 +191,7 @@ static void FlipPixelData(uint8_t* data, TGAHeader* header)
 		topRow += rowBytes;
 		bottomRow -= rowBytes;
 	}
-	DisposePtr((Ptr) topRowCopy);
+	SafeDisposePtr((Ptr) topRowCopy);
 }
 
 OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, bool forceARGB)
@@ -253,7 +253,7 @@ OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, bool f
 		GAME_ASSERT(header.paletteOriginLo == 0 && header.paletteOriginHi == 0);
 		GAME_ASSERT(paletteColorCount <= 256);
 
-		palette = (uint8_t*) NewPtr(paletteBytes);
+		palette = (uint8_t*) AllocPtr(paletteBytes);
 
 		readCount = paletteBytes;
 		FSRead(refNum, &readCount, (Ptr) palette);
@@ -261,7 +261,7 @@ OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, bool f
 	}
 
 	// Allocate pixel data
-	pixelData = (uint8_t*) NewPtr(pixelDataLength);
+	pixelData = (uint8_t*) AllocPtr(pixelDataLength);
 
 	// Read pixel data; decompress it if needed
 	if (compressed)
@@ -294,10 +294,10 @@ OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, bool f
 	{
 		uint8_t* remapped = ConvertColormappedToBGR(pixelData, &header, palette);
 
-		DisposePtr((Ptr) palette);
+		SafeDisposePtr((Ptr) palette);
 		palette = nil;
 
-		DisposePtr((Ptr) pixelData);
+		SafeDisposePtr((Ptr) pixelData);
 		pixelData = remapped;
 
 		// Update header to make it an BGR image
@@ -313,7 +313,7 @@ OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, bool f
 		header.imageType = TGA_IMAGETYPE_CONVERTED_ARGB;
 		header.bpp = 32;
 
-		DisposePtr((Ptr) pixelData);
+		SafeDisposePtr((Ptr) pixelData);
 		pixelData = converted;
 	}
 

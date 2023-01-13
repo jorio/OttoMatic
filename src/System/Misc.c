@@ -23,6 +23,8 @@
 /*     VARIABLES      */
 /**********************/
 
+int gNumPointers = 0;
+
 short	gPrefsFolderVRefNum;
 long	gPrefsFolderDirID;
 
@@ -278,32 +280,15 @@ int PositiveModulo(int value, unsigned int m)
 
 Handle	AllocHandle(long size)
 {
-Handle	hand;
-OSErr	err;
-
-	hand = NewHandle(size);							// alloc in APPL
-	if (hand == nil)
-	{
-		DoAlert("AllocHandle: using temp mem");
-		hand = TempNewHandle(size,&err);			// try TEMP mem
-		if (hand == nil)
-		{
-			DoAlert("AllocHandle: failed!");
-			return(nil);
-		}
-		else
-			return(hand);
-	}
-	return(hand);
-
+	return NewHandle(size);
 }
-
 
 
 /****************** ALLOC PTR ********************/
 
 void *AllocPtr(long size)
 {
+	gNumPointers++;
 	return NewPtr(size);
 }
 
@@ -312,6 +297,7 @@ void *AllocPtr(long size)
 
 void *AllocPtrClear(long size)
 {
+	gNumPointers++;
 	return NewPtrClear(size);
 }
 
@@ -320,7 +306,13 @@ void *AllocPtrClear(long size)
 
 void SafeDisposePtr(Ptr ptr)
 {
-	DisposePtr(ptr);
+	if (ptr)
+	{
+		GAME_ASSERT(gNumPointers > 0);
+		gNumPointers--;
+
+		DisposePtr(ptr);
+	}
 }
 
 

@@ -936,6 +936,7 @@ void PatchSplineLoop(SplineDefType* spline)
 
 		/* CLEAN UP */
 
-	DisposePtr((Ptr) pointsPerSpan_wrapping);
+	SafeDisposePtr((Ptr) pointsPerSpan_wrapping);
+	SafeDisposePtr((Ptr) nubList_wrapping);
 }
 
