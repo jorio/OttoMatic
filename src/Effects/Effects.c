@@ -67,7 +67,6 @@ static	float	gDeathExitDelay;
 
 void InitEffects(void)
 {
-
 	InitParticleSystem();
 	InitShardSystem();
 
@@ -75,71 +74,8 @@ void InitEffects(void)
 			/* SET SPRITE BLENDING FLAGS */
 
 	BlendASprite(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_Splash);
-
-
-
 }
 
-
-#pragma mark -
-
-
-/************************* MAKE RIPPLE *********************************/
-
-#if 0
-ObjNode *MakeRipple(float x, float y, float z, float startScale)
-{
-ObjNode	*newObj;
-
-	gNewObjectDefinition.group = GLOBAL1_MGroupNum_Ripple;
-	gNewObjectDefinition.type = GLOBAL1_MObjType_Ripple;
-	gNewObjectDefinition.coord.x = x;
-	gNewObjectDefinition.coord.y = y;
-	gNewObjectDefinition.coord.z = z;
-	gNewObjectDefinition.flags 	= STATUS_BIT_NOZWRITES|STATUS_BIT_NOFOG|STATUS_BIT_GLOW|STATUS_BIT_DONTCULL;
-	gNewObjectDefinition.slot 	= SLOT_OF_DUMB+2;
-	gNewObjectDefinition.moveCall = MoveRipple;
-	gNewObjectDefinition.rot = 0;
-	gNewObjectDefinition.scale = startScale;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
-	if (newObj == nil)
-		return(nil);
-
-	newObj->Health = .8;										// transparency value
-
-	MakeObjectTransparent(newObj, newObj->Health);
-
-	return(newObj);
-}
-
-
-
-/******************** MOVE RIPPLE ************************/
-
-static void MoveRipple(ObjNode *theNode)
-{
-float	fps = gFramesPerSecondFrac;
-
-	theNode->Health -= fps * .8f;
-	if (theNode->Health < 0)
-	{
-		DeleteObject(theNode);
-		return;
-	}
-
-	MakeObjectTransparent(theNode, theNode->Health);
-
-	theNode->Scale.x += fps*6.0f;
-	theNode->Scale.y += fps*6.0f;
-	theNode->Scale.z += fps*6.0f;
-
-	UpdateObjectTransforms(theNode);
-}
-#endif
-
-//=============================================================================================================
-//=============================================================================================================
-//=============================================================================================================
 
 #pragma mark -
 
@@ -147,24 +83,76 @@ float	fps = gFramesPerSecondFrac;
 
 void InitParticleSystem(void)
 {
-FSSpec	spec;
-ObjNode	*obj;
-
-
 			/* INIT GROUP ARRAY */
 
 	memset(gParticleGroups, 0, sizeof(gParticleGroups));
 
 	gNumActiveParticleGroups = 0;
 
+	for (int i = 0; i < MAX_PARTICLE_GROUPS; i++)
+	{
+		MOVertexArrayData vertexArrayData =
+		{
+			.numMaterials	= 0,
+			.numPoints		= 0,
+			.numTriangles	= 0,
+			.points			= (OGLPoint3D*) AllocPtr(sizeof(OGLPoint3D) * MAX_PARTICLES * 4),
+			.normals		= NULL,
+			.uvs[0]			= (OGLTextureCoord*) AllocPtr(sizeof(OGLTextureCoord) * MAX_PARTICLES * 4),
+			.colorsByte		= (OGLColorRGBA_Byte*) AllocPtr(sizeof(OGLColorRGBA_Byte) * MAX_PARTICLES * 4),
+			.colorsFloat	= NULL,
+			.triangles		= (MOTriangleIndecies*) AllocPtr(sizeof(MOTriangleIndecies) * MAX_PARTICLES * 2),
+		};
+		
+				/* INIT UV ARRAYS */
+
+		OGLTextureCoord* uv = vertexArrayData.uvs[0];
+		for (int j = 0; j < MAX_PARTICLES * 4; j += 4)
+		{
+			uv[j].u = 0;									// upper left
+			uv[j].v = 1;
+			uv[j+1].u = 0;									// lower left
+			uv[j+1].v = 0;
+			uv[j+2].u = 1;									// lower right
+			uv[j+2].v = 0;
+			uv[j+3].u = 1;									// upper right
+			uv[j+3].v = 1;
+		}
+
+				/* INIT TRIANGLE ARRAYS */
+
+		for (int j = 0, k = 0; j < MAX_PARTICLES * 2; j += 2, k += 4)
+		{
+			MOTriangleIndecies* t1 = &vertexArrayData.triangles[j];
+			MOTriangleIndecies* t2 = &vertexArrayData.triangles[j+1];
+
+			t1->vertexIndices[0] = k;
+			t1->vertexIndices[1] = k + 1;
+			t1->vertexIndices[2] = k + 2;
+
+			t2->vertexIndices[0] = k;
+			t2->vertexIndices[1] = k + 2;
+			t2->vertexIndices[2] = k + 3;
+		}
+
+
+				/* CREATE NEW GEOMETRY OBJECT */
+
+		GAME_ASSERT(gParticleGroups[i].geometryObj == NULL);
+
+		gParticleGroups[i].geometryObj = MO_CreateNewObjectOfType(MO_TYPE_GEOMETRY, MO_GEOMETRY_SUBTYPE_VERTEXARRAY, &vertexArrayData);
+	}
+
 
 
 			/* LOAD SPRITES */
 
+	FSSpec	spec;
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
 	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
 
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
+
 
 
 		/*************************************************************************/
@@ -174,15 +162,18 @@ ObjNode	*obj;
 		// The particles need to be drawn after the fences object, but before any sprite or font objects.
 		//
 
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;
-	gNewObjectDefinition.slot 		= PARTICLE_SLOT;
-	gNewObjectDefinition.moveCall 	= MoveParticleGroups;
-	gNewObjectDefinition.scale 		= 1;
-	gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOZWRITES;
+	NewObjectDefinitionType driverDef =
+	{
+		.genre = CUSTOM_GENRE,
+		.slot = PARTICLE_SLOT,
+		.moveCall = MoveParticleGroups,
+		.scale = 1,
+		.flags = STATUS_BIT_KEEPBACKFACES | STATUS_BIT_NOLIGHTING | STATUS_BIT_NOZWRITES,
+	};
 
-	obj = MakeNewObject(&gNewObjectDefinition);
+	ObjNode* obj;
+	obj = MakeNewObject(&driverDef);
 	obj->CustomDrawFunction = DrawParticleGroup;
-
 }
 
 
@@ -190,6 +181,17 @@ ObjNode	*obj;
 
 void DisposeParticleSystem(void)
 {
+			/* NUKE GEOMETRY DATA*/
+
+	for (int i = 0; i < MAX_PARTICLE_GROUPS; i++)
+	{
+		GAME_ASSERT(gParticleGroups[i].geometryObj);
+		MO_DisposeObjectReference(gParticleGroups[i].geometryObj);
+		gParticleGroups[i].geometryObj = NULL;
+	}
+
+	DeleteAllParticleGroups();
+
 	DisposeSpriteGroup(SPRITE_GROUP_PARTICLES);
 }
 
@@ -202,6 +204,8 @@ void DeleteAllParticleGroups(void)
 	{
 		DeleteParticleGroup(i);
 	}
+
+	GAME_ASSERT(gNumActiveParticleGroups == 0);
 }
 
 
@@ -209,22 +213,15 @@ void DeleteAllParticleGroups(void)
 
 static void DeleteParticleGroup(long groupNum)
 {
-	if (gParticleGroups[groupNum].isGroupActive)
-	{
-			/* NUKE GEOMETRY DATA */
+	if (!gParticleGroups[groupNum].isGroupActive)
+		return;
 
-		MO_DisposeObjectReference(gParticleGroups[groupNum].geometryObj);
+	gParticleGroups[groupNum].isGroupActive = false;
+	gParticleGroups[groupNum].geometryObj->objectData.numMaterials = 0;
+	gParticleGroups[groupNum].geometryObj->objectData.numPoints = 0;
+	gParticleGroups[groupNum].geometryObj->objectData.numTriangles = 0;
 
-
-				/* NUKE GROUP ITSELF */
-
-//		SafeDisposePtr((Ptr)gParticleGroups[groupNum]);
-//		gParticleGroups[groupNum] = nil;
-
-		gParticleGroups[groupNum].isGroupActive = false;
-
-		gNumActiveParticleGroups--;
-	}
+	gNumActiveParticleGroups--;
 }
 
 
@@ -240,9 +237,6 @@ static void DeleteParticleGroup(long groupNum)
 
 short NewParticleGroup(const NewParticleGroupDefType *def)
 {
-OGLTextureCoord			*uv;
-MOVertexArrayData 		vertexArrayData;
-MOTriangleIndecies		*t;
 ParticleGroupType* particleGroup = NULL;
 
 			/*************************/
@@ -262,13 +256,6 @@ ParticleGroupType* particleGroup = NULL;
 	if (particleGroup == NULL)		// nothing free
 		return -1;
 
-#if 0
-			/* ALLOCATE NEW GROUP */
-
-		gParticleGroups[i] = (ParticleGroupType *)AllocPtr(sizeof(ParticleGroupType));
-		if (gParticleGroups[i] == nil)
-			return(-1);									// out of memory
-#endif
 
 		/* INITIALIZE THE GROUP */
 
@@ -289,58 +276,19 @@ ParticleGroupType* particleGroup = NULL;
 	particleGroup->srcBlend 			= def->srcBlend;
 	particleGroup->dstBlend 			= def->dstBlend;
 
-		/*****************************/
-		/* INIT THE GROUP'S GEOMETRY */
-		/*****************************/
+		/**************************************/
+		/* INIT THE GROUP'S VERTEX ARRAY DATA */
+		/**************************************/
+		// Note: most everything was initialized in InitParticleSystem
 
-			/* SET THE DATA */
+	MOVertexArrayData* vertexArrayData = &particleGroup->geometryObj->objectData;
 
-	vertexArrayData.numMaterials 	= 1;
-	vertexArrayData.materials[0]	= gSpriteGroupList[SPRITE_GROUP_PARTICLES][def->particleTextureNum].materialObject;	// set illegal ref because it is made legit below
+	vertexArrayData->numPoints = 0;		// no quads until we call AddParticleToGroup
+	vertexArrayData->numTriangles = 0;
 
-	vertexArrayData.numPoints 		= 0;
-	vertexArrayData.numTriangles 	= 0;
-	vertexArrayData.points 			= (OGLPoint3D *)AllocPtr(sizeof(OGLPoint3D) * MAX_PARTICLES * 4);
-	vertexArrayData.normals 		= nil;
-	vertexArrayData.uvs[0]	 		= (OGLTextureCoord *)AllocPtr(sizeof(OGLTextureCoord) * MAX_PARTICLES * 4);
-	vertexArrayData.colorsByte 		= (OGLColorRGBA_Byte *)AllocPtr(sizeof(OGLColorRGBA_Byte) * MAX_PARTICLES * 4);
-	vertexArrayData.colorsFloat		= nil;
-	vertexArrayData.triangles		= (MOTriangleIndecies *)AllocPtr(sizeof(MOTriangleIndecies) * MAX_PARTICLES * 2);
+	vertexArrayData->numMaterials = 1;
+	vertexArrayData->materials[0] = gSpriteGroupList[SPRITE_GROUP_PARTICLES][def->particleTextureNum].materialObject;	// set illegal ref because it is made legit below
 
-
-			/* INIT UV ARRAYS */
-
-	uv = vertexArrayData.uvs[0];
-	for (int j = 0; j < MAX_PARTICLES*4; j+=4)
-	{
-		uv[j].u = 0;									// upper left
-		uv[j].v = 1;
-		uv[j+1].u = 0;									// lower left
-		uv[j+1].v = 0;
-		uv[j+2].u = 1;									// lower right
-		uv[j+2].v = 0;
-		uv[j+3].u = 1;									// upper right
-		uv[j+3].v = 1;
-	}
-
-			/* INIT TRIANGLE ARRAYS */
-
-	t = vertexArrayData.triangles;
-	for (int j = 0, k = 0; j < MAX_PARTICLES*2; j+=2, k+=4)
-	{
-		t[j].vertexIndices[0] = k;							// triangle A
-		t[j].vertexIndices[1] = k+1;
-		t[j].vertexIndices[2] = k+2;
-
-		t[j+1].vertexIndices[0] = k;							// triangle B
-		t[j+1].vertexIndices[1] = k+2;
-		t[j+1].vertexIndices[2] = k+3;
-	}
-
-
-		/* CREATE NEW GEOMETRY OBJECT */
-
-	particleGroup->geometryObj = MO_CreateNewObjectOfType(MO_TYPE_GEOMETRY, MO_GEOMETRY_SUBTYPE_VERTEXARRAY, &vertexArrayData);
 
 	gNumActiveParticleGroups++;
 
