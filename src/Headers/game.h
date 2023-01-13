@@ -148,7 +148,6 @@ extern	ObjNode					*gSaucerTarget;
 extern	ObjNode					*gSoapBubble;
 extern	ObjNode					*gTargetPickup;
 extern	ObjNode					*gTractorBeamObj;
-extern	ParticleGroupType		*gParticleGroups[];
 extern	PrefsType				gGamePrefs;
 extern	SDL_GameController		*gSDLController;
 extern	SDL_GLContext			gAGLContext;
