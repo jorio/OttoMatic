@@ -53,6 +53,7 @@ static const short kLevelSongs[NUM_LEVELS] =
 /****************************/
 
 Boolean				gG4 = true;
+Boolean				gIsInGame = false;
 
 float				gGravity = NORMAL_GRAVITY;
 
@@ -267,6 +268,7 @@ static void PlayArea(void)
 	CalcFramesPerSecond();
 	CalcFramesPerSecond();
 	gDisableHiccupTimer = true;
+	gIsInGame = true;
 
 	MakeFadeEvent(true, 1.0);
 
@@ -307,7 +309,7 @@ static void PlayArea(void)
 
 			/* SEE IF PAUSED */
 
-		if (GetNewNeedState(kNeed_UIPause))
+		if (GetNewNeedState(kNeed_UIPause) || IsCmdQPressed())
 		{
 			CaptureMouse(false);
 			DoPaused();
@@ -346,6 +348,7 @@ static void PlayArea(void)
 
 	}
 
+	gIsInGame = false;
 
 	OGL_FadeOutScene(DrawObjects, PausedUpdateCallback);
 

@@ -142,44 +142,44 @@ void UpdateInput(void)
 				}
 				break;
 
-				case SDL_TEXTINPUT:
-					memcpy(gTextInput, event.text.text, sizeof(gTextInput));
-					_Static_assert(sizeof(gTextInput) == sizeof(event.text.text), "size mismatch: gTextInput/event.text.text");
-					break;
+			case SDL_TEXTINPUT:
+				memcpy(gTextInput, event.text.text, sizeof(gTextInput));
+				_Static_assert(sizeof(gTextInput) == sizeof(event.text.text), "size mismatch: gTextInput/event.text.text");
+				break;
 
-				case SDL_MOUSEMOTION:
-					if (!gEatMouse)
-					{
-						gMouseMotionNow = true;
-						MouseSmoothing_OnMouseMotion(&event.motion);
-					}
-					break;
+			case SDL_MOUSEMOTION:
+				if (!gEatMouse)
+				{
+					gMouseMotionNow = true;
+					MouseSmoothing_OnMouseMotion(&event.motion);
+				}
+				break;
 
-				case SDL_MOUSEWHEEL:
-					if (!gEatMouse)
-					{
-						mouseWheelDelta += event.wheel.y;
-						mouseWheelDelta += event.wheel.x;
-					}
-					break;
+			case SDL_MOUSEWHEEL:
+				if (!gEatMouse)
+				{
+					mouseWheelDelta += event.wheel.y;
+					mouseWheelDelta += event.wheel.x;
+				}
+				break;
 
-				case SDL_JOYDEVICEADDED:	 // event.jdevice.which is the joy's INDEX (not an instance id!)
-					TryOpenController(false);
-					break;
+			case SDL_JOYDEVICEADDED:	 // event.jdevice.which is the joy's INDEX (not an instance id!)
+				TryOpenController(false);
+				break;
 
-				case SDL_JOYDEVICEREMOVED:	// event.jdevice.which is the joy's UNIQUE INSTANCE ID (not an index!)
-					OnJoystickRemoved(event.jdevice.which);
-					break;
+			case SDL_JOYDEVICEREMOVED:	// event.jdevice.which is the joy's UNIQUE INSTANCE ID (not an index!)
+				OnJoystickRemoved(event.jdevice.which);
+				break;
 
-				case SDL_KEYDOWN:
-					gUserPrefersGamepad = false;
-					break;
+			case SDL_KEYDOWN:
+				gUserPrefersGamepad = false;
+				break;
 
-				case SDL_CONTROLLERBUTTONDOWN:
-				case SDL_CONTROLLERBUTTONUP:
-				case SDL_JOYBUTTONDOWN:
-					gUserPrefersGamepad = true;
-					break;
+			case SDL_CONTROLLERBUTTONDOWN:
+			case SDL_CONTROLLERBUTTONUP:
+			case SDL_JOYBUTTONDOWN:
+				gUserPrefersGamepad = true;
+				break;
 		}
 	}
 
@@ -352,6 +352,19 @@ void UpdateInput(void)
 
 	if (!gGamePrefs.mouseControlsOtto)
 		gCameraControlDelta.x -= mdx * mouseSensitivityFrac * 0.04f;
+
+
+	// --------------------------------------------
+
+			/*******************/
+			/* CHECK FOR CMD+Q */
+			/*******************/
+			// When in-game, take a different path (see PlayArea)
+
+	if ((!gIsInGame || gGamePaused) && IsCmdQPressed())
+	{
+		CleanQuit();
+	}
 }
 
 void CaptureMouse(Boolean doCapture)
@@ -412,6 +425,17 @@ Boolean FlushMouseButtonPress(uint8_t sdlButton)
 	if (gotPress)
 		gMouseButtonState[sdlButton] = KEYSTATE_HELD;
 	return gotPress;
+}
+
+Boolean IsCmdQPressed(void)
+{
+#if __APPLE__
+	return (GetKeyState(SDL_SCANCODE_LGUI) || GetKeyState(SDL_SCANCODE_RGUI))
+		&& GetNewKeyState(SDL_GetScancodeFromKey(SDLK_q));
+#else
+	// on non-mac systems, alt-f4 is handled by the system
+	return false;
+#endif
 }
 
 #pragma mark -

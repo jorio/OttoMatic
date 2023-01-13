@@ -102,6 +102,7 @@ Boolean GetNewNeedState(int needID);
 Boolean GetNeedState(int needID);
 Boolean FlushMouseButtonPress(uint8_t sdlButton);
 Boolean UserWantsOut(void);
+Boolean IsCmdQPressed(void);
 void Rumble(float strength, uint32_t ms);
 float SnapAngle(float angle, float snap);
 

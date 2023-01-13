@@ -96,6 +96,7 @@ extern	Boolean					gGameOver;
 extern	Boolean					gGamePaused;
 extern	Boolean					gHelpMessageDisabled[NUM_HELP_MESSAGES];
 extern	Boolean					gIceCracked;
+extern	Boolean					gIsInGame;
 extern	Boolean					gLevelCompleted;
 extern	Boolean					gMouseMotionNow;
 extern	Boolean					gMyState_Lighting;
