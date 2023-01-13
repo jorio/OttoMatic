@@ -6,7 +6,7 @@
 #pragma once
 
 
-#define	MAX_PARTICLE_GROUPS		70
+#define	MAX_PARTICLE_GROUPS		120
 #define	MAX_PARTICLES			250		// (note change Byte below if > 255)
 
 
