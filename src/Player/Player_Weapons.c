@@ -1105,7 +1105,6 @@ next:
 static void StartSuperNovaCharge(ObjNode *player)
 {
 ObjNode	*newObj;
-int		i,j;
 
 	MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_CHARGING, 4);
 
@@ -1128,15 +1127,23 @@ int		i,j;
 	gPlayerInfo.superNovaStatic = newObj;
 
 
+			/* CALC COORD OF LEFT & RIGHT ANTENNAE */
+
+	OGLPoint3D	antennaL, antennaR;
+
+	FindCoordOnJoint(gPlayerInfo.objNode, PLAYER_JOINT_HEAD, &antennaLOff, &antennaL);
+	FindCoordOnJoint(gPlayerInfo.objNode, PLAYER_JOINT_HEAD, &antennaROff, &antennaR);
+
+
 			/* CREATE ANTENNA GLOW */
 
-	for (j = 0; j < 2; j++)
+	for (int j = 0; j < 2; j++)
 	{
-		i = newObj->Sparkles[j] = GetFreeSparkle(newObj);				// get free sparkle slot
+		int i = newObj->Sparkles[j] = GetFreeSparkle(newObj);				// get free sparkle slot
 		if (i != -1)
 		{
 			gSparkles[i].flags = SPARKLE_FLAG_OMNIDIRECTIONAL;
-			gSparkles[i].where = newObj->Coord;
+			gSparkles[i].where = j==0? antennaL: antennaR;
 
 			gSparkles[i].color.r = 1;
 			gSparkles[i].color.g = 1;
