@@ -79,6 +79,10 @@ static inline float AnchorBottom(float y);
 #define	HUMAN_Y				AnchorTop(150.0f)
 #define	HUMAN_SPACING		(HUMAN_SCALE * 2.8f)
 
+#define	ALTHUMAN_SPACING	(HUMAN_SCALE * 2.3f)
+#define ALTHUMAN_X			AnchorRight(ALTHUMAN_SPACING*0.75f)
+#define ALTHUMAN_Y			AnchorBottom(-3)
+
 #define	HELP_Y				AnchorBottom(60)
 
 
@@ -622,9 +626,6 @@ short	i;
 
 static void Infobar_DrawHumans(void)
 {
-Str255	s;
-int		i,n;
-float	tx,y,x;
 static const float scales[NUM_HUMAN_TYPES] =
 {
 	HUMAN_SCALE * 2.0f,					// farmer
@@ -633,14 +634,19 @@ static const float scales[NUM_HUMAN_TYPES] =
 	HUMAN_SCALE
 };
 
-	for (i = 0; i < NUM_HUMAN_TYPES; i++)
+
+	Boolean useAltPlacement
+		= gGamePrefs.uiCentering
+		&& (fabsf(gUIAnchors.right - g2DLogicalWidth/GetUIScale()) > 15);
+
+
+	for (int i = 0; i < NUM_HUMAN_TYPES; i++)
 	{
 		if (gNumHumansRescuedOfType[i] == 0)					// skip if none of these rescued
 			continue;
 
 				/* SCROLL INTO POSITION */
 
-		x = HUMAN_X + gHumanOffsetX[i];							// get current scroll X
 		if (gHumanOffsetX[i] > 0.0f)							// see if need to move it
 		{
 			gHumanOffsetX[i] -= gFramesPerSecondFrac * 150.0f;
@@ -648,37 +654,46 @@ static const float scales[NUM_HUMAN_TYPES] =
 				gHumanOffsetX[i] = 0;
 		}
 
-		y = HUMAN_Y + HUMAN_SPACING * i;
 
+		float x;
+		float y;
+		float mugshotY;
 
-					/* DRAW FRAME */
-
-		DrawInfobarSprite_Centered(x, y, HUMAN_SCALE * 3.0f, INFOBAR_SObjType_HumanFrame);
-
-
-
-					/* DRAW HUMAN ICON */
-
-		x -= HUMAN_SCALE * .4f;
-		DrawInfobarSprite_Centered(x, y, scales[i], INFOBAR_SObjType_Farmer+i);
-
-
-					/* DRAW QUANTITY */
-
-		NumToString(gNumHumansRescuedOfType[i], s);
-
-		tx = x - (HUMAN_SCALE * 3/4);
-
-		for (n = 1; n <= s[0]; n++)
+		if (!useAltPlacement)
 		{
-			DrawInfobarSprite(tx, y-HUMAN_SCALE, HUMAN_SCALE/3, INFOBAR_SObjType_0 + s[n]-'0');
-			tx += HUMAN_SCALE/5;
+			x = HUMAN_X + gHumanOffsetX[i];
+			y = HUMAN_Y + HUMAN_SPACING * i;
+			mugshotY = y;
+			DrawInfobarSprite_Centered(x, y, HUMAN_SCALE * 3.0f, INFOBAR_SObjType_HumanFrame);
+		}
+		else
+		{
+			y = ALTHUMAN_Y + gHumanOffsetX[i];
+			x = ALTHUMAN_X - ALTHUMAN_SPACING * i;
+			mugshotY = y - HUMAN_SCALE * .65f;
+			DrawInfobarSprite_Centered(x, y, HUMAN_SCALE * 3.0f, INFOBAR_SObjType_HumanFrame2);
 		}
 
+				/* DRAW HUMAN ICON */
+
+		x -= HUMAN_SCALE * .4f;
+		DrawInfobarSprite_Centered(x, mugshotY, scales[i], INFOBAR_SObjType_Farmer+i);
+
+				/* DRAW QUANTITY */
+
+		int n = gNumHumansRescuedOfType[i];
+
+		float tx = x - (HUMAN_SCALE * .8f);
+		if (n >= 100) tx += 2*HUMAN_SCALE/5;
+		else if (n >= 10) tx += HUMAN_SCALE/5;
+
+		for (; n != 0; n /= 10)
+		{
+			DrawInfobarSprite(tx, y-HUMAN_SCALE*0.9f, HUMAN_SCALE/3, INFOBAR_SObjType_0 + (n % 10));
+			tx -= HUMAN_SCALE/5;
+		}
 	}
 }
-
-
 
 
 /********************** DRAW HEALTH *************************/
@@ -1235,9 +1250,3 @@ void DisableHelpType(short messNum)
 
 
 }
-
-
-
-
-
-

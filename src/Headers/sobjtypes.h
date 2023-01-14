@@ -243,6 +243,7 @@ enum
 	INFOBAR_SObjType_DestructoBeam,
 
 	INFOBAR_SObjType_HumanFrame,
+	INFOBAR_SObjType_HumanFrame2,
 	INFOBAR_SObjType_Farmer,
 	INFOBAR_SObjType_BeeWoman,
 	INFOBAR_SObjType_Scientist,
