@@ -390,7 +390,11 @@ slow_down:
 	}
 
 	// In debug builds, speed up with BACKTICK+KP_PLUS or LT on gamepad
+#if _DEBUG
+	if (GetKeyState(SDL_SCANCODE_KP_PLUS))
+#else
 	if (GetKeyState(SDL_SCANCODE_GRAVE) && GetKeyState(SDL_SCANCODE_KP_PLUS))
+#endif
 	{
 		gFramesPerSecond = MIN_FPS;
 	}

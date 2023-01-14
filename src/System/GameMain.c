@@ -320,7 +320,9 @@ static void PlayArea(void)
 
 		gGameFrameNum++;
 
+#if !_DEBUG
 		if (GetKeyState(SDL_SCANCODE_GRAVE))							// cheat key
+#endif
 		{
 			if (GetNewKeyState(SDL_SCANCODE_F9))						// goto checkpoint
 			{
