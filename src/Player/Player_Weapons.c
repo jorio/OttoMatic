@@ -324,7 +324,7 @@ static const short weaponToModel[] =
 
 					/* MAKE IT FLY AWAY */
 
-			if (type == WEAPON_TYPE_GROWTH)			// special case the growth powerup
+			if ((type == WEAPON_TYPE_GROWTH) && (gLevelNum == LEVEL_NUM_JUNGLE))			// special case the growth powerup
 				TossGrowthVial();
 			else
 			{
