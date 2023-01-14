@@ -1125,26 +1125,35 @@ OSErr					iErr;
 	hand = GetResource('Itms',1000);
 	GAME_ASSERT_MESSAGE(hand, "Error reading itemlist resource!");
 	{
-		TerrainItemEntryType   *rezItems;
-
 		DetachResource(hand);							// lets keep this data around
 		HLockHi(hand);									// LOCK this one because we have the lookup table into this
 		gMasterItemList = (TerrainItemEntryType **)hand;
-		rezItems = (TerrainItemEntryType *)*hand;
 
 					/* CONVERT COORDINATES */
 
 		for (int i = 0; i < gNumTerrainItems; i++)
 		{
-			(*gMasterItemList)[i].x = SwizzleULong(&rezItems[i].x) * MAP2UNIT_VALUE;								// convert coordinates
-			(*gMasterItemList)[i].y = SwizzleULong(&rezItems[i].y) * MAP2UNIT_VALUE;
+			TerrainItemEntryType* item = &(*gMasterItemList)[i];
+			item->x = SwizzleULong(&item->x);
+			item->y = SwizzleULong(&item->y);
+			item->type = SwizzleUShort(&item->type);
+			item->flags = SwizzleUShort(&item->flags);
 
-			(*gMasterItemList)[i].type = SwizzleUShort(&rezItems[i].type);
-			(*gMasterItemList)[i].parm[0] = rezItems[i].parm[0];
-			(*gMasterItemList)[i].parm[1] = rezItems[i].parm[1];
-			(*gMasterItemList)[i].parm[2] = rezItems[i].parm[2];
-			(*gMasterItemList)[i].parm[3] = rezItems[i].parm[3];
-			(*gMasterItemList)[i].flags = SwizzleUShort(&rezItems[i].flags);
+#if 0
+			printf("Item#%d: %08x %08x %04x %02x%02x%02x%02x %04x\n",
+				i,
+				item->x,
+				item->y,
+				item->type,
+				item->parm[0],
+				item->parm[1],
+				item->parm[2],
+				item->parm[3],
+				item->flags);
+#endif
+
+			item->x *= MAP2UNIT_VALUE;
+			item->y *= MAP2UNIT_VALUE;
 		}
 	}
 

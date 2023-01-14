@@ -35,7 +35,7 @@ void DoWarpCheat(void)
 
 		GAME_ASSERT(mi < kMaxItems);
 
-		snprintf(textPtr, kCharsPerLine, "#%03d   %05d,%05d   \t%s", i, item->x, item->y, itemName);
+		snprintf(textPtr, kCharsPerLine, "#%03d   %05d,%05d   \t%s", gTerrainItemFileIDs[i], item->x, item->y, itemName);
 		menu[mi] = (MenuItem){ .type = kMenuItem_Pick, .text = -1, .rawText = textPtr, .pick = i };
 
 		mi++;

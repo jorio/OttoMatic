@@ -256,6 +256,12 @@ void DisposeTerrain(void)
 		gMasterItemList = nil;
 	}
 
+	if (gTerrainItemFileIDs)
+	{
+		DisposePtr((Ptr) gTerrainItemFileIDs);
+		gTerrainItemFileIDs = nil;
+	}
+
 	if (gMapYCoords)
 	{
 		Free_2d_array(gMapYCoords);

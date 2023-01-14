@@ -230,6 +230,7 @@ extern	int						gTerrainTileDepth;
 extern	int						gTerrainTileWidth;
 extern	int						gTerrainUnitDepth;
 extern	int						gTerrainUnitWidth;
+extern	int						*gTerrainItemFileIDs;
 extern	short					gBeamMode;
 extern	short					gBeamModeSelected;
 extern	short					gBestCheckpointNum;

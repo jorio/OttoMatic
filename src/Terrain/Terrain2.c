@@ -28,6 +28,7 @@ static Boolean NilAdd(TerrainItemEntryType *itemPtr,long x, long z);
 
 int						gNumTerrainItems;
 TerrainItemEntryType 	**gMasterItemList = nil;
+int						*gTerrainItemFileIDs = nil;		// maps sorted terrain item IDs to the order in which they appear in the .ter.rsrc file (for debugging)
 
 float					**gMapYCoords = nil;			// 2D array of map vertex y coords
 float					**gMapYCoordsOriginal = nil;	// copy of gMapYCoords data as it was when file was loaded
@@ -193,6 +194,9 @@ int						total;
 	srcList = *gMasterItemList;
 	newList = *tempItemList;
 
+	GAME_ASSERT(!gTerrainItemFileIDs);
+	gTerrainItemFileIDs = (int*) AllocPtrClear(sizeof(int) * gNumTerrainItems);
+
 
 			/************************/
 			/* SCAN ALL SUPERTILES  */
@@ -223,6 +227,7 @@ int						total;
 						gSuperTileItemIndexGrid[row][col].itemIndex = total;	// set starting index
 
 					newList[total] = srcList[i];					// copy into new list
+					gTerrainItemFileIDs[total] = i;
 					total++;										// inc counter
 					gSuperTileItemIndexGrid[row][col].numItems++;	// inc # items on this supertile
 
