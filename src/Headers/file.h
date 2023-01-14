@@ -57,7 +57,8 @@ typedef struct
 {
 	Boolean	fullscreen;
 	Boolean	vsync;
-	Boolean	centeredInfobar;
+	Boolean	uiCentering;
+	Byte	uiScaleLevel;
 	Byte	preferredDisplay;
 	Byte	antialiasingLevel;
 	Boolean	music;

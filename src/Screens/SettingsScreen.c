@@ -275,21 +275,11 @@ static const MenuItem gVideoMenu[] =
 	},
 	{
 		.type = kMenuItem_Cycler,
-		.rawText = "V-Sync",
+		.text = STR_VSYNC,
 		.cycler =
 		{
 			.callback = SetFullscreenModeFromPrefs,
 			.valuePtr = &gGamePrefs.vsync,
-			.numChoices = 2,
-			.choices = {STR_OFF, STR_ON},
-		},
-	},
-	{
-		.type = kMenuItem_Cycler,
-		.rawText = "Centered infobar",
-		.cycler =
-		{
-			.valuePtr = &gGamePrefs.centeredInfobar,
 			.numChoices = 2,
 			.choices = {STR_OFF, STR_ON},
 		},
@@ -373,6 +363,37 @@ static const MenuItem gSettingsMenu[] =
 		},
 	},
 
+	{
+		.type = kMenuItem_Cycler,
+		.text= STR_UI_CENTERING,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.uiCentering,
+			.numChoices = 2,
+			.choices = {STR_OFF, STR_ON},
+		},
+	},
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_UI_SCALE,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.uiScaleLevel,
+			.numChoices = NUM_UI_SCALE_LEVELS,
+			.choices =
+			{
+				STR_MOUSE_SENSITIVITY_1,
+				STR_MOUSE_SENSITIVITY_2,
+				STR_MOUSE_SENSITIVITY_3,
+				STR_MOUSE_SENSITIVITY_4,
+				STR_MOUSE_SENSITIVITY_5,
+				STR_MOUSE_SENSITIVITY_6,
+				STR_MOUSE_SENSITIVITY_7,
+				STR_MOUSE_SENSITIVITY_8,
+			},
+		},
+	},
+
 	{ .type = kMenuItem_Spacer },
 
 	{
@@ -400,6 +421,7 @@ static const MenuItem gSettingsMenu[] =
 		.text = STR_CONFIGURE_GAMEPAD,
 		.submenu = {.menu = gGamepadMenu},
 	},
+
 
 #if _DEBUG
 	{.type = kMenuItem_Spacer},

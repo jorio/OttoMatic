@@ -1,7 +1,8 @@
 /****************************/
 /*   	INFOBAR.C		    */
-/* (c)2001 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2001 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -54,13 +55,14 @@ static inline float AnchorBottom(float y);
 #define	WEAPON_INACTIVE_Y	-30
 #define	WEAPON_SIZE			50
 #define	WEAPON_FRAME_SIZE	(WEAPON_SIZE * 3/2)
+#define	WEAPON_SPACING		(WEAPON_FRAME_SIZE - 5)
 
 #define FUEL_SIZE			HEALTH_SIZE
 #define	FUEL_X				AnchorRight(FUEL_SIZE+23.0f)
 #define	FUEL_Y				HEALTH_Y
 
-#define	BEAM_CUP_X			190.0f
-#define	BEAM_CUP_Y			20.0f
+#define	BEAM_CUP_X			AnchorLeft(190.0f)
+#define	BEAM_CUP_Y			AnchorTop(20.0f)
 #define	BEAM_CUP_SCALE		20.0f
 #define	BEAM_CUP_GLOW_SCALE (BEAM_CUP_SCALE * 3.0f)
 
@@ -77,7 +79,7 @@ static inline float AnchorBottom(float y);
 #define	HUMAN_Y				AnchorTop(150.0f)
 #define	HUMAN_SPACING		(HUMAN_SCALE * 2.8f)
 
-#define	HELP_Y				420.0f
+#define	HELP_Y				AnchorBottom(60)
 
 
 
@@ -88,7 +90,7 @@ static inline float AnchorBottom(float y);
 /*    VARIABLES      */
 /*********************/
 
-static RectF	gInfobarViewport;
+static RectF	gUIAnchors;
 
 static 	short			gHealthWarningChannel = -1;
 static	float			gHealthWarningWobble = 0;
@@ -115,35 +117,55 @@ static	float	gHumanOffsetX[NUM_HUMAN_TYPES];
 
 /*************** ASPECT RATIO-INDEPENDENT ANCHORS ******************/
 
+static inline float GetUIScale(void)
+{
+	// During normal gameplay, Otto may fill up 5 different weapon slots in level 10.
+	// The max scale to be able to fit 5 weapon slots comfortably in a 4:3 aspect ratio is 1.1x.
+
+	static const float values[NUM_UI_SCALE_LEVELS] =
+	{
+		[0] = 0.5f,
+		[1] = 0.6f,
+		[2] = 0.7f,
+		[3] = 0.8f,
+		[4] = 0.9f,
+		[5] = 1.0f,
+		[6] = 1.05f,
+		[7] = 1.1f,
+	};
+
+	return values[gGamePrefs.uiScaleLevel];
+}
+
 static inline float AnchorLeft(float x)
 {
-	return gInfobarViewport.left + x;
+	return gUIAnchors.left + x;
 }
 
 static inline float AnchorRight(float x)
 {
-	return gInfobarViewport.right - x;
+	return gUIAnchors.right - x;
 }
 
 static inline float AnchorTop(float y)
 {
-	return gInfobarViewport.top + y;
+	return gUIAnchors.top + y;
 }
 
 static inline float AnchorBottom(float y)
 {
-	return gInfobarViewport.bottom - y;
+	return gUIAnchors.bottom - y;
 }
 
 static inline float AnchorCenterX(float x)
 {
-	float cx = 0.5f * (gInfobarViewport.right + gInfobarViewport.left);
+	float cx = 0.5f * (gUIAnchors.right + gUIAnchors.left);
 	return x + cx;
 }
 
 static inline float AnchorCenterY(float y)
 {
-	float cy = 0.5f * (gInfobarViewport.bottom + gInfobarViewport.top);
+	float cy = 0.5f * (gUIAnchors.bottom + gUIAnchors.top);
 	return y + cy;
 }
 
@@ -222,12 +244,57 @@ void SetInfobarSpriteState(bool setOriginToCenterOfScreen)
 }
 
 
+static void SetInfobarSpriteStateScaled(float s)
+{
+	OGL_DisableLighting();
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);								// no z-buffer
+
+	gGlobalMaterialFlags = BG3D_MATERIALFLAG_CLAMP_V|BG3D_MATERIALFLAG_CLAMP_U;	// clamp all textures
+
+
+			/* INIT MATRICES */
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, g2DLogicalWidth/s, g2DLogicalHeight/s, 0, 0, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+}
+
+
 /********************** DRAW INFOBAR ****************************/
 
 void DrawInfobar(void)
 {
 	if (gHideInfobar)
 		return;
+
+		/*********************/
+		/* SET UP UI ANCHORS */
+		/*********************/
+
+	float uiScale = GetUIScale();
+
+	gUIAnchors.left = 0;
+	gUIAnchors.top = 0;
+	gUIAnchors.right = g2DLogicalWidth / uiScale;
+	gUIAnchors.bottom = g2DLogicalHeight / uiScale;
+	if (gGamePrefs.uiCentering)
+	{
+		float currentAR = g2DLogicalWidth / g2DLogicalHeight;
+		float targetAR = 640.0f / 480.0f;
+
+		if (currentAR >= targetAR)		// current aspect ratio is wider than the target aspect ratio
+		{
+			float covered = (g2DLogicalWidth / uiScale) * targetAR / currentAR;
+			float padding = (g2DLogicalWidth / uiScale) - covered;
+
+			gUIAnchors.left = padding / 2.0f;
+			gUIAnchors.right = gUIAnchors.left + covered;
+		}
+	}
+
 
 		/************/
 		/* SET TAGS */
@@ -238,26 +305,8 @@ void DrawInfobar(void)
 	if (gGameViewInfoPtr->useFog)
 		glDisable(GL_FOG);
 
-	gInfobarViewport.left = 0;
-	gInfobarViewport.top = 0;
-	gInfobarViewport.right = g2DLogicalWidth;
-	gInfobarViewport.bottom = g2DLogicalHeight;
-	if (gGamePrefs.centeredInfobar)
-	{
-		float currentAR = g2DLogicalWidth / g2DLogicalHeight;
-		float targetAR = 640.0f / 480.0f;
 
-		if (currentAR >= targetAR)		// current aspect ratio is wider than the target aspect ratio
-		{
-			float covered = g2DLogicalWidth * targetAR / currentAR;
-			float padding = g2DLogicalWidth - covered;
-
-			gInfobarViewport.left = padding / 2.0f;
-			gInfobarViewport.right = g2DLogicalWidth - padding / 2.0f;//gInfobarViewport.left + covered;
-		}
-	}
-
-	SetInfobarSpriteState(false);
+	SetInfobarSpriteStateScaled(uiScale);
 
 
 
@@ -538,7 +587,7 @@ Str255	s;
 
 			/* NEXT SLOT */
 
-		x += WEAPON_FRAME_SIZE - 5;
+		x += WEAPON_SPACING;
 	}
 
 }
@@ -549,9 +598,11 @@ Str255	s;
 
 static void Infobar_DrawGirders(void)
 {
+	// TODO: Scale g2DLogicalWidth
+	// TODO: Hide fusée if not enough room for all weapon slots
 	// Always draw girders in corners of screen (no AnchorLeft/AnchorRight) even if HUD is centered
 	DrawInfobarSprite(0, 0, 100, INFOBAR_SObjType_LeftGirder);
-	DrawInfobarSprite(g2DLogicalWidth-100, 0, 100, INFOBAR_SObjType_RightGirder);
+	DrawInfobarSprite(g2DLogicalWidth/GetUIScale()-100, 0, 100, INFOBAR_SObjType_RightGirder);
 }
 
 
@@ -703,7 +754,25 @@ float	n, fps = gFramesPerSecondFrac;
 
 			/* DRAW ROCKET ICON */
 
-	DrawInfobarSprite(FUEL_X-34, 15, 30, INFOBAR_SObjType_RocketIcon);
+			
+	float rocketIconX = FUEL_X-34;
+	Boolean roomForRocketIcon = true;
+
+
+	for (int i = 0; i < MAX_INVENTORY_SLOTS; i++)
+	{
+		if (gPlayerInfo.weaponInventory[i].type != NO_INVENTORY_HERE)
+		{
+			if (WEAPON_X + (i+1) * WEAPON_SPACING > rocketIconX)
+			{
+				roomForRocketIcon = false;
+				break;
+			}
+		}
+	}
+
+	if (roomForRocketIcon)
+		DrawInfobarSprite(FUEL_X-34, 15, 30, INFOBAR_SObjType_RocketIcon);
 
 
 	n = gPlayerInfo.fuel;										// get health
@@ -1063,13 +1132,15 @@ const float	fps = gFramesPerSecondFrac;
 			/* DRAW THE BORDER */
 			/*******************/
 
+	float uiScale = GetUIScale();
+
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	SetColor4f(.2,.2,.2,gHelpMessageAlpha * .5f);
 	glBegin(GL_QUADS);
 	glVertex2f(0, 				HELP_Y + 24);
-	glVertex2f(g2DLogicalWidth, HELP_Y + 24);
-	glVertex2f(g2DLogicalWidth, HELP_Y - 2);
+	glVertex2f(g2DLogicalWidth/uiScale, HELP_Y + 24);
+	glVertex2f(g2DLogicalWidth/uiScale, HELP_Y - 2);
 	glVertex2f(0,				HELP_Y - 2);
 	glEnd();
 	SetColor4f(1,1,1,1);
@@ -1080,6 +1151,9 @@ const float	fps = gFramesPerSecondFrac;
 			/*******************/
 
 	gHelpMessageObject->ColorFilter.a = gHelpMessageAlpha;
+	gHelpMessageObject->Coord.x = AnchorCenterX(0);
+	gHelpMessageObject->Coord.y = HELP_Y;
+	UpdateObjectTransforms(gHelpMessageObject);
 	gGlobalTransparency = gHelpMessageAlpha;
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	MO_DrawObject(gHelpMessageObject->BaseGroup);

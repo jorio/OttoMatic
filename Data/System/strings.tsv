@@ -58,11 +58,14 @@ Rocket is now fueled.  Press [#] when ready to leave	Le plein est achevé. Appui
 You don’t have enough fuel to leave yet	Pas assez de carburant pour partir	Sie haben nicht genug Treibstoff um schon fortzufliegen	No tiene suficiente combustible para partir	Non hai sufficiente carburante per partire	Än har du inte tillräckligt med bränsle för att åka i väg
 Frozen slime balls can be picked up and used as powerups	Les boules gluantes congelées sont des bonus à ramasser	Gefrorene Bälle können als Powerups verwendet werden	Las pelotas congeladas pueden utilizarse como powerups	Raccogli e usa come ricariche le sfere di viscidume ghiacciato	Frusna slembollar kan plockas upp och användas som bonusar
 Mechanical devices here need electricity	Ce dispositif mécanique a besoin d’électricité	Diese mechanischen Einrichtungen benötigen Strom	Los dispositivos eléctricos necesitan electricidad en este sitio	I dispositivi meccanici hanno bisogno di elettricità	De mekaniska apparaterna här behöver el för att fungera
-Door cannot be activated from this side	La porte ne peut pas être ouverte de ce côté	Die Tür kann von dieser Seite aus nicht aktiviert werden	La puerta no puede activarse desde este lugar	Impossibile attivare la porta da questo lato	Dörren kan inte aktiveras från detta hållet
+Door cannot be activated from this side	La porte ne s’ouvre pas de ce côté	Die Tür kann von dieser Seite aus nicht aktiviert werden	La puerta no puede activarse desde este lugar	Impossibile attivare la porta da questo lato	Dörren kan inte aktiveras från detta hållet
 Press [#] to climb into the cannon	Grimpe dans le canon avec [#]	Drücke [#], um in die Kanone zu klettern	Presione [#] para entrar en el cañón	Premi [#] per entrare nel cannone	Tryck på [#] för att gå in i kanonen
 Language	Langue	Sprache	Idioma	Lingua	Språk
 Video settings	Réglages vidéo	Grafikeinstellungen	Ajustes de vídeo	Impostazioni video	Grafikinställningar
 Fullscreen	Plein écran	Bildschirmfüllend	Pantalla completa	Schermo intero	Fullskärm
+V-Sync					
+Centered infobar	Centrer barre d’état	HUD zentrieren	HUD centrado	HUD centrato	Centrerat statusfält
+Infobar scale	Taille barre d’état	HUD-Maßstab	Tamaño HUD	Dimensione HUD	Statusfältstorlek
 Antialiasing	Anticrénelage	Antialiasing	Antialiasing	Antialiasing	Kantutjämning
 MSAA 2x					
 MSAA 4x					

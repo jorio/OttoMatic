@@ -148,7 +148,8 @@ void InitDefaultPrefs(void)
 	gGamePrefs.language						= GetBestLanguageIDFromSystemLocale();
 	gGamePrefs.fullscreen					= true;
 	gGamePrefs.vsync						= true;
-	gGamePrefs.centeredInfobar				= false;
+	gGamePrefs.uiCentering					= false;
+	gGamePrefs.uiScaleLevel					= DEFAULT_UI_SCALE_LEVEL;
 	gGamePrefs.preferredDisplay				= 0;
 	gGamePrefs.antialiasingLevel			= 0;
 	gGamePrefs.music						= true;
