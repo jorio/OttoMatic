@@ -419,7 +419,7 @@ void MyFlushEvents(void)
 
 /********************* SWIZZLE SHORT **************************/
 
-int16_t SwizzleShort(int16_t *shortPtr)
+int16_t SwizzleShort(const int16_t *shortPtr)
 {
 int16_t	theShort = *shortPtr;
 
@@ -437,7 +437,7 @@ int16_t	theShort = *shortPtr;
 
 /********************* SWIZZLE USHORT **************************/
 
-uint16_t SwizzleUShort(uint16_t *shortPtr)
+uint16_t SwizzleUShort(const uint16_t *shortPtr)
 {
 uint16_t	theShort = *shortPtr;
 
@@ -456,7 +456,7 @@ uint16_t	theShort = *shortPtr;
 
 /********************* SWIZZLE LONG **************************/
 
-int32_t SwizzleLong(int32_t *longPtr)
+int32_t SwizzleLong(const int32_t *longPtr)
 {
 int32_t	theLong = *longPtr;
 
@@ -477,7 +477,7 @@ int32_t	theLong = *longPtr;
 
 /********************* SWIZZLE U LONG **************************/
 
-uint32_t SwizzleULong(uint32_t *longPtr)
+uint32_t SwizzleULong(const uint32_t *longPtr)
 {
 uint32_t	theLong = *longPtr;
 
@@ -499,7 +499,7 @@ uint32_t	theLong = *longPtr;
 
 /********************* SWIZZLE U LONG **************************/
 
-uint64_t SwizzleULong64(uint64_t *u64Ptr)
+uint64_t SwizzleULong64(const uint64_t *u64Ptr)
 {
 	uint64_t	u64 = *u64Ptr;
 
@@ -532,10 +532,10 @@ uint64_t SwizzleULong64(uint64_t *u64Ptr)
 
 /********************* SWIZZLE FLOAT **************************/
 
-float SwizzleFloat(float *floatPtr)
+float SwizzleFloat(const float *floatPtr)
 {
 float	*theFloat;
-uint32_t	bytes = SwizzleULong((uint32_t *)floatPtr);
+uint32_t	bytes = SwizzleULong((const uint32_t *)floatPtr);
 
 	theFloat = (float *)&bytes;
 
