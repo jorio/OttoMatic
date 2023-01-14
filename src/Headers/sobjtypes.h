@@ -136,7 +136,10 @@ enum
 
 enum
 {
-	HIGHSCORES_SObjType_Cyc,
+	HIGHSCORES_SObjType_ScoreText,
+	HIGHSCORES_SObjType_ScoreTextGlow,
+	HIGHSCORES_SObjType_EnterNameText,
+	HIGHSCORES_SObjType_EnterNameGlow,
 	HIGHSCORES_SObjType_COUNT,
 };
 

@@ -2,9 +2,7 @@
 // mobjtypes.h
 //
 
-
-#ifndef MOBJ_H
-#define MOBJ_H
+#pragma once
 
 enum
 {
@@ -500,8 +498,10 @@ enum
 	BRAINBOSS_ObjType_FencePost
 };
 
-#endif
+/******************* HIGH SCORES *************************/
 
-
-
+enum
+{
+	HIGHSCORES_ObjType_Cyc,
+};
 

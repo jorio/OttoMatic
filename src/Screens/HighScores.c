@@ -32,15 +32,6 @@ static void SaveHighScores(void);
 /*    CONSTANTS            */
 /***************************/
 
-enum
-{
-	HIGHSCORES_SObjType_ScoreText,
-	HIGHSCORES_SObjType_ScoreTextGlow,
-	HIGHSCORES_SObjType_EnterNameText,
-	HIGHSCORES_SObjType_EnterNameGlow
-};
-
-
 #define kHSTableYStart		(-140)
 #define kHSTableScale		.7f
 #define kHSTableXSpread		150
@@ -509,7 +500,7 @@ Str255				scoreString;
 			/* MAKE CYC */
 
 	gNewObjectDefinition.group 		= MODEL_GROUP_HIGHSCORES;
-	gNewObjectDefinition.type 		= HIGHSCORES_SObjType_Cyc;
+	gNewObjectDefinition.type 		= HIGHSCORES_ObjType_Cyc;
 	gNewObjectDefinition.coord		= viewDef.camera.from;
 	gNewObjectDefinition.flags 		= STATUS_BIT_DONTCULL|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG;
 	gNewObjectDefinition.slot 		= 10;
