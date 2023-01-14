@@ -92,12 +92,14 @@ float					rot;
 Boolean AddTeleporter(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj,*console;
-short	id;
 
-	id = itemPtr->parm[0];
+	int id = itemPtr->parm[0];
+	int destinationID = itemPtr->parm[1];
 
-	if (id >= 12)						// error check since there is a 12 <--> 13 pair of teleporters which we have no 3D model for (for 1.0.2 update)
-		return(true);
+	float rotation = itemPtr->parm[2] * (PI2/8.0f);
+
+	// There's no console model for the 12<-->13 pair
+	Boolean consoleModelExists = destinationID >= 0 && destinationID <= 11;
 
 			/************************/
 			/* MAKE TELEPORTER ARCH */
@@ -112,13 +114,13 @@ short	id;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= 70;
 	gNewObjectDefinition.moveCall 	= MoveTeleporter;
-	gNewObjectDefinition.rot 		= itemPtr->parm[2] * (PI2/8.0f);
+	gNewObjectDefinition.rot 		= rotation;
 	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	newObj->TerrainItemPtr = itemPtr;								// keep ptr to item list
 
 	newObj->TeleporterID = id;										// get id#
-	newObj->DestinationID = itemPtr->parm[1];						// get dest id#
+	newObj->DestinationID = destinationID;							// get dest id#
 
 
 			/* SET COLLISION STUFF */
@@ -133,14 +135,15 @@ short	id;
 			/* MAKE CONSOLE */
 			/****************/
 
-	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_Console0 + newObj->DestinationID;
+	gNewObjectDefinition.type		= APOCALYPSE_ObjType_Console0 + (consoleModelExists? newObj->DestinationID: 0);
 	gNewObjectDefinition.slot++;
 	gNewObjectDefinition.moveCall 	= nil;
 	console = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
+	if (!consoleModelExists)
+		console->StatusBits |= STATUS_BIT_HIDDEN;
 
 	newObj->ChainNode = console;
-
 
 	if (gTeleporterActive[id])									// see if this guy is active
 		ActivateTeleporter(newObj);

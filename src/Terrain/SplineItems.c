@@ -115,7 +115,7 @@ Boolean (*gSplineItemPrimeRoutines[MAX_SPLINE_ITEM_NUM+1])(long, SplineItemType 
 		NilPrime,							// 66:  crashed ship
 		NilPrime,							// 67:  chain reacting mine
 		NilPrime,							// 68:  rubble
-		NilPrime,							// 69:  teleporter map
+		NilPrime,							// 69:  teleporter map (UNUSED)
 		NilPrime,							// 70:  green steam
 		NilPrime,							// 71:  tentacle generator
 		NilPrime,							// 72:  pitcher plant boss

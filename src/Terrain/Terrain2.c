@@ -115,7 +115,7 @@ static Boolean (*gTerrainItemAddRoutines[MAX_ITEM_NUM+1])(TerrainItemEntryType *
 		AddCrashedShip,						// 66:  crashed ship
 		AddChainReactingMine,				// 67:  chain reacting mine
 		AddRubble,							// 68:  rubble
-		AddTeleporterMap,					// 69:  teleporter map
+		AddTeleporterMap,					// 69:  teleporter map (UNUSED)
 		AddGreenSteam,						// 70:  green steam
 		AddTentacleGenerator,				// 71:  tentacle generator
 		AddPitcherPlantBoss,				// 72:  pitcher plant boss
