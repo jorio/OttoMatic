@@ -295,12 +295,14 @@ const Byte	cloud[] =
 			/* MAKE TITLE */
 			/**************/
 
-	gNewObjectDefinition.scale 	    = 1.00f;
-	gNewObjectDefinition.coord.x 	= -310;
-	gNewObjectDefinition.coord.y 	= 200;
-	gNewObjectDefinition.coord.z 	= 0.0f;
-	gNewObjectDefinition.moveCall	= MoveLevelName;
-	ObjNode* levelName = TextMesh_New(Localize(STR_LEVEL_1 + gLevelNum), 0, &gNewObjectDefinition);
+	NewObjectDefinitionType titleDef =
+	{
+		.scale		= 1.00f,
+		.coord		= {-310, 200, 0},
+		.moveCall	= MoveLevelName,
+		.slot		= SPRITE_SLOT,
+	};
+	ObjNode* levelName = TextMesh_New(Localize(STR_LEVEL_1 + gLevelNum), 0, &titleDef);
 	levelName->ColorFilter.a = 0;
 
 
@@ -311,7 +313,6 @@ const Byte	cloud[] =
 	for (i = 0; i < 170; i++)
 	{
 		OGLMatrix4x4	m;
-		OGLPoint3D		p;
 		static const OGLColorRGBA colors[] =
 		{
 			{1,1,1,1},			// white
@@ -321,24 +322,25 @@ const Byte	cloud[] =
 		};
 
 		OGLMatrix4x4_SetRotateAboutPoint(&m, &viewDef.camera.from, RandomFloat()*PI2,RandomFloat()*PI2,RandomFloat()*PI2);
-		p.x = p.y =0;
-		p.z = viewDef.camera.yon * .9f;
-		OGLPoint3D_Transform(&p,&m,&gNewObjectDefinition.coord);
+		OGLPoint3D p = {0, 0, viewDef.camera.yon * 0.9f};
+		OGLPoint3D_Transform(&p, &m, &p);
 
-		gNewObjectDefinition.group 		= MODEL_GROUP_LEVELINTRO;
-		gNewObjectDefinition.type 		= INTRO_ObjType_Star;
-		gNewObjectDefinition.flags 		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_GLOW | STATUS_BIT_NOTEXTUREWRAP |
-										STATUS_BIT_NOZWRITES | STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING | STATUS_BIT_AIMATCAMERA;
-		gNewObjectDefinition.slot 		= 200;
-		gNewObjectDefinition.moveCall 	= MoveStar;
-		gNewObjectDefinition.rot 		= 0;
-		gNewObjectDefinition.scale 	    = 4.0f + RandomFloat() * 3.0f;
-		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+		NewObjectDefinitionType starDef =
+		{
+			.group		= MODEL_GROUP_LEVELINTRO,
+			.type		= INTRO_ObjType_Star,
+			.flags		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_GLOW | STATUS_BIT_NOTEXTUREWRAP |
+							STATUS_BIT_NOZWRITES | STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING | STATUS_BIT_AIMATCAMERA,
+			.slot		= 200,
+			.moveCall 	= MoveStar,
+			.rot		= 0,
+			.coord		= p,
+			.scale		= 4.0f + RandomFloat() * 3.0f,
+		};
 
+		newObj = MakeNewDisplayGroupObject(&starDef);
 		newObj->SpecialF[0] = RandomFloat() * PI;
-
 		newObj->ColorFilter = colors[MyRandomLong()&0x3];
-
 	}
 
 
