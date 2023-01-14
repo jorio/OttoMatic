@@ -600,7 +600,7 @@ ObjNode	*newObj;
 static void MoveHillGenerator(ObjNode *theNode)
  {
 SuperTileMemoryType *superTile;
-int					row,col,v,rowStart,rowEnd,colStart,colEnd,r,c;
+int					v;
 float				y,hillX,hillZ,d;
 float				fps = gFramesPerSecondFrac;
 float				h;
@@ -623,41 +623,21 @@ float				h;
 	hillX = theNode->Coord.x;
 	hillZ = theNode->Coord.z;
 
-	row = hillZ * TERRAIN_SUPERTILE_UNIT_SIZE_Frac;					// calc supertile row/col of generator
-	col = hillX * TERRAIN_SUPERTILE_UNIT_SIZE_Frac;
+	int row = hillZ * TERRAIN_SUPERTILE_UNIT_SIZE_Frac;					// calc supertile row/col of generator
+	int col = hillX * TERRAIN_SUPERTILE_UNIT_SIZE_Frac;
 
-	rowStart = row - 3;												// pick a range
-	if (rowStart < 0)
-		rowStart = 0;
-	if (rowStart >= gNumSuperTilesDeep)
-		rowStart = gNumSuperTilesDeep-1;
-
-	rowEnd = row + 3;
-	if (rowEnd < 0)
-		rowEnd = 0;
-	if (rowEnd >= gNumSuperTilesDeep)
-		rowEnd = gNumSuperTilesDeep-1;
-
-	colStart = col - 3;
-	if (colStart < 0)
-		colStart = 0;
-	if (colStart >= gNumSuperTilesWide)
-		colStart = gNumSuperTilesWide-1;
-
-	colEnd = col + 3;
-	if (colEnd < 0)
-		colEnd = 0;
-	if (colEnd >= gNumSuperTilesWide)
-		colEnd = gNumSuperTilesWide-1;
-
+	int rowStart	= ClampInt(row-3, 0, gNumSuperTilesDeep-1);			// pick a range
+	int rowEnd		= ClampInt(row+3, 0, gNumSuperTilesDeep-1);
+	int colStart	= ClampInt(col-3, 0, gNumSuperTilesWide-1);
+	int colEnd		= ClampInt(col+3, 0, gNumSuperTilesWide-1);
 
 			/*************************************/
 			/* SCAN EACH SUPERTILE AND DEFORM IT */
 			/*************************************/
 
-	for (r = rowStart; r <= rowEnd; r++)
+	for (int r = rowStart; r <= rowEnd; r++)
 	{
-		for (c = colStart; c <= colEnd; c++)
+		for (int c = colStart; c <= colEnd; c++)
 		{
 			OGLPoint3D	*points;
 			int			i,tRow,tCol;

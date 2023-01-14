@@ -26,7 +26,7 @@ static Boolean NilAdd(TerrainItemEntryType *itemPtr,long x, long z);
 /*     VARIABLES      */
 /**********************/
 
-short	  				gNumTerrainItems;
+int						gNumTerrainItems;
 TerrainItemEntryType 	**gMasterItemList = nil;
 
 float					**gMapYCoords = nil;			// 2D array of map vertex y coords
@@ -323,8 +323,7 @@ Boolean			flag;
 		type = itemPtr[i].type;									// get item #
 		if (type > MAX_ITEM_NUM)								// error check!
 		{
-			DoAlert("Illegal Map Item Type!");
-			ShowSystemErr(type);
+			DoFatalAlert("Illegal Map Item Type!");
 		}
 
 		flag = gTerrainItemAddRoutines[type](&itemPtr[i],itemPtr[i].x, itemPtr[i].y); // call item's ADD routine

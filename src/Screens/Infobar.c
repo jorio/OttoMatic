@@ -205,14 +205,9 @@ static inline float AnchorCenterY(float y)
 
 void InitInfobar(void)
 {
-int	i;
-
-#pragma unused()
-
 	gDisplayedHelpMessage = HELP_MESSAGE_NONE;
 
-
-	for (i = 0; i < NUM_HUMAN_TYPES; i++)
+	for (int i = 0; i < NUM_HUMAN_TYPES; i++)
 		gHumanOffsetX[i] = HUMAN_OFFSCREEN_OFFSET_X;
 
 	gHealthOccilate = 0;
@@ -235,10 +230,8 @@ int	i;
 	BlendASprite(SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_DartGlow);
 
 
-	for (i = 0; i< MAX_INVENTORY_SLOTS; i++)
+	for (int i = 0; i < MAX_INVENTORY_SLOTS; i++)
 		gWeaponY[i] = WEAPON_HIDDEN_Y;
-
-
 }
 
 

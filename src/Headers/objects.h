@@ -2,9 +2,7 @@
 // Object.h
 //
 
-#ifndef OBJECTS_H
-#define OBJECTS_H
-
+#pragma once
 
 #include "ogl_support.h"
 
@@ -47,9 +45,9 @@ enum
 
 //========================================================
 
-extern	void InitObjectManager(void);
-extern	ObjNode	*MakeNewObject(NewObjectDefinitionType *newObjDef);
-extern	void MoveObjects(void);
+void InitObjectManager(void);
+ObjNode* MakeNewObject(NewObjectDefinitionType* newObjDef);
+void MoveObjects(void);
 void DrawObjects(void);
 
 extern	void DeleteAllObjects(void);
@@ -86,16 +84,9 @@ void CreateCollisionBoxFromBoundingBox(ObjNode *theNode, float tweakXZ, float tw
 void CreateCollisionBoxFromBoundingBox_Maximized(ObjNode *theNode);
 void CreateCollisionBoxFromBoundingBox_Rotated(ObjNode *theNode, float tweakXZ, float tweakY);
 void CreateCollisionBoxFromBoundingBox_Update(ObjNode *theNode, float tweakXZ, float tweakY);
-ObjNode *FindClosestCType(OGLPoint3D *pt, u_long ctype);
-ObjNode *FindClosestCType3D(OGLPoint3D *pt, u_long ctype);
+ObjNode* FindClosestCType(const OGLPoint3D* pt, uint32_t ctype);
+ObjNode* FindClosestCType3D(const OGLPoint3D* pt, uint32_t ctype);
 extern	void StopObjectStreamEffect(ObjNode *theNode);
 extern	void KeepOldCollisionBoxes(ObjNode *theNode);
 void AddCollisionBoxToObject(ObjNode *theNode, float top, float bottom, float left,
 							 float right, float front, float back);
-
-
-
-
-#endif
-
-

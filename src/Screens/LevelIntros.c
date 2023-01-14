@@ -455,8 +455,6 @@ float	x,z;
 
 static void CreateIntroSaucer2(void)
 {
-ObjNode	*newObj;
-
 	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELINTRO;
 	gNewObjectDefinition.type 		= INTRO_ObjType_IceSaucer;
 	gNewObjectDefinition.coord.x 	= 130;
@@ -467,7 +465,7 @@ ObjNode	*newObj;
 	gNewObjectDefinition.moveCall 	= MoveIntroSaucer;
 	gNewObjectDefinition.rot 		= RandomFloat()*PI2;
 	gNewObjectDefinition.scale 		= ICESAUCER_SCALE;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	MakeNewDisplayGroupObject(&gNewObjectDefinition);
 }
 
 

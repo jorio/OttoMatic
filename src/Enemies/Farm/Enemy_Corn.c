@@ -212,20 +212,18 @@ static	void(*myMoveTable[])(ObjNode *) =
 
 static void  MoveCorn_Standing(ObjNode *theNode)
 {
-float	angleToTarget,dist;
-
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if on ground, add friction
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
 
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, CORN_TURN_SPEED, true);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, CORN_TURN_SPEED, true);
 
 
 
 				/* SEE IF CHASE */
 
-	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
+	float dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
 	if (dist < CORN_CHASE_DIST)
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, CORN_ANIM_WALK, 8);
@@ -361,7 +359,7 @@ float	scale;
 
 Boolean PrimeEnemy_Corn(long splineNum, SplineItemType *itemPtr)
 {
-ObjNode			*newObj,*shadowObj;
+ObjNode			*newObj;
 float			x,z,placement;
 
 			/* GET SPLINE INFO */
@@ -412,7 +410,7 @@ float			x,z,placement;
 
 				/* MAKE SHADOW */
 
-	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8, false);
+	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8, false);
 
 	CreateCornSparkles(newObj);
 

@@ -164,7 +164,9 @@ static ObjNode *gInteriorObj;
 
 static	Byte	gShowScoreMode;
 
-static	u_long	gBonusTotal, gBonus, gInventoryQuantity;
+static	uint32_t	gBonusTotal;
+static	uint32_t	gBonus;
+static	uint32_t	gInventoryQuantity;
 
 static	float	gScoreAlpha,gInventoryQuantityAlpha,gInventoryCountTimer;
 
@@ -849,7 +851,7 @@ static void MoveBonusRocket_TractorBeam(ObjNode *rocket)
 {
 float	fps = gFramesPerSecondFrac;
 ObjNode	*flame;
-u_long	vol;
+uint32_t	vol;
 
 	GetObjectInfo(rocket);
 
@@ -1541,9 +1543,8 @@ float	fps = gFramesPerSecondFrac;
 static void MoveBonusRocket(ObjNode *rocket)
 {
 float	fps = gFramesPerSecondFrac;
-float	a;
 ObjNode	*flame;
-u_long	vol;
+uint32_t	vol;
 
 	GetObjectInfo(rocket);
 
@@ -1554,7 +1555,7 @@ u_long	vol;
 
 	if (gCoord.z > 400.0f)													// fade when close
 	{
-		a = rocket->ColorFilter.a -= fps * 1.3f;							// fade out the ship
+		rocket->ColorFilter.a -= fps * 1.3f;								// fade out the ship
 		if (rocket->ColorFilter.a <= 0.0f)
 		{
 			gInteriorObj->ColorFilter.a = 1.0f;								// make sure interior is full alpha

@@ -97,7 +97,7 @@ void DeleteEnemy(ObjNode *theEnemy)
 // OUTPUT: true = was deleted
 //
 
-Boolean DoEnemyCollisionDetect(ObjNode *theEnemy, unsigned long ctype, Boolean useBBoxBottom)
+Boolean DoEnemyCollisionDetect(ObjNode *theEnemy, uint32_t ctype, Boolean useBBoxBottom)
 {
 float	terrainY,distToFloor,bottomOff;
 

@@ -28,7 +28,7 @@
 /*********************/
 
 SpriteType	*gSpriteGroupList[MAX_SPRITE_GROUPS];
-long		gNumSpritesInGroupList[MAX_SPRITE_GROUPS];		// note:  this must be long's since that's what we read from the sprite file!
+int			gNumSpritesInGroupList[MAX_SPRITE_GROUPS];
 
 
 
@@ -124,7 +124,7 @@ MOMaterialData	matData;
 	for (i = 0; i < gNumSpritesInGroupList[groupNum]; i++)
 	{
 		long		bufferSize;
-		u_char *buffer;
+		uint8_t *buffer;
 
 			/* READ WIDTH/HEIGHT, ASPECT RATIO, SRC/DEST FORMATS */
 
@@ -152,7 +152,7 @@ MOMaterialData	matData;
 		if (gSpriteGroupList[groupNum][i].srcFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV)
 		{
 			int		q;
-			u_short *pix = (u_short *)buffer;
+			uint16_t *pix = (uint16_t *)buffer;
 			for (q = 0; q < (count/2); q++)
 			{
 				pix[q] = SwizzleUShort(&pix[q]);
@@ -193,7 +193,7 @@ MOMaterialData	matData;
 		else
 		if ((matData.pixelSrcFormat == GL_RGB) && (matData.pixelDstFormat == GL_RGB5_A1))
 		{
-			u_short	*buff16 = (u_short *)AllocPtr(matData.width*matData.height*2);			// alloc buff for 16-bit texture
+			uint16_t	*buff16 = (uint16_t *)AllocPtr(matData.width*matData.height*2);			// alloc buff for 16-bit texture
 
 			ConvertTexture24To16(buffer, buff16, matData.width, matData.height);
 			matData.textureName[0] = OGL_TextureMap_Load(buff16, matData.width, matData.height, GL_BGRA_EXT, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV); // load 16 as 16
@@ -379,7 +379,7 @@ MOMaterialObject	*m;
 
 /************************** DRAW SPRITE ************************/
 
-void DrawSprite(int	group, int type, float x, float y, float scale, float rot, u_long flags)
+void DrawSprite(int	group, int type, float x, float y, float scale, float rot, uint32_t flags)
 {
 			/* SET STATE */
 

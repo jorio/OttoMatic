@@ -39,7 +39,7 @@ typedef struct
 	OGLTextureCoord			uvs[3];
 	MOMaterialObject		*material;
 	OGLColorRGBA			colorFilter;
-	u_long					glow;
+	Boolean					glow;
 }ShardType;
 
 
@@ -197,10 +197,8 @@ MOVertexArrayData	*vaData;
 static void ExplodeVertexArray(MOVertexArrayData *data, MOMaterialObject *overrideTexture)
 {
 OGLPoint3D			centerPt = {0,0,0};
-u_long				ind[3];
-int					t;
+uint32_t			ind[3];
 OGLTextureCoord		*uvPtr;
-long				i;
 float				boomForce = gBoomForce;
 OGLPoint3D			origin = {0,0,0};
 
@@ -215,11 +213,11 @@ OGLPoint3D			origin = {0,0,0};
 			/* SCAN THRU ALL TRIANGLES */
 			/***************************/
 
-	for (t = 0; t < data->numTriangles; t += gShardDensity)				// scan thru all triangles
+	for (int t = 0; t < data->numTriangles; t += gShardDensity)				// scan thru all triangles
 	{
 				/* GET FREE PARTICLE INDEX */
 
-		i = FindFreeShard();
+		int i = FindFreeShard();
 		if (i == -1)														// see if all out
 			break;
 
@@ -276,7 +274,7 @@ OGLPoint3D			origin = {0,0,0};
 		}
 
 		gShards[i].colorFilter = gShardSrcObj->ColorFilter;						// keep color
-		gShards[i].glow = gShardSrcObj->StatusBits & STATUS_BIT_GLOW;
+		gShards[i].glow = !!(gShardSrcObj->StatusBits & STATUS_BIT_GLOW);
 
 			/*********************/
 			/* SET PHYSICS STUFF */

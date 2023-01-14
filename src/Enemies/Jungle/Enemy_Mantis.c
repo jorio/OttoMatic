@@ -388,7 +388,7 @@ static void  MoveMantis_Death(ObjNode *theNode)
 
 Boolean PrimeEnemy_Mantis(long splineNum, SplineItemType *itemPtr)
 {
-ObjNode			*newObj,*shadowObj;
+ObjNode			*newObj;
 float			x,z,placement;
 int				i;
 
@@ -439,7 +439,7 @@ int				i;
 
 				/* MAKE SHADOW & GLOW */
 
-	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 15, 15, false);
+	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 15, 15, false);
 
 
 

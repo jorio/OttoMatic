@@ -314,7 +314,8 @@ float	speed,r,fps = gFramesPerSecondFrac;
 
 static void MoveHammerBot_Chase(ObjNode *theNode)
 {
-float	speed,angle,r,fps = gFramesPerSecondFrac;
+float	speed, r;
+float	fps = gFramesPerSecondFrac;
 float	targetX,targetY,targetZ,sinR,cosR;
 
 		/* ACCEL TO CHASE SPEED */
@@ -326,7 +327,7 @@ float	targetX,targetY,targetZ,sinR,cosR;
 
 			/* MOVE TOWARD PLAYER */
 
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, HAMMERBOT_TURN_SPEED, false);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, HAMMERBOT_TURN_SPEED, false);
 
 	r = theNode->Rot.y;
 	sinR = -sin(r);

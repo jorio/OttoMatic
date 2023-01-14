@@ -228,7 +228,7 @@ static	void(*myMoveTable[])(ObjNode *) =
 
 static void  MoveBlob_Walking(ObjNode *theNode)
 {
-float		r,fps,dist,angleToPlayer;
+float		r,fps,dist;
 float		health = theNode->Health;
 float		speed;
 
@@ -243,7 +243,7 @@ float		speed;
 
 			/* MOVE TOWARD PLAYER */
 
-	angleToPlayer = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, BLOB_TURN_SPEED * health, true);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, BLOB_TURN_SPEED * health, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * speed;

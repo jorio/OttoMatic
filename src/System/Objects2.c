@@ -580,8 +580,9 @@ float		minX,minY,minZ,maxX,maxY,maxZ;
 OGLMatrix4x4		m;
 OGLBoundingBox		*bBox;
 float		minusHW;				// -hW
-u_long		clipFlags;				// Clip in/out tests for point
-u_long		clipCodeAND,clipCodeOR;	// Clip test for entire object
+uint32_t	clipFlags;				// Clip in/out tests for point
+uint32_t	clipCodeAND;			// Clip test for entire object
+//uint32_t	clipCodeOR;				// Clip test for entire object
 float		lX, lY, lZ;				// Local space co-ordinates
 float		hX, hY, hZ, hW;			// Homogeneous co-ordinates
 
@@ -648,7 +649,7 @@ try_cull:
 	maxZ = bBox->max.z;
 
 	clipCodeAND = ~0u;
-	clipCodeOR 	= 0;
+//	clipCodeOR 	= 0;
 
 	for (i = 0; i < 8; i++)
 	{
@@ -700,7 +701,7 @@ try_cull:
 			clipFlags |= 0x1;
 
 		clipCodeAND &= clipFlags;
-		clipCodeOR |= clipFlags;
+//		clipCodeOR |= clipFlags;
 	}
 
 	/****************************/

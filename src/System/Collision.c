@@ -38,7 +38,7 @@ enum
 
 
 CollisionRec	gCollisionList[MAX_COLLISIONS];
-short			gNumCollisions = 0;
+int				gNumCollisions = 0;
 Byte			gTotalSides;
 
 

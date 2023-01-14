@@ -59,7 +59,7 @@ float				gGravity = NORMAL_GRAVITY;
 
 Byte				gDebugMode = 0;				// 0 == none, 1 = fps, 2 = all
 
-u_long				gAutoFadeStatusBits;
+uint32_t			gAutoFadeStatusBits;
 short				gMainAppRezFile;
 
 OGLSetupOutputType		*gGameViewInfoPtr = nil;
@@ -74,7 +74,7 @@ OGLColorRGBA		gFillColor1 = { .9, .9, 0.85, 1};
 OGLColorRGBA		gApocalypseColor = {.6, .6, .7,1};
 OGLColorRGBA		gFireIceColor = {.7, .6, .6,1};
 
-u_long				gGameFrameNum = 0;
+uint32_t			gGameFrameNum = 0;
 
 Boolean				gPlayingFromSavedGame = false;
 Boolean				gGameOver = false;
@@ -87,7 +87,8 @@ short				gBestCheckpointNum;
 OGLPoint2D			gBestCheckpointCoord;
 float				gBestCheckpointAim;
 
-u_long	gScore,gLoadedScore;
+uint32_t			gScore;
+uint32_t			gLoadedScore;
 
 
 
@@ -981,9 +982,6 @@ static void CheckBootCheats(void)
 
 void GameMain(void)
 {
-unsigned long	someLong;
-
-
 				/**************/
 				/* BOOT STUFF */
 				/**************/
@@ -1005,8 +1003,14 @@ unsigned long	someLong;
 
 	InitObjectManager();
 
-	GetDateTime ((unsigned long *)(&someLong));		// init random seed
-	SetMyRandomSeed(someLong);
+	{
+			/* INIT RANDOM SEED */
+
+		unsigned long someLong;
+		GetDateTime(&someLong);
+		SetMyRandomSeed((uint32_t) someLong);
+	}
+
 	SDL_ShowCursor(0);
 
 	Pomme_FlushPtrTracking(false);

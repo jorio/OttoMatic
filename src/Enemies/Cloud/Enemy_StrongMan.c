@@ -410,7 +410,7 @@ static void  MoveStrongMan_GotHit(ObjNode *theNode)
 
 Boolean PrimeEnemy_StrongMan(long splineNum, SplineItemType *itemPtr)
 {
-ObjNode			*newObj,*shadowObj;
+ObjNode			*newObj;
 float			x,z,placement;
 
 			/* GET SPLINE INFO */
@@ -462,7 +462,7 @@ float			x,z,placement;
 
 				/* MAKE SHADOW & GLOW */
 
-	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 6, false);
+	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 6, false);
 
 
 			/* ADD SPLINE OBJECT TO SPLINE OBJECT LIST */

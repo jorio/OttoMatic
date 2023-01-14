@@ -128,14 +128,9 @@ short	i;
 // file to this ObjNode.
 //
 
-ObjNode	*MakeNewSkeletonObject(NewObjectDefinitionType *newObjDef)
+ObjNode* MakeNewSkeletonObject(NewObjectDefinitionType *newObjDef)
 {
 ObjNode	*newNode;
-int		type;
-float	scale;
-
-	type = newObjDef->type;
-	scale = newObjDef->scale;
 
 			/* CREATE NEW OBJECT NODE */
 
@@ -147,7 +142,7 @@ float	scale;
 
 			/* LOAD SKELETON FILE INTO OBJECT */
 
-	newNode->Skeleton = MakeNewSkeletonBaseData(type); 			// alloc & set skeleton data
+	newNode->Skeleton = MakeNewSkeletonBaseData(newObjDef->type); 			// alloc & set skeleton data
 	if (newNode->Skeleton == nil)
 		DoFatalAlert("MakeNewSkeletonObject: MakeNewSkeletonBaseData == nil");
 
@@ -225,17 +220,14 @@ long	numAnims,numJoints;
 
 static void DisposeSkeletonDefinitionMemory(SkeletonDefType *skeleton)
 {
-short	j,numAnims,numJoints;
-
 	if (skeleton == nil)
 		return;
 
-	numAnims = skeleton->NumAnims;										// get # anims in skeleton
-	numJoints = skeleton->NumBones;
+	int numJoints = skeleton->NumBones;
 
 			/* NUKE THE SKELETON BONE POINT & NORMAL INDEX ARRAYS */
 
-	for (j=0; j < numJoints; j++)
+	for (int j = 0; j < numJoints; j++)
 	{
 		if (skeleton->Bones[j].pointList)
 			SafeDisposePtr((Ptr)skeleton->Bones[j].pointList);
@@ -254,7 +246,7 @@ short	j,numAnims,numJoints;
 
 			/* DISPOSE JOINT INFO */
 
-	for (j=0; j < numJoints; j++)
+	for (int j = 0; j < numJoints; j++)
 	{
 		Free_2d_array(skeleton->JointKeyframes[j].keyFrames);		// dispose 2D array of keyframe data
 
@@ -307,10 +299,7 @@ SkeletonObjDataType	*skeletonData;
 
 	skeletonDefPtr = gLoadedSkeletonsList[sourceSkeletonNum];				// get ptr to source skeleton definition info
 	if (skeletonDefPtr == nil)
-	{
-		DoAlert("MakeNewSkeletonBaseData: Skeleton data isnt loaded!");
-		ShowSystemErr(sourceSkeletonNum);
-	}
+		DoFatalAlert("MakeNewSkeletonBaseData: Skeleton data isnt loaded!");
 
 
 			/* ALLOC MEMORY FOR NEW SKELETON OBJECT DATA STRUCTURE */

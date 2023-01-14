@@ -55,7 +55,7 @@ static float	gGravitoidDistBuffer[MAX_PARTICLES][MAX_PARTICLES];
 
 NewParticleGroupDefType	gNewParticleGroupDef;
 
-short			gNumActiveParticleGroups = 0;
+int				gNumActiveParticleGroups = 0;
 
 Boolean	gDoDeathExit = false;
 static float	gDeathExitX = 0;

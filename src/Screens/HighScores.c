@@ -424,7 +424,6 @@ static void SetupScoreScreen(void)
 {
 FSSpec				spec;
 OGLSetupInputType	viewDef;
-ObjNode				*newObj;
 Str255				scoreString;
 
 	PlaySong(SONG_HIGHSCORE, 0);
@@ -527,7 +526,7 @@ Str255				scoreString;
 	gNewObjectDefinition.moveCall 	= MoveHighScoresCyc;
 	gNewObjectDefinition.rot 		= 0;
 	gNewObjectDefinition.scale 		= 2;
-	newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+	MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 
 			/* SCORE STRING */

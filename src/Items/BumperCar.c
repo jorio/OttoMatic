@@ -628,12 +628,7 @@ static void UpdateBumperCar(ObjNode *theNode)
 
 static void DoBumperCarCollision(ObjNode *theNode)
 {
-int		i,hitCount = 0;
-ObjNode	*otherCar;
-float	dist,speed;
-OGLVector2D	vec2to1,move1,move2,bounce,bounce2;
-float	otherX,otherZ;
-u_long	ctype;
+int		hitCount = 0;
 short	area = theNode->AreaNum;
 
 			/************************/
@@ -641,17 +636,17 @@ short	area = theNode->AreaNum;
 			/************************/
 
 
-	for (i = 0; i < MAX_CARS; i++)
+	for (int i = 0; i < MAX_CARS; i++)
 	{
-		otherCar = gCarList[area][i];
+		ObjNode* otherCar = gCarList[area][i];
 
 		if ((otherCar == theNode) || (otherCar == nil))							// don't check against self or if blank
 			continue;
 
-		otherX = otherCar->Coord.x;
-		otherZ = otherCar->Coord.z;
+		float otherX = otherCar->Coord.x;
+		float otherZ = otherCar->Coord.z;
 
-		dist = CalcDistance(gCoord.x, gCoord.z, otherX, otherZ);				// calc dist to the car
+		float dist = CalcDistance(gCoord.x, gCoord.z, otherX, otherZ);			// calc dist to the car
 
 					/*****************************/
 					/* SEE IF THEY HAVE COLLIDED */
@@ -659,6 +654,8 @@ short	area = theNode->AreaNum;
 
 		if (dist < BUMPER_CAR_RADIUSX2)
 		{
+			OGLVector2D	vec2to1, move1, move2, bounce, bounce2;
+
 						/* CALC OUR VECTORS */
 
 			vec2to1.x = gCoord.x - otherX;										// calc vector from other to us
@@ -682,7 +679,7 @@ short	area = theNode->AreaNum;
 			vec2to1.y = -vec2to1.y;
 			ReflectVector2D(&move2, &vec2to1, &bounce2);						// reflect the motion vector of #2
 
-			speed = (theNode->Speed2D * .5f) + (otherCar->Speed2D * .5f);			// swap some energy
+			float speed = (theNode->Speed2D * .5f) + (otherCar->Speed2D * .5f);	// swap some energy
 
 
 					/* BOUNCE 1ST OBJECT (OUR CAR) */
@@ -735,6 +732,7 @@ short	area = theNode->AreaNum;
 
 			/* HANDLE GENERAL COLLISION */
 
+	uint32_t ctype;
 	if (theNode == gPlayerCar)
 		ctype = CTYPE_FENCE|CTYPE_MISC|CTYPE_TRIGGER2;
 	else

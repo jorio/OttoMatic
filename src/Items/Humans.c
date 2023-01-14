@@ -50,7 +50,7 @@ enum
 #define	RingOffset	SpecialF[0]
 
 int		gNumHumansRescuedTotal;
-short	gNumHumansRescuedOfType[NUM_HUMAN_TYPES];
+int		gNumHumansRescuedOfType[NUM_HUMAN_TYPES];
 
 float	gHumanScaleRatio;
 

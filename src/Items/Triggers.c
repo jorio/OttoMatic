@@ -1076,7 +1076,7 @@ static Boolean DoTrig_BumperBubble(ObjNode *theNode, ObjNode *whoNode, Byte side
 Boolean AddFallingSlimePlatform(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-float	s,y;
+float	s;
 short	type = itemPtr->parm[0];
 int		i;
 
@@ -1096,7 +1096,7 @@ int		i;
 	}
 
 	gNewObjectDefinition.coord.x 	= x;
-	y = gNewObjectDefinition.coord.y += 200.0f;
+	gNewObjectDefinition.coord.y	+= 200.0f;
 	gNewObjectDefinition.coord.z 	= z;
 	gNewObjectDefinition.flags 		= gAutoFadeStatusBits;
 	gNewObjectDefinition.slot 		= TRIGGER_SLOT;

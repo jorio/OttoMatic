@@ -289,7 +289,8 @@ float	speed,r,fps = gFramesPerSecondFrac;
 
 static void MoveJawsBot_Chase(ObjNode *theNode)
 {
-float	speed,angle,r,fps = gFramesPerSecondFrac;
+float	speed,r;
+float	fps = gFramesPerSecondFrac;
 
 		/* ACCEL TO CHASE SPEED */
 
@@ -300,7 +301,7 @@ float	speed,angle,r,fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
 
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, JAWSBOT_TURN_SPEED, false);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, JAWSBOT_TURN_SPEED, false);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * speed;

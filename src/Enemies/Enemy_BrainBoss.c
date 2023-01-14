@@ -528,13 +528,11 @@ float	fps = gFramesPerSecondFrac;
 
 	if (gNumPortalsBlown >= NUM_BRAIN_PORTALS)
 	{
-		float	angle,r;
-
 				/* TURN AND MOVE */
 
-		angle = TurnObjectTowardTarget(core, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, 1.0, false);
+		TurnObjectTowardTarget(core, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, 1.0, false);
 
-		r = core->Rot.y;
+		float r = core->Rot.y;
 		gDelta.x = -sin(r) * BRAINBOSS_SPEED;
 		gDelta.z = -cos(r) * BRAINBOSS_SPEED;
 
@@ -550,7 +548,6 @@ float	fps = gFramesPerSecondFrac;
 				/* UPDATE DEFORMATION COORDS */
 
 		UpdateDeformationCoords(gBrainBossDeformation, gCoord.x, gCoord.z);
-
 	}
 
 

@@ -1007,7 +1007,7 @@ explode_weapon:
 static Boolean SeeIfDoPickup(ObjNode *player)
 {
 ObjNode *thisNode,*nearest;
-float	ex,ey,ez,dist,bestDist;
+float	bestDist;
 OGLVector2D	aim;
 short		anim;
 
@@ -1029,11 +1029,10 @@ short		anim;
 		if (thisNode->StatusBits & STATUS_BIT_HIDDEN)			// ... that are visible
 			goto next;
 
-		ex = thisNode->Coord.x;									// get coords
-		ey = thisNode->Coord.y;
-		ez = thisNode->Coord.z;
+		float ex = thisNode->Coord.x;							// get coords
+		float ez = thisNode->Coord.z;
 
-		dist = CalcDistance(gCoord.x, gCoord.z, ex, ez);
+		float dist = CalcDistance(gCoord.x, gCoord.z, ex, ez);
 		if ((dist < bestDist) && (dist < (170.0f * gPlayerInfo.scaleRatio)))			// see if best dist & close enough
 		{
 			bestDist = dist;
@@ -1054,6 +1053,7 @@ next:
 		gTargetPickup = nearest;
 
 		DisableHelpType(HELP_MESSAGE_PICKUPPOW);							// disable this help message since the player can now do it
+
 
 		switch(gTargetPickup->POWType)
 		{
@@ -1240,7 +1240,7 @@ int	i,j,n;
 ObjNode *thisNode;
 float	dist,worstDist;
 int		count;
-u_long	ctype;
+uint32_t	ctype;
 				/* INIT THE LIST */
 
 	for (i = 0; i < MAX_SUPERNOVA_DISCHARGES; i++)

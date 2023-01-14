@@ -406,7 +406,6 @@ no_target:
 static void MoveAlienSaucer_Abducting(ObjNode *topObj)
 {
 float	fps = gFramesPerSecondFrac;
-float	tx,ty,tz,y;
 
 
 		/***********************/
@@ -427,13 +426,12 @@ float	tx,ty,tz,y;
 			goto no_target;
 
 
-		tx = gSaucerTarget->Coord.x;											// get target coords
-		ty = gSaucerTarget->Coord.y;
-		tz = gSaucerTarget->Coord.z;
+		float tx = gSaucerTarget->Coord.x;										// get target coords
+		float tz = gSaucerTarget->Coord.z;
+		float y = GetTerrainY_Undeformed(tx, tz) + SAUCER_HOVER_HEIGHT;			// move to y
 
 		gDelta.x = gSaucerTarget->Delta.x;										// match dx/dz of target
 		gDelta.z = gSaucerTarget->Delta.z;
-		y = GetTerrainY_Undeformed(tx, tz) + SAUCER_HOVER_HEIGHT;				// move to y
 		gDelta.y = y - gCoord.y;
 
 		gCoord.x += gDelta.x * fps;

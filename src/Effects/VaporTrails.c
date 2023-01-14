@@ -39,7 +39,7 @@ typedef struct
 	Byte				ownerTrailNum;							// index so owner can have multiple trails
 
 	Byte				type;								// type of trail to create
-	u_short				numSegments;						// # segments in trail
+	uint16_t				numSegments;						// # segments in trail
 	OGLPoint3D			points[MAX_TRAIL_SEGMENTS];			// segment points
 	OGLColorRGBA		color[MAX_TRAIL_SEGMENTS];			// each segment has a color+alpha value to fade
 	Boolean				isLastPointPinned;					// if false, last point is currently tracking joint pos each frame
@@ -420,7 +420,7 @@ void DrawVaporTrails(void)
 static void DrawVaporTrail_ColorStreak(int	i)
 {
 #if 0
-u_long	w,p,n;
+uint32_t	w,p,n;
 float	size,dist;
 
 

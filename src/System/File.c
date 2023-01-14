@@ -112,7 +112,7 @@ float	g3DTileSize, g3DMinY, g3DMaxY;
 
 SkeletonDefType *LoadSkeletonFile(short skeletonType)
 {
-QDErr		iErr;
+//QDErr		iErr;
 short		fRefNum;
 FSSpec		fsSpec;
 SkeletonDefType	*skeleton;
@@ -158,9 +158,8 @@ const char *fileNames[MAX_SKELETON_TYPES] =
 	fRefNum = FSpOpenResFile(&fsSpec,fsRdPerm);
 	if (fRefNum == -1)
 	{
-		iErr = ResError();
-		DoAlert("Error opening Skel Rez file");
-		ShowSystemErr(iErr);
+//		iErr = ResError();
+		DoFatalAlert("Error opening Skel Rez file");
 	}
 
 	UseResFile(fRefNum);
@@ -265,7 +264,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 	for (i=0; i < numJoints; i++)
 	{
 		File_BoneDefinitionType	*bonePtr;
-		u_short					*indexPtr;
+		uint16_t					*indexPtr;
 
 			/* READ BONE DATA */
 
@@ -287,11 +286,11 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 
 			/* ALLOC THE POINT & NORMALS SUB-ARRAYS */
 
-		skeleton->Bones[i].pointList = (u_short *)AllocPtr(sizeof(u_short) * (int)skeleton->Bones[i].numPointsAttachedToBone);
+		skeleton->Bones[i].pointList = (uint16_t *)AllocPtr(sizeof(uint16_t) * (int)skeleton->Bones[i].numPointsAttachedToBone);
 		if (skeleton->Bones[i].pointList == nil)
 			DoFatalAlert("ReadDataFromSkeletonFile: AllocPtr/pointList failed!");
 
-		skeleton->Bones[i].normalList = (u_short *)AllocPtr(sizeof(u_short) * (int)skeleton->Bones[i].numNormalsAttachedToBone);
+		skeleton->Bones[i].normalList = (uint16_t *)AllocPtr(sizeof(uint16_t) * (int)skeleton->Bones[i].numNormalsAttachedToBone);
 		if (skeleton->Bones[i].normalList == nil)
 			DoFatalAlert("ReadDataFromSkeletonFile: AllocPtr/normalList failed!");
 
@@ -301,7 +300,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		if (hand == nil)
 			DoFatalAlert("Error reading BonP resource!");
 		HLock(hand);
-		indexPtr = (u_short *)(*hand);
+		indexPtr = (uint16_t *)(*hand);
 
 			/* COPY POINT INDEX ARRAY INTO BONE STRUCT */
 
@@ -316,7 +315,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 		if (hand == nil)
 			DoFatalAlert("Error reading BonN resource!");
 		HLock(hand);
-		indexPtr = (u_short *)(*hand);
+		indexPtr = (uint16_t *)(*hand);
 
 			/* COPY NORMAL INDEX ARRAY INTO BONE STRUCT */
 
@@ -341,7 +340,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 	HLock(hand);
 	pointPtr = (OGLPoint3D *)*hand;
 
-	i = GetHandleSize(hand) / sizeof(OGLPoint3D);
+	i = (int) (GetHandleSize(hand) / sizeof(OGLPoint3D));
 	if (i != skeleton->numDecomposedPoints)
 		DoFatalAlert("# of points in Reference Model has changed!");
 	else
@@ -1080,16 +1079,16 @@ OSErr					iErr;
 			//
 
 	{
-		u_short	*src;
+		uint16_t	*src;
 
 		hand = GetResource('Layr',1000);
 		GAME_ASSERT_MESSAGE(hand, "Error reading map layer rez");
 		{
 			if (gTileGrid)														// free old array
 				Free_2d_array(gTileGrid);
-			Alloc_2d_array(u_short, gTileGrid, gTerrainTileDepth, gTerrainTileWidth);
+			Alloc_2d_array(uint16_t, gTileGrid, gTerrainTileDepth, gTerrainTileWidth);
 
-			src = (u_short *)*hand;
+			src = (uint16_t *)*hand;
 			for (int row = 0; row < gTerrainTileDepth; row++)
 			{
 				for (int col = 0; col < gTerrainTileWidth; col++)

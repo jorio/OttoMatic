@@ -32,9 +32,9 @@ static Boolean NilPrime(long splineNum, SplineItemType *itemPtr);
 /**********************/
 
 SplineDefType	**gSplineList = nil;
-long			gNumSplines = 0;
+int				gNumSplines = 0;
 
-static long		gNumSplineObjects = 0;
+static int		gNumSplineObjects = 0;
 static ObjNode	*gSplineObjectList[MAX_SPLINE_OBJECTS];
 
 

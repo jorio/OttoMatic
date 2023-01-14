@@ -43,7 +43,7 @@ static void	ConvertTextureToColorAnaglyph(void *imageMemory, short width, short 
 float					gAnaglyphFocallength	= 150.0f;
 float					gAnaglyphEyeSeparation 	= 40.0f;
 Byte					gAnaglyphPass;
-u_char					gAnaglyphGreyTable[255];
+uint8_t					gAnaglyphGreyTable[255];
 
 
 SDL_GLContext	gAGLContext = nil;
@@ -86,21 +86,27 @@ static ObjNode* gDebugText;
 
 void OGL_Boot(void)
 {
-short	i;
-float	f;
-
 		/* GENERATE ANAGLYPH GREY CONVERSION TABLE */
+
+#if 1
+	// TODO: "< 255" instead of "<= 255" on purpose?
+	for (int i = 0; i < 255; i++)
+	{
+		gAnaglyphGreyTable[i] = i;
+	}
+#else
 		//
 		// This makes an intensity curve to brighten things up, but sometimes
 		// it washes them out.
 		//
 
-	f = 0;
-	for (i = 0; i < 255; i++)
+	float f = 0;
+	for (int i = 0; i < 255; i++)
 	{
-		gAnaglyphGreyTable[i] = i; //sin(f) * 255.0f;
+		gAnaglyphGreyTable[i] = sin(f) * 255.0f;
 		f += (PI/2.0) / 255.0f;
 	}
+#endif
 
 
 		/* CREATE DRAW CONTEXT THAT WILL BE USED THROUGHOUT THE GAME */
@@ -1148,7 +1154,7 @@ uint32_t	a;
 	else
 	if (dataType == GL_UNSIGNED_SHORT_1_5_5_5_REV)
 	{
-		u_short	*pix16 = (u_short *)imageMemory;
+		uint16_t	*pix16 = (uint16_t *)imageMemory;
 		for (y = 0; y < height; y++)
 		{
 			for (x = 0; x < width; x++)

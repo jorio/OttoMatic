@@ -69,9 +69,8 @@ static const OGLPoint3D gBombOff = {0,-50,0};
 
 Boolean PrimeEnemy_ClownFish(long splineNum, SplineItemType *itemPtr)
 {
-ObjNode			*newObj,*shadowObj;
+ObjNode			*newObj;
 float			x,z,placement;
-int				i;
 
 			/* GET SPLINE INFO */
 
@@ -110,7 +109,7 @@ int				i;
 
 				/* SET WEAPON HANDLERS */
 
-	for (i = 0; i < NUM_WEAPON_TYPES; i++)
+	for (int i = 0; i < NUM_WEAPON_TYPES; i++)
 		newObj->HitByWeaponHandler[WEAPON_TYPE_STUNPULSE] 	= ClownFishHitByWeapon;
 
 	newObj->HurtCallback = HurtClownFish;							// set hurt callback function
@@ -118,7 +117,7 @@ int				i;
 
 				/* MAKE SHADOW & GLOW */
 
-	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 14, 10, false);
+	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 14, 10, false);
 
 				/* GIVE IT THE BOMB */
 

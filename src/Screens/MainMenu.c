@@ -1018,7 +1018,7 @@ ObjNode	*icon;
 static void CalcIconMatrix(ObjNode *theNode)
 {
 OGLMatrix4x4	m,m2,m3;
-float			r,s;
+float			s;
 
 				/* SET SCALE MATRIX */
 
@@ -1032,7 +1032,7 @@ float			r,s;
 
 			/* CALC LOCATION ON RIM */
 
-	r = PI + (theNode->Kind / NUM_SELECTIONS) * PI2;
+//	r = PI + (theNode->Kind / NUM_SELECTIONS) * PI2;
 	OGLMatrix4x4_SetTranslate(&m, theNode->Coord.x, theNode->Coord.y, theNode->Coord.z);
 	OGLMatrix4x4_Multiply(&m3, &m, &m2);
 

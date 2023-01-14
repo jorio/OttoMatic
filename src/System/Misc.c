@@ -28,7 +28,7 @@ int gNumPointers = 0;
 short	gPrefsFolderVRefNum;
 long	gPrefsFolderDirID;
 
-u_long 	seed0 = 0, seed1 = 0, seed2 = 0;
+uint32_t 	seed0 = 0, seed1 = 0, seed2 = 0;
 
 float	gFramesPerSecond, gFramesPerSecondFrac;
 
@@ -37,39 +37,6 @@ float	gFramesPerSecond, gFramesPerSecondFrac;
 /**********************/
 /*     PROTOTYPES     */
 /**********************/
-
-
-/****************** DO SYSTEM ERROR ***************/
-
-void ShowSystemErr(long err)
-{
-Str255		numStr;
-
-	Enter2D();
-
-	snprintf(numStr, sizeof(numStr), "System error: %ld", err);
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", numStr, gSDLWindow);
-
-	Exit2D();
-
-	CleanQuit();
-}
-
-/****************** DO SYSTEM ERROR : NONFATAL ***************/
-//
-// nonfatal
-//
-void ShowSystemErr_NonFatal(long err)
-{
-Str255		numStr;
-
-	Enter2D();
-
-	snprintf(numStr, sizeof(numStr), "System error (non-fatal): %ld", err);
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", numStr, gSDLWindow);
-
-	Exit2D();
-}
 
 
 /*********************** DO ALERT *******************/
@@ -162,7 +129,7 @@ static Boolean	beenHere = false;
 //		without the 0xffff at the end.
 //
 
-unsigned long MyRandomLong(void)
+uint32_t MyRandomLong(void)
 {
   return seed2 ^= (((seed1 ^= (seed2>>5)*1568397607UL)>>7)+
                    (seed0 = (seed0+1)*3141592621UL))*2435386481UL;
@@ -174,10 +141,10 @@ unsigned long MyRandomLong(void)
 // THE RANGE *IS* INCLUSIVE OF MIN AND MAX
 //
 
-u_short	RandomRange(unsigned short min, unsigned short max)
+uint16_t	RandomRange(unsigned short min, unsigned short max)
 {
-u_short		qdRdm;											// treat return value as 0-65536
-u_long		range, t;
+uint16_t		qdRdm;											// treat return value as 0-65536
+uint32_t		range, t;
 
 	qdRdm = MyRandomLong();
 	range = max+1 - min;
@@ -244,12 +211,11 @@ float RandomFloatRange(float a, float b)
 
 /**************** SET MY RANDOM SEED *******************/
 
-void SetMyRandomSeed(unsigned long seed)
+void SetMyRandomSeed(uint32_t seed)
 {
 	seed0 = seed;
 	seed1 = 0;
 	seed2 = 0;
-
 }
 
 /**************** INIT MY RANDOM SEED *******************/
@@ -340,8 +306,8 @@ long		createdDirID;
 
 void RegulateSpeed(short fps)
 {
-u_long	n;
-static u_long oldTick = 0;
+uint32_t	n;
+static uint32_t oldTick = 0;
 
 	n = 60 / fps;
 	while ((TickCount() - oldTick) < n) {}			// wait for n ticks

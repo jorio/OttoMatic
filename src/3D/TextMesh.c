@@ -232,8 +232,8 @@ void TextMesh_InitMaterial(bool redFont)
 	matData.flags			= BG3D_MATERIALFLAG_ALWAYSBLEND | BG3D_MATERIALFLAG_TEXTURED | BG3D_MATERIALFLAG_CLAMP_U | BG3D_MATERIALFLAG_CLAMP_V;
 	matData.diffuseColor	= (OGLColorRGBA) {1, 1, 1, 1};
 	matData.numMipmaps		= 1;
-	matData.width			= (u_long) ATLAS_WIDTH;
-	matData.height			= (u_long) ATLAS_HEIGHT;
+	matData.width			= (uint32_t) ATLAS_WIDTH;
+	matData.height			= (uint32_t) ATLAS_HEIGHT;
 	matData.textureName[0]	= OGL_TextureMap_LoadTGA(redFont? ":system:font2.tga": ":system:font1.tga", 0, nil, nil);
 	gFontMaterial = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
 }

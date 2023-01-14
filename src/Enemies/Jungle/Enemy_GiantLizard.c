@@ -620,9 +620,8 @@ float	fps = gFramesPerSecondFrac;
 
 Boolean PrimeEnemy_GiantLizard(long splineNum, SplineItemType *itemPtr)
 {
-ObjNode			*newObj,*shadowObj;
+ObjNode			*newObj;
 float			x,z,placement;
-int				i;
 
 			/* GET SPLINE INFO */
 
@@ -663,7 +662,7 @@ int				i;
 
 				/* SET WEAPON HANDLERS */
 
-	for (i = 0; i < NUM_WEAPON_TYPES; i++)
+	for (int i = 0; i < NUM_WEAPON_TYPES; i++)
 		newObj->HitByWeaponHandler[i] = GiantLizardHitByWeapon;
 	newObj->HitByJumpJetHandler = GiantLizardHitByJumpJet;
 
@@ -673,7 +672,7 @@ int				i;
 
 				/* MAKE SHADOW & GLOW */
 
-	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 20, 35, false);
+	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 20, 35, false);
 
 
 

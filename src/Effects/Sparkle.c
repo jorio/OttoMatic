@@ -118,7 +118,7 @@ void DeleteSparkle(short i)
 
 static void DrawSparkles(ObjNode* theNode)
 {
-u_long	flags;
+uint32_t	flags;
 int		i;
 float	dot,separation;
 OGLMatrix4x4	m;
@@ -457,7 +457,7 @@ float			fps = gFramesPerSecondFrac;
 
 Boolean AddRunwayLights(TerrainItemEntryType *itemPtr, long  x, long z)
 {
-u_char	flicker = itemPtr->parm[3] & 1;						// see if flicker
+uint8_t	flicker = itemPtr->parm[3] & 1;						// see if flicker
 ObjNode	*newObj;
 short	i,numSparkles,j,t;
 float	r,dx,dz,x2,z2;

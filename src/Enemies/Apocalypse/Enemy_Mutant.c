@@ -312,14 +312,12 @@ float		r,fps,angle,dist;
 
 static void  MoveMutant_Attack(ObjNode *theNode)
 {
-float	angleToTarget;
-
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if on ground, add friction
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
 
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, MUTANT_TURN_SPEED, true);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, MUTANT_TURN_SPEED, true);
 
 
 			/* MOVE */
@@ -497,7 +495,7 @@ float	scale;
 
 Boolean PrimeEnemy_Mutant(long splineNum, SplineItemType *itemPtr)
 {
-ObjNode			*newObj,*shadowObj;
+ObjNode			*newObj;
 float			x,z,placement;
 
 			/* GET SPLINE INFO */
@@ -548,7 +546,7 @@ float			x,z,placement;
 
 				/* MAKE SHADOW & GLOW */
 
-	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8, false);
+	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8, false);
 
 	CreateMutantGlow(newObj);
 

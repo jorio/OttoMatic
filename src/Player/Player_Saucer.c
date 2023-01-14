@@ -61,7 +61,7 @@ short	gBeamModeSelected,gBeamMode;
 
 int		gNumHumansInTransit;
 
-short	gNumHumansInSaucer;
+int		gNumHumansInSaucer;
 Byte	gHumansInSaucerList[MAX_HUMANS_IN_SAUCER];
 
 static	float	gBeamDownDelay;

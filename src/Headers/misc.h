@@ -2,22 +2,19 @@
 // misc.h
 //
 
-extern	void ShowSystemErr(long err);
-extern void	DoAlert(const char*);
+void DoAlert(const char*);
 void DoFatalAlert(const char*);
 void DoAssert(const char* msg, const char* file, int line);
 extern	void CleanQuit(void);
-extern	void SetMyRandomSeed(unsigned long seed);
-extern	unsigned long MyRandomLong(void);
+void SetMyRandomSeed(uint32_t seed);
+uint32_t MyRandomLong(void);
 extern	Handle	AllocHandle(long size);
 extern	void *AllocPtr(long size);
 void *AllocPtrClear(long size);
 extern	void InitMyRandomSeed(void);
 extern	void CheckPreferencesFolder(void);
-extern	float RandomFloat(void);
-u_short	RandomRange(unsigned short min, unsigned short max);
-extern	void RegulateSpeed(short fps);
-extern	void ShowSystemErr_NonFatal(long err);
+float RandomFloat(void);
+uint16_t RandomRange(unsigned short min, unsigned short max);
 void CalcFramesPerSecond(void);
 Boolean IsPowerOf2(int num);
 float RandomFloat2(void);

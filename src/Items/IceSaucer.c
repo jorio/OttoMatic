@@ -365,23 +365,16 @@ void SeeIfCrackSaucerIce(OGLPoint3D *impactPt)
 {
 float	x = impactPt->x;
 float	z = impactPt->z;
-ObjNode	*crack,*ice;
 
 
-	if (!gSaucerIceBounds)
+	if (!gSaucerIceBounds
+		|| x < gSaucerIceBounds->left
+		|| x > gSaucerIceBounds->right
+		|| z > gSaucerIceBounds->front
+		|| z < gSaucerIceBounds->back)
+	{
 		return;
-
-	if (x < gSaucerIceBounds->left)
-		return;
-
-	if (x > gSaucerIceBounds->right)
-		return;
-
-	if (z > gSaucerIceBounds->front)
-		return;
-
-	if (z < gSaucerIceBounds->back)
-		return;
+	}
 
 
 	PlayEffect_Parms3D(EFFECT_ICECRACK, impactPt, NORMAL_CHANNEL_RATE, 2.0);
@@ -397,7 +390,7 @@ ObjNode	*crack,*ice;
 
 		gSaucerIceBounds = nil;							// hammers cant hit ice anymore
 
-		ice = gPlayerSaucer->ChainNode->ChainNode;		// get ice object
+		ObjNode* ice = gPlayerSaucer->ChainNode->ChainNode;		// get ice object
 		gPlayerSaucer->ChainNode->ChainNode = nil;		// saucer doesn't have ice
 
 		ExplodeGeometry(ice, 400, SHARD_MODE_BOUNCE, 1, .5);
@@ -418,7 +411,7 @@ ObjNode	*crack,*ice;
 		gNewObjectDefinition.moveCall 	= MoveIceCrack;
 		gNewObjectDefinition.rot 		= RandomFloat() * PI2;
 		gNewObjectDefinition.scale 		= 3.0f + RandomFloat() * 1.0f;
-		crack = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+		MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	}
 }
 
@@ -432,22 +425,5 @@ static void MoveIceCrack(ObjNode *theNode)
 {
 	if (gIceCracked)
 		DeleteObject(theNode);
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -30,8 +30,8 @@ static void MakeWaterGeometry(void);
 /*     VARIABLES      */
 /**********************/
 
-long			gNumWaterPatches = 0;
-short			gNumWaterDrawn;
+int				gNumWaterPatches = 0;
+int				gNumWaterDrawn;
 WaterDefType	**gWaterListHandle = nil;
 WaterDefType	*gWaterList = nil;
 
@@ -203,22 +203,13 @@ float					y,centerX,centerZ;
 
 static void MakeWaterGeometry(void)
 {
-int						f;
-u_short					type, numNubs;
-long					i;
-WaterDefType			*water;
-float					minX,minY,minZ,maxX,maxY,maxZ;
-double					x,y,z;
-
-	for (f = 0; f < gNumWaterPatches; f++)
+	for (int f = 0; f < gNumWaterPatches; f++)
 	{
 				/* GET WATER INFO */
 
-		water = &gWaterList[f];								// point to this water
-		numNubs = water->numNubs;							// get # nubs in water (note:  this is the # from the file, not including the extra center point we added earlier!)
-		if (numNubs < 3)
-			DoFatalAlert("MakeWaterGeometry: numNubs < 3");
-		type = water->type;									// get water type
+		const WaterDefType* water = &gWaterList[f];			// point to this water
+		int numNubs = water->numNubs;						// get # nubs in water (note:  this is the # from the file, not including the extra center point we added earlier!)
+		GAME_ASSERT(numNubs >= 3);
 
 
 					/***************************/
@@ -238,13 +229,13 @@ double					x,y,z;
 
 				/* BUILD TRIANGLE INFO */
 
-		for (i = 0; i < gWaterTriMeshData[f].numTriangles; i++)
+		for (int i = 0; i < gWaterTriMeshData[f].numTriangles; i++)
 		{
 			gWaterTriangles[f][i].vertexIndices[0] = numNubs;							// vertex 0 is always the radial center that we appended to the end of the list
 			gWaterTriangles[f][i].vertexIndices[1] = i + 0;
 			gWaterTriangles[f][i].vertexIndices[2] = i + 1;
 
-			if (gWaterTriangles[f][i].vertexIndices[2] == numNubs)						// check for wrap back
+			if (gWaterTriangles[f][i].vertexIndices[2] == (GLuint) numNubs)				// check for wrap back
 				 gWaterTriangles[f][i].vertexIndices[2] = 0;
 		}
 
@@ -253,24 +244,26 @@ double					x,y,z;
 
 		gWaterTriMeshData[f].numMaterials	= 2;
 		gWaterTriMeshData[f].materials[0] 	= 											// set illegal ref to material
-		gWaterTriMeshData[f].materials[1] 	= gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_Water+type].materialObject;
+		gWaterTriMeshData[f].materials[1] 	= gSpriteGroupList[SPRITE_GROUP_GLOBAL][GLOBAL_SObjType_Water+water->type].materialObject;
 
 
 				/*************/
 				/* CALC BBOX */
 				/*************/
 
+		float maxX, maxY, maxZ;
+		float minX, minY, minZ;
 		maxX = maxY = maxZ = -1000000;									// build new bboxes while we do this
 		minX = minY = minZ = -maxX;
 
-		for (i = 0; i < numNubs; i++)
+		for (int i = 0; i < numNubs; i++)
 		{
 
 					/* GET COORDS */
 
-			x = gWaterPoints[f][i].x;
-			y = gWaterPoints[f][i].y;
-			z = gWaterPoints[f][i].z;
+			float x = gWaterPoints[f][i].x;
+			float y = gWaterPoints[f][i].y;
+			float z = gWaterPoints[f][i].z;
 
 					/* CHECK BBOX */
 
@@ -297,11 +290,10 @@ double					x,y,z;
 				/* BUILD UV's */
 				/**************/
 
-		for (i = 0; i <= numNubs; i++)
+		for (int i = 0; i <= numNubs; i++)
 		{
-			x = gWaterPoints[f][i].x;
-			y = gWaterPoints[f][i].y;
-			z = gWaterPoints[f][i].z;
+			float x = gWaterPoints[f][i].x;
+			float z = gWaterPoints[f][i].z;
 
 			gWaterUVs[f][i].u 	= x * .002;
 			gWaterUVs[f][i].v 	= z * .002;

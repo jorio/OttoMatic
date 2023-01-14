@@ -1236,7 +1236,6 @@ void OGLMatrix4x4_Transpose(const OGLMatrix4x4 *matrix4x4, OGLMatrix4x4 *result)
 {
 OGLMatrix4x4 		source;
 const OGLMatrix4x4	*sourcePtr;
-u_long 				row, column;
 
 	if (result == matrix4x4)
 	{
@@ -1246,14 +1245,12 @@ u_long 				row, column;
 	else
 		sourcePtr = matrix4x4;
 
-	for (row = 0; row < 4; row++)
+	for (int row = 0; row < 4; row++)
 	{
-		for (column = 0; column < 4; column++)
+		for (int column = 0; column < 4; column++)
 		{
-			int	a,b;
-
-			a = column*4 + row;
-			b = row*4 + column;
+			int a = column*4 + row;
+			int b = row*4 + column;
 			result->value[a] = sourcePtr->value[b];
 		}
 	}
@@ -2277,10 +2274,9 @@ float			lX, lY, lZ;				// Local space co-ordinates
 float			hX, hY, hZ, hW;			// Homogeneous co-ordinates
 float			minusHW;				// -hW
 
-u_long		clipFlags;				// Clip in/out tests for point
-u_long		clipCodeAND;			// Clip test for entire object
+uint32_t		clipFlags;				// Clip in/out tests for point
+uint32_t		clipCodeAND;			// Clip test for entire object
 
-long			i;
 float			minX,minY,minZ,maxX,maxY,maxZ;
 
 OGLMatrix4x4	m2,*m;
@@ -2326,7 +2322,7 @@ OGLMatrix4x4	m2,*m;
 
 	clipCodeAND = ~0u;
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		switch (i)									// load current bbox corner in IX,IY,IZ
 		{

@@ -59,10 +59,6 @@ int _i;																	\
 		array = nil;						\
 }
 
-typedef	unsigned char u_char;
-typedef	unsigned long u_long;
-typedef	unsigned short u_short;
-
 
 #define	PI					((float)3.1415926535898)
 #define PI2					(2.0f*PI)

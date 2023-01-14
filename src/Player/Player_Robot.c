@@ -130,7 +130,7 @@ enum
 /*    VARIABLES      */
 /*********************/
 
-u_short			gPlayerTileAttribs;
+uint16_t			gPlayerTileAttribs;
 
 OGLVector3D		gPreCollisionDelta;
 
@@ -912,7 +912,7 @@ update:
 static void TurnPlayerTowardPunchable(ObjNode *player)
 {
 ObjNode *thisNode,*nearest;
-float	ex,ey,ez,dist,bestDist,maxDist;
+float	bestDist,maxDist;
 
 	bestDist = 10000000;
 	nearest = nil;
@@ -928,11 +928,10 @@ float	ex,ey,ez,dist,bestDist,maxDist;
 		if (thisNode->HitByWeaponHandler[WEAPON_TYPE_FIST] == nil)					// only look for punchables
 			goto next;
 
-		ex = thisNode->Coord.x;									// get obj coords
-		ey = thisNode->Coord.y;
-		ez = thisNode->Coord.z;
+		float ex = thisNode->Coord.x;							// get obj coords
+		float ez = thisNode->Coord.z;
 
-		dist = CalcDistance(gCoord.x, gCoord.z, ex, ez);
+		float dist = CalcDistance(gCoord.x, gCoord.z, ex, ez);
 		if ((dist < bestDist) && (dist < maxDist))				// see if best dist & close enough
 		{
 			bestDist = dist;
@@ -1256,7 +1255,7 @@ static void MovePlayerRobot_Drowned(ObjNode *theNode)
 
 static void MovePlayerRobot_Flattened(ObjNode *theNode)
 {
-u_long	wasOnGround = theNode->StatusBits & STATUS_BIT_ONGROUND;
+Boolean	wasOnGround = !!(theNode->StatusBits & STATUS_BIT_ONGROUND);
 
 	gTimeSinceLastThrust = 0;							// reset this so camera won't auto-adjust during this anim (a bit of a hack really)
 
@@ -1934,7 +1933,6 @@ float	tx,tz;
 static Boolean DoPlayerMovementAndCollision(ObjNode *theNode, Byte aimMode, Boolean useBBoxForTerrain)
 {
 float				fps = gFramesPerSecondFrac,oldFPS,oldFPSFrac,terrainY;
-OGLPoint3D			oldCoord;
 OGLVector2D			aimVec,deltaVec, accVec;
 OGLMatrix3x3		m;
 static OGLPoint2D origin = {0,0};
@@ -2095,7 +2093,7 @@ Boolean				killed = false;
 	{
 		float	dx,dy,dz;
 
-		oldCoord = gCoord;								// remember starting coord
+//		OGLPoint3D oldCoord = gCoord;									// remember starting coord
 
 
 				/* GET DELTA */
@@ -2167,7 +2165,6 @@ OGLVector3D			accVec;
 OGLMatrix4x4		m;
 static const OGLVector3D up = {0,1,0};
 Boolean				killed = false;
-OGLPoint3D			oldCoord;
 int					numPasses,pass;
 
 
@@ -2220,7 +2217,7 @@ int					numPasses,pass;
 	{
 		float	dx,dy,dz;
 
-		oldCoord = gCoord;								// remember starting coord
+//		OGLPoint3D oldCoord = gCoord;									// remember starting coord
 
 
 				/* GET DELTA */
@@ -2570,10 +2567,8 @@ float	x,z,fps;
 
 static Boolean DoRobotCollisionDetect(ObjNode *theNode, Boolean useBBoxForTerrain)
 {
-short		i;
 ObjNode		*hitObj;
-unsigned long	ctype;
-u_char		sides;
+uint32_t	ctype;
 float		distToFloor, terrainY, fps = gFramesPerSecondFrac;
 float		bottomOff;
 Boolean		killed = false;
@@ -2598,12 +2593,12 @@ Boolean		killed = false;
 	else
 		theNode->BottomOff = gPlayerBottomOff;
 
-	sides = HandleCollisions(theNode, ctype, -.3);
+	HandleCollisions(theNode, ctype, -.3);
 
 			/* SCAN FOR INTERESTING STUFF */
 
 
-	for (i=0; i < gNumCollisions; i++)
+	for (int i = 0; i < gNumCollisions; i++)
 	{
 		if (gCollisionList[i].type == COLLISION_TYPE_OBJ)
 		{

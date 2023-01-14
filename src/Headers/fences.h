@@ -2,9 +2,7 @@
 // fences.h
 //
 
-#ifndef FENCE_H
-#define FENCE_H
-
+#pragma once
 
 typedef struct
 {
@@ -13,8 +11,8 @@ typedef struct
 
 typedef struct
 {
-	u_short			type;				// type of fence
-	short			numNubs;			// # nubs in fence
+	uint16_t		type;				// type of fence
+	int				numNubs;			// # nubs in fence
 	OGLPoint3D		*nubList;			// pointer to nub list	
 	OGLBoundingBox	bBox;				// bounding box of fence area	
 	OGLVector2D		*sectionVectors;	// for each section/span, this is the vector from nub(n) to nub(n+1)
@@ -28,8 +26,3 @@ void PrimeFences(void);
 Boolean DoFenceCollision(ObjNode *theNode);
 void DisposeFences(void);
 Boolean SeeIfLineSegmentHitsFence(const OGLPoint3D *endPoint1, const OGLPoint3D *endPoint2, OGLPoint3D *intersect, Boolean *overTop, float *fenceTopY);
-
-
-#endif
-
-

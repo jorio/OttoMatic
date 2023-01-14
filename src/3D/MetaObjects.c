@@ -15,9 +15,9 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static MetaObjectPtr AllocateEmptyMetaObject(u_long type, u_long subType);
+static MetaObjectPtr AllocateEmptyMetaObject(uint32_t type, uint32_t subType);
 static void SetMetaObjectToGroup(MOGroupObject *groupObj);
-static void SetMetaObjectToGeometry(MetaObjectPtr mo, u_long subType, void *data);
+static void SetMetaObjectToGeometry(MetaObjectPtr mo, uint32_t subType, void *data);
 static void SetMetaObjectToMaterial(MOMaterialObject *matObj, MOMaterialData *inData);
 static void SetMetaObjectToVertexArrayGeometry(MOVertexArrayObject *geoObj, MOVertexArrayData *data);
 static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData);
@@ -53,7 +53,7 @@ int					gNumMetaObjects = 0;
 
 float				gGlobalTransparency = 1;			// 0 == clear, 1 = opaque
 OGLColorRGB			gGlobalColorFilter = {1,1,1};
-u_long				gGlobalMaterialFlags = 0;
+uint32_t			gGlobalMaterialFlags = 0;
 
 MOMaterialObject	*gMostRecentMaterial;
 
@@ -145,7 +145,7 @@ int					i;
 //
 
 
-MetaObjectPtr	MO_CreateNewObjectOfType(u_long type, u_long subType, void *data)
+MetaObjectPtr	MO_CreateNewObjectOfType(uint32_t type, uint32_t subType, void *data)
 {
 MetaObjectPtr	mo;
 
@@ -197,7 +197,7 @@ MetaObjectPtr	mo;
 // allocates an empty meta object and connects it to the linked list
 //
 
-static MetaObjectPtr AllocateEmptyMetaObject(u_long type, u_long subType)
+static MetaObjectPtr AllocateEmptyMetaObject(uint32_t type, uint32_t subType)
 {
 MetaObjectHeader	*mo;
 int					size;
@@ -311,7 +311,7 @@ static void SetMetaObjectToGroup(MOGroupObject *groupObj)
 // INPUT:	mo = meta object which has already been allocated and added to linked list.
 //
 
-static void SetMetaObjectToGeometry(MetaObjectPtr mo, u_long subType, void *data)
+static void SetMetaObjectToGeometry(MetaObjectPtr mo, uint32_t subType, void *data)
 {
 	switch(subType)
 	{
@@ -695,8 +695,7 @@ int	numChildren,i;
 void MO_DrawGeometry_VertexArray(const MOVertexArrayData *data)
 {
 Boolean		useTexture = false, multiTexture = false;
-u_long 	materialFlags;
-short	i;
+uint32_t 	materialFlags;
 
 
 			/**********************/
@@ -721,12 +720,10 @@ short	i;
 #if 0
 			/* SHOW VERTEX NORMALS */
 		{
-			int	i;
-
 			OGL_PushState();
 			glDisable(GL_TEXTURE_2D);
 			SetColor4f(1,1,0,1);
-			for (i = 0; i < data->numPoints; i++)
+			for (int i = 0; i < data->numPoints; i++)
 			{
 				glBegin(GL_LINES);
 
@@ -821,7 +818,7 @@ short	i;
 		{
 			useTexture = multiTexture = true;
 
-			for (i = 0 ;i < data->numMaterials; i++)
+			for (int i = 0; i < data->numMaterials; i++)
 			{
 				glActiveTextureARB(GL_TEXTURE0_ARB+i);								// activate texture layer #i
 				glClientActiveTextureARB(GL_TEXTURE0_ARB+i);
@@ -864,9 +861,9 @@ use_current:
 
 				if (materialFlags & BG3D_MATERIALFLAG_MULTITEXTURE)
 				{
-					u_short	multiTextureMode 	= gMostRecentMaterial->objectData.multiTextureMode;
-					u_short	multiTextureCombine = gMostRecentMaterial->objectData.multiTextureCombine;
-					u_short	envMapNum 		= gMostRecentMaterial->objectData.envMapNum;
+					uint16_t	multiTextureMode 	= gMostRecentMaterial->objectData.multiTextureMode;
+					uint16_t	multiTextureCombine = gMostRecentMaterial->objectData.multiTextureCombine;
+					uint16_t	envMapNum 		= gMostRecentMaterial->objectData.envMapNum;
 
 					if (envMapNum >= gNumSpritesInGroupList[SPRITE_GROUP_SPHEREMAPS])
 						DoFatalAlert("MO_DrawGeometry_VertexArray: illegal envMapNum");
@@ -879,7 +876,7 @@ use_current:
 								/* REFLECTION SPHERE */
 
 						case	MULTI_TEXTURE_MODE_REFLECTIONSPHERE:
-								for (i = 0 ;i < 2; i++)
+								for (int i = 0; i < 2; i++)
 								{
 									glActiveTextureARB(GL_TEXTURE0_ARB+i);								// activate texture layer #i
 									glClientActiveTextureARB(GL_TEXTURE0_ARB+i);
@@ -928,7 +925,7 @@ use_current:
 								/* OBJECT PLANE PROJECTION */
 
 						case	MULTI_TEXTURE_MODE_OBJECT_PLANE:
-								for (i = 0 ;i < 2; i++)
+								for (int i = 0; i < 2; i++)
 								{
 									glActiveTextureARB(GL_TEXTURE0_ARB+i);								// activate texture layer #i
 									glClientActiveTextureARB(GL_TEXTURE0_ARB+i);
@@ -1052,7 +1049,7 @@ MOMaterialData		*matData;
 OGLColorRGBA		*diffuseColor,diffColor2;
 Boolean				textureHasAlpha = false;
 Boolean				alreadySet;
-u_long				matFlags;
+uint32_t			matFlags;
 
 			/* SEE IF THIS MATERIAL IS ALREADY SET AS CURRENT */
 
@@ -1272,10 +1269,10 @@ float			scaleX,scaleY,x,y,z;
 			/* DRAW IT */
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0,1);	glVertex2f(x, y);
-	glTexCoord2f(1,1);	glVertex2f(x+scaleX, y);
-	glTexCoord2f(1,0);	glVertex2f(x+scaleX, y+scaleY);
-	glTexCoord2f(0,0);	glVertex2f(x, y+scaleY);
+	glTexCoord2f(0,1);	glVertex3f(x, y, z);
+	glTexCoord2f(1,1);	glVertex3f(x+scaleX, y, z);
+	glTexCoord2f(1,0);	glVertex3f(x+scaleX, y+scaleY, z);
+	glTexCoord2f(0,0);	glVertex3f(x, y+scaleY, z);
 	glEnd();
 
 

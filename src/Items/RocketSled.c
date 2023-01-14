@@ -171,7 +171,7 @@ static void MoveRocketSled(ObjNode *theNode)
 float	r,oldRot;
 float	fps = gFramesPerSecondFrac;
 OGLVector2D	aim;
-u_short		effect;
+uint16_t		effect;
 
 
 			/* JUST TRACK IT IF NOT BEING DRIVEN YET */

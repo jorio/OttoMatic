@@ -6,9 +6,9 @@
 
 typedef struct
 {
-	u_short	effectNum;
+	uint16_t	effectNum;
 	float	volumeAdjust;
-	u_long	leftVolume, rightVolume;
+	uint32_t	leftVolume, rightVolume;
 }ChannelInfoType;
 
 
@@ -277,16 +277,16 @@ extern	void StopAllEffectChannels(void);
 void PlaySong(short songNum, int flags);
 void KillSong(void);
 extern	short PlayEffect(short effectNum);
-short PlayEffect_Parms3D(short effectNum, OGLPoint3D *where, u_long rateMultiplier, float volumeAdjust);
+short PlayEffect_Parms3D(short effectNum, OGLPoint3D *where, uint32_t rateMultiplier, float volumeAdjust);
 void EnforceMusicPausePref(void);
 extern void	DoSoundMaintenance(void);
 void LoadSoundEffect(int effectNum);
 void DisposeSoundEffect(int effectNum);
 void LoadSoundBank(int bankNum);
 void DisposeSoundBank(int bankNum);
-short PlayEffect_Parms(int effectNum, u_long leftVolume, u_long rightVolume, unsigned long rateMultiplier);
+short PlayEffect_Parms(int effectNum, uint32_t leftVolume, uint32_t rightVolume, unsigned long rateMultiplier);
 void PauseAllChannels(Boolean pause);
-void ChangeChannelVolume(short channel, u_long leftVol, u_long rightVol);
+void ChangeChannelVolume(short channel, uint32_t leftVol, uint32_t rightVol);
 short PlayEffect3D(short effectNum, OGLPoint3D *where);
 Boolean Update3DSoundChannel(short effectNum, short *channel, OGLPoint3D *where);
 Boolean IsEffectChannelPlaying(short chanNum);

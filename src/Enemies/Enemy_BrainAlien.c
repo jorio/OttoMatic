@@ -596,7 +596,7 @@ float	fps = gFramesPerSecondFrac;
 
 Boolean PrimeEnemy_BrainAlien(long splineNum, SplineItemType *itemPtr)
 {
-ObjNode			*newObj,*shadowObj;
+ObjNode			*newObj;
 float			x,z,placement;
 
 			/* GET SPLINE INFO */
@@ -653,7 +653,7 @@ float			x,z,placement;
 
 				/* MAKE SHADOW & GLOW */
 
-	shadowObj = AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8, false);
+	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 8, 8, false);
 
 	CreateBrainAlienGlow(newObj);
 

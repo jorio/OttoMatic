@@ -199,20 +199,18 @@ static	void(*myMoveTable[])(ObjNode *) =
 
 static void  MoveFlamester_Standing(ObjNode *theNode)
 {
-float	angleToTarget,dist;
-
 	if (theNode->StatusBits & STATUS_BIT_ONGROUND)			// if on ground, add friction
 		ApplyFrictionToDeltas(2000.0,&gDelta);
 
 				/* TURN TOWARDS ME */
 
-	angleToTarget = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, FLAMESTER_TURN_SPEED, true);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, FLAMESTER_TURN_SPEED, true);
 
 
 
 				/* SEE IF CHASE */
 
-	dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
+	float dist = CalcQuickDistance(gPlayerInfo.coord.x, gPlayerInfo.coord.z, gCoord.x, gCoord.z);
 	if (dist < FLAMESTER_CHASE_DIST_MAX)
 	{
 		MorphToSkeletonAnim(theNode->Skeleton, FLAMESTER_ANIM_WALK, 4);
@@ -244,13 +242,13 @@ float	angleToTarget,dist;
 
 static void  MoveFlamester_Walk(ObjNode *theNode)
 {
-float		r,fps,angle,dist;
+float		r,fps,dist;
 
 	fps = gFramesPerSecondFrac;
 
 			/* MOVE TOWARD PLAYER */
 
-	angle = TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, FLAMESTER_TURN_SPEED, true);
+	TurnObjectTowardTarget(theNode, &gCoord, gPlayerInfo.coord.x, gPlayerInfo.coord.z, FLAMESTER_TURN_SPEED, true);
 
 	r = theNode->Rot.y;
 	gDelta.x = -sin(r) * FLAMESTER_WALK_SPEED;

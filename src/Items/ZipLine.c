@@ -233,10 +233,8 @@ static void GenerateZipSpline(short zipNum, OGLPoint3D *nubPoints)
 OGLPoint3D	**space,*splinePoints;
 OGLPoint3D 	*a, *b, *c, *d;
 OGLPoint3D 	*h0, *h1, *h2, *h3, *hi_a;
-short 		imax;
 float 		t, dt;
-long		i,i1,numPoints;
-long		nub;
+int			numPoints;
 long		maxX,minX,maxZ,minZ,maxY,minY;
 int			pointsPerSpan;
 
@@ -279,11 +277,11 @@ const short numNubs = 4;
 
 				/* COPY CONTROL POINTS INTO ARRAY */
 
-	for (i = 0; i < numNubs; i++)
+	for (int i = 0; i < numNubs; i++)
 		d[i] = nubPoints[i];
 
 
-	for (i = 0, imax = numNubs - 2; i < imax; i++)
+	for (int i = 0, imax = numNubs - 2; i < imax; i++)
 	{
 		h2[i].x = h2[i].y = h2[i].z = 1;
 		h3[i].x = 3 *(d[i+ 2].x - 2 * d[i+ 1].x + d[i].x);
@@ -297,7 +295,7 @@ const short numNubs = 4;
 	h1[0].y = h3[0].y / a[0].y;
 	h1[0].z = h3[0].z / a[0].z;
 
-	for (i = 1, i1 = 0, imax = numNubs - 2; i < imax; i++, i1++)
+	for (int i = 1, i1 = 0, imax = numNubs - 2; i < imax; i++, i1++)
 	{
 		h0[i1].x = h2[i1].x / a[i1].x;
 		a[i].x = 4.0f - h0[i1].x;
@@ -314,14 +312,14 @@ const short numNubs = 4;
 
 	b[numNubs - 3] = h1[numNubs - 3];
 
-	for (i = numNubs - 4; i >= 0; i--)
+	for (int i = numNubs - 4; i >= 0; i--)
 	{
  		b[i].x = h1[i].x - h0[i].x * b[i+ 1].x;
  		b[i].y = h1[i].y - h0[i].y * b[i+ 1].y;
  		b[i].z = h1[i].z - h0[i].z * b[i+ 1].z;
  	}
 
-	for (i = numNubs - 2; i >= 1; i--)
+	for (int i = numNubs - 2; i >= 1; i--)
 		b[i] = b[i - 1];
 
 	b[0].x = b[numNubs - 1].x =
@@ -351,7 +349,7 @@ const short numNubs = 4;
 	d = space[7];
 
   	numPoints = 0;
-	for (nub = 0; a < hi_a; a++, b++, c++, d++, nub++)
+	for (int nub = 0; a < hi_a; a++, b++, c++, d++, nub++)
 	{
 
 				/* CALC THIS SPAN */

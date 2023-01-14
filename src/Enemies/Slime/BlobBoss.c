@@ -432,7 +432,6 @@ static void MoveBlobBossBeams(ObjNode *theNode)
 {
 float	fps = gFramesPerSecondFrac;
 float	x,y,z,tx,tz;
-int		particleGroup,magicNum,i,j;
 NewParticleGroupDefType	groupDef;
 NewParticleDefType	newParticleDef;
 OGLVector3D			d;
@@ -450,7 +449,7 @@ ObjNode				*player = gPlayerInfo.objNode;
 	y = theNode->Coord.y;
 	z = theNode->Coord.z;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		OGLPoint2D	pp;
 		float		distToLine,t;
@@ -485,8 +484,8 @@ ObjNode				*player = gPlayerInfo.objNode;
 	{
 		theNode->ParticleTimer += .02f;
 
-		particleGroup 	= theNode->ParticleGroup;
-		magicNum 		= theNode->ParticleMagicNum;
+		int			particleGroup 	= theNode->ParticleGroup;
+		uint32_t	magicNum 		= theNode->ParticleMagicNum;
 
 		if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 		{
@@ -510,9 +509,9 @@ new_group:
 		if (particleGroup != -1)
 		{
 			p.y = y;
-			for (i = 0; i < 9; i++)
+			for (int i = 0; i < 9; i++)
 			{
-				j = MyRandomLong() & 3;												// random beam
+				int j = MyRandomLong() & 3;											// random beam
 				if (gBeamDestroyed[j])												// no sparkes from blown beams
 					continue;
 				switch(j)

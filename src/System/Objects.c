@@ -94,11 +94,11 @@ void InitObjectManager(void)
 // The linked list is sorted from smallest to largest!
 //
 
-ObjNode	*MakeNewObject(NewObjectDefinitionType *newObjDef)
+ObjNode* MakeNewObject(NewObjectDefinitionType* newObjDef)
 {
 ObjNode	*newNodePtr = NULL;
 long	slot;
-unsigned long flags = newObjDef->flags;
+uint32_t flags = newObjDef->flags;
 
 			/* TRY TO GET AN OBJECT FROM THE POOL */
 
@@ -1521,7 +1521,6 @@ void UpdateObjectTransforms(ObjNode *theNode)
 {
 OGLMatrix4x4	m,m2;
 OGLMatrix4x4	mx,my,mz,mxz;
-u_long			bits;
 
 	if (theNode->CType == INVALID_NODE_FLAG)		// see if already deleted
 		return;
@@ -1537,7 +1536,7 @@ u_long			bits;
 			/* NOW ROTATE & TRANSLATE IT */
 			/*****************************/
 
-	bits = theNode->StatusBits;
+	uint32_t bits = theNode->StatusBits;
 
 				/* USE ALIGNMENT MATRIX */
 
@@ -1630,10 +1629,10 @@ MOMatrixObject	*mo = theNode->BaseTransformObject;
 
 /********************* FIND CLOSEST CTYPE *****************************/
 
-ObjNode *FindClosestCType(OGLPoint3D *pt, u_long ctype)
+ObjNode* FindClosestCType(const OGLPoint3D *pt, uint32_t ctype)
 {
 ObjNode		*thisNodePtr,*best = nil;
-float	d,minDist = 10000000;
+float		minDist = 10000000;
 
 
 	thisNodePtr = gFirstNodePtr;
@@ -1645,7 +1644,7 @@ float	d,minDist = 10000000;
 
 		if (thisNodePtr->CType & ctype)
 		{
-			d = CalcQuickDistance(pt->x,pt->z,thisNodePtr->Coord.x, thisNodePtr->Coord.z);
+			float d = CalcQuickDistance(pt->x, pt->z, thisNodePtr->Coord.x, thisNodePtr->Coord.z);
 			if (d < minDist)
 			{
 				minDist = d;
@@ -1662,10 +1661,10 @@ float	d,minDist = 10000000;
 
 /********************* FIND CLOSEST CTYPE 3D *****************************/
 
-ObjNode *FindClosestCType3D(OGLPoint3D *pt, u_long ctype)
+ObjNode* FindClosestCType3D(const OGLPoint3D* pt, uint32_t ctype)
 {
 ObjNode		*thisNodePtr,*best = nil;
-float	d,minDist = 10000000;
+float		minDist = 10000000;
 
 
 	thisNodePtr = gFirstNodePtr;
@@ -1677,7 +1676,7 @@ float	d,minDist = 10000000;
 
 		if (thisNodePtr->CType & ctype)
 		{
-			d = OGLPoint3D_Distance(pt, &thisNodePtr->Coord);
+			float d = OGLPoint3D_Distance(pt, &thisNodePtr->Coord);
 			if (d < minDist)
 			{
 				minDist = d;
@@ -1690,18 +1689,4 @@ float	d,minDist = 10000000;
 
 	return(best);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

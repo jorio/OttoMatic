@@ -16,7 +16,7 @@ typedef struct
 {
 	Boolean				isActive;								// true if this one is active
 	ObjNode				*owner;									// node which owns this sparkle (or nil)
-	u_long				flags;						
+	uint32_t			flags;						
 	OGLPoint3D			where;	
 	OGLVector3D			aim;
 	OGLColorRGBA		color;

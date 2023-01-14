@@ -67,8 +67,8 @@ enum
 /*     VARIABLES      */
 /**********************/
 
-long			gNumFences = 0;
-short			gNumFencesDrawn;
+int				gNumFences = 0;
+int				gNumFencesDrawn;
 FenceDefType	*gFenceList = nil;
 
 
@@ -259,15 +259,14 @@ ObjNode					*obj;
 
 static void MakeFenceGeometry(void)
 {
-int						f;
-u_short					type;
+uint16_t				type;
 float					u,height,aspectRatio,textureUOff;
-long					i,numNubs,j;
+int						numNubs;
 FenceDefType			*fence;
 OGLPoint3D				*nubs;
 float					minX,minY,minZ,maxX,maxY,maxZ;
 
-	for (f = 0; f < gNumFences; f++)
+	for (int f = 0; f < gNumFences; f++)
 	{
 				/******************/
 				/* GET FENCE INFO */
@@ -298,13 +297,13 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 		gFenceTriMeshData[f].normals					= nil;
 		gFenceTriMeshData[f].colorsByte					= &gFenceColors[f][0];
 		gFenceTriMeshData[f].colorsFloat				= nil;
-		gFenceTriMeshData[f].numPoints = numNubs * 2;					// 2 vertices per nub
-		gFenceTriMeshData[f].numTriangles = (numNubs-1) * 2;			// 2 faces per nub (minus 1st)
+		gFenceTriMeshData[f].numPoints					= numNubs * 2;					// 2 vertices per nub
+		gFenceTriMeshData[f].numTriangles				= (numNubs-1) * 2;			// 2 faces per nub (minus 1st)
 
 
 				/* BUILD TRIANGLE INFO */
 
-		for (i = j = 0; i < MAX_NUBS_IN_FENCE; i++, j+=2)
+		for (int i = 0, j = 0; i < MAX_NUBS_IN_FENCE; i++, j+=2)
 		{
 			gFenceTriangles[f][j].vertexIndices[0] = 1 + j;
 			gFenceTriangles[f][j].vertexIndices[1] = 0 + j;
@@ -313,12 +312,11 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 			gFenceTriangles[f][j+1].vertexIndices[0] = 3 + j;
 			gFenceTriangles[f][j+1].vertexIndices[1] = 0 + j;
 			gFenceTriangles[f][j+1].vertexIndices[2] = 2 + j;
-
 		}
 
 				/* INIT VERTEX COLORS */
 
-		for (i = 0; i < (MAX_NUBS_IN_FENCE*2); i++)
+		for (int i = 0; i < (MAX_NUBS_IN_FENCE*2); i++)
 			gFenceColors[f][i].r = gFenceColors[f][i].g = gFenceColors[f][i].b = 0xff;
 
 
@@ -335,7 +333,7 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 		minX = minY = minZ = -maxX;
 
 		u = 0;
-		for (i = j = 0; i < numNubs; i++, j+=2)
+		for (int i = 0, j = 0; i < numNubs; i++, j+=2)
 		{
 			float		x,y,z,y2;
 
@@ -402,7 +400,6 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 
 static void DrawFences(ObjNode *theNode)
 {
-long			f,type;
 float			cameraX, cameraZ;
 
 #pragma unused (theNode)
@@ -436,10 +433,8 @@ float			cameraX, cameraZ;
 
 	gNumFencesDrawn = 0;
 
-	for (f = 0; f < gNumFences; f++)
+	for (int f = 0; f < gNumFences; f++)
 	{
-		type = gFenceList[f].type;							// get type
-
 					/* DO BBOX CULLING */
 
 		if (OGL_IsBBoxVisible(&gFenceList[f].bBox, nil))

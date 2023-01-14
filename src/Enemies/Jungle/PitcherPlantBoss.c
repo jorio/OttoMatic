@@ -203,7 +203,7 @@ ObjNode	*newObj;
 Boolean AddTentacleGenerator(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-u_long	burned = itemPtr->flags & ITEM_FLAGS_USER1;
+uint32_t	burned = itemPtr->flags & ITEM_FLAGS_USER1;
 
 
 	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
@@ -367,15 +367,13 @@ got_it:
 
 static void UpdateTentacles(ObjNode *theNode)
 {
-int		i,n,j,q;
 float	fps = gFramesPerSecondFrac;
 float	fps2;
-float	r,px,py,pz;
 ObjNode	*player = gPlayerInfo.objNode;
 
 #pragma unused (theNode)
 
-	for (i = 0; i < MAX_TENTACLES; i++)
+	for (int i = 0; i < MAX_TENTACLES; i++)
 	{
 		if (!gTentacles[i].isUsed)													// see if skip this slot
 			continue;
@@ -389,12 +387,12 @@ ObjNode	*player = gPlayerInfo.objNode;
 			case	TENTACLE_MODE_GROW:
 
 					fps2 = fps * .2f;
-					for (q = 0; q < 5; q++)										// do this several times to increase the resolution nicely
+					for (int q = 0; q < 5; q++)									// do this several times to increase the resolution nicely
 					{
 							/* UPDATE GROWTH */
 
-						n = gTentacles[i].numPoints;								// get # points
-						if (n >= MAX_SPLINE_POINTS)									// see if list is full
+						int n = gTentacles[i].numPoints;						// get # points
+						if (n >= MAX_SPLINE_POINTS)								// see if list is full
 						{
 							gTentacles[i].mode = TENTACLE_MODE_AWAY;			// make go away
 							goto next_i;
@@ -406,7 +404,7 @@ ObjNode	*player = gPlayerInfo.objNode;
 
 							/* CALC A NEW POINT TOWARD ME */
 
-						r = gTentacles[i].rot;
+						float r = gTentacles[i].rot;
 						gTentacles[i].tipCoord.x -= sin(r) * (400.0f * fps2);
 						gTentacles[i].tipCoord.z -= cos(r) * (400.0f * fps2);
 						gTentacles[i].tipCoord.y = 60.0f + GetTerrainY(gTentacles[i].tipCoord.x,gTentacles[i].tipCoord.z) + cos(gTentacles[i].cosIndex) * 40.0f;
@@ -433,12 +431,12 @@ ObjNode	*player = gPlayerInfo.objNode;
 					gTentacles[i].delayToGoAway -= fps;			// dec wait timer
 					if (gTentacles[i].delayToGoAway <= 0.0f)
 					{
-						n = gTentacles[i].numPoints;			// get # points in list
-						j = fps * 200.0f;						// calc # points to remove this time
+						int n = gTentacles[i].numPoints;		// get # points in list
+						int j = fps * 200.0f;					// calc # points to remove this time
 						if (j < 1)
 							j = 1;
 
-						q = n-j;								// calc # points after we remove some
+						int q = n-j;							// calc # points after we remove some
 						if (q <= 0)
 						{
 							gTentacles[i].isUsed = false;		// free this one
@@ -459,26 +457,25 @@ ObjNode	*player = gPlayerInfo.objNode;
 				/* DO TENTACLE COLLISION DETECTION */
 				/***********************************/
 
-		px = gPlayerInfo.coord.x;											// get player coords
-		py = gPlayerInfo.coord.y + gPlayerInfo.objNode->BBox.min.y;			// y = bottom of player
-		pz = gPlayerInfo.coord.z;
+//		px = gPlayerInfo.coord.x;											// get player coords
+//		py = gPlayerInfo.coord.y + gPlayerInfo.objNode->BBox.min.y;			// y = bottom of player
+//		pz = gPlayerInfo.coord.z;
 
-		n = gTentacles[i].numPoints;
-		for (j = 0; j < n; j += SKIP_FACTOR)								// calc at intervals along the spline
+		int n = gTentacles[i].numPoints;
+		for (int j = 0; j < n; j += SKIP_FACTOR)							// calc at intervals along the spline
 		{
 			float	tx = gTentacles[i].splinePoints[j].x;
 			float	ty = gTentacles[i].splinePoints[j].y;
 			float	tz = gTentacles[i].splinePoints[j].z;
-			short	numHits,c;
 
 						/* GET HITS */
 
-			numHits = DoSimpleBoxCollision(ty + TENTACLE_RADIUS, ty - TENTACLE_RADIUS,
+			int numHits = DoSimpleBoxCollision(ty + TENTACLE_RADIUS, ty - TENTACLE_RADIUS,
 											tx - TENTACLE_RADIUS, tx + TENTACLE_RADIUS,
 											tz + TENTACLE_RADIUS, tz - TENTACLE_RADIUS,
 											CTYPE_PLAYER|CTYPE_WEAPON);
 
-			for (c = 0; c < numHits; c++)
+			for (int c = 0; c < numHits; c++)
 			{
 				ObjNode	*hitObj = gCollisionList[c].objectPtr;
 
@@ -855,9 +852,6 @@ static void MovePitcherPlant_Burning(ObjNode *theNode)
 
 static Boolean PitcherPlantHitByFire(ObjNode *weapon, ObjNode *plant, OGLPoint3D *weaponCoord, OGLVector3D *weaponDelta)
 {
-ObjNode	*newObj;
-
-
 #pragma unused (weapon, weaponCoord, weaponDelta)
 
 	if (!plant->Vulnerable)								// see if vulnerable
@@ -890,7 +884,7 @@ ObjNode	*newObj;
 		gNewObjectDefinition.moveCall 	= MovePitcherPlant_Burning;
 		gNewObjectDefinition.rot 		= plant->Rot.y;
 		gNewObjectDefinition.scale 		= plant->Scale.x;
-		newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
+		MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 				/* DELETE PITCHER PLANT */
 
@@ -925,7 +919,7 @@ ObjNode	*newObj;
 Boolean AddPitcherPod(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*stem, *pod;
-u_long	podDestroyed = itemPtr->flags & ITEM_FLAGS_USER1;
+uint32_t	podDestroyed = itemPtr->flags & ITEM_FLAGS_USER1;
 
 			/* CREATE STEM */
 

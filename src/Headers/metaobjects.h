@@ -38,10 +38,10 @@ enum
 
 struct MetaObjectHeader
 {
-	u_long		cookie;						// this value should always == MO_COOKIE
-	long		refCount;					// # times this is referenced
-	u_long		type;						// object type
-	u_long		subType;					// object sub-type
+	uint32_t	cookie;						// this value should always == MO_COOKIE
+	int			refCount;					// # times this is referenced
+	uint32_t	type;						// object type
+	uint32_t	subType;					// object sub-type
 	void		*data;						// pointer to meta object's specific data	
 	
 	struct MetaObjectHeader *parentGroup;			// illegal reference to parent group, or nil if no parent
@@ -81,14 +81,14 @@ typedef struct
 {
 	OGLSetupOutputType *setupInfo;					// materials are draw context relative, so remember which context we're using now
 	
-	u_long			flags;	
+	uint32_t		flags;
 	OGLColorRGBA	diffuseColor;					// rgba diffuse color
-	u_short			multiTextureMode;				// sphere map, etc.
-	u_short			multiTextureCombine;			// blend, replace, etc.
-	u_short			envMapNum;						// texture # in env map list to use
+	uint16_t		multiTextureMode;				// sphere map, etc.
+	uint16_t		multiTextureCombine;			// blend, replace, etc.
+	uint16_t		envMapNum;						// texture # in env map list to use
 	
-	u_long			numMipmaps;						// # texture mipmaps to use
-	u_long			width,height;					// dimensions of texture
+	int				numMipmaps;						// # texture mipmaps to use
+	int				width,height;					// dimensions of texture
 	GLint			pixelSrcFormat;					// OGL format (GL_RGBA, etc.) for src pixels (ignored if texturePixels == nil)
 	GLint			pixelDstFormat;					// OGL format (GL_RGBA, etc.) for VRAM (ignored if texturePixels == nil)
 	void			*texturePixels[MO_MAX_MIPMAPS]; // ptr to texture pixels for each mipmap (if nil, user code must preload GL texture)
@@ -215,7 +215,7 @@ typedef struct
 //-----------------------------
 
 void MO_InitHandler(void);
-MetaObjectPtr MO_CreateNewObjectOfType(u_long type, u_long subType, void *data);
+MetaObjectPtr MO_CreateNewObjectOfType(uint32_t type, uint32_t subType, void *data);
 MetaObjectPtr MO_GetNewReference(MetaObjectPtr mo);
 void MO_AppendToGroup(MOGroupObject *group, MetaObjectPtr newObject);
 void MO_AttachToGroupStart(MOGroupObject *group, MetaObjectPtr newObject);
