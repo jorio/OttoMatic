@@ -24,8 +24,9 @@ enum
 enum
 {
 	GLOBAL_SObjType_Shadow_Circular,
-	GLOBAL_SObjType_Shadow_Triangular,
-	
+
+	GLOBAL_SObjType_FrozenBrainAlien,
+
 	GLOBAL_SObjType_Water,
 	GLOBAL_SObjType_Soap,
 	GLOBAL_SObjType_GreenWater,
@@ -43,8 +44,6 @@ enum
 	GLOBAL_SObjType_AtomicRing_Blue,
 	GLOBAL_SObjType_NovaCharge,
 	GLOBAL_SObjType_MagnetRay,
-	
-	GLOBAL_SObjType_FrozenBrainAlien,
 
 	GLOBAL_SObjType_COUNT,
 };
