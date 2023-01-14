@@ -713,10 +713,10 @@ ObjNode			*rocket;
 		/* DRAW IT */
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0,0);	glVertex3f(x+verts[0].x * s, y+verts[0].y * s, z+verts[0].z);
-	glTexCoord2f(1,0);	glVertex3f(x+verts[1].x * s, y+verts[1].y * s, z+verts[1].z);
-	glTexCoord2f(1,1);	glVertex3f(x+verts[2].x * s, y+verts[2].y * s, z+verts[2].z);
-	glTexCoord2f(0,1);	glVertex3f(x+verts[3].x * s, y+verts[3].y * s, z+verts[3].z);
+	glTexCoord2f(0,1);	glVertex3f(x+verts[0].x * s, y+verts[0].y * s, z+verts[0].z);
+	glTexCoord2f(1,1);	glVertex3f(x+verts[1].x * s, y+verts[1].y * s, z+verts[1].z);
+	glTexCoord2f(1,0);	glVertex3f(x+verts[2].x * s, y+verts[2].y * s, z+verts[2].z);
+	glTexCoord2f(0,0);	glVertex3f(x+verts[3].x * s, y+verts[3].y * s, z+verts[3].z);
 	glEnd();
 
 	theNode->SpecialF[0] -= gFramesPerSecondFrac;			// animate

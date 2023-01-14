@@ -34,12 +34,6 @@ static void SaveHighScores(void);
 
 enum
 {
-	HIGHSCORES_SObjType_Cyc
-};
-
-
-enum
-{
 	HIGHSCORES_SObjType_ScoreText,
 	HIGHSCORES_SObjType_ScoreTextGlow,
 	HIGHSCORES_SObjType_EnterNameText,
@@ -507,13 +501,9 @@ Str255				scoreString;
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
+	LoadSpriteGroup(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_COUNT, "particle");
+	LoadSpriteGroup(SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_COUNT, "highscores");
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:highscores.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_HIGHSCORES);
-
 
 
 			/* MAKE CYC */

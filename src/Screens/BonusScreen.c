@@ -74,23 +74,6 @@ enum
 };
 
 
-
-enum
-{
-	BONUS_SObjType_BonusText,
-	BONUS_SObjType_BonusGlow,
-
-	BONUS_SObjType_InventoryText,
-	BONUS_SObjType_InventoryGlow,
-
-	BONUS_SObjType_TotalBonusText,
-	BONUS_SObjType_TotalBonusGlow,
-
-	BONUS_SObjType_ScoreText,
-	BONUS_SObjType_ScoreGlow
-};
-
-
 enum
 {
 	SHOW_SCORE_MODE_OFF,
@@ -332,15 +315,11 @@ static const OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 
 			/* LOAD SPRITES */
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
+	LoadSpriteGroup(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_COUNT, "particle");
+	LoadSpriteGroup(SPRITE_GROUP_BONUS, BONUS_SObjType_COUNT, "bonus");
+	LoadSpriteGroup(SPRITE_GROUP_SPHEREMAPS, SPHEREMAP_SObjType_COUNT, "spheremap");
+
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:bonus.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_BONUS);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
 
 
 				/* LOAD AUDIO */

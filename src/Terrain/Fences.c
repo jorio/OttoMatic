@@ -30,38 +30,6 @@ static void DrawFenceNormals(short f);
 
 #define	FENCE_SINK_FACTOR	70.0f
 
-enum
-{
-	FENCE_TYPE_FARMWOOD,
-	FENCE_TYPE_CORNSTALK,
-	FENCE_TYPE_CHICKENWIRE,
-	FENCE_TYPE_METALFARM,
-
-	FENCE_TYPE_PINKCRYSTAL,
-	FENCE_TYPE_MECH,
-	FENCE_TYPE_SLIMETREE,
-	FENCE_TYPE_BLUECRYSTAL,
-	FENCE_TYPE_MECH2,
-	FENCE_TYPE_JUNGLEWOOD,
-	FENCE_TYPE_JUNGLEFERN,
-
-	FENCE_TYPE_LAMP,
-	FENCE_TYPE_RUBBLE,
-	FENCE_TYPE_CRUNCH,
-
-	FENCE_TYPE_FUN,
-	FENCE_TYPE_HEDGE,
-	FENCE_TYPE_LINE,
-	FENCE_TYPE_TENT,
-
-	FENCE_TYPE_LAVAFENCE,
-	FENCE_TYPE_ROCKFENCE,
-
-	FENCE_TYPE_NEURONFENCE,
-
-	FENCE_TYPE_SAUCER
-};
-
 
 /**********************/
 /*     VARIABLES      */
@@ -376,8 +344,8 @@ float					minX,minY,minZ,maxX,maxY,maxZ;
 									gFencePoints[f][j-2].x, gFencePoints[f][j-2].y, gFencePoints[f][j-2].z) * textureUOff;
 			}
 
-			gFenceUVs[f][j].v 		= 0;									// bottom
-			gFenceUVs[f][j+1].v 	= 1.0;									// top
+			gFenceUVs[f][j].v 		= 1;									// bottom
+			gFenceUVs[f][j+1].v 	= 0;									// top
 			gFenceUVs[f][j].u 		= gFenceUVs[f][j+1].u = u;
 		}
 

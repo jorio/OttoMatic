@@ -1269,10 +1269,10 @@ float			scaleX,scaleY,x,y,z;
 			/* DRAW IT */
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0,1);	glVertex3f(x, y, z);
-	glTexCoord2f(1,1);	glVertex3f(x+scaleX, y, z);
-	glTexCoord2f(1,0);	glVertex3f(x+scaleX, y+scaleY, z);
-	glTexCoord2f(0,0);	glVertex3f(x, y+scaleY, z);
+	glTexCoord2f(0,0);	glVertex3f(x, y, z);
+	glTexCoord2f(1,0);	glVertex3f(x+scaleX, y, z);
+	glTexCoord2f(1,1);	glVertex3f(x+scaleX, y+scaleY, z);
+	glTexCoord2f(0,1);	glVertex3f(x, y+scaleY, z);
 	glEnd();
 
 

@@ -211,10 +211,10 @@ int				px,py,pw,ph;
 		fy = (ph-y) / (ph/2) - 1.0f;
 
 		glBegin(GL_QUADS);
-		glTexCoord2f(0,0);	glVertex2f(fx - sx, fy - sy);
-		glTexCoord2f(1,0);	glVertex2f(fx + sx, fy - sy);
-		glTexCoord2f(1,1);	glVertex2f(fx + sx, fy + sy);
-		glTexCoord2f(0,1);	glVertex2f(fx - sx, fy + sy);
+		glTexCoord2f(0,1);	glVertex2f(fx - sx, fy - sy);
+		glTexCoord2f(1,1);	glVertex2f(fx + sx, fy - sy);
+		glTexCoord2f(1,0);	glVertex2f(fx + sx, fy + sy);
+		glTexCoord2f(0,0);	glVertex2f(fx - sx, fy + sy);
 		glEnd();
 	}
 

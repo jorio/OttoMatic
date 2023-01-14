@@ -601,18 +601,23 @@ const char*	levelModelFiles[NUM_LEVELS] =
 	":Models:level10_brainboss.bg3d",
 };
 
-const char*	levelSpriteFiles[NUM_LEVELS] =
+struct
 {
-	":Sprites:level1_farm.sprites",
-	":Sprites:level2_slime.sprites",
-	"",
-	":Sprites:level4_apocalypse.sprites",
-	":Sprites:level5_cloud.sprites",
-	":Sprites:level6_jungle.sprites",
-	":Sprites:level6_jungle.sprites",
-	":Sprites:level8_fireice.sprites",
-	"",
-	":Sprites:level10_brainboss.sprites",
+	const char* groupName;
+	int numSprites;
+}
+levelSpriteFiles[NUM_LEVELS] =
+{
+	{"farm", FARM_SObjType_COUNT},
+	{"slime", SLIME_SObjType_COUNT},
+	{NULL, 0},
+	{"apocalypse", APOCALYPSE_SObjType_COUNT},
+	{"cloud", CLOUD_SObjType_COUNT},
+	{"jungle", JUNGLE_SObjType_COUNT},
+	{"jungle", JUNGLE_SObjType_COUNT},
+	{"fireice", FIREICE_SObjType_COUNT},
+	{NULL, 0},
+	{"brainboss", BRAINBOSS_SObjType_COUNT},
 };
 
 
@@ -915,23 +920,15 @@ const char*	levelSpriteFiles[NUM_LEVELS] =
 
 			/* LOAD SPRITES */
 
-	if (levelSpriteFiles[gLevelNum][0] > 0)
+	if (levelSpriteFiles[gLevelNum].numSprites != 0)
 	{
-		FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, levelSpriteFiles[gLevelNum], &spec);
-		LoadSpriteFile(&spec, SPRITE_GROUP_LEVELSPECIFIC);
+		LoadSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC, levelSpriteFiles[gLevelNum].numSprites, levelSpriteFiles[gLevelNum].groupName);
 	}
 
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:infobar.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_INFOBAR);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:fence.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_FENCES);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:global.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_GLOBAL);
-
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:spheremap.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_SPHEREMAPS);
+	LoadSpriteGroup(SPRITE_GROUP_INFOBAR, INFOBAR_SObjType_COUNT, "infobar");
+	LoadSpriteGroup(SPRITE_GROUP_FENCES, FENCE_TYPE_COUNT, "fence");
+	LoadSpriteGroup(SPRITE_GROUP_GLOBAL, GLOBAL_SObjType_COUNT, "global");
+	LoadSpriteGroup(SPRITE_GROUP_SPHEREMAPS, SPHEREMAP_SObjType_COUNT, "spheremap");
 
 
 			/* LOAD TERRAIN */

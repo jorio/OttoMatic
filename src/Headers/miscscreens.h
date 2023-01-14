@@ -15,16 +15,6 @@ typedef struct
 
 enum
 {
-	LOSE_SObjType_GameOver,
-	WIN_SObjType_TheEnd_Text,
-	WIN_SObjType_TheEnd_Glow,
-	WIN_SObjType_BlackOut,
-	WIN_SObjType_QText,
-	WIN_SObjType_QGlow
-};
-
-enum
-{
 	FILE_SCREEN_TYPE_LOAD,
 	FILE_SCREEN_TYPE_SAVE,
 };

@@ -80,60 +80,6 @@ static inline float AnchorBottom(float y);
 #define	HELP_Y				420.0f
 
 
-/******************* INFOBAR SOBJTYPES *************************/
-
-enum
-{
-	INFOBAR_SObjType_PulseGun,
-	INFOBAR_SObjType_FreezeGun,
-	INFOBAR_SObjType_FlameGun,
-	INFOBAR_SObjType_Fist,
-	INFOBAR_SObjType_SuperNova,
-	INFOBAR_SObjType_GrowVial,
-	INFOBAR_SObjType_FlareGun,
-	INFOBAR_SObjType_DartPOW,
-
-	INFOBAR_SObjType_PulseGunGlow,
-	INFOBAR_SObjType_FreezeGlow,
-	INFOBAR_SObjType_FlameGlow,
-	INFOBAR_SObjType_FistGlow,
-	INFOBAR_SObjType_SuperNovaGlow,
-	INFOBAR_SObjType_GrowVialGlow,
-	INFOBAR_SObjType_FlareGlow,
-	INFOBAR_SObjType_DartGlow,
-
-	INFOBAR_SObjType_LeftGirder,
-	INFOBAR_SObjType_RightGirder,
-	INFOBAR_SObjType_OttoHead,
-	INFOBAR_SObjType_HealthMeter,
-	INFOBAR_SObjType_FuelMeter,
-	INFOBAR_SObjType_JumpJetMeter,
-	INFOBAR_SObjType_MeterBack,
-	INFOBAR_SObjType_WeaponDisplay,
-	INFOBAR_SObjType_RocketIcon,
-
-	INFOBAR_SObjType_0,
-	INFOBAR_SObjType_1,
-	INFOBAR_SObjType_2,
-	INFOBAR_SObjType_3,
-	INFOBAR_SObjType_4,
-	INFOBAR_SObjType_5,
-	INFOBAR_SObjType_6,
-	INFOBAR_SObjType_7,
-	INFOBAR_SObjType_8,
-	INFOBAR_SObjType_9,
-
-	INFOBAR_SObjType_BeamCupLeft,
-	INFOBAR_SObjType_BeamCupRight,
-	INFOBAR_SObjType_TeleportBeam,
-	INFOBAR_SObjType_DestructoBeam,
-
-	INFOBAR_SObjType_HumanFrame,
-	INFOBAR_SObjType_Farmer,
-	INFOBAR_SObjType_BeeWoman,
-	INFOBAR_SObjType_Scientist,
-	INFOBAR_SObjType_SkirtLady
-};
 
 
 
@@ -347,10 +293,10 @@ float				aspect;
 			/* DRAW IT */
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0,1);	glVertex2f(x, 		y);
-	glTexCoord2f(1,1);	glVertex2f(x+size, 	y);
-	glTexCoord2f(1,0);	glVertex2f(x+size,  y+(size*aspect));
-	glTexCoord2f(0,0);	glVertex2f(x,		y+(size*aspect));
+	glTexCoord2f(0,0);	glVertex2f(x, 		y);
+	glTexCoord2f(1,0);	glVertex2f(x+size, 	y);
+	glTexCoord2f(1,1);	glVertex2f(x+size,  y+(size*aspect));
+	glTexCoord2f(0,1);	glVertex2f(x,		y+(size*aspect));
 	glEnd();
 }
 
@@ -377,10 +323,10 @@ float				aspect;
 			/* DRAW IT */
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0,1);	glVertex2f(x, 		y);
-	glTexCoord2f(1,1);	glVertex2f(x+size, 	y);
-	glTexCoord2f(1,0);	glVertex2f(x+size,  y+(size*aspect));
-	glTexCoord2f(0,0);	glVertex2f(x,		y+(size*aspect));
+	glTexCoord2f(0,0);	glVertex2f(x, 		y);
+	glTexCoord2f(1,0);	glVertex2f(x+size, 	y);
+	glTexCoord2f(1,1);	glVertex2f(x+size,  y+(size*aspect));
+	glTexCoord2f(0,1);	glVertex2f(x,		y+(size*aspect));
 	glEnd();
 }
 
@@ -406,10 +352,10 @@ float				aspect;
 			/* DRAW IT */
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0,1);	glVertex2f(x, 		y);
-	glTexCoord2f(1,1);	glVertex2f(x+size, 	y);
-	glTexCoord2f(1,0);	glVertex2f(x+size,  y+(size*aspect));
-	glTexCoord2f(0,0);	glVertex2f(x,		y+(size*aspect));
+	glTexCoord2f(0,0);	glVertex2f(x, 		y);
+	glTexCoord2f(1,0);	glVertex2f(x+size, 	y);
+	glTexCoord2f(1,1);	glVertex2f(x+size,  y+(size*aspect));
+	glTexCoord2f(0,1);	glVertex2f(x,		y+(size*aspect));
 	glEnd();
 }
 
@@ -450,10 +396,10 @@ OGLMatrix3x3		m;
 			/* DRAW IT */
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0,1);	glVertex2f(p[0].x + xoff, p[0].y + yoff);
-	glTexCoord2f(1,1);	glVertex2f(p[1].x + xoff, p[1].y + yoff);
-	glTexCoord2f(1,0);	glVertex2f(p[2].x + xoff, p[2].y + yoff);
-	glTexCoord2f(0,0);	glVertex2f(p[3].x + xoff, p[3].y + yoff);
+	glTexCoord2f(0,0);	glVertex2f(p[0].x + xoff, p[0].y + yoff);
+	glTexCoord2f(1,0);	glVertex2f(p[1].x + xoff, p[1].y + yoff);
+	glTexCoord2f(1,1);	glVertex2f(p[2].x + xoff, p[2].y + yoff);
+	glTexCoord2f(0,1);	glVertex2f(p[3].x + xoff, p[3].y + yoff);
 	glEnd();
 }
 
@@ -475,10 +421,10 @@ float				aspect;
 			/* DRAW IT */
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0,1);	glVertex2f(x, 			y);
-	glTexCoord2f(1,1);	glVertex2f(x+scaleX, 	y);
-	glTexCoord2f(1,0);	glVertex2f(x+scaleX, 	y+(scaleY*aspect));
-	glTexCoord2f(0,0);	glVertex2f(x,			y+(scaleY*aspect));
+	glTexCoord2f(0,0);	glVertex2f(x, 			y);
+	glTexCoord2f(1,0);	glVertex2f(x+scaleX, 	y);
+	glTexCoord2f(1,1);	glVertex2f(x+scaleX, 	y+(scaleY*aspect));
+	glTexCoord2f(0,1);	glVertex2f(x,			y+(scaleY*aspect));
 	glEnd();
 }
 

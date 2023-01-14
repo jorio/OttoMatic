@@ -546,10 +546,10 @@ int	shadowType = theNode->Kind;
 
 	glDisable(GL_CULL_FACE);
 	glBegin(GL_QUADS);
-	glTexCoord2f(0,0);	glVertex3f(-20, 0, 20);
-	glTexCoord2f(1,0);	glVertex3f(20, 0, 20);
-	glTexCoord2f(1,1);	glVertex3f(20, 0, -20);
-	glTexCoord2f(0,1);	glVertex3f(-20, 0, -20);
+	glTexCoord2f(0,1);	glVertex3f(-20, 0, 20);
+	glTexCoord2f(1,1);	glVertex3f(20, 0, 20);
+	glTexCoord2f(1,0);	glVertex3f(20, 0, -20);
+	glTexCoord2f(0,0);	glVertex3f(-20, 0, -20);
 	glEnd();
 	glEnable(GL_CULL_FACE);
 

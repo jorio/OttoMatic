@@ -103,7 +103,7 @@ static uint8_t* ConvertToARGB(const uint8_t* in, const TGAHeader* header)
 
 	switch (header->bpp)
 	{
-		case 32:	// BGRA -> ARGB
+		case 32:	// BGRA -> ARGB  -- TODO: Perhaps we could do away with this (native endianness)
 		{
 			const uint8_t* inComponent = (const uint8_t*) in;
 			for (int p = 0; p < pixelCount; p++)
@@ -138,16 +138,34 @@ static uint8_t* ConvertToARGB(const uint8_t* in, const TGAHeader* header)
 		case 16:	// RGB16 -> ARGB
 		{
 			const uint16_t* inPtr16 = (const uint16_t*) in;
-			for (int p = 0; p < pixelCount; p++)
-			{
-				uint16_t inRGB16 = *inPtr16;
-				argbOut[0] = 0xFF;
-				argbOut[1] = (((inRGB16 >> 10) & 0b11111) * 255) / 31;
-				argbOut[2] = (((inRGB16 >> 5) & 0b11111) * 255) / 31;
-				argbOut[3] = (((inRGB16 >> 0) & 0b11111) * 255) / 31;
 
-				argbOut += 4;
-				inPtr16++;
+			if (header->imageDescriptor & 1)	// targa 16 has alpha
+			{
+				for (int p = 0; p < pixelCount; p++)
+				{
+					uint16_t inRGB16 = *inPtr16;
+					argbOut[0] = (inRGB16 & 0x8000) ? (0xFF) : (0x00);
+					argbOut[1] = (((inRGB16 >> 10) & 0b11111) * 255) / 31;
+					argbOut[2] = (((inRGB16 >> 5) & 0b11111) * 255) / 31;
+					argbOut[3] = (((inRGB16 >> 0) & 0b11111) * 255) / 31;
+
+					argbOut += 4;
+					inPtr16++;
+				}
+			}
+			else
+			{
+				for (int p = 0; p < pixelCount; p++)
+				{
+					uint16_t inRGB16 = *inPtr16;
+					argbOut[0] = 0xFF;
+					argbOut[1] = (((inRGB16 >> 10) & 0b11111) * 255) / 31;
+					argbOut[2] = (((inRGB16 >> 5) & 0b11111) * 255) / 31;
+					argbOut[3] = (((inRGB16 >> 0) & 0b11111) * 255) / 31;
+
+					argbOut += 4;
+					inPtr16++;
+				}
 			}
 			break;
 		}

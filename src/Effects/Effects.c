@@ -109,14 +109,10 @@ void InitParticleSystem(void)
 		OGLTextureCoord* uv = vertexArrayData.uvs[0];
 		for (int j = 0; j < MAX_PARTICLES * 4; j += 4)
 		{
-			uv[j].u = 0;									// upper left
-			uv[j].v = 1;
-			uv[j+1].u = 0;									// lower left
-			uv[j+1].v = 0;
-			uv[j+2].u = 1;									// lower right
-			uv[j+2].v = 0;
-			uv[j+3].u = 1;									// upper right
-			uv[j+3].v = 1;
+			uv[j  ] = (OGLTextureCoord) {0, 0};				// upper left
+			uv[j+1] = (OGLTextureCoord) {0, 1};				// lower left
+			uv[j+2] = (OGLTextureCoord) {1, 1};				// lower right
+			uv[j+3] = (OGLTextureCoord) {1, 0};				// upper right
 		}
 
 				/* INIT TRIANGLE ARRAYS */
@@ -147,10 +143,7 @@ void InitParticleSystem(void)
 
 			/* LOAD SPRITES */
 
-	FSSpec	spec;
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Sprites:particle.sprites", &spec);
-	LoadSpriteFile(&spec, SPRITE_GROUP_PARTICLES);
-
+	LoadSpriteGroup(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_COUNT, "particle");
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
 

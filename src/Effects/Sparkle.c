@@ -243,10 +243,10 @@ static OGLPoint3D		frame[4] =
 
 
 		glBegin(GL_QUADS);
-		glTexCoord2f(0,0);	glVertex3fv((GLfloat *)&tc[0]);
-		glTexCoord2f(1,0);	glVertex3fv((GLfloat *)&tc[1]);
-		glTexCoord2f(1,1);	glVertex3fv((GLfloat *)&tc[2]);
-		glTexCoord2f(0,1);	glVertex3fv((GLfloat *)&tc[3]);
+		glTexCoord2f(0,1);	glVertex3fv((GLfloat *)&tc[0]);
+		glTexCoord2f(1,1);	glVertex3fv((GLfloat *)&tc[1]);
+		glTexCoord2f(1,0);	glVertex3fv((GLfloat *)&tc[2]);
+		glTexCoord2f(0,0);	glVertex3fv((GLfloat *)&tc[3]);
 		glEnd();
 	}
 
@@ -545,20 +545,4 @@ static const short textureTable[] =
 
 	return(true);													// item was added
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
