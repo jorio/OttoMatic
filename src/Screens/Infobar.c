@@ -56,7 +56,7 @@ static inline float AnchorBottom(float y);
 #define	WEAPON_FRAME_SIZE	(WEAPON_SIZE * 3/2)
 
 #define FUEL_SIZE			HEALTH_SIZE
-#define	FUEL_X				AnchorRight(FUEL_SIZE+HEALTH_X)
+#define	FUEL_X				AnchorRight(FUEL_SIZE+23.0f)
 #define	FUEL_Y				HEALTH_Y
 
 #define	BEAM_CUP_X			190.0f
@@ -74,7 +74,7 @@ static inline float AnchorBottom(float y);
 #define HUMAN_XFROMRIGHT	(-10 - HUMAN_SCALE/2)
 #define HUMAN_OFFSCREEN_OFFSET_X (HUMAN_XFROMRIGHT + 60.0f)
 #define	HUMAN_X				AnchorRight(-HUMAN_XFROMRIGHT)
-#define	HUMAN_Y				150.0f
+#define	HUMAN_Y				AnchorTop(150.0f)
 #define	HUMAN_SPACING		(HUMAN_SCALE * 2.8f)
 
 #define	HELP_Y				420.0f
@@ -87,6 +87,8 @@ static inline float AnchorBottom(float y);
 /*********************/
 /*    VARIABLES      */
 /*********************/
+
+static RectF	gInfobarViewport;
 
 static 	short			gHealthWarningChannel = -1;
 static	float			gHealthWarningWobble = 0;
@@ -115,32 +117,34 @@ static	float	gHumanOffsetX[NUM_HUMAN_TYPES];
 
 static inline float AnchorLeft(float x)
 {
-	return x;
+	return gInfobarViewport.left + x;
 }
 
 static inline float AnchorRight(float x)
 {
-	return g2DLogicalWidth - x;
+	return gInfobarViewport.right - x;
 }
 
 static inline float AnchorTop(float y)
 {
-	return y;
+	return gInfobarViewport.top + y;
 }
 
 static inline float AnchorBottom(float y)
 {
-	return g2DLogicalHeight - y;
+	return gInfobarViewport.bottom - y;
 }
 
 static inline float AnchorCenterX(float x)
 {
-	return g2DLogicalWidth/2;
+	float cx = 0.5f * (gInfobarViewport.right + gInfobarViewport.left);
+	return x + cx;
 }
 
 static inline float AnchorCenterY(float y)
 {
-	return g2DLogicalHeight/2;
+	float cy = 0.5f * (gInfobarViewport.bottom + gInfobarViewport.top);
+	return y + cy;
 }
 
 
@@ -196,7 +200,7 @@ void DisposeInfobar(void)
 
 /***************** SET INFOBAR SPRITE STATE *******************/
 
-void SetInfobarSpriteState(bool centered)
+void SetInfobarSpriteState(bool setOriginToCenterOfScreen)
 {
 	OGL_DisableLighting();
 	glDisable(GL_CULL_FACE);
@@ -209,7 +213,7 @@ void SetInfobarSpriteState(bool centered)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	if (centered)
+	if (setOriginToCenterOfScreen)
 		glOrtho(-g2DLogicalWidth*.5f, g2DLogicalWidth*.5f, g2DLogicalHeight*.5f, -g2DLogicalHeight*.5f, 0, 1);
 	else
 		glOrtho(0, g2DLogicalWidth, g2DLogicalHeight, 0, 0, 1);
@@ -233,6 +237,25 @@ void DrawInfobar(void)
 
 	if (gGameViewInfoPtr->useFog)
 		glDisable(GL_FOG);
+
+	gInfobarViewport.left = 0;
+	gInfobarViewport.top = 0;
+	gInfobarViewport.right = g2DLogicalWidth;
+	gInfobarViewport.bottom = g2DLogicalHeight;
+	if (gGamePrefs.centeredInfobar)
+	{
+		float currentAR = g2DLogicalWidth / g2DLogicalHeight;
+		float targetAR = 640.0f / 480.0f;
+
+		if (currentAR >= targetAR)		// current aspect ratio is wider than the target aspect ratio
+		{
+			float covered = g2DLogicalWidth * targetAR / currentAR;
+			float padding = g2DLogicalWidth - covered;
+
+			gInfobarViewport.left = padding / 2.0f;
+			gInfobarViewport.right = g2DLogicalWidth - padding / 2.0f;//gInfobarViewport.left + covered;
+		}
+	}
 
 	SetInfobarSpriteState(false);
 
@@ -526,10 +549,9 @@ Str255	s;
 
 static void Infobar_DrawGirders(void)
 {
-
-	DrawInfobarSprite(AnchorLeft(0), AnchorTop(0), 100, INFOBAR_SObjType_LeftGirder);
-
-	DrawInfobarSprite(AnchorRight(100), AnchorTop(0), 100, INFOBAR_SObjType_RightGirder);
+	// Always draw girders in corners of screen (no AnchorLeft/AnchorRight) even if HUD is centered
+	DrawInfobarSprite(0, 0, 100, INFOBAR_SObjType_LeftGirder);
+	DrawInfobarSprite(g2DLogicalWidth-100, 0, 100, INFOBAR_SObjType_RightGirder);
 }
 
 

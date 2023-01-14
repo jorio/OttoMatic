@@ -46,7 +46,7 @@ static inline void Blit16(
 
 #define PREFS_HEADER_LENGTH 16
 #define PREFS_FILE_NAME ":OttoMatic:Preferences6"
-const char PREFS_HEADER_STRING[PREFS_HEADER_LENGTH+1] = "OttoMaticPrefs06";		// Bump this every time prefs struct changes -- note: this will reset user prefs
+const char PREFS_HEADER_STRING[PREFS_HEADER_LENGTH+1] = "OttoMaticPrefs07";		// Bump this every time prefs struct changes -- note: this will reset user prefs
 
 
 		/* PLAYFIELD HEADER */
