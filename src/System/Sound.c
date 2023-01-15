@@ -100,7 +100,6 @@ static	SndChannelPtr		gMusicChannel = nil;
 Boolean						gAllowAudioKeys = true;
 
 
-static short				gMusicFileRefNum = 0x0ded;
 static short				gCurrentSong = -1;
 static Boolean				gSongPlayingFlag = false;
 
@@ -544,6 +543,10 @@ OSErr err;
 	loadedSound->sndHandle = Pomme_SndLoadFileAsResource(refNum);
 	GAME_ASSERT_MESSAGE(loadedSound->sndHandle, path);
 
+			/* CLOSE FILE */
+
+	FSClose(refNum);
+
 			/* GET OFFSET INTO IT */
 
 	GetSoundHeaderOffset(loadedSound->sndHandle, &loadedSound->sndOffset);
@@ -760,16 +763,15 @@ static const float	volumeTweaks[NUM_SONGS] =
 			/* OPEN APPROPRIATE AIFF FILE */
 			/******************************/
 
-	{
-		FSSpec spec;
-		OSErr iErr;
+	short musicFileRefNum = -1;
+	FSSpec spec;
+	OSErr iErr;
 
-		iErr = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, songNames[songNum], &spec);
-		GAME_ASSERT(!iErr);
+	iErr = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, songNames[songNum], &spec);
+	GAME_ASSERT(!iErr);
 
-		iErr = FSpOpenDF(&spec, fsRdPerm, &gMusicFileRefNum);
-		GAME_ASSERT(!iErr);
-	}
+	iErr = FSpOpenDF(&spec, fsRdPerm, &musicFileRefNum);
+	GAME_ASSERT(!iErr);
 
 	gCurrentSong = songNum;
 
@@ -799,9 +801,9 @@ static const float	volumeTweaks[NUM_SONGS] =
 
 			/* START PLAYING FROM FILE */
 
-	OSErr iErr = SndStartFilePlay(
+	iErr = SndStartFilePlay(
 			gMusicChannel,
-			gMusicFileRefNum,
+			musicFileRefNum,
 			0,
 			/*STREAM_BUFFER_SIZE*/0,
 			/*gMusicBuffer*/nil,
@@ -810,6 +812,8 @@ static const float	volumeTweaks[NUM_SONGS] =
 			true);
 	GAME_ASSERT(!iErr);
 	gSongPlayingFlag = true;
+
+	FSClose(musicFileRefNum);		// close the file (Pomme decompresses entire song into memory)
 
 
 			/* SET VOLUME ON STREAM */
@@ -853,19 +857,6 @@ void KillSong(void)
 	gSongPlayingFlag = false;
 
 	SndStopFilePlay(gMusicChannel, true);
-
-	if (gMusicFileRefNum == 0x0ded)
-		DoAlert("KillSong: gMusicFileRefNum == 0x0ded");
-	else
-	{
-		OSErr iErr = FSClose(gMusicFileRefNum);							// close the file
-		if (iErr)
-		{
-			DoAlert("KillSong: FSClose failed!");
-		}
-	}
-
-	gMusicFileRefNum = 0x0ded;
 }
 
 /******************** TOGGLE MUSIC *********************/
