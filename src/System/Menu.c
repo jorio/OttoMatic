@@ -118,10 +118,18 @@ static KeyBinding* GetBindingAtRow(int row)
 static const char* GetKeyBindingName(int row, int col)
 {
 	int16_t scancode = GetBindingAtRow(row)->key[col];
-	if (scancode == 0)
-		return Localize(STR_UNBOUND_PLACEHOLDER);
-	else
-		return SDL_GetScancodeName(scancode);
+
+	switch (scancode)
+	{
+		case 0:
+			return Localize(STR_UNBOUND_PLACEHOLDER);
+		case SDL_SCANCODE_COMMA:				// on a US layout, it makes more sense to show "<" for camera left
+			return "<";						
+		case SDL_SCANCODE_PERIOD:				// on a US layout, it makes more sense to show ">" for camera right
+			return ">";						
+		default:
+			return SDL_GetScancodeName(scancode);
+	}
 }
 
 static const char* GetPadBindingName(int row, int col)
