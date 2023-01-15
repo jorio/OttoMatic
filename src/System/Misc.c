@@ -105,8 +105,6 @@ static Boolean	beenHere = false;
 		TextMesh_DisposeMetrics();
 	}
 
-	UseResFile(gMainAppRezFile);
-
 	SDL_ShowCursor(1);
 	MyFlushEvents();
 

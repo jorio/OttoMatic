@@ -236,7 +236,6 @@ extern	short					gBeamMode;
 extern	short					gBeamModeSelected;
 extern	short					gBestCheckpointNum;
 extern	short					gDisplayedHelpMessage;
-extern	short					gMainAppRezFile;
 extern	int						gNumActiveParticleGroups;
 extern	int						gNumCollisions;
 extern	int						gNumFencesDrawn;

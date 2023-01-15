@@ -1,5 +1,5 @@
 // OTTO MATIC ENTRY POINT
-// (C) 2021 Iliyas Jorio
+// (C) 2023 Iliyas Jorio
 // This file is part of Otto Matic. https://github.com/jorio/ottomatic
 
 #include <SDL.h>
@@ -72,16 +72,12 @@ tryAgain:
 	// Set data spec -- Lets the game know where to find its asset files
 	gDataSpec = Pomme::Files::HostPathToFSSpec(dataPath / "Skeletons");
 
-	// Use application resource file
-	auto applicationSpec = Pomme::Files::HostPathToFSSpec(dataPath / "System" / "Application");
-	short resFileRefNum = FSpOpenResFile(&applicationSpec, fsRdPerm);
-
-	if (resFileRefNum == -1)
+	FSSpec someDataFileSpec;
+	OSErr iErr = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":Skeletons:Otto.bg3d", &someDataFileSpec);
+	if (iErr)
 	{
 		goto tryAgain;
 	}
-
-	UseResFile(resFileRefNum);
 
 	return dataPath;
 }
@@ -211,7 +207,7 @@ retryVideo:
 		auto gamecontrollerdbPath8 = (dataPath / "System" / "gamecontrollerdb.txt").u8string();
 		if (-1 == SDL_GameControllerAddMappingsFromFile((const char*)gamecontrollerdbPath8.c_str()))
 		{
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Billy Frontier", "Couldn't load gamecontrollerdb.txt!", gSDLWindow);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Otto Matic", "Couldn't load gamecontrollerdb.txt!", gSDLWindow);
 		}
 	}
 }

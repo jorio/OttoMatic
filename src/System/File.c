@@ -182,7 +182,6 @@ const char *fileNames[MAX_SKELETON_TYPES] =
 			/* CLOSE REZ FILE */
 
 	CloseResFile(fRefNum);
-	UseResFile(gMainAppRezFile);
 
 	return(skeleton);
 }
@@ -1351,7 +1350,6 @@ OSErr					iErr;
 			/* CLOSE REZ FILE */
 
 	CloseResFile(fRefNum);
-	UseResFile(gMainAppRezFile);
 
 
 

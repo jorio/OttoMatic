@@ -60,7 +60,6 @@ float				gGravity = NORMAL_GRAVITY;
 Byte				gDebugMode = 0;				// 0 == none, 1 = fps, 2 = all
 
 uint32_t			gAutoFadeStatusBits;
-short				gMainAppRezFile;
 
 OGLSetupOutputType		*gGameViewInfoPtr = nil;
 
@@ -104,14 +103,6 @@ uint32_t			gLoadedScore;
 void ToolBoxInit(void)
 {
 	MyFlushEvents();
-
-	gMainAppRezFile = CurResFile();
-
-
-
-
-
-
 
 			/* BOOT OGL */
 
