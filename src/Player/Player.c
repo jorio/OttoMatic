@@ -363,13 +363,30 @@ ObjNode	*player = gPlayerInfo.objNode;
 
 
 		case	PLAYER_DEATH_TYPE_FALL:
+		{
+				gPlayerInfo.fellThroughTrapDoor = NULL;
 				if (player->Skeleton->AnimNum != PLAYER_ANIM_FALL)
 					MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_FALL, 5);
 				gPlayerInfo.invincibilityTimer = 2.0f;
 				gDeathTimer = 2.0;
 				gPlayerFellIntoBottomlessPit = true;
 				PlayEffect_Parms3D(EFFECT_FALLYAA, &player->Coord, NORMAL_CHANNEL_RATE, 1.5);
+
+				float bestTrapDoorDistance = 1.5f * TERRAIN_POLYGON_SIZE;
+				for (ObjNode* trapDoorCandidate = gFirstNodePtr; trapDoorCandidate; trapDoorCandidate = trapDoorCandidate->NextNode)
+				{
+					if (trapDoorCandidate->TerrainItemPtr && trapDoorCandidate->TerrainItemPtr->type == 84)
+					{
+						float candidateDistance = CalcQuickDistance(player->Coord.x, player->Coord.z, trapDoorCandidate->Coord.x, trapDoorCandidate->Coord.z);
+						if (candidateDistance < bestTrapDoorDistance)
+						{
+							gPlayerInfo.fellThroughTrapDoor = trapDoorCandidate;
+							bestTrapDoorDistance = candidateDistance;
+						}
+					}
+				}
 				break;
+		}
 
 		case	PLAYER_DEATH_TYPE_SAUCERBOOM:
 				BlowUpSaucer(player);

@@ -212,6 +212,11 @@ typedef struct
 	ObjNode				*superNovaStatic;
 
 	Boolean				didCheat;
+
+
+			/* SPECIAL */
+
+	ObjNode*			fellThroughTrapDoor;
 }PlayerInfoType;
 
 

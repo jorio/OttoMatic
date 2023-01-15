@@ -367,6 +367,13 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 	if (myY < -1400.0f)								// keep from looking straight down if fallen into bottomless pit
 		myY = -1400.0f;
 
+	if (gPlayerFellIntoBottomlessPit && gPlayerInfo.fellThroughTrapDoor)
+	{
+		myX = gPlayerInfo.fellThroughTrapDoor->Coord.x;
+		myY = gPlayerInfo.fellThroughTrapDoor->Coord.y - 100;
+		myZ = gPlayerInfo.fellThroughTrapDoor->Coord.z + TERRAIN_POLYGON_SIZE / 2;
+	}
+
 	gPlayerToCameraAngle = PI - CalcYAngleFromPointToPoint(PI-gPlayerToCameraAngle, myX, myZ, oldCamX, oldCamZ);	// calc angle of camera around player
 
 
@@ -420,19 +427,9 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 	distY = target.y - oldPointOfInterestY;
 	distZ = target.z - oldPointOfInterestZ;
 
-	if (distX > 350.0f)
-		distX = 350.0f;
-	else
-	if (distX < -350.0f)
-		distX = -350.0f;
-
-	if (distZ > 350.0f)
-		distZ = 350.0f;
-	else
-	if (distZ < -350.0f)
-		distZ = -350.0f;
-
-
+	distX = ClampFloat(distX, -350, 350);
+	distZ = ClampFloat(distZ, -350, 350);
+	
 				/* MOVE "TO" */
 
 	delta = distX * (fps * gCameraLookAtAccel);										// calc delta to move
@@ -505,6 +502,8 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 
 		if (skeleton->AnimNum == PLAYER_ANIM_PICKUPANDHOLDMAGNET)	// closer if skiing
 			dist = 400.0f;
+		else if (gPlayerFellIntoBottomlessPit)
+			dist = 200;
 
 
 		target.x = myX + (pToC.x * dist);									// target is appropriate dist based on cam's current coord
@@ -588,21 +587,19 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 		from.y = gGameViewInfoPtr->cameraPlacement.cameraLocation.y+(dist*fps);
 
 		if (gPlayerInfo.scaleRatio <= 1.0f)
-			if (from.y < (to.y+CAM_MINY))								// make sure camera never under the "to" point (insures against camera flipping over)
-				from.y = (to.y+CAM_MINY);
+			from.y = MaxFloat(from.y, to.y + CAM_MINY);						// make sure camera never under the "to" point (insures against camera flipping over)
 
 
 				/* MAKE SURE NOT UNDERGROUND OR WATER */
 
 		dist = GetTerrainY2(from.x, from.z) + gMinHeightOffGround;
-		if (from.y < dist)
-			from.y = dist;
+		if (gPlayerFellIntoBottomlessPit) dist += 100;
+		from.y = MaxFloat(from.y, dist);
 
 		if (GetWaterY(from.x, from.z, &waterY))
 		{
 			waterY += 50.0f;
-			if (from.y < waterY)
-				from.y = waterY;
+			from.y = MaxFloat(from.y, waterY);
 		}
 	}
 
