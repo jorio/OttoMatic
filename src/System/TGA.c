@@ -1,6 +1,6 @@
 // TGA.C
-// (C) 2020 Iliyas Jorio
-// This file is part of Bugdom. https://github.com/jorio/bugdom
+// (C) 2023 Iliyas Jorio
+// This file is part of Otto Matic. https://github.com/jorio/ottomatic
 
 #include "game.h"
 
@@ -94,94 +94,81 @@ static uint8_t* ConvertColormappedToBGR(const uint8_t* in, const TGAHeader* head
 	return remapped;
 }
 
-static uint8_t* ConvertToARGB(const uint8_t* in, const TGAHeader* header)
+static uint8_t* ConvertToRGBA(const uint8_t* in, const TGAHeader* header)
 {
 	uint8_t* converted = (uint8_t*) AllocPtr(header->width * header->height * 4);
-	uint8_t* argbOut = converted;
+
+	struct TargetPixel { uint8_t r, g, b, a; } *outPixel = (struct TargetPixel*) converted;
 
 	const int pixelCount = header->width * header->height;
 
 	switch (header->bpp)
 	{
-		case 32:	// BGRA -> ARGB  -- TODO: Perhaps we could do away with this (native endianness)
+		case 32:	// Targa source data is BGRA
 		{
-			const uint8_t* inComponent = (const uint8_t*) in;
 			for (int p = 0; p < pixelCount; p++)
 			{
-				argbOut[0] = inComponent[3];
-				argbOut[1] = inComponent[2];
-				argbOut[2] = inComponent[1];
-				argbOut[3] = inComponent[0];
-
-				argbOut += 4;
-				inComponent += 4;
+				*outPixel = (struct TargetPixel) { .r = in[2], .g = in[1], .b = in[0], .a = in[3] };
+				outPixel++;
+				in += 4;
 			}
 			break;
 		}
 
-		case 24:	// BGR -> ARGB
+		case 24:	// Targa source data is BGR
 		{
-			const uint8_t* inComponent = (const uint8_t*) in;
 			for (int p = 0; p < pixelCount; p++)
 			{
-				argbOut[0] = 0xFF;
-				argbOut[1] = inComponent[2];
-				argbOut[2] = inComponent[1];
-				argbOut[3] = inComponent[0];
-
-				argbOut += 4;
-				inComponent += 3;
+				*outPixel = (struct TargetPixel){ .r = in[2], .g = in[1], .b = in[0], .a = 0xFF };
+				outPixel++;
+				in += 3;
 			}
 			break;
 		}
 
-		case 16:	// RGB16 -> ARGB
+		case 16:	// Targa source data is A1RGB5 (packed into a little-endian 16-bit word)
 		{
 			const uint16_t* inPtr16 = (const uint16_t*) in;
 
-			if (header->imageDescriptor & 1)	// targa 16 has alpha
+			if (header->imageDescriptor & 1)	// 1 alpha + 5-5-5 color
 			{
 				for (int p = 0; p < pixelCount; p++)
 				{
-					uint16_t inRGB16 = *inPtr16;
-					argbOut[0] = (inRGB16 & 0x8000) ? (0xFF) : (0x00);
-					argbOut[1] = (((inRGB16 >> 10) & 0b11111) * 255) / 31;
-					argbOut[2] = (((inRGB16 >> 5) & 0b11111) * 255) / 31;
-					argbOut[3] = (((inRGB16 >> 0) & 0b11111) * 255) / 31;
+					uint16_t inRGB16 = UnpackI16LE(inPtr16);
+					outPixel->r = (((inRGB16 >> 10) & 0b11111) * 255) / 31;
+					outPixel->g = (((inRGB16 >> 5) & 0b11111) * 255) / 31;
+					outPixel->b = (((inRGB16 >> 0) & 0b11111) * 255) / 31;
+					outPixel->a = (inRGB16 & 0x8000) ? (0xFF) : (0x00);
 
-					argbOut += 4;
+					outPixel++;
 					inPtr16++;
 				}
 			}
-			else
+			else	// 5-5-5 color without alpha
 			{
 				for (int p = 0; p < pixelCount; p++)
 				{
-					uint16_t inRGB16 = *inPtr16;
-					argbOut[0] = 0xFF;
-					argbOut[1] = (((inRGB16 >> 10) & 0b11111) * 255) / 31;
-					argbOut[2] = (((inRGB16 >> 5) & 0b11111) * 255) / 31;
-					argbOut[3] = (((inRGB16 >> 0) & 0b11111) * 255) / 31;
+					uint16_t inRGB16 = UnpackI16LE(inPtr16);
+					outPixel->r = (((inRGB16 >> 10) & 0b11111) * 255) / 31;
+					outPixel->g = (((inRGB16 >> 5) & 0b11111) * 255) / 31;
+					outPixel->b = (((inRGB16 >> 0) & 0b11111) * 255) / 31;
+					outPixel->a = 0xFF;
 
-					argbOut += 4;
+					outPixel++;
 					inPtr16++;
 				}
 			}
 			break;
 		}
 
-		case 8:		// grayscale -> ARGB
+		case 8:		// Grayscale (note: for 8-bit indexed-color data, call ConvertColormappedToBGR first)
 		{
-			const uint8_t* inGray = (const uint8_t*) in;
 			for (int p = 0; p < pixelCount; p++)
 			{
-				argbOut[0] = 0xFF;
-				argbOut[1] = *inGray;
-				argbOut[2] = *inGray;
-				argbOut[3] = *inGray;
-
-				argbOut += 4;
-				inGray++;
+				uint8_t gray = *in;
+				*outPixel = (struct TargetPixel){ .r = gray, .g = gray, .b = gray, .a = 0xFF };
+				outPixel++;
+				in++;
 			}
 			break;
 		}
@@ -212,7 +199,7 @@ static void FlipPixelData(uint8_t* data, TGAHeader* header)
 	SafeDisposePtr((Ptr) topRowCopy);
 }
 
-OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, bool forceARGB)
+OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, bool forceRGBA)
 {
 	short		refNum;
 	OSErr		err;
@@ -323,12 +310,12 @@ OSErr ReadTGA(const FSSpec* spec, uint8_t** outPtr, TGAHeader* outHeader, bool f
 		header.bpp = header.paletteBitsPerColor;
 	}
 
-	// Convert to ARGB if required
-	if (forceARGB)
+	// Convert to RGBA if required
+	if (forceRGBA)
 	{
-		uint8_t* converted = ConvertToARGB(pixelData, &header);
+		uint8_t* converted = ConvertToRGBA(pixelData, &header);
 
-		header.imageType = TGA_IMAGETYPE_CONVERTED_ARGB;
+		header.imageType = TGA_IMAGETYPE_CONVERTED_RGBA;
 		header.bpp = 32;
 
 		SafeDisposePtr((Ptr) pixelData);

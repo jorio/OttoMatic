@@ -129,7 +129,7 @@ char			path[256];
 
 
 		GAME_ASSERT(tgaHeader.bpp == 32);
-		GAME_ASSERT(tgaHeader.imageType == TGA_IMAGETYPE_CONVERTED_ARGB);
+		GAME_ASSERT(tgaHeader.imageType == TGA_IMAGETYPE_CONVERTED_RGBA);
 
 
 			/* READ WIDTH/HEIGHT, ASPECT RATIO, SRC/DEST FORMATS */
@@ -137,7 +137,7 @@ char			path[256];
 		gSpriteGroupList[groupNum][i].width			= tgaHeader.width;
 		gSpriteGroupList[groupNum][i].height		= tgaHeader.height;
 		gSpriteGroupList[groupNum][i].aspectRatio	= (float) tgaHeader.height / (float) tgaHeader.width;
-		gSpriteGroupList[groupNum][i].srcFormat		= GL_BGRA;
+		gSpriteGroupList[groupNum][i].srcFormat		= GL_RGBA;
 		gSpriteGroupList[groupNum][i].destFormat	= GL_RGBA;
 
 
@@ -188,11 +188,15 @@ char			path[256];
 		else
 #endif
 		{
-			matData.textureName[0] 	= OGL_TextureMap_Load(buffer,
-													 matData.width,
-													 matData.height,
-													 matData.pixelSrcFormat,
-													 matData.pixelDstFormat, GL_UNSIGNED_INT_8_8_8_8);
+			matData.textureName[0] 	= OGL_TextureMap_Load(
+				buffer,
+				matData.width,
+				matData.height,
+				matData.pixelSrcFormat,
+				matData.pixelDstFormat,
+				//GL_UNSIGNED_INT_8_8_8_8
+				GL_UNSIGNED_BYTE
+			);
 		}
 
 		gSpriteGroupList[groupNum][i].materialObject = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);

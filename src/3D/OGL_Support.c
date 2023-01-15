@@ -839,13 +839,13 @@ OSErr					err;
 
 	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, path, &spec);
 
-			/* LOAD RAW ARGB DATA FROM TGA FILE */
+			/* LOAD RAW RGBA DATA FROM TGA FILE */
 
 	err = ReadTGA(&spec, &pixelData, &header, true);
 	GAME_ASSERT(err == noErr);
 
 	GAME_ASSERT(header.bpp == 32);
-	GAME_ASSERT(header.imageType == TGA_IMAGETYPE_CONVERTED_ARGB);
+	GAME_ASSERT(header.imageType == TGA_IMAGETYPE_CONVERTED_RGBA);
 
 			/* PRE-PROCESS IMAGE */
 
@@ -878,10 +878,9 @@ OSErr					err;
 			pixelData,
 			header.width,
 			header.height,
-			GL_BGRA,
+			GL_RGBA,
 			internalFormat,
-			GL_UNSIGNED_INT_8_8_8_8
-			);
+			GL_UNSIGNED_BYTE);
 
 			/* CLEAN UP */
 
