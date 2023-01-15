@@ -589,6 +589,13 @@ float	fps = gFramesPerSecondFrac;
 OGLMatrix3x3		m;
 static OGLPoint2D origin = {0,0};
 
+				/* CHECK FOR CHEATS */
+
+	if (GetCheatKeyCombo())
+	{
+		gPlayerInfo.fuel = 1;
+	}
+
 				/*****************************/
 				/* CHECK USER MOTION CONTROL */
 				/*****************************/

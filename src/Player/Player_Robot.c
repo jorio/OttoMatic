@@ -2804,9 +2804,7 @@ static void CheckPlayerActionControls(ObjNode *theNode)
 {
 		/* SEE IF DO CHEAT */
 
-	if (GetKeyState(SDL_SCANCODE_B) &&
-		GetKeyState(SDL_SCANCODE_R) &&
-		GetKeyState(SDL_SCANCODE_I))
+	if (GetCheatKeyCombo())
 	{
 		if (gPlayerInfo.lives < 3)
 			gPlayerInfo.lives 	= 3;

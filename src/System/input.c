@@ -438,6 +438,11 @@ Boolean IsCmdQPressed(void)
 #endif
 }
 
+Boolean GetCheatKeyCombo(void)
+{
+	return GetKeyState(SDL_SCANCODE_B) && GetKeyState(SDL_SCANCODE_R) && GetKeyState(SDL_SCANCODE_I);
+}
+
 #pragma mark -
 
 /****************************** SDL JOYSTICK FUNCTIONS ********************************/
