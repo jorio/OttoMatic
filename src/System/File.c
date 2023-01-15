@@ -450,7 +450,7 @@ SkeletonFile_AnimHeader_Type	*animHeaderPtr;
 // Load in standard preferences
 //
 
-OSErr LoadPrefs(PrefsType *prefBlock)
+OSErr LoadPrefs(void)
 {
 OSErr		iErr;
 short		refNum;
@@ -503,16 +503,9 @@ PrefsType	prefBuffer;
 
 	FSClose(refNum);
 
-			/* NUKE NON-REMAPPABLE KEYBINDINGS TO DEFAULTS */
-
-	for (int i = NUM_REMAPPABLE_NEEDS; i < NUM_CONTROL_NEEDS; i++)
-	{
-		prefBuffer.keys[i] = kDefaultKeyBindings[i];
-	}
-
 			/* PREFS ARE OK */
 
-	*prefBlock = prefBuffer;
+	gGamePrefs = prefBuffer;
 	return noErr;
 
 fileIsCorrupt:

@@ -112,7 +112,7 @@ static OGLColorRGBA PulsateColor(float* time)
 
 static KeyBinding* GetBindingAtRow(int row)
 {
-	return &gGamePrefs.keys[gMenu[row].kb];
+	return &gGamePrefs.remappableKeys[gMenu[row].kb];
 }
 
 static const char* GetKeyBindingName(int row, int col)
@@ -574,7 +574,8 @@ static void NavigateKeyBinding(const MenuItem* entry)
 	if (GetNewNeedState(kNeed_UIDelete)
 		|| (gMouseHoverValidRow && FlushMouseButtonPress(SDL_BUTTON_MIDDLE)))
 	{
-		gGamePrefs.keys[entry->kb].key[gKeyColumn] = 0;
+		gGamePrefs.remappableKeys[entry->kb].key[gKeyColumn] = 0;
+
 		PlayEffect(kSfxDelete);
 		MakeTextAtRowCol(Localize(STR_UNBOUND_PLACEHOLDER), gMenuRow, gKeyColumn+1);
 		return;
@@ -617,7 +618,8 @@ static void NavigatePadBinding(const MenuItem* entry)
 	if (GetNewNeedState(kNeed_UIDelete)
 		|| (gMouseHoverValidRow && FlushMouseButtonPress(SDL_BUTTON_MIDDLE)))
 	{
-		gGamePrefs.keys[entry->kb].gamepad[gPadColumn].type = kInputTypeUnbound;
+		gGamePrefs.remappableKeys[entry->kb].gamepad[gPadColumn].type = kInputTypeUnbound;
+
 		PlayEffect(kSfxDelete);
 		MakeTextAtRowCol(Localize(STR_UNBOUND_PLACEHOLDER), gMenuRow, gPadColumn+1);
 		return;
@@ -647,7 +649,8 @@ static void NavigateMouseBinding(const MenuItem* entry)
 	if (GetNewNeedState(kNeed_UIDelete)
 		|| (gMouseHoverValidRow && FlushMouseButtonPress(SDL_BUTTON_MIDDLE)))
 	{
-		gGamePrefs.keys[entry->kb].mouseButton = 0;
+		gGamePrefs.remappableKeys[entry->kb].mouseButton = 0;
+
 		PlayEffect(kSfxDelete);
 		MakeTextAtRowCol(Localize(STR_UNBOUND_PLACEHOLDER), gMenuRow, 1);
 		return;
@@ -802,6 +805,7 @@ static void AwaitKeyPress(void)
 		{
 			UnbindScancodeFromAllRemappableInputNeeds(scancode);
 			kb->key[gKeyColumn] = scancode;
+
 			MakeTextAtRowCol(GetKeyBindingName(gMenuRow, gKeyColumn), gMenuRow, gKeyColumn+1);
 			gMenuState = kMenuStateReady;
 			PlayEffect(kSfxCycle);
@@ -844,6 +848,7 @@ static void AwaitPadPress(void)
 			UnbindPadButtonFromAllRemappableInputNeeds(kInputTypeButton, button);
 			kb->gamepad[gPadColumn].type = kInputTypeButton;
 			kb->gamepad[gPadColumn].id = button;
+
 			MakeTextAtRowCol(GetPadBindingName(gMenuRow, gPadColumn), gMenuRow, gPadColumn+1);
 			gMenuState = kMenuStateReady;
 			PlayEffect(kSfxCycle);
@@ -870,6 +875,7 @@ static void AwaitPadPress(void)
 			UnbindPadButtonFromAllRemappableInputNeeds(axisType, axis);
 			kb->gamepad[gPadColumn].type = axisType;
 			kb->gamepad[gPadColumn].id = axis;
+
 			MakeTextAtRowCol(GetPadBindingName(gMenuRow, gPadColumn), gMenuRow, gPadColumn+1);
 			gMenuState = kMenuStateReady;
 			PlayEffect(kSfxCycle);
@@ -897,6 +903,7 @@ static void AwaitMouseClick(void)
 		{
 			UnbindMouseButtonFromAllRemappableInputNeeds(mouseButton);
 			kb->mouseButton = mouseButton;
+
 			MakeTextAtRowCol(GetMouseBindingName(gMenuRow), gMenuRow, 1);
 			gMenuState = kMenuStateReady;
 			PlayEffect(kSfxCycle);

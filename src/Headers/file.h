@@ -74,7 +74,7 @@ typedef struct
 	uint8_t	anaglyphCalibrationGreen;
 	uint8_t	anaglyphCalibrationBlue;
 	Boolean doAnaglyphChannelBalancing;
-	KeyBinding	keys[NUM_CONTROL_NEEDS];
+	KeyBinding	remappableKeys[NUM_REMAPPABLE_NEEDS];
 }PrefsType;
 
 
@@ -99,7 +99,7 @@ typedef struct
 //=================================================
 
 SkeletonDefType *LoadSkeletonFile(short skeletonType);
-extern	OSErr LoadPrefs(PrefsType *prefBlock);
+OSErr LoadPrefs(void);
 void SavePrefs(void);
 
 void LoadPlayfield(FSSpec *specPtr);

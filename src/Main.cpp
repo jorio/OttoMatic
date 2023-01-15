@@ -143,7 +143,7 @@ static void Boot(int argc, char** argv)
 
 	// Load game prefs before starting
 	InitDefaultPrefs();
-	LoadPrefs(&gGamePrefs);
+	LoadPrefs();
 
 	ParseCommandLine(argc, argv);
 

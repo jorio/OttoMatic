@@ -165,8 +165,10 @@ void InitDefaultPrefs(void)
 	gGamePrefs.doAnaglyphChannelBalancing	= true;
 	gGamePrefs.gamepadRumble				= true;
 
-	memcpy(gGamePrefs.keys, kDefaultKeyBindings, sizeof(gGamePrefs.keys));
-	_Static_assert(sizeof(kDefaultKeyBindings) == sizeof(gGamePrefs.keys), "size mismatch: default keybindings / prefs keybindings");
+	for (int i = 0; i < NUM_REMAPPABLE_NEEDS; i++)
+	{
+		gGamePrefs.remappableKeys[i] = kDefaultKeyBindings[i];
+	}
 }
 
 

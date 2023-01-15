@@ -28,9 +28,9 @@ static void cb_SetRumble(void)
 
 static void cb_ResetKeyBindings(void)
 {
-	for (int i = 0; i < NUM_CONTROL_NEEDS; i++)
+	for (int i = 0; i < NUM_REMAPPABLE_NEEDS; i++)
 	{
-		memcpy(gGamePrefs.keys[i].key, kDefaultKeyBindings[i].key, sizeof(gGamePrefs.keys[i].key));
+		memcpy(gGamePrefs.remappableKeys[i].key, kDefaultKeyBindings[i].key, sizeof(gGamePrefs.remappableKeys[i].key));
 	}
 
 	MyFlushEvents();
@@ -40,9 +40,9 @@ static void cb_ResetKeyBindings(void)
 
 static void cb_ResetPadBindings(void)
 {
-	for (int i = 0; i < NUM_CONTROL_NEEDS; i++)
+	for (int i = 0; i < NUM_REMAPPABLE_NEEDS; i++)
 	{
-		memcpy(gGamePrefs.keys[i].gamepad, kDefaultKeyBindings[i].gamepad, sizeof(gGamePrefs.keys[i].gamepad));
+		memcpy(gGamePrefs.remappableKeys[i].gamepad, kDefaultKeyBindings[i].gamepad, sizeof(gGamePrefs.remappableKeys[i].gamepad));
 	}
 
 	MyFlushEvents();
@@ -52,9 +52,9 @@ static void cb_ResetPadBindings(void)
 
 static void cb_ResetMouseBindings(void)
 {
-	for (int i = 0; i < NUM_CONTROL_NEEDS; i++)
+	for (int i = 0; i < NUM_REMAPPABLE_NEEDS; i++)
 	{
-		gGamePrefs.keys[i].mouseButton = kDefaultKeyBindings[i].mouseButton;
+		gGamePrefs.remappableKeys[i].mouseButton = kDefaultKeyBindings[i].mouseButton;
 	}
 
 	MyFlushEvents();

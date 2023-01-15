@@ -40,27 +40,26 @@ enum
 Boolean				gUserPrefersGamepad = false;
 
 SDL_GameController	*gSDLController = NULL;
-SDL_JoystickID		gSDLJoystickInstanceID = -1;		// ID of the joystick bound to gSDLController
+static SDL_JoystickID	gSDLJoystickInstanceID = -1;		// ID of the joystick bound to gSDLController
 
-Byte				gRawKeyboardState[SDL_NUM_SCANCODES];
+static Byte			gRawKeyboardState[SDL_NUM_SCANCODES];
 char				gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
 
-Byte				gNeedStates[NUM_CONTROL_NEEDS];
+static Byte			gNeedStates[NUM_CONTROL_NEEDS];
 
-Boolean				gEatMouse = false;
+static Boolean		gEatMouse = false;
 Boolean				gMouseMotionNow = false;
 static Byte			gMouseButtonState[NUM_SUPPORTED_MOUSE_BUTTONS + 2];
 
 OGLVector2D			gCameraControlDelta;
 
 
-static OGLVector2D GetThumbStickVector(bool rightStick);
-
 
 /**********************/
 /* STATIC FUNCTIONS   */
 /**********************/
 
+static OGLVector2D GetThumbStickVector(bool rightStick);
 
 static inline void UpdateKeyState(Byte* state, bool downNow)
 {
@@ -229,7 +228,7 @@ void UpdateInput(void)
 
 	for (int i = 0; i < NUM_CONTROL_NEEDS; i++)
 	{
-		const KeyBinding* kb = &gGamePrefs.keys[i];
+		const KeyBinding* kb = (i < NUM_REMAPPABLE_NEEDS) ? &gGamePrefs.remappableKeys[i] : &kDefaultKeyBindings[i];
 
 		bool downNow = false;
 

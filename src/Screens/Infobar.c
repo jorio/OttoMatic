@@ -961,10 +961,13 @@ int	i;
 
 static const char* GetShortNameForInputNeed(int need)
 {
+	GAME_ASSERT(need >= 0);
+	GAME_ASSERT(need < NUM_REMAPPABLE_NEEDS);
+
 	if (gUserPrefersGamepad)
 	{
-		int8_t type	= gGamePrefs.keys[need].gamepad[0].type;
-		int8_t id	= gGamePrefs.keys[need].gamepad[0].id;
+		int8_t type	= gGamePrefs.remappableKeys[need].gamepad[0].type;
+		int8_t id	= gGamePrefs.remappableKeys[need].gamepad[0].id;
 		switch (type)
 		{
 			case kInputTypeButton:
@@ -977,7 +980,7 @@ static const char* GetShortNameForInputNeed(int need)
 	}
 	else
 	{
-		int16_t key = gGamePrefs.keys[need].key[0];
+		int16_t key = gGamePrefs.remappableKeys[need].key[0];
 		switch (key)
 		{
 #if __APPLE__
