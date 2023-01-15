@@ -1,7 +1,0 @@
-{
-    "notarize": [{
-        "path": "./dist/OttoMatic-4.0.0-mac.dmg",
-        "bundle_id": "io.jor.ottomatic",
-        "staple": true
-    }]
-}
