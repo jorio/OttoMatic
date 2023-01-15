@@ -1,7 +1,8 @@
 /****************************/
 /*   	PLAYER.C   			*/
-/* (c)2001 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2001 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -21,6 +22,7 @@ static void MoveRocketShip_Landing(ObjNode *rocket);
 static void MoveRocketShip_Leave(ObjNode *rocket);
 static void MoveRocketShip_OpenDoor(ObjNode *rocket);
 static void MoveRocketShip_Deplane(ObjNode *rocket);
+static void MoveRocketShip_PreEnter(ObjNode *rocket);
 static void MoveRocketShip_Enter(ObjNode *rocket);
 static void MoveRocketShip_CloseDoor(ObjNode *rocket);
 static void MoveRocketShip_Waiting(ObjNode *rocket);
@@ -46,6 +48,16 @@ static void AlignRocketDoor(ObjNode *rocket);
 #define	PLAYER_OFF_Y	(445.8f * ROCKET_SCALE)
 #define PLAYER_OFF_Z	(9.3f * ROCKET_SCALE)
 
+static const OGLPoint2D kRocketShipHotZoneTemplate[4] =
+{
+	{-40, ROCKET_SCALE * 370.0f},
+	{40, ROCKET_SCALE * 370.0f},
+	{50, ROCKET_SCALE * 490.0f},
+	{-50, ROCKET_SCALE * 490.0f},
+};
+
+static const OGLPoint2D kRocketShipRampEntryPoint = {0, ROCKET_SCALE*400.0f};
+
 
 /*********************/
 /*    VARIABLES      */
@@ -67,6 +79,7 @@ ObjNode	*gExitRocket;
 Boolean	gPlayerFellIntoBottomlessPit;
 
 float	gRocketScaleAdjust;
+OGLPoint2D	gRocketShipHotZone[4];
 
 
 /******************** INIT PLAYER INFO ***************************/
@@ -767,6 +780,10 @@ static void MoveRocketShip(ObjNode *rocket)
 				MoveRocketShip_Waiting2(rocket);
 				break;
 
+		case	ROCKET_MODE_PREENTER:
+				MoveRocketShip_PreEnter(rocket);
+				break;
+
 		case	ROCKET_MODE_ENTER:
 				MoveRocketShip_Enter(rocket);
 				break;
@@ -1172,44 +1189,104 @@ ObjNode	*player = gPlayerInfo.objNode;
 }
 
 
-/****************** MOVE ROCKET SHIP: ENTER *******************/
+/****************** MOVE ROCKET SHIP: PRE-ENTER (MOVE OTTO TO RAMP ENTRY POINT) *******************/
+
+static void MoveRocketShip_PreEnter(ObjNode *rocket)
+{
+float	fps = gFramesPerSecondFrac;
+ObjNode	*player = gPlayerInfo.objNode;
+
+	DisableHelpType(HELP_MESSAGE_ENTERSHIP);				// player is going up, so we don't need this help anymore
+
+	gPlayerInfo.holdingGun = false;							// hide gun so it doesn't clip thru rocket once we're in
+	gPlayerInfo.invincibilityTimer = 1;						// don't want to get hit by crap while walking
+
+	GetObjectInfo(player);
+
+	OGLPoint2D rampEntryPoint = kRocketShipRampEntryPoint;
+	OGLMatrix3x3 m;
+	OGLMatrix3x3_SetRotate(&m, -rocket->Rot.y);
+	OGLPoint2D_Transform(&rampEntryPoint, &m, &rampEntryPoint);
+	rampEntryPoint.x += rocket->Coord.x;
+	rampEntryPoint.y += rocket->Coord.z;
+
+	float oldDist = CalcDistance(gCoord.x, gCoord.z, rampEntryPoint.x, rampEntryPoint.y);
+
+	if (oldDist < PLAYER_OFF_Z)								// close enough already, just skip to next state
+		goto forceEnter;
+
+	OGLVector2D direction =	{ rampEntryPoint.x - player->Coord.x, rampEntryPoint.y - player->Coord.z };
+	OGLVector2D_Normalize(&direction, &direction);
+
+	gDelta.x = direction.x * 250;
+	gDelta.z = direction.y * 250;
+	gDelta.y = -100;
+
+	gCoord.x += gDelta.x * fps;
+	gCoord.z += gDelta.z * fps;
+	gCoord.y = GetTerrainY2(gCoord.x, gCoord.z) - gPlayerInfo.objNode->BottomOff;
+
+	float dist = CalcDistance(gCoord.x, gCoord.z, rampEntryPoint.x, rampEntryPoint.y);
+
+	if (dist > 2000)
+	{
+#if _DEBUG
+		DoAlert("Enormous pre-enter distance! Fast-forwarding...");
+#endif
+		goto forceEnter;
+	}
+
+			/* SEE IF WE'RE IN FRONT OF THE RAMP */
+
+	if (dist < PLAYER_OFF_Z || dist > oldDist)
+	{
+forceEnter:
+			/* PIN TO RAMP ENTRY POINT */
+
+		gCoord.x = rampEntryPoint.x;
+		gCoord.z = rampEntryPoint.y;
+		gCoord.y = GetTerrainY2(gCoord.x, gCoord.z) - gPlayerInfo.objNode->BottomOff;
+
+		rocket->Mode = ROCKET_MODE_ENTER;
+		gPlayerHasLanded = false;
+	}
+
+	UpdatePlayer_Robot(player);
+}
+
+
+/****************** MOVE ROCKET SHIP: ENTER (WALK OTTO UP RAMP) *******************/
 
 static void MoveRocketShip_Enter(ObjNode *rocket)
 {
 float	fps = gFramesPerSecondFrac;
-float	 r,dist,oldDist;
 ObjNode	*player = gPlayerInfo.objNode;
-
 
 	DisableHelpType(HELP_MESSAGE_ENTERSHIP);				// player is going up, so we don't need this help anymore
 
-	r = rocket->Rot.y;
-
+	gPlayerInfo.holdingGun = false;							// hide gun so it doesn't clip thru rocket once we're in
+	gPlayerInfo.invincibilityTimer = 1;						// don't want to get hit by crap while walking
 
 	GetObjectInfo(player);
 
-	oldDist = CalcDistance(gCoord.x, gCoord.z, rocket->Coord.x, rocket->Coord.z);
+	float oldDist = CalcDistance(gCoord.x, gCoord.z, rocket->Coord.x, rocket->Coord.z);
 
-	gDelta.x = sin(r) * -250.0f;
-	gDelta.z = cos(r) * -250.0f;
+	gDelta.x = sin(rocket->Rot.y) * -250.0f;
+	gDelta.z = cos(rocket->Rot.y) * -250.0f;
 
 	gCoord.x += gDelta.x * fps;
 	gCoord.z += gDelta.z * fps;
 
+			/* GO UP RAMP */
 
-			/* SEE IF GO UP RAMP */
+	gCoord.y += 400.0f * fps;
 
-	dist = CalcDistance(gCoord.x, gCoord.z, rocket->Coord.x, rocket->Coord.z);
-	if (dist < (360.0f * ROCKET_SCALE))
-	{
-		gCoord.y += 400.0f * fps;
-
-		if ((gCoord.y + player->BottomOff) > (rocket->Coord.y + PLAYER_OFF_Y))		// dont go higher than where we want it
-			gCoord.y = rocket->Coord.y + PLAYER_OFF_Y - player->BottomOff;
-
-	}
+	gCoord.y = MinFloat(gCoord.y,
+						rocket->Coord.y + PLAYER_OFF_Y - player->BottomOff);	// don't go higher than where we want it
 
 			/* SEE IF DONE */
+
+	float dist = CalcDistance(gCoord.x, gCoord.z, rocket->Coord.x, rocket->Coord.z);
 
 	if ((dist <= PLAYER_OFF_Z) || (dist > oldDist))
 	{
@@ -1217,9 +1294,7 @@ ObjNode	*player = gPlayerInfo.objNode;
 		gPlayerHasLanded = false;
 		MorphToSkeletonAnim(player->Skeleton, PLAYER_ANIM_STAND, 6);
 		PlayEffect3D(EFFECT_HATCH, &rocket->Coord);
-
 	}
-
 
 	UpdatePlayer_Robot(player);
 }
@@ -1366,23 +1441,15 @@ ObjNode	*door = rocket->ChainNode;
 		{
 			float r = rocket->Rot.y;
 			OGLMatrix3x3	m;
-			static const OGLPoint2D inArea[4] =
-			{
-				{-40, ROCKET_SCALE * 370.0f},
-				{40, ROCKET_SCALE * 370.0f},
-				{50, ROCKET_SCALE * 490.0f},
-				{-50, ROCKET_SCALE * 490.0f},
-			};
-			OGLPoint2D	area[4];
-
 
 					/* CALC ZONE @ BASE OF RAMP */
 
 			OGLMatrix3x3_SetRotate(&m, -r);											// rotate the hot zone
-			OGLPoint2D_TransformArray(inArea, &m, area, 4);
+			m.value[N02] = rocket->Coord.x;											// translate the hot zone
+			m.value[N12] = rocket->Coord.z;
+			OGLPoint2D_TransformArray(kRocketShipHotZoneTemplate, &m, gRocketShipHotZone, 4);
 
-			if (IsPointInPoly2D(gPlayerInfo.coord.x - rocket->Coord.x,
-								gPlayerInfo.coord.z - rocket->Coord.z, 4, area))	// see if play in hot zone
+			if (IsPointInPoly2D(gPlayerInfo.coord.x, gPlayerInfo.coord.z, 4, gRocketShipHotZone))	// see if play in hot zone
 			{
 				player->CType = 0;
 
@@ -1392,7 +1459,7 @@ ObjNode	*door = rocket->ChainNode;
 				player->Rot.y = rocket->Rot.y;;										// aim directly at rocket
 				player->StatusBits |= STATUS_BIT_NOMOVE;							// rocket now controls player
 
-				rocket->Mode = ROCKET_MODE_ENTER;
+				rocket->Mode = ROCKET_MODE_PREENTER;
 				gPlayerHasLanded = false;
 
 				gFreezeCameraFromXZ = true;											// camera is frozen
@@ -1575,17 +1642,4 @@ float	y;
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 

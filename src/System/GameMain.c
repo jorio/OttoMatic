@@ -907,6 +907,8 @@ DeformationType		defData;
 
 static void CleanupLevel(void)
 {
+	memset(gRocketShipHotZone, 0, sizeof(gRocketShipHotZone));
+
 	StopAllEffectChannels();
  	EmptySplineObjectList();
 	DisposeInfobar();

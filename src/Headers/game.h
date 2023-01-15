@@ -130,6 +130,7 @@ extern	OGLMatrix4x4			gWorldToFrustumMatrix;
 extern	OGLMatrix4x4			gWorldToViewMatrix;
 extern	OGLMatrix4x4			gWorldToWindowMatrix;
 extern	OGLPoint2D				gBestCheckpointCoord;
+extern	OGLPoint2D				gRocketShipHotZone[4];
 extern	OGLPoint3D				gCoord;
 extern	OGLSetupOutputType		*gGameViewInfoPtr;
 extern	OGLVector2D				gCameraControlDelta;

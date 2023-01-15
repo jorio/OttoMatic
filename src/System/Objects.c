@@ -961,6 +961,22 @@ float				left,right,top,bottom,front,back;
 
 	}
 
+
+
+	if (gRocketShipHotZone[0].x != 0 && gRocketShipHotZone[0].y != 0)
+	{
+		glBegin(GL_LINE_LOOP);
+		for (int i = 0; i < 4; i++)
+		{
+			float x = gRocketShipHotZone[i].x;
+			float z = gRocketShipHotZone[i].y;
+			float y = 10 + GetTerrainY(x, z);
+			glVertex3f(x,y,z);
+		}
+		glEnd();
+	}
+
+
 	OGL_PopState();
 }
 
