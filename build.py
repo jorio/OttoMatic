@@ -24,7 +24,7 @@ dist_dir = os.path.abspath("dist")
 
 game_name           = "OttoMatic"  # no spaces
 game_name_human     = "Otto Matic"  # spaces and other special characters allowed
-game_ver            = "4.0.0"
+game_ver            = "4.0.1"
 
 source_check        = "src/Enemies/Enemy_BrainAlien.c"  # some file that's likely to be from the game's source tree
 

@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.16)
 
 set(GAME_TARGET				"OttoMatic")
-set(GAME_VERSION			"4.0.0")
+set(GAME_VERSION			"4.0.1")
+
 set(GAME_MAC_ICNS			"packaging/${GAME_TARGET}.icns")
-set(GAME_MAC_COPYRIGHT		"© 2001 Pangea Software, Inc.\n© 2021 Iliyas Jorio.")
+set(GAME_MAC_COPYRIGHT		"© 2001 Pangea Software, Inc.\n© 2023 Iliyas Jorio.")
 set(GAME_MAC_BUNDLE_ID		"io.jor.ottomatic")
+set(GAME_MAC_BUNDLE_NAME	"Otto Matic")
 
 set(CMAKE_MODULE_PATH		"${CMAKE_SOURCE_DIR}/cmake")
 
@@ -223,7 +225,7 @@ set_target_properties(${GAME_TARGET} PROPERTIES
 	MACOSX_BUNDLE_EXECUTABLE_NAME		${GAME_TARGET}			# CFBundleExecutable - executable name inside the bundle
 	MACOSX_BUNDLE_SHORT_VERSION_STRING	${PROJECT_VERSION}		# CFBundleShortVersionString
 	MACOSX_BUNDLE_COPYRIGHT				${GAME_MAC_COPYRIGHT}	# NSHumanReadableCopyright (supersedes CFBundleGetInfoString (MACOSX_BUNDLE_INFO_STRING))
-	MACOSX_BUNDLE_BUNDLE_NAME			${GAME_TARGET}			# CFBundleName - user-visible (where??) short name for the bundle, up to 15 characters
+	MACOSX_BUNDLE_BUNDLE_NAME			${GAME_MAC_BUNDLE_NAME}	# CFBundleName - user-visible short name for the bundle
 	MACOSX_BUNDLE_GUI_IDENTIFIER		${GAME_MAC_BUNDLE_ID}	# CFBundleIdentifier - unique bundle ID in reverse-DNS format
 
 	# Bundle ID required for code signing - must match CFBundleIdentifier otherwise xcode will complain

@@ -26,7 +26,7 @@ BEGIN
             VALUE "FileDescription",    "Otto Matic"
             VALUE "FileVersion",        PROJECT_VERSION
             VALUE "InternalName",       "OttoMatic"
-            VALUE "LegalCopyright",     "(C) 2001 Pangea Software, Inc. (C) 2021 Iliyas Jorio."
+            VALUE "LegalCopyright",     "(C) 2001 Pangea Software, Inc. (C) 2023 Iliyas Jorio."
             VALUE "OriginalFilename",   "OttoMatic.exe"
             VALUE "ProductName",        "Otto Matic"
             VALUE "ProductVersion",     PROJECT_VERSION
