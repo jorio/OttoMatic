@@ -1,125 +1,90 @@
 /****************************/
 /*   	MISCSCREENS.C	    */
-/* (c)2001 Pangea Software  */
 /* By Brian Greenstone      */
-/****************************/
-
-
-/****************************/
-/*    EXTERNALS             */
+/* (c)2001 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 #include "game.h"
-
-/****************************/
-/*    PROTOTYPES            */
-/****************************/
-
-static void DisplayPicture_Draw(void);
+#include "version.h"
 
 
-/****************************/
-/*    CONSTANTS             */
-/****************************/
-
-
-
-/*********************/
-/*    VARIABLES      */
-/*********************/
-
-static MOPictureObject 	*gBackgroundPicture = nil;
-
-
-/********************** DISPLAY PICTURE **************************/
-//
-// Displays a picture using OpenGL until the user clicks the mouse or presses any key.
-//
-
-void DisplayPicture(const char* path, float timeout)
+static void DrawLegalImage(ObjNode* theNode)
 {
-OGLSetupInputType	viewDef;
+	float s = 800;
 
+	OGL_PushState();
+	SetInfobarSpriteState(true);
+	DrawInfobarSprite2(-s/2, -s/4, s, SPRITE_GROUP_LEVELSPECIFIC, 0);
+	OGL_PopState();
+}
+
+void DoLegalScreen(void)
+{
+	float timeout = 8.0f;
 
 			/* SETUP VIEW */
 
+	OGLSetupInputType viewDef;
 	OGL_NewViewDef(&viewDef);
 
 	viewDef.camera.hither 			= 10;
 	viewDef.camera.yon 				= 3000;
-	viewDef.view.clearColor.r 		= 1;
-	viewDef.view.clearColor.g 		= 1;
-	viewDef.view.clearColor.b		= 0;
+	viewDef.view.clearColor 		= (OGLColorRGBA) {0,0,0,1};
 	viewDef.styles.useFog			= false;
 
 	OGL_SetupWindow(&viewDef);
 
+			/* CREATE OBJECTS */
 
-			/* CREATE BACKGROUND OBJECT */
+	LoadSpriteGroup(SPRITE_GROUP_LEVELSPECIFIC, 1, "legal");
 
-	gBackgroundPicture = MO_CreateNewObjectOfType(MO_TYPE_PICTURE, 0, (void*) path);
-	GAME_ASSERT(gBackgroundPicture);
+	NewObjectDefinitionType imageDef =
+	{
+		.coord = {0,0,0},
+		.genre = CUSTOM_GENRE,
+		.type = 0,
+		.scale = 1,
+		.slot = SPRITE_SLOT,
+	};
+	ObjNode* imageDriver = MakeNewObject(&imageDef);
+	imageDriver->CustomDrawFunction = DrawLegalImage;
 
-
+	NewObjectDefinitionType versionDef =
+	{
+		.coord = {0,-80,0},
+		.scale = 0.5f,
+		.slot = SPRITE_SLOT + 1
+	};
+	ObjNode* versionText = TextMesh_New("version " PROJECT_VERSION, kTextMeshAlignCenter, &versionDef);
+	versionText->ColorFilter = (OGLColorRGBA) {0.3f, 0.5f, 0.2f, 1.0f};
 
 		/***********/
 		/* SHOW IT */
 		/***********/
 
-
 	MakeFadeEvent(true, 1.0);
 	UpdateInput();
 	CalcFramesPerSecond();
 
-					/* MAIN LOOP */
+	do
+	{
+		CalcFramesPerSecond();
+		MoveObjects();
+		OGL_DrawScene(DrawObjects);
+		UpdateInput();
 
-		do
-		{
-			CalcFramesPerSecond();
-			MoveObjects();
-			OGL_DrawScene(DisplayPicture_Draw);
-
-			UpdateInput();
-
-			timeout -= gFramesPerSecondFrac;
-			if (timeout < 0.0f)
-				break;
-		} while (!UserWantsOut());
-
+		timeout -= gFramesPerSecondFrac;
+	} while (!UserWantsOut() && timeout > 0);
 
 			/* FADE OUT */
 
-	OGL_FadeOutScene(DisplayPicture_Draw, NULL);
-
+	OGL_FadeOutScene(DrawObjects, NULL);
 
 			/* CLEANUP */
 
 	DeleteAllObjects();
-	MO_DisposeObjectReference(gBackgroundPicture);
 	DisposeAllSpriteGroups();
-
-
-
-
 	OGL_DisposeWindowSetup();
-}
-
-
-/***************** DISPLAY PICTURE: DRAW *******************/
-
-static void DisplayPicture_Draw(void)
-{
-	MO_DrawObject(gBackgroundPicture);
-	DrawObjects();
-}
-
-
-#pragma mark -
-
-/************** DO LEGAL SCREEN *********************/
-
-void DoLegalScreen(void)
-{
-	DisplayPicture(":system:legal.tga", 8.0f);
 	Pomme_FlushPtrTracking(true);
 }
