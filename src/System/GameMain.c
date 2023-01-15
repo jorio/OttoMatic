@@ -375,9 +375,8 @@ static void DrawAreaExtraStuff(ObjNode* theNode)
 
 	DrawShards();												// draw shards
 	DrawVaporTrails();											// draw vapor trails
-	if (!gGamePaused)
-		DrawInfobar();												// draw infobar last
 	DrawLensFlare();											// draw lens flare
+	DrawInfobar();												// draw infobar last
 	DrawDeathExit();											// draw death exit stuff
 }
 
