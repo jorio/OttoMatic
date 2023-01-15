@@ -21,15 +21,12 @@ static void SetMetaObjectToGeometry(MetaObjectPtr mo, uint32_t subType, void *da
 static void SetMetaObjectToMaterial(MOMaterialObject *matObj, MOMaterialData *inData);
 static void SetMetaObjectToVertexArrayGeometry(MOVertexArrayObject *geoObj, MOVertexArrayData *data);
 static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData);
-static void SetMetaObjectToPicture(MOPictureObject* pictObj, const char* tgaPath, int tgaFlags);
 static void MO_DetachFromLinkedList(MetaObjectPtr obj);
 static void MO_DisposeObject_Group(MOGroupObject *group);
 static void MO_DeleteObjectInfo_Material(MOMaterialObject *obj);
 static void MO_GetNewGroupReference(MOGroupObject *obj);
 static void MO_GetNewVertexArrayReference(MOVertexArrayObject *obj);
 static void MO_CalcBoundingBox_Recurse(MetaObjectPtr object, OGLBoundingBox *bBox);
-static void MO_DisposeObject_Picture(MOPictureObject *obj);
-static void MO_DeleteObjectInfo_Picture(MOPictureObject *obj);
 
 static void SetMetaObjectToSprite(MOSpriteObject *spriteObj, MOSpriteSetupData* inData);
 static void MO_DisposeObject_Sprite(MOSpriteObject *obj);
@@ -176,10 +173,6 @@ MetaObjectPtr	mo;
 				SetMetaObjectToMatrix(mo, data);
 				break;
 
-		case	MO_TYPE_PICTURE:
-				SetMetaObjectToPicture(mo, data, 0);
-				break;
-
 		case	MO_TYPE_SPRITE:
 				SetMetaObjectToSprite(mo, data);
 				break;
@@ -229,10 +222,6 @@ int					size;
 
 		case	MO_TYPE_MATRIX:
 				size = sizeof(MOMatrixObject);
-				break;
-
-		case	MO_TYPE_PICTURE:
-				size = sizeof(MOPictureObject);
 				break;
 
 		case	MO_TYPE_SPRITE:
@@ -398,47 +387,6 @@ static void SetMetaObjectToMatrix(MOMatrixObject *matObj, OGLMatrix4x4 *inData)
 }
 
 
-/******************* SET META OBJECT TO PICTURE ********************/
-//
-// INPUT:	mo = meta object which has already been allocated and added to linked list.
-//
-
-static void SetMetaObjectToPicture(MOPictureObject* pictObj, const char* tgaPath, int tgaFlags)
-{
-int			width,height;
-MOPictureData	*picData = &pictObj->objectData;
-MOMaterialData	matData;
-
-			/* LOAD TEXTURE */
-
-	GLuint texture = OGL_TextureMap_LoadTGA(tgaPath, tgaFlags, &width, &height);
-
-			/********************************/
-			/* SET SOME PICTURE OBJECT DATA */
-			/********************************/
-
-	picData->fullWidth 		= width;
-	picData->fullHeight		= height;
-
-
-			/***************************/
-			/* CREATE A TEXTURE OBJECT */
-			/***************************/
-
-	memset(&matData, 0, sizeof(matData));
-
-	matData.setupInfo		= gGameViewInfoPtr;
-	matData.flags			= BG3D_MATERIALFLAG_TEXTURED|BG3D_MATERIALFLAG_CLAMP_U|BG3D_MATERIALFLAG_CLAMP_V;
-	matData.diffuseColor	= (OGLColorRGBA) {1,1,1,1};
-	matData.numMipmaps		= 1;
-	matData.width			= width;
-	matData.height			= height;
-	matData.textureName[0] 	= texture;
-
-	picData->material = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
-}
-
-
 /******************* SET META OBJECT TO SPRITE ********************/
 //
 // INPUT:	mo = meta object which has already been allocated and added to linked list.
@@ -450,42 +398,20 @@ static void SetMetaObjectToSprite(MOSpriteObject *spriteObj, MOSpriteSetupData* 
 {
 MOSpriteData	*spriteData = &spriteObj->objectData;
 
-
-		/* CREATE MATERIAL OBJECT FROM FSSPEC */
-
-	if (inData->loadFile)
-	{
-#if 0
-		GLint	destPixelFormat = inData->pixelFormat;									// use passed in format
-
-		spriteData->material = MO_GetTextureFromFile(&inData->spec, setupInfo, destPixelFormat);
-
-		spriteData->width = spriteData->material->objectData.width;						// get dimensions of the texture
-		spriteData->height = spriteData->material->objectData.width;
-		spriteData->aspectRatio = spriteData->height / spriteData->width;				// calc aspect ratio
-#else
-		DoFatalAlert("SetMetaObjectToSprite: loading texture from file not supported");
-#endif
-	}
-
 			/* GET MATERIAL FROM SPRITE LIST */
-	else
-	{
-		short	group,type;
 
-		group = inData->group;
-		type = inData->type;
+	short group = inData->group;
+	short type = inData->type;
 
-		if (inData->type >= gNumSpritesInGroupList[group])								// make sure type is valid
-			DoFatalAlert("SetMetaObjectToSprite: illegal type");
+	if (inData->type >= gNumSpritesInGroupList[group])								// make sure type is valid
+		DoFatalAlert("SetMetaObjectToSprite: illegal type");
 
-		spriteData->material = gSpriteGroupList[group][type].materialObject;
-		MO_GetNewReference(spriteData->material);										// this is a new reference, so inc ref count
+	spriteData->material = gSpriteGroupList[group][type].materialObject;
+	MO_GetNewReference(spriteData->material);										// this is a new reference, so inc ref count
 
-		spriteData->width 		= gSpriteGroupList[group][type].width;					// get width and height of texture
-		spriteData->height 		= gSpriteGroupList[group][type].height;
-		spriteData->aspectRatio = gSpriteGroupList[group][type].aspectRatio;			// get aspect ratio
-	}
+	spriteData->width 		= gSpriteGroupList[group][type].width;					// get width and height of texture
+	spriteData->height 		= gSpriteGroupList[group][type].height;
+	spriteData->aspectRatio = gSpriteGroupList[group][type].aspectRatio;			// get aspect ratio
 
 
 			/*******************************/
@@ -502,33 +428,6 @@ MOSpriteData	*spriteData = &spriteObj->objectData;
 	spriteData->scaleY		= 1.0;
 	spriteData->rot			= 0;								// rot
 }
-
-
-
-#pragma mark -
-
-#if 0
-/*************** SET PICTURE OBJECT COORDS TO MOUSE *******************/
-
-void MO_SetPictureObjectCoordsToMouse(MOPictureObject *obj)
-{
-MOPictureData	*picData = &obj->objectData;				//  point to pic obj's data
-int				mx = 0;
-int				my = 0;
-int				x,y,w,h;
-
-	SDL_GetMouseState(&mx, &my);							// get mouse screen coords
-
-			/* CONVERT SCREEN COORD TO OPENGL COORD */
-
-	OGL_GetCurrentViewport(info, &x, &y, &w, &h);
-
-
-	picData->drawCoord.x = -1.0f + (float)mx / (float)w * 2.0f;
-	picData->drawCoord.y = 1.0f - (float)my / (float)h * 2.0f;
-
-}
-#endif
 
 
 #pragma mark -
@@ -634,10 +533,6 @@ MOVertexArrayObject	*vObj;
 
 		case	MO_TYPE_MATRIX:
 				MO_DrawMatrix(object);
-				break;
-
-		case	MO_TYPE_PICTURE:
-				MO_DrawPicture(object);
 				break;
 
 		case	MO_TYPE_SPRITE:
@@ -1188,53 +1083,6 @@ const OGLMatrix4x4		*m;
 
 }
 
-/************************ MO: DRAW PICTURE **************************/
-
-void MO_DrawPicture(const MOPictureObject *picObj)
-{
-const MOPictureData	*picData = &picObj->objectData;
-
-			/* INIT MATRICES */
-
-	OGL_PushState();
-
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_FOG);
-	glDisable(GL_CULL_FACE);
-	OGL_DisableLighting();
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, g2DLogicalWidth, g2DLogicalHeight, 0, 0, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);	// no filtering!
-//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-			/* ACTIVATE THE MATERIAL */
-
-	MO_DrawMaterial(picData->material);			// submit material #0
-
-	glBegin(GL_QUADS);
-	glTexCoord2f(0, 0); glVertex3f(0, 0, 0);
-	glTexCoord2f(1, 0); glVertex3f(g2DLogicalWidth, 0, 0);
-	glTexCoord2f(1, 1); glVertex3f(g2DLogicalWidth, g2DLogicalHeight, 0);
-	glTexCoord2f(0, 1); glVertex3f(0, g2DLogicalHeight, 0);
-	glEnd();
-
-	gPolysThisFrame += 2;										// 2 more triangles
-
-
-			/* RESTORE STATE */
-
-	OGL_PopState();
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-}
-
 /************************ MO: DRAW SPRITE **************************/
 //
 // Assume that the matrices are already set to identity
@@ -1335,10 +1183,6 @@ MOVertexArrayObject	*vObj;
 				}
 				break;
 
-		case	MO_TYPE_PICTURE:
-				MO_DisposeObject_Picture(obj);
-				break;
-
 		case	MO_TYPE_SPRITE:
 				MO_DisposeObject_Sprite(obj);
 				break;
@@ -1375,10 +1219,6 @@ MOVertexArrayObject	*vObj;
 
 			case	MO_TYPE_MATERIAL:
 					MO_DeleteObjectInfo_Material(obj);
-					break;
-
-			case	MO_TYPE_PICTURE:
-					MO_DeleteObjectInfo_Picture(obj);
 					break;
 		}
 
@@ -1474,17 +1314,6 @@ int	i,n;
 	}
 }
 
-/****************** DISPOSE OBJECT: PICTURE *******************/
-//
-// Decrement references to all of the materials used in this picture.
-//
-
-static void MO_DisposeObject_Picture(MOPictureObject *obj)
-{
-MOPictureData *data = &obj->objectData;
-
-	MO_DisposeObjectReference(data->material);		// dispose of this object's ref
-}
 
 /****************** DISPOSE OBJECT: SPRITE *******************/
 //
@@ -1586,13 +1415,6 @@ MOMaterialData		*data = &obj->objectData;
 		glDeleteTextures(data->numMipmaps, &data->textureName[0]);
 }
 
-
-/****************** DELETE OBJECT INFO: PICTURE *******************/
-
-static void MO_DeleteObjectInfo_Picture(MOPictureObject *obj)
-{
-	(void) obj;
-}
 
 
 #pragma mark -

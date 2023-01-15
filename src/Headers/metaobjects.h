@@ -158,23 +158,6 @@ typedef struct
 	OGLMatrix4x4		matrix;
 }MOMatrixObject;
 
-
-		/******************/
-		/* PICTURE OBJECT */
-		/******************/
-
-typedef struct
-{
-	int					fullWidth,fullHeight;
-	MOMaterialObject	*material;
-}MOPictureData;
-		
-typedef struct
-{
-	MetaObjectHeader	objectHeader;
-	MOPictureData		objectData;
-}MOPictureObject;
-
 	
 		/*****************/
 		/* SPRITE OBJECT */
@@ -202,11 +185,6 @@ typedef struct
 
 typedef struct
 {
-	Boolean	loadFile;				// true if want to create sprite from pict right now, otherwise use from gSpriteList
-
-	FSSpec	spec;					// picture file to load as sprite
-	GLint	pixelFormat;			// format to store loaded sprite as
-
 	short	group,type;				// group and type of gSpriteList sprite to use
 }MOSpriteSetupData;
 	
@@ -224,13 +202,11 @@ void MO_DrawGroup(const MOGroupObject *object);
 void MO_DrawObject(const MetaObjectPtr object);
 void MO_DrawMaterial(MOMaterialObject *matObj);
 void MO_DrawMatrix(const MOMatrixObject *matObj);
-void MO_DrawPicture(const MOPictureObject *picObj);
 void MO_DisposeObjectReference(MetaObjectPtr obj);
 void MO_DuplicateVertexArrayData(MOVertexArrayData *inData, MOVertexArrayData *outData);
 void MO_DeleteObjectInfo_Geometry_VertexArray(MOVertexArrayData *data);
 void MO_DisposeObject_Geometry_VertexArray(MOVertexArrayData *data);
 void MO_CalcBoundingBox(MetaObjectPtr object, OGLBoundingBox *bBox);
-void MO_SetPictureObjectCoordsToMouse(MOPictureObject *obj);
 
 void MO_DrawSprite(const MOSpriteObject *spriteObj);
 void MO_VertexArray_OffsetUVs(MetaObjectPtr object, float du, float dv);

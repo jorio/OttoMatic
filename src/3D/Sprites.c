@@ -233,7 +233,6 @@ MOSpriteSetupData	spriteData;
 
 			/* MAKE SPRITE META-OBJECT */
 
-	spriteData.loadFile = false;										// these sprites are already loaded into gSpriteList
 	spriteData.group	= newObjDef->group;								// set group
 	spriteData.type 	= newObjDef->type;								// set group subtype
 
@@ -276,7 +275,6 @@ MOSpriteObject		*spriteMO;
 
 		/* MAKE NEW SPRITE MO */
 
-	spriteData.loadFile = false;									// these sprites are already loaded into gSpriteList
 	spriteData.group	= theNode->Group;							// set group
 	spriteData.type 	= type;										// set group subtype
 
