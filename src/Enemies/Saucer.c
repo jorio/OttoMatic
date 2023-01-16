@@ -80,6 +80,8 @@ static float gSaucerStuckTimer = 0;
 
 Boolean CallAlienSaucer(ObjNode *who)
 {
+	float maxCallDistance = 4000.0f;
+
 	switch(gLevelNum)									// no saucers on some levels
 	{
 		case	LEVEL_NUM_BLOBBOSS:
@@ -103,12 +105,29 @@ Boolean CallAlienSaucer(ObjNode *who)
 	if (MyRandomLong() & 0xf)							// randomize so that various types of callers have a chance each time
 		return(false);
 
-	if (CalcQuickDistance(who->Coord.x, who->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) > 4000.0f)	// see if too far away
+	// Reduce call distance if Otto is doing some level-specific acrobatics with non-standard controls
+	if (gPlayerInfo.objNode && gPlayerInfo.objNode->Skeleton)
+	{
+		switch (gPlayerInfo.objNode->Skeleton->AnimNum)
+		{
+			case PLAYER_ANIM_ROCKETSLED:
+			case PLAYER_ANIM_PICKUPANDHOLDMAGNET:
+			case PLAYER_ANIM_SHOOTFROMCANNON:
+			case PLAYER_ANIM_RIDEZIP:					// Level 4: scientist near zipline 2 nearly impossible to rescue otherwise
+			case PLAYER_ANIM_BUBBLE:					// Level 2: some women cannot be rescued if Otto's timing is out of phase with their splinePlacement
+				maxCallDistance = 2000.0f;
+				break;
+		}
+	}
+
+	// Don't call if too far away
+	if (CalcQuickDistance(who->Coord.x, who->Coord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) > maxCallDistance)
 		return(false);
 
 	// Don't call if there's a fence or a gate between us
 	if (SeeIfLineSegmentHitsAnything(&who->Coord, &gPlayerInfo.coord, nil, CTYPE_FENCE | CTYPE_BLOCKRAYS))
 		return(false);
+
 
 
 

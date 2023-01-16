@@ -675,7 +675,7 @@ do_anaglyph:
 			"player y:\t%.3f%s\n"
 			"\n"
 			"nodes:\t%d\n"
-			"enemies:\t%d%s\n"
+			"enemies:\t%d%s%s\n"
 #if 0
 			"t-defs:\t%d\n"
 			"h2o:\t\t%d\n"
@@ -707,6 +707,7 @@ do_anaglyph:
 			gNumObjectNodes,
 			gNumEnemies,
 			(gMaxEnemies > 0 && gNumEnemies >= gMaxEnemies) ? " (!!!)" : "",
+			gAlienSaucer ? " [+ saucer]" : "",
 #if 0
 			gNumTerrainDeformations,
 			gNumWaterDrawn,
