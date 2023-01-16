@@ -125,7 +125,8 @@ enum
 	CTYPE_IMPENETRABLE	= (1<<22),	// set if object must have high collision priority and cannot be pushed thru this
 	CTYPE_IMPENETRABLE2	= (1<<23),	// set with CTYPE_IMPENETRABLE if dont want player to do coord=oldCoord when touched
 	CTYPE_AUTOTARGETJUMP = (1<<24),	// if auto target when jumping
-	CTYPE_HEATSEEKATTACT = (1<<25)	// if can attract heat seeking weapons
+	CTYPE_HEATSEEKATTACT = (1<<25),	// if can attract heat seeking weapons
+	CTYPE_MPLATFORM_FREEJUMP = (1<<26),	// don't factor in platform deltas when jumping off of it
 };
 
 

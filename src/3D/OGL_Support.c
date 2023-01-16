@@ -672,7 +672,7 @@ do_anaglyph:
 			"\n"
 			"player x:\t%.3f\n"
 			"player z:\t%.3f\n"
-			"player y:\t%.3f%s\n"
+			"player y:\t%.3f\t%s%s\n"
 			"\n"
 			"nodes:\t%d\n"
 			"enemies:\t%d%s%s\n"
@@ -703,7 +703,8 @@ do_anaglyph:
 			gPlayerInfo.coord.x,
 			gPlayerInfo.coord.z,
 			gPlayerInfo.coord.y,
-			gPlayerInfo.objNode && (gPlayerInfo.objNode->StatusBits & STATUS_BIT_ONGROUND)? " G": "",
+			gPlayerInfo.objNode && (gPlayerInfo.objNode->StatusBits & STATUS_BIT_ONGROUND)? "G": "",
+			gPlayerInfo.objNode && (gPlayerInfo.objNode->MPlatform)? "M": "",
 			gNumObjectNodes,
 			gNumEnemies,
 			(gMaxEnemies > 0 && gNumEnemies >= gMaxEnemies) ? " (!!!)" : "",

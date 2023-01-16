@@ -2881,11 +2881,19 @@ static void CheckPlayerActionControls(ObjNode *theNode)
 
 			gDelta.y += JUMP_DELTA;
 
-			if (theNode->MPlatform != nil)			// if jumping off of mplatform then also use platform's deltas
+			if (theNode->MPlatform != nil)			
 			{
-				gDelta.x += theNode->MPlatform->Delta.x;
-				gDelta.y += theNode->MPlatform->Delta.y;
-				gDelta.z += theNode->MPlatform->Delta.z;
+				if (theNode->MPlatform->CType & CTYPE_MPLATFORM_FREEJUMP)
+				{
+					theNode->MPlatform = nil;
+				}
+				else
+				{
+					// if jumping off of mplatform then also use platform's deltas
+					gDelta.x += theNode->MPlatform->Delta.x;
+					gDelta.y += theNode->MPlatform->Delta.y;
+					gDelta.z += theNode->MPlatform->Delta.z;
+				}
 			}
 		}
 	}

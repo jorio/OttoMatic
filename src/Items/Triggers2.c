@@ -435,7 +435,8 @@ ObjNode	*newObj,*shadowObj;
 
 			/* SET COLLISION STUFF */
 
-	newObj->CType 			= CTYPE_TRIGGER|CTYPE_MISC|CTYPE_BLOCKCAMERA|CTYPE_BLOCKSHADOW;
+	newObj->CType 			= CTYPE_TRIGGER | CTYPE_MISC | CTYPE_BLOCKCAMERA | CTYPE_BLOCKSHADOW
+								| CTYPE_MPLATFORM | CTYPE_MPLATFORM_FREEJUMP;		// helps keep Otto grounded
 	newObj->CBits			= CBITS_ALLSOLID;
 	newObj->TriggerSides 	= CBITS_TOP;							// side(s) to activate it
 	newObj->Kind		 	= TRIGTYPE_LEAFPLATFORM;
@@ -498,6 +499,15 @@ OGLPoint3D	p;
 		theNode->SpecialF[1] = 0.015f;
 	}
 	UpdateObjectTransforms(theNode);
+
+
+			/* PIN OTTO TO PLATFORM AS WE WOBBLE */
+
+	// Since we're an MPlatform, Otto will copy our deltas.
+	// So, pin Otto to the platform with a large negative delta Y.
+	// This ensures that Otto stays firmly grounded (at high
+	// framerates) even as the leaf wobbles towards the floor.
+	theNode->Delta.y = -300;
 
 
 			/* UPDATE COLLISION TOP */

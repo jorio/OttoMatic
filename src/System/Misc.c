@@ -16,7 +16,7 @@
 /*    CONSTANTS             */
 /****************************/
 
-#define	MIN_FPS				10
+#define	MIN_FPS				15			// Platform physics are unstable under 15 FPS
 #define MAX_FPS				500
 
 /**********************/
