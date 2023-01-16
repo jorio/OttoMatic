@@ -25,7 +25,7 @@ static ObjNode* LayOutCyclerValueText(int row);
 /*    CONSTANTS             */
 /****************************/
 
-#define MAX_MENU_ROWS	25
+#define MAX_MENU_ROWS	32
 #define MAX_MENU_COLS	5
 
 #define kSfxNavigate	EFFECT_WEAPONCLICK
