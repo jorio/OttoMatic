@@ -466,7 +466,7 @@ float	dist,scaleX,scaleZ;
 			{
 				if (thisNodePtr->NumCollisionBoxes)
 				{
-					if (y < thisNodePtr->CollisionBoxes[0].top)		// if bottom of owner is below top of blocker, then skip
+					if (y < thisNodePtr->CollisionBoxes[0].top-1)		// if bottom of owner is below top of blocker, then skip
 						goto next;
 					if (x < thisNodePtr->CollisionBoxes[0].left)
 						goto next;
