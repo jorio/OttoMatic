@@ -1,7 +1,8 @@
 /****************************/
 /*   	TRAPS.C			    */
-/* (c)2001 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2001 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -63,8 +64,17 @@ static void MoveConeBlast(ObjNode *theNode);
 enum
 {
 	PLUNGER_MODE_WAIT,
+	PLUNGER_MODE_JUSTPRESSED,
 	PLUNGER_MODE_DOWN,
+	PLUNGER_MODE_BOTTOMED_OUT,
 	PLUNGER_MODE_UP
+};
+
+
+enum
+{
+	SOAP_BUBBLE_MODE_GROWING,
+	SOAP_BUBBLE_MODE_FREE_FLOAT,
 };
 
 
@@ -91,10 +101,6 @@ enum
 ObjNode	*gSoapBubble;
 
 ObjNode	*gMagnetMonsterList[MAX_MAGNET_MONSTERS];
-
-#define	PlungerMode			Special[0]
-#define	SoapBubbleFree		Flag[0]
-
 
 #define	OneWay				Flag[0]
 #define	IsPowered			Flag[1]
@@ -449,17 +455,20 @@ float	r = (float)itemPtr->parm[0] * (PI2/4.0f);
 	gNewObjectDefinition.moveCall 	= nil;
 	plunger = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
-	plunger->PlungerMode = PLUNGER_MODE_WAIT;
+	plunger->Mode = PLUNGER_MODE_WAIT;
 
 
 			/* SET COLLISION STUFF */
 
-	plunger->CType 			= CTYPE_TRIGGER|CTYPE_MISC|CTYPE_BLOCKSHADOW|CTYPE_MPLATFORM;
+	plunger->CType 			= CTYPE_TRIGGER|CTYPE_MISC|CTYPE_BLOCKSHADOW|CTYPE_MPLATFORM|CTYPE_MPLATFORM_FREEJUMP;
 	plunger->CBits			= CBITS_ALLSOLID;
 	plunger->TriggerSides 	= ALL_SOLID_SIDES;				// side(s) to activate it
 	plunger->Kind		 	= TRIGTYPE_BUBBLEPUMP;
+	plunger->Mode			= PLUNGER_MODE_WAIT;
+	plunger->Timer			= 0;
 
 	CreateCollisionBoxFromBoundingBox_Rotated(plunger, 1,1);
+	KeepOldCollisionBoxes(plunger);
 
 	pump->ChainNode = plunger;
 	plunger->ChainHead = pump;
@@ -477,24 +486,25 @@ float	r = (float)itemPtr->parm[0] * (PI2/4.0f);
 
 Boolean DoTrig_BubblePump(ObjNode *theNode, ObjNode *whoNode, Byte sideBits)
 {
-ObjNode	*body;
+	(void) whoNode;
+	(void) sideBits;
 
-#pragma unused (sideBits, whoNode)
+	switch (theNode->Mode)
+	{
+		case PLUNGER_MODE_DOWN:									// otto is already on top
+		case PLUNGER_MODE_BOTTOMED_OUT:
+		case PLUNGER_MODE_JUSTPRESSED:
+			theNode->Mode = PLUNGER_MODE_DOWN;
+			break;
 
-	if (theNode->PlungerMode != PLUNGER_MODE_WAIT)		// only if ready
-		return(true);
+		default:												// otto just landed on it
+			theNode->Mode = PLUNGER_MODE_JUSTPRESSED;
+			gDelta.x *= .2f;									// friction to keep from sliding
+			gDelta.z *= .2f;
+			break;
+	}
 
-	gDelta.x *= .2f;									// friction to keep from sliding
-	gDelta.z *= .2f;
-	gDelta.y = 400.0f;
-
-	theNode->PlungerMode = PLUNGER_MODE_DOWN;
-
-	body = theNode->ChainHead;							// get pump from plunger
-	MakeSoapBubble(body->Coord.x, body->Coord.y + 130.0f, body->Coord.z);
-
-	PlayEffect3D(EFFECT_AIRPUMP, &gCoord);
-	return(true);
+	return true;
 }
 
 
@@ -517,32 +527,57 @@ ObjNode *plunger = pump->ChainNode;
 
 	GetObjectInfo(plunger);
 
-	switch(plunger->PlungerMode)
+	float speed = 80.0f / 50.0f;
+	float depressedY = pump->Coord.y;
+	float pressedY = pump->Coord.y - 50;
+
+	switch (plunger->Mode)
 	{
+		case	PLUNGER_MODE_WAIT:
+				plunger->Timer = 0;
+				break;
+
+		case	PLUNGER_MODE_JUSTPRESSED:
+				if (plunger->Timer < 0.5f)		// allow creating a bubble as long as we're at least halfway back up
+				{
+					ObjNode* body = plunger->ChainHead;							// get pump from plunger
+					MakeSoapBubble(body->Coord.x, body->Coord.y + 130.0f, body->Coord.z);
+					PlayEffect3D(EFFECT_AIRPUMP, &body->Coord);
+				}
+				plunger->Mode = PLUNGER_MODE_DOWN;
+				SDL_FALLTHROUGH;
+
 		case	PLUNGER_MODE_DOWN:
-				gDelta.y = -80.0f;
-				gCoord.y += gDelta.y * gFramesPerSecondFrac;
-				if (gCoord.y <= (pump->Coord.y - 50.0f))				// see if all the way down
+				plunger->Timer += speed * gFramesPerSecondFrac;
+				if (plunger->Timer >= 1)
 				{
-					gCoord.y = pump->Coord.y - 50.0f;
-					plunger->PlungerMode = PLUNGER_MODE_UP;
+					// all the way down
+					plunger->Timer = 1;
+					plunger->Mode = PLUNGER_MODE_BOTTOMED_OUT;
 				}
 				break;
 
+		case	PLUNGER_MODE_BOTTOMED_OUT:
 		case	PLUNGER_MODE_UP:
-				gDelta.y = 80.0f;
-				gCoord.y += gDelta.y * gFramesPerSecondFrac;
-				if (gCoord.y >= plunger->InitCoord.y)				// see if all the way up
+				plunger->Timer -= speed * gFramesPerSecondFrac;
+				if (plunger->Timer <= 0)
 				{
-					gCoord.y = plunger->InitCoord.y;
-					plunger->PlungerMode = PLUNGER_MODE_WAIT;
-					gDelta.y = 0;
+					// all the way up
+					plunger->Timer = 0;
+					plunger->Mode = PLUNGER_MODE_WAIT;
+				}
+				else
+				{
+					plunger->Mode = PLUNGER_MODE_UP;
 				}
 				break;
-
 	}
 
+	float t = plunger->Timer;
+	t = 0.5f * (1 + sinf((t - 0.5f) * PI));
+	gCoord.y = LerpFloat(depressedY, pressedY, t);
 
+	KeepOldCollisionBoxes(plunger);
 	UpdateObject(plunger);
 }
 
@@ -572,7 +607,7 @@ ObjNode	*newObj;
 	newObj->SpecialF[0] = RandomFloat2()*PI2;					// randomize wobble
 	newObj->SpecialF[1] = RandomFloat2()*PI2;
 
-	newObj->SoapBubbleFree = false;								// still growing, not free yet
+	newObj->Mode = SOAP_BUBBLE_MODE_GROWING;					// still growing, not free yet
 
 	newObj->Health = 15;										// set life timer before pop
 
@@ -611,7 +646,7 @@ float	s,avgX,avgY,avgZ;
 		if (s >= SOAP_BUBBLE_SCALE)						// see if full size
 		{
 			s = SOAP_BUBBLE_SCALE;
-			bubble->SoapBubbleFree = true;				// its free now
+			bubble->Mode = SOAP_BUBBLE_MODE_FREE_FLOAT;	// its free now
 
 			gDelta.x = RandomFloat2() * 80.0f;			// set random drift
 			gDelta.z = RandomFloat2() * 80.0f;
@@ -637,7 +672,7 @@ float	s,avgX,avgY,avgZ;
 			/* FREE FLOAT */
 			/**************/
 
-	if (bubble->SoapBubbleFree)
+	if (bubble->Mode == SOAP_BUBBLE_MODE_FREE_FLOAT)
 	{
 		gDelta.y -= 60.0f * fps;								// add slight gravity to it
 
