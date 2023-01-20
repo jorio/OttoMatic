@@ -49,6 +49,7 @@ enum
 
 #define	RingOffset	SpecialF[0]
 
+int		gNumHumansInLevel = 0;
 int		gNumHumansRescuedTotal;
 int		gNumHumansRescuedOfType[NUM_HUMAN_TYPES];
 
@@ -79,11 +80,9 @@ static Byte GetSkeletonFromHumanType(Byte humanType)
 
 void InitHumans(void)
 {
-int	i;
-
 	gNumHumansRescuedTotal	= 0;
 
-	for (i = 0; i < NUM_HUMAN_TYPES; i++)
+	for (int i = 0; i < NUM_HUMAN_TYPES; i++)
 		gNumHumansRescuedOfType[i] = 0;
 
 
@@ -93,6 +92,54 @@ int	i;
 		gHumanScaleRatio = 1.0f;
 
 
+		/* COUNT STATIC HUMANS */
+
+	gNumHumansInLevel = 0;
+	for (int i = 0; i < gNumTerrainItems; i++)
+	{
+		TerrainItemEntryType* item = &(*gMasterItemList)[i];
+
+		switch (item->type)
+		{
+			case MAP_ITEM_HUMAN_SCIENTIST:
+			case MAP_ITEM_HUMAN:
+				gNumHumansInLevel++;
+				break;
+
+			case MAP_ITEM_PEOPLE_HUT:
+				if (item->parm[0] == 0)												// see if random #
+				{
+					item->parm[0] = 1 + (MyRandomLong() & 7);
+				}
+				gNumHumansInLevel += item->parm[0];
+				break;
+		}
+	}
+
+		/* COUNT SPLINE-BOUND HUMANS */
+
+	for (int i = 0; i < gNumSplines; i++)
+	{
+		const SplineDefType* spline = &(*gSplineList)[i];
+
+		for (int j = 0; j < spline->numItems; j++)
+		{
+			switch ((*spline->itemList)[j].type)
+			{
+				case MAP_ITEM_HUMAN:
+					gNumHumansInLevel++;
+					break;
+
+				case MAP_ITEM_HUMAN_SCIENTIST:
+					gNumHumansInLevel++;
+					break;
+
+				case MAP_ITEM_PEOPLE_HUT:
+					GAME_ASSERT_MESSAGE(false, "people hut moving along spline!?");
+					break;
+			}
+		}
+	}
 }
 
 
@@ -1014,8 +1061,7 @@ ObjNode	*newObj;
 short	humanType = itemPtr->parm[1];
 short	numHumans = itemPtr->parm[0];
 
-	if (numHumans == 0)												// see if random #
-		numHumans = 1 + (MyRandomLong()&7);
+	GAME_ASSERT_MESSAGE(numHumans != 0, "PeopleHut human count should have been set in InitHumans!");
 
 
 			/******************/

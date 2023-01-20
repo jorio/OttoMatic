@@ -138,6 +138,7 @@ static const float gWeaponIconYOff[] =
 
 float	gBonusTimer;
 
+#define	HumanNumberInSequence	Special[0]
 #define	InvisibleDelay	SpecialF[0]
 #define	RingOffset		SpecialF[0]
 
@@ -147,6 +148,7 @@ static ObjNode *gInteriorObj;
 
 static	Byte	gShowScoreMode;
 
+static	int			gNumHumansShownSoFar = 0;
 static	uint32_t	gBonusTotal;
 static	uint32_t	gBonus;
 static	uint32_t	gInventoryQuantity;
@@ -476,19 +478,51 @@ static void MoveTallyText(ObjNode* theNode)
 		case 1:
 			targetTally = gScore;
 			break;
-		default:
+		case 2:
 			targetTally = gInventoryQuantity;
 			theNode->ColorFilter.a *= gInventoryQuantityAlpha;
 			break;
+		case 3:
+			targetTally = gNumHumansInLevel - gNumHumansShownSoFar;
+			if (gNumHumansShownSoFar < gNumHumansRescuedTotal)
+				theNode->ColorFilter.a = 0;
+			else
+			{
+				theNode->Timer += gFramesPerSecondFrac * 2.0f;
+				theNode->Timer = ClampFloat(theNode->Timer, 0, 1);
+				theNode->ColorFilter.a *= theNode->Timer;
+			}
+			break;
+		default:
+			targetTally = -1;
 	}
 
-	if (targetTally != theNode->Special[1])
+	if (targetTally >= 0
+		&& targetTally != theNode->Special[1])
 	{
 		theNode->Special[1] = targetTally;
 
-		Str255 s;
-		NumToStringC(targetTally, s);
-		TextMesh_Update(s, kTextMeshAlignCenter, theNode);
+		char text[128];
+
+		switch (theNode->Special[0])
+		{
+			case 0:
+			case 1:
+			case 2:
+				snprintf(text, sizeof(text), "%d", targetTally);
+				break;
+
+			case 3:
+				if (targetTally <= 0)
+					snprintf(text, sizeof(text), "%s", Localize(STR_ALL_HUMANS_RESCUED));
+				else if (targetTally == 1)
+					snprintf(text, sizeof(text), "%s", Localize(STR_1_HUMAN_MISSING));
+				else
+					snprintf(text, sizeof(text), Localize(STR_N_HUMANS_MISSING), targetTally);
+				break;
+		}
+
+		TextMesh_Update(text, kTextMeshAlignCenter, theNode);
 	}
 }
 
@@ -525,8 +559,16 @@ static void DoHumansBonusTally(void)
 	gScoreAlpha = 0;
 	gShowScoreMode = SHOW_SCORE_MODE_HUMANBONUS;
 
+	gNumHumansShownSoFar = 0;
+
 	CreateBonusHumans();
 	ObjNode* tallyText = CreateTallyText(0, 150);
+
+	ObjNode* tallyText2 = CreateTallyText(3, 180);
+	tallyText2->Scale.x *= 0.66f;
+	tallyText2->Scale.y *= 0.66f;
+	tallyText2->Scale.z *= 0.66f;
+	UpdateObjectTransforms(tallyText2);
 
 	CalcFramesPerSecond();
 	UpdateInput();
@@ -564,6 +606,7 @@ static void DoHumansBonusTally(void)
 	}
 
 	DeleteObject(tallyText);
+	DeleteObject(tallyText2);
 }
 
 
@@ -1261,6 +1304,11 @@ const short	humanSkeletons[NUM_HUMAN_TYPES] =
 
 	gBonusTimer = gNumHumansRescuedTotal * 1.4f + 3.0f;
 
+	if (gNumHumansRescuedTotal == gNumHumansInLevel)
+		gBonusTimer += 2;
+	else if (gNumHumansRescuedTotal != 0)
+		gBonusTimer += 1;
+
 	d = 1.0;														// MUST start with a non-zero delay or first one will be skipped
 	j = 0;
 
@@ -1274,7 +1322,7 @@ const short	humanSkeletons[NUM_HUMAN_TYPES] =
 
 			gNewObjectDefinition.type 		= humanSkeletons[t];
 			gNewObjectDefinition.animNum	= 0;
-			if (j++ & 1)											// alternate left/right
+			if (j & 1)												// alternate left/right
 				gNewObjectDefinition.coord.x = 200.0f;
 			else
 				gNewObjectDefinition.coord.x = -200.0f;
@@ -1290,8 +1338,10 @@ const short	humanSkeletons[NUM_HUMAN_TYPES] =
 
 			newObj->ColorFilter.a = 0;
 			newObj->InvisibleDelay = d;
+			newObj->HumanNumberInSequence = j;
 
 			d += 1.25f;
+			j++;
 		}
 	}
 }
@@ -1313,6 +1363,7 @@ float	fps = gFramesPerSecondFrac;
 				/* START TELEPORT */
 
 			StartBonusTeleport(theNode);
+			gNumHumansShownSoFar++;
 			gBonus += POINTS_HUMAN;
 		}
 		else

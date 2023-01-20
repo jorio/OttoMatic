@@ -209,6 +209,7 @@ extern	int						gLevelNum;
 extern	int						gMaxEnemies;
 extern	int						gNumEnemies;
 extern	int						gNumEnemyOfKind[NUM_ENEMY_KINDS];
+extern	int						gNumHumansInLevel;
 extern	int						gNumHumansInTransit;
 extern	int						gNumHumansRescuedTotal;
 extern	int						gNumIceCracks;
