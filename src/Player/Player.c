@@ -652,15 +652,18 @@ int		i;
 
 				/* MAKE FLAME OBJECT */
 
-	gNewObjectDefinition.genre		= CUSTOM_GENRE;
-	gNewObjectDefinition.coord 		= rocket->Coord;
-	gNewObjectDefinition.flags 		= STATUS_BIT_NOZWRITES|STATUS_BIT_NOTEXTUREWRAP|STATUS_BIT_NOLIGHTING|STATUS_BIT_NOFOG|STATUS_BIT_GLOW|STATUS_BIT_KEEPBACKFACES;
-	gNewObjectDefinition.slot 		= PARTICLE_SLOT+1;
-	gNewObjectDefinition.moveCall 	= nil;
-	gNewObjectDefinition.rot 		= 0;
-	gNewObjectDefinition.scale 		= 1;
+	NewObjectDefinitionType def =
+	{
+		.genre		= CUSTOM_GENRE,
+		.coord 		= rocket->Coord,
+		.flags		= STATUS_BIT_NOZWRITES | STATUS_BIT_NOTEXTUREWRAP | STATUS_BIT_NOLIGHTING | STATUS_BIT_NOFOG | STATUS_BIT_GLOW,
+		.slot 		= PARTICLE_SLOT+1,
+		.moveCall 	= nil,
+		.rot 		= 0,
+		.scale 		= 1,
+	};
 
-	newObj = MakeNewObject(&gNewObjectDefinition);
+	newObj = MakeNewObject(&def);
 
 	newObj->CustomDrawFunction = DrawRocketFlame;
 
@@ -697,30 +700,84 @@ int		i;
 }
 
 
+/******************* GENERATE ROCKET FLAME MESH ************************/
+
+#define ROCKETFLAME_SEGMENTS	5		// amount of trapezoids making up the flame
+#define ROCKETFLAME_HDIV		8		// how much to tesselate each trapezoid horizontally (more => mitigate texture distortion)
+
+static MOVertexArrayData* GenerateRocketFlameMesh(void)
+{
+	static const float flameWidth = 100;
+	static const float flameHeight = 800;
+	static const float segmentThickness[ROCKETFLAME_SEGMENTS]	= { .51, .70, .85,   1, 1 };
+	static const float segmentBottomYFrac[ROCKETFLAME_SEGMENTS]	= { .03, .07, .15, .30, 1 };
+
+	static OGLPoint3D			pts[ROCKETFLAME_SEGMENTS * ROCKETFLAME_HDIV * 4];
+	static OGLTextureCoord		uvs[ROCKETFLAME_SEGMENTS * ROCKETFLAME_HDIV * 4];
+	static MOTriangleIndecies	tris[ROCKETFLAME_SEGMENTS * ROCKETFLAME_HDIV * 2];
+	static MOVertexArrayData	mesh;
+
+	int v = 0;		// vertex index
+	int t = 0;		// triangle index
+	for (int i = 0; i < ROCKETFLAME_SEGMENTS; i++)
+	{
+		float x1 = flameWidth * segmentThickness[i];											// top thickness
+		float x2 = flameWidth * segmentThickness[MinInt(i + 1, ROCKETFLAME_SEGMENTS - 1)];		// bottom thickness
+
+		float yfrac1 = i<=0 ? 0 : segmentBottomYFrac[i - 1];
+		float yfrac2 = segmentBottomYFrac[i];
+
+		float y1 = -flameHeight * yfrac1;
+		float y2 = -flameHeight * yfrac2;
+
+		for (int j = 0; j < ROCKETFLAME_HDIV; j++) 		// tesselate the trapezoid horizontally to mitigate texture distortion
+		{
+			float xfrac1 = (float)(j + 0) / ROCKETFLAME_HDIV;
+			float xfrac2 = (float)(j + 1) / ROCKETFLAME_HDIV;
+			
+			pts[v+0] = (OGLPoint3D){ LerpFloat(-x1, x1, xfrac1), y1, 0 };
+			pts[v+1] = (OGLPoint3D){ LerpFloat(-x1, x1, xfrac2), y1, 0 };
+			pts[v+2] = (OGLPoint3D){ LerpFloat(-x2, x2, xfrac2), y2, 0 };
+			pts[v+3] = (OGLPoint3D){ LerpFloat(-x2, x2, xfrac1), y2, 0 };
+
+			uvs[v+0] = (OGLTextureCoord){ xfrac1, yfrac1 };
+			uvs[v+1] = (OGLTextureCoord){ xfrac2, yfrac1 };
+			uvs[v+2] = (OGLTextureCoord){ xfrac2, yfrac2 };
+			uvs[v+3] = (OGLTextureCoord){ xfrac1, yfrac2 };
+
+			tris[t+0] = (MOTriangleIndecies){ {v+0, v+1, v+3} };
+			tris[t+1] = (MOTriangleIndecies){ {v+1, v+2, v+3} };
+
+			v += 4;
+			t += 2;
+		}
+	}
+
+	mesh = (MOVertexArrayData)
+	{
+		.triangles		= tris,
+		.uvs[0]			= uvs,
+		.points			= pts,
+		.numPoints		= ROCKETFLAME_SEGMENTS * ROCKETFLAME_HDIV * 4,
+		.numTriangles	= ROCKETFLAME_SEGMENTS * ROCKETFLAME_HDIV * 2,
+		.numMaterials	= 0,		// set in draw call
+	};
+
+	return &mesh;
+}
+
+
 /******************* DRAW ROCKET FLAME ************************/
 
 void DrawRocketFlame(ObjNode *theNode)
 {
 float		x,y,z,r,s;
-OGLMatrix4x4	m;
-static const OGLPoint3D vOff[4] =
-{
-	{-100, -800, 0},
-	{100, -800, 0},
-	{100, 0, 0},
-	{-100, 0, 0},
-};
-OGLPoint3D		verts[4];
+OGLMatrix4x4	m1, m2;
 ObjNode			*rocket;
 
 	rocket = theNode->ChainHead->ChainHead;					// assume landing mode
 	if (rocket == nil)										// nope, must be bonus screen
 		rocket = theNode->ChainHead;
-
-
-			/* SUBMIT FLAME TEXTURE */
-
-	MO_DrawMaterial(gSpriteGroupList[SPRITE_GROUP_PARTICLES][PARTICLE_SObjType_RocketFlame0+theNode->Special[0]].materialObject);
 
 
 		/* CALC COORDS */
@@ -732,22 +789,29 @@ ObjNode			*rocket;
 	r = theNode->Rot.y = CalcYAngleFromPointToPoint(theNode->Rot.y, x, z,
 												gGameViewInfoPtr->cameraPlacement.cameraLocation.x,
 												gGameViewInfoPtr->cameraPlacement.cameraLocation.z);
-	OGLMatrix4x4_SetRotate_Y(&m, r);
-
-	OGLPoint3D_TransformArray(vOff, &m, verts, 4);
-
 
 	s = gRocketScaleAdjust;
 
+	OGLMatrix4x4_SetRotate_Y(&m1, r);
+	OGLMatrix4x4_SetScale(&m2, s, s, s);
+	OGLMatrix4x4_Multiply(&m1, &m2, &m1);
+	OGLMatrix4x4_SetTranslate(&m2, x, y, z);
+	OGLMatrix4x4_Multiply(&m1, &m2, &m1);
+
+	MOVertexArrayData* mesh = GenerateRocketFlameMesh();
+	OGLPoint3D_TransformArray(mesh->points, &m1, mesh->points, mesh->numPoints);
+
+		/* SET TEXTURE FOR CURRENT FRAME */
+
+	mesh->numMaterials = 1;
+	int frame = (int)(theNode->Special[0]);
+	mesh->materials[0] = gSpriteGroupList[SPRITE_GROUP_PARTICLES][PARTICLE_SObjType_RocketFlame0 + frame].materialObject;
 
 		/* DRAW IT */
 
-	glBegin(GL_QUADS);
-	glTexCoord2f(0,1);	glVertex3f(x+verts[0].x * s, y+verts[0].y * s, z+verts[0].z);
-	glTexCoord2f(1,1);	glVertex3f(x+verts[1].x * s, y+verts[1].y * s, z+verts[1].z);
-	glTexCoord2f(1,0);	glVertex3f(x+verts[2].x * s, y+verts[2].y * s, z+verts[2].z);
-	glTexCoord2f(0,0);	glVertex3f(x+verts[3].x * s, y+verts[3].y * s, z+verts[3].z);
-	glEnd();
+	MO_DrawGeometry_VertexArray(mesh);
+
+		/* ANIMATE */
 
 	theNode->SpecialF[0] -= gFramesPerSecondFrac;			// animate
 	if (theNode->SpecialF[0] <= 0.0f)
