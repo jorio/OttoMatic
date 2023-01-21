@@ -2923,7 +2923,7 @@ static void StartJumpJet(ObjNode *theNode)
 	}
 
 	gPlayerInfo.jumpJet -= .1f;						// dec fuel
-	if (gPlayerInfo.jumpJet < 0.0f)
+	if (gPlayerInfo.jumpJet < EPS)					// avoid free shot when real close to 0 due to FP imprecision
 		gPlayerInfo.jumpJet = 0.0f;
 
 	gResetJumpJet = false;

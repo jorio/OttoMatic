@@ -13,6 +13,8 @@ enum
 {
 	MAP_ITEM_MYSTARTCOORD		= 0,			// map item # for my start coords
 	MAP_ITEM_HUMAN				= 4,
+	MAP_ITEM_ATOM				= 5,
+	MAP_ITEM_POWERUPPOD			= 6,
 	MAP_ITEM_EXITROCKET			= 26,
 	MAP_ITEM_CHECKPOINT			= 27,
 	MAP_ITEM_BUBBLEPUMP			= 37,

@@ -1121,6 +1121,8 @@ OSErr					iErr;
 		HLockHi(hand);									// LOCK this one because we have the lookup table into this
 		gMasterItemList = (TerrainItemEntryType **)hand;
 
+		GAME_ASSERT(GetHandleSize(hand) == (Size)(gNumTerrainItems * sizeof(TerrainItemEntryType)));
+
 					/* CONVERT COORDINATES */
 
 		for (int i = 0; i < gNumTerrainItems; i++)

@@ -45,11 +45,13 @@ enum
 	ATOM_TYPE_FUEL
 };
 
+#define ATOM_INCREMENT_HEALTH	0.1f
+#define ATOM_INCREMENT_JUMPJET	0.1f
+#define ATOM_INCREMENT_FUEL		0.05f
+
 #define	POD_SCALE	1.8f
 
 #define	BALLOON_SCALE	1.2f
-
-#define	SHIELD_FIELD_SCALE	1.6
 
 
 /*********************/
@@ -63,6 +65,7 @@ enum
 #define	BalloonWobble		SpecialF[1]
 
 #define	AtomDelayToActive	SpecialF[4]
+#define	AtomRegenThreshold	SpecialF[5]
 #define	AtomOnWater			Flag[0]
 
 
@@ -84,6 +87,7 @@ int		i;
 		atom->Delta.y = 500.0f + RandomFloat() * 500.0f;
 		atom->Delta.z = RandomFloat2() * 400.0f;
 		atom->POWRegenerate = regenerate;
+		atom->AtomRegenThreshold = ((float) i) * ATOM_INCREMENT_HEALTH;
 	}
 
 			/* DO GREEN */
@@ -96,6 +100,7 @@ int		i;
 		atom->Delta.y = 500.0f + RandomFloat() * 500.0f;
 		atom->Delta.z = RandomFloat2() * 400.0f;
 		atom->POWRegenerate = regenerate;
+		atom->AtomRegenThreshold = ((float) i) * ATOM_INCREMENT_JUMPJET;
 	}
 
 			/* DO BLUE */
@@ -333,16 +338,18 @@ static void CheckIfRegenerateAtom(ObjNode *theNode)
 {
 Boolean	reGen = false;			// assume no re-gen
 
+	float regenThreshold = theNode->AtomRegenThreshold;
+
 	switch(theNode->Type)
 	{
 		case	ATOM_TYPE_HEALTH:
-				if (gPlayerInfo.health <= 0.0f)												// if player is out of health
+				if (gPlayerInfo.health <= regenThreshold)									// if player is out of health
 					if (!OGL_IsBBoxVisible(&theNode->BBox, &theNode->BaseTransformMatrix))	// and player won't see it pop back to life...
 						reGen = true;														// ... then regenerate it
 				break;
 
 		case	ATOM_TYPE_JUMPJET:
-				if (gPlayerInfo.jumpJet <= 0.0f)											// if player is out of jumpjet
+				if (gPlayerInfo.jumpJet <= regenThreshold)									// if player is out of jumpjet
 					if (!OGL_IsBBoxVisible(&theNode->BBox, &theNode->BaseTransformMatrix))	// and player won't see it pop back to life...
 						reGen = true;														// ... then regenerate it
 				break;
@@ -489,23 +496,20 @@ float		x,y,z;
 	switch(theNode->Type)
 	{
 		case	ATOM_TYPE_HEALTH:
-				gPlayerInfo.health += .1f;
-				if (gPlayerInfo.health > 1.0f)
-					gPlayerInfo.health = 1.0f;
+				gPlayerInfo.health += ATOM_INCREMENT_HEALTH;
+				gPlayerInfo.health = MinFloat(1, gPlayerInfo.health);
 				DisableHelpType(HELP_MESSAGE_HEALTHATOM);
 				break;
 
 		case	ATOM_TYPE_JUMPJET:
-				gPlayerInfo.jumpJet += .1f;
-				if (gPlayerInfo.jumpJet > 1.0f)
-					gPlayerInfo.jumpJet = 1.0f;
+				gPlayerInfo.jumpJet += ATOM_INCREMENT_JUMPJET;
+				gPlayerInfo.jumpJet = MinFloat(1, gPlayerInfo.jumpJet);
 				DisableHelpType(HELP_MESSAGE_JUMPJETATOM);
 				break;
 
 		case	ATOM_TYPE_FUEL:
-				gPlayerInfo.fuel += .05f;
-				if (gPlayerInfo.fuel > 1.0f)
-					gPlayerInfo.fuel = 1.0f;
+				gPlayerInfo.fuel += ATOM_INCREMENT_FUEL;
+				gPlayerInfo.fuel = MinFloat(1, gPlayerInfo.fuel);
 				DisableHelpType(HELP_MESSAGE_FUELATOM);
 				break;
 
