@@ -532,12 +532,13 @@ uint64_t SwizzleULong64(const uint64_t *u64Ptr)
 
 float SwizzleFloat(const float *floatPtr)
 {
-float	*theFloat;
-uint32_t	bytes = SwizzleULong((const uint32_t *)floatPtr);
+	const void* blob = floatPtr;
 
-	theFloat = (float *)&bytes;
+	uint32_t theLong = SwizzleULong((const uint32_t *) blob);
 
-	return(*theFloat);
+	blob = &theLong;
+
+	return *((const float *) blob);
 }
 
 

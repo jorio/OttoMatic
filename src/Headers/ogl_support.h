@@ -5,13 +5,11 @@
 #pragma once
 
 #define	MAX_FILL_LIGHTS		4
-#define	MAX_TEXTURES		300
-
 
 #define	USE_GL_COLOR_MATERIAL	1
 
 #if USE_GL_COLOR_MATERIAL
-	#define SetColor4fv(colorVV)		glColor4fv((GLfloat *)colorVV)		// set current diffuse color
+	#define SetColor4fv(colorVV)		glColor4fv((colorVV))		// set current diffuse color
 	#define SetColor4f(r, g, b, a)		\
 	do {																		\
 		glColor4f(r, g, b, a);													\

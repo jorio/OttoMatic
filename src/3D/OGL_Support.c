@@ -414,7 +414,7 @@ OGLStyleDefType *styleDefPtr = &setupDefPtr->styles;
 		glFogf(GL_FOG_DENSITY, styleDefPtr->fogDensity);
 		glFogf(GL_FOG_START, styleDefPtr->fogStart);
 		glFogf(GL_FOG_END, styleDefPtr->fogEnd);
-		glFogfv(GL_FOG_COLOR, (float *)&setupDefPtr->view.clearColor);
+		glFogfv(GL_FOG_COLOR, &setupDefPtr->view.clearColor.r);
 		glEnable(GL_FOG);
 	}
 	else

@@ -1122,10 +1122,10 @@ static const float heights[] =
 			/* DRAW IT */
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0,v);		glVertex3fv((GLfloat *)&tc[0]);
-	glTexCoord2f(1,v);		glVertex3fv((GLfloat *)&tc[1]);
-	glTexCoord2f(1,1+v);	glVertex3fv((GLfloat *)&tc[2]);
-	glTexCoord2f(0,1+v);	glVertex3fv((GLfloat *)&tc[3]);
+	glTexCoord2f(0,v);		glVertex3fv(&tc[0].x);
+	glTexCoord2f(1,v);		glVertex3fv(&tc[1].x);
+	glTexCoord2f(1,1+v);	glVertex3fv(&tc[2].x);
+	glTexCoord2f(0,1+v);	glVertex3fv(&tc[3].x);
 	glEnd();
 
 	gGlobalMaterialFlags = 0;

@@ -196,7 +196,7 @@ int				px,py,pw,ph;
 		{
 			if (transColor.a <= 0.0f)							// see if faded all out
 				break;
-			SetColor4fv((float *)&transColor);
+			SetColor4fv(&transColor.r);
 		}
 
 

@@ -239,7 +239,7 @@ static const float	scale[4] = {.5, .7, .9, .6};
 		m.value[M03] = x;												// translate
 		m.value[M13] = y;
 		m.value[M23] = z;
-		glMultMatrixf((GLfloat *)&m);
+		glMultMatrixf(m.value);
 
 
 		glBegin(GL_QUADS);

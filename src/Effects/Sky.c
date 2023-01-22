@@ -226,12 +226,12 @@ float			u,v;
 			/* SETUP VERTEX ARRAY */
 
 	glEnableClientState(GL_VERTEX_ARRAY);								// enable vertex arrays
-	glVertexPointer(3, GL_FLOAT, 0, (GLfloat *)&gSkyPoints[0][0]);		// point to point array
+	glVertexPointer(3, GL_FLOAT, 0, &gSkyPoints[0][0].x);				// point to point array
 
 
 			/* SETUP VERTEX UVS */
 
-	glTexCoordPointer(2, GL_FLOAT, 0,(GLfloat *)&gSkyUVs1[0][0]);			// enable uv arrays
+	glTexCoordPointer(2, GL_FLOAT, 0, &gSkyUVs1[0][0].u);				// enable uv arrays
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 
@@ -239,7 +239,7 @@ float			u,v;
 
 	if (kSkyTable[gLevelNum].fadeEdges)
 	{
-		glColorPointer(4, GL_FLOAT, 0, (GLfloat *)&gSkyColors[0][0]);
+		glColorPointer(4, GL_FLOAT, 0, &gSkyColors[0][0].r);
 		glEnableClientState(GL_COLOR_ARRAY);								// enable color arrays
 	}
 	else
@@ -251,7 +251,7 @@ float			u,v;
 	OGLMatrix4x4_SetTranslate(&m, gPlayerInfo.camera.cameraLocation.x,
 								kSkyTable[gLevelNum].altitude,
 								gPlayerInfo.camera.cameraLocation.z);
-	glMultMatrixf((GLfloat *)&m);
+	glMultMatrixf(m.value);
 
 
 			/* SUBMIT IT */

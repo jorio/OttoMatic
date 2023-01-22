@@ -1045,7 +1045,7 @@ uint32_t			matFlags;
 	diffColor2.b *= gGlobalColorFilter.b;
 
 
-	SetColor4fv(&diffColor2);						// set current diffuse color
+	SetColor4fv(&diffColor2.r);					// set current diffuse color
 #if USE_GL_COLOR_MATERIAL
 //	glEnable(GL_COLOR_MATERIAL);	//-------- continuously reenable this since OGL seems to have a bug where it will magically get disabled.
 #endif
@@ -1070,13 +1070,9 @@ uint32_t			matFlags;
 
 void MO_DrawMatrix(const MOMatrixObject *matObj)
 {
-const OGLMatrix4x4		*m;
-
-	m = &matObj->matrix;							// point to matrix
-
 				/* MULTIPLY CURRENT MATRIX BY THIS */
 
-	glMultMatrixf((GLfloat *)m);
+	glMultMatrixf(matObj->matrix.value);
 
 	if (OGL_CheckError())
 		DoFatalAlert("MO_DrawMatrix: glMultMatrixf!");
