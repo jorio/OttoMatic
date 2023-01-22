@@ -126,8 +126,6 @@ ObjNode	*newObj,*console;
 			/* SET COLLISION STUFF */
 
 	newObj->CType 			= CTYPE_MISC|CTYPE_IMPENETRABLE|CTYPE_BLOCKCAMERA|CTYPE_LIGHTNINGROD;
-//	newObj->CBits			= CBITS_ALLSOLID;
-//	CreateCollisionBoxFromBoundingBox_Rotated(newObj,.8,1);
 
 	newObj->HitByWeaponHandler[WEAPON_TYPE_SUPERNOVA] 	= TeleporterHitBySuperNova;
 
@@ -165,17 +163,11 @@ static Boolean TeleporterHitBySuperNova(ObjNode *weapon, ObjNode *teleporter, OG
 	return(false);
 }
 
-
 /************************* MOVE TELEPORTER ****************************/
 
 static void MoveTeleporter(ObjNode *teleporter)
 {
-ObjNode *zap1,*zap2,*player = gPlayerInfo.objNode;
-float	dist,oldSide,newSide;
 float	fps = gFramesPerSecondFrac;
-OGLMatrix3x3	m;
-OGLVector2D		oldTtoV,v,newTtoV;
-int				i;
 
 	if (TrackTerrainItem(teleporter))							// just check to see if it's gone
 	{
@@ -203,10 +195,10 @@ int				i;
 		/* UPDATE ZAPS */
 		/***************/
 
-	zap1 = teleporter->ChainNode->ChainNode;			// 1st zap is chained off of console
+	ObjNode* zap1 = teleporter->ChainNode->ChainNode;			// 1st zap is chained off of console
 	if (zap1)
 	{
-		zap2 = zap1->ChainNode;
+		ObjNode* zap2 = zap1->ChainNode;
 		if (zap2)
 		{
 			zap1->Rot.z += RandomFloat()*PI2;
@@ -216,101 +208,100 @@ int				i;
 		}
 	}
 
-			/*****************************************/
-			/* DETERMINE WHICH SIDE PLAYER IS/WAS ON */
-			/*****************************************/
+	float dist = OGLPoint3D_Distance(&teleporter->Coord, &gPlayerInfo.coord);		// calc dist to player
 
-	dist = OGLPoint3D_Distance(&teleporter->Coord, &gPlayerInfo.coord);					// calc dist to player
-	if (dist < 900.0f)
+			/* SEE IF INITIATE TELEPORT */
+
+	if (dist < (281 * teleporter->Scale.x))							// see if within teleportation radius
 	{
-					/* CALC PERPENDICULAR AIM VECTOR OF TELEPORTER */
-		v.x = 1;
-		v.y = 0;
-		OGLMatrix3x3_SetRotate(&m, teleporter->Rot.y);
-		OGLVector2D_Transform(&v,&m,&v);
+			/* DETERMINE WHICH SIDE PLAYER IS/WAS ON */
 
-						/* CALC TELE->PLAYER VECTORS */
+		OGLMatrix3x3	m;
 
-		oldTtoV.x = player->OldCoord.x - teleporter->Coord.x;					// calc vector to old player coord
-		oldTtoV.y = player->OldCoord.z - teleporter->Coord.z;
-		FastNormalizeVector2D(oldTtoV.x, oldTtoV.y,&oldTtoV,true);
+		OGLPoint3D tele = teleporter->Coord;
+		OGLPoint3D oldP = gPlayerInfo.objNode->OldCoord;
+		OGLPoint3D newP = gPlayerInfo.objNode->Coord;
 
-		newTtoV.x = player->Coord.x - teleporter->Coord.x;						// calc vector to new player coord
-		newTtoV.y = player->Coord.z - teleporter->Coord.z;
-		FastNormalizeVector2D(newTtoV.x, newTtoV.y,&newTtoV,true);
+		OGLVector2D oldT2P = {oldP.x - tele.x, oldP.z - tele.z};	// old vector teleporter --> player
+		OGLVector2D newT2P = {newP.x - tele.x, newP.z - tele.z};	// new vector teleporter --> player
+		FastNormalizeVector2D(oldT2P.x, oldT2P.y, &oldT2P, true);
+		FastNormalizeVector2D(newT2P.x, newT2P.y, &newT2P, true);
 
-						/* DETERMINE SIDEDNESS */
+		OGLVector2D gateVector = {1, 0};
+		OGLMatrix3x3_SetRotate(&m, -teleporter->Rot.y);				// not sure why angle must be negated for correct behavior on non-axis-aligned teleporters?
+		OGLVector2D_Transform(&gateVector, &m, &gateVector);
 
-		oldSide = OGLVector2D_Cross(&v, &oldTtoV);
-		newSide = OGLVector2D_Cross(&v, &newTtoV);
+		float oldSide = OGLVector2D_Cross(&gateVector, &oldT2P);
+		float newSide = OGLVector2D_Cross(&gateVector, &newT2P);
 
 			/* SEE IF CROSSED FROM FRONT TO BACK - THEN START TELEPORT */
 
-		if (dist < (281.0f * teleporter->Scale.x))								// see if within zap radius
+		if ((oldSide * newSide) < 0.0f)								// if (-) then it changed signs, thus changed sides
 		{
-			if ((oldSide * newSide) < 0.0f)										// if (-) then it changed signs, thus changed sides
-			{
-				InitiatePlayerTeleportation(teleporter);
-			}
+			InitiatePlayerTeleportation(teleporter);
 		}
+	}
 
-			/**********************************/
-			/* SEE IF DO ABSORPTOIN PARTICLES */
-			/**********************************/
+			/************************/
+			/* ABSORPTION PARTICLES */
+			/************************/
 
+	if (dist < 900.0f)
+	{
+		teleporter->ParticleTimer += fps;
+		while (teleporter->ParticleTimer > 0.01f)
 		{
-			int					particleGroup,magicNum;
-			NewParticleGroupDefType	groupDef;
-			NewParticleDefType	newParticleDef;
-			OGLVector3D			d;
-			OGLPoint3D			p;
+			teleporter->ParticleTimer -= 0.01f;
 
-			teleporter->ParticleTimer += fps;
-			if (teleporter->ParticleTimer > 0.01f)
+			short particleGroup	= teleporter->ParticleGroup;
+			uint32_t magicNum	= teleporter->ParticleMagicNum;
+
+			if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
 			{
-				teleporter->ParticleTimer += 0.01f;
+				teleporter->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
 
-				particleGroup 	= teleporter->ParticleGroup;
-				magicNum 		= teleporter->ParticleMagicNum;
-
-				if ((particleGroup == -1) || (!VerifyParticleGroupMagicNum(particleGroup, magicNum)))
+				NewParticleGroupDefType groupDef =
 				{
-					teleporter->ParticleMagicNum = magicNum = MyRandomLong();			// generate a random magic num
+					.magicNum				= magicNum,
+					.type					= PARTICLE_TYPE_GRAVITOIDS,
+					.flags					= PARTICLE_FLAGS_DONTCHECKGROUND,
+					.gravity				= 0,
+					.magnetism				= 0,
+					.baseScale				= 30,
+					.decayRate				= 0,
+					.fadeRate				= 1,
+					.particleTextureNum		= PARTICLE_SObjType_WhiteSpark3,
+					.srcBlend				= GL_SRC_ALPHA,
+					.dstBlend				= GL_ONE,
+				};
+				teleporter->ParticleGroup = particleGroup = NewParticleGroup(&groupDef);
+			}
 
-					groupDef.magicNum				= magicNum;
-					groupDef.type					= PARTICLE_TYPE_GRAVITOIDS;
-					groupDef.flags					= PARTICLE_FLAGS_DONTCHECKGROUND;
-					groupDef.gravity				= 0;
-					groupDef.magnetism				= 0;
-					groupDef.baseScale				= 30;
-					groupDef.decayRate				= 0;
-					groupDef.fadeRate				= 1.0;
-					groupDef.particleTextureNum		= PARTICLE_SObjType_WhiteSpark3;
-					groupDef.srcBlend				= GL_SRC_ALPHA;
-					groupDef.dstBlend				= GL_ONE;
-					teleporter->ParticleGroup = particleGroup = NewParticleGroup(&groupDef);
-				}
+			if (particleGroup != -1)
+			{
+				OGLPoint3D p = gPlayerInfo.coord;
+				p.y += RandomFloat2() * 90;
 
-				if (particleGroup != -1)
+				OGLVector3D d =
 				{
-					p.x = gPlayerInfo.coord.x;
-					p.y = gPlayerInfo.coord.y + RandomFloat2() * 100.0f;
-					p.z = gPlayerInfo.coord.z;
+					teleporter->Coord.x - p.x,
+					teleporter->Coord.y - p.y + 200,
+					teleporter->Coord.z - p.z,
+				};
 
-					d.x = teleporter->Coord.x - p.x;
-					d.y = teleporter->Coord.y + 200.0f - p.y;
-					d.z = teleporter->Coord.z - p.z;
+				NewParticleDefType	newParticleDef =
+				{
+					.groupNum	= particleGroup,
+					.where		= &p,
+					.delta		= &d,
+					.scale		= RandomFloat() + 1.0f,
+					.rotZ		= RandomFloat()*PI2,
+					.rotDZ		= 0,
+					.alpha		= .9f,
+				};
 
-					newParticleDef.groupNum		= particleGroup;
-					newParticleDef.where		= &p;
-					newParticleDef.delta		= &d;
-					newParticleDef.scale		= RandomFloat() + 1.0f;
-					newParticleDef.rotZ			= RandomFloat()*PI2;
-					newParticleDef.rotDZ		= 0;
-					newParticleDef.alpha		= .9;
-					if (AddParticleToGroup(&newParticleDef))
-						teleporter->ParticleGroup = -1;
-				}
+				if (AddParticleToGroup(&newParticleDef))
+					teleporter->ParticleGroup = -1;
 			}
 		}
 	}
@@ -320,7 +311,7 @@ int				i;
 		/* UPDATE SPARKLE */
 		/******************/
 
-	i = teleporter->Sparkles[0];
+	int i = teleporter->Sparkles[0];
 	if (i != -1)
 	{
 		gSparkles[i].color.a -= fps * 1.0f;
@@ -479,24 +470,4 @@ float	fps = gFramesPerSecondFrac;
 	UpdateObjectTransforms(player);
 	UpdateRobotHands(player);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

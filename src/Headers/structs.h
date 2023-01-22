@@ -267,7 +267,7 @@ struct ObjNode
 	OGLPoint3D		InitCoord;			// coord where was created
 	OGLVector3D		Delta;				// delta velocity of object
 	OGLVector3D		DeltaRot;
-	OGLVector3D		Rot;				// rotation of object
+	OGLVector3D		Rot;				// rotation of object (in radians)
 	OGLVector3D		Scale;				// scale of object
 	OGLVector2D		AccelVector;		// current acceleration vector
 	float			Friction;			// amount of friction to apply to player if player lands on top of this (for platforms and the like).  0 = normal, 1 = slick
