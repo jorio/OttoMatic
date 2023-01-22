@@ -54,6 +54,21 @@ static void MoveGlowDisc(ObjNode *theNode);
 #define STARS_LOW_Y		(-1000.0f)
 #define STARS_HIGH_Y	(2000.0f)
 
+static const RectF gInteriorStarZones[] =
+{
+	{.top=150, .bottom=-50, .left=-650, .right=-480},
+	{.top=800, .bottom=600, .left=-650, .right=-480},
+
+	{.top=150, .bottom=-50, .left=-200, .right=-20},
+	{.top=700, .bottom=500, .left=-200, .right=-20},
+
+	{.top=150, .bottom=-50, .left=220, .right=400},
+	{.top=700, .bottom=500, .left=220, .right=400},
+
+	{.top=250, .bottom=-50, .left=-1250, .right=-950},
+	{.top=250, .bottom=-50, .left=700, .right=1550},
+};
+
 enum
 {
 	BONUS_ObjType_Star,
@@ -213,6 +228,8 @@ void DoBonusScreen(void)
 
 	if (gLevelNum == LEVEL_NUM_JUNGLE)
 	{
+		gShowScoreMode = SHOW_SCORE_MODE_OFF;		// reset stars
+
 		DoTractorBeam();
 		// Tractor beam does its own async fadeout
 	}
@@ -222,6 +239,7 @@ void DoBonusScreen(void)
 			/* CLEANUP */
 
 	FreeBonusScreen();
+	gShowScoreMode = SHOW_SCORE_MODE_OFF;
 }
 
 
@@ -233,8 +251,15 @@ static void SetupBonusScreen(void)
 FSSpec				spec;
 OGLSetupInputType	viewDef;
 ObjNode				*newObj;
-int					i;
 static const OGLVector3D	fillDirection1 = { 1, 0, -.3 };
+
+static const OGLColorRGBA	starColors[] =
+{
+	{1.0f, 1.0f, 1.0f, 1.0f},			// white
+	{1.0f, 0.6f, 0.6f, 1.0f},			// red
+	{0.6f, 0.6f, 1.0f, 1.0f},			// blue
+	{0.7f, 0.7f, 1.0f, 1.0f},			// grey
+};
 
 
 	gShowScoreMode = SHOW_SCORE_MODE_OFF;
@@ -335,16 +360,8 @@ static const OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 				/* MAKE STARS */
 				/**************/
 
-		for (i = 0; i < 60*5; i++)
+		for (int i = 0; i < 60*5; i++)
 		{
-			static const OGLColorRGBA colors[] =
-			{
-				{1.0f, 1.0f, 1.0f, 1.0f},			// white
-				{1.0f, 0.6f, 0.6f, 1.0f},			// red
-				{0.6f, 0.6f, 1.0f, 1.0f},			// blue
-				{0.7f, 0.7f, 1.0f, 1.0f},			// grey
-			};
-
 			gNewObjectDefinition.group 		= MODEL_GROUP_BONUS;
 			gNewObjectDefinition.type 		= BONUS_ObjType_Star;
 			gNewObjectDefinition.coord.x 	= RandomFloatRange(-1600.0f, 2000.0f);
@@ -358,9 +375,13 @@ static const OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 			gNewObjectDefinition.scale 	    = .1f + RandomFloat() * .2f;
 			newObj = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
-			newObj->SpecialF[0] = RandomFloat() * PI;
+			newObj->Timer = RandomFloat() * PI;
+			newObj->Mode = 0;
+			newObj->SpecialF[0] = STARS_LOW_Y;
+			newObj->SpecialF[1] = STARS_HIGH_Y;
+			newObj->SpecialF[2] = 1;
 
-			newObj->ColorFilter = colors[MyRandomLong()&0x3];
+			newObj->ColorFilter = starColors[MyRandomLong()&0x3];
 
 			newObj->Delta.y = -(5.0f + RandomFloat() * 15.0f);
 		}
@@ -416,6 +437,43 @@ static const OGLVector3D	fillDirection1 = { 1, 0, -.3 };
 	gInteriorObj->ChainNode = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 
 	gInteriorObj->ChainNode->ColorFilter.a = gInteriorObj->ColorFilter.a * .99f;
+
+		/* MAKE DENSER STARS VIEWABLE FROM INSIDE WINDOWS */
+
+	int numInteriorStarZones = (int) (sizeof(gInteriorStarZones) / sizeof(gInteriorStarZones[0]));
+
+	for (int starRect = 0; starRect < numInteriorStarZones; starRect++)
+	{
+		RectF r = gInteriorStarZones[starRect];
+		float width = r.right - r.left;
+		float height = r.top - r.bottom;
+		float area = width * height;
+
+		for (int i = 0; i <= (int)(area/4000); i++)
+		{
+			NewObjectDefinitionType def =
+			{
+				.group		= MODEL_GROUP_BONUS,
+				.type		= BONUS_ObjType_Star,
+				.coord		= {RandomFloatRange(r.left, r.right), RandomFloatRange(r.bottom, r.top), -500},
+				.flags		= STATUS_BIT_KEEPBACKFACES | STATUS_BIT_GLOW | STATUS_BIT_NOTEXTUREWRAP |
+								STATUS_BIT_NOZWRITES | STATUS_BIT_DONTCULL | STATUS_BIT_NOLIGHTING,
+				.slot		= 50,
+				.moveCall	= MoveStar,
+				.rot		= 0,
+				.scale		= .15f + RandomFloat() * .2f,
+			};
+			newObj = MakeNewDisplayGroupObject(&def);
+
+			newObj->Timer = RandomFloat() * PI;
+			newObj->Mode = 1;
+			newObj->SpecialF[0] = r.bottom;
+			newObj->SpecialF[1] = r.top;
+			newObj->SpecialF[2] = 0;
+			newObj->ColorFilter = starColors[MyRandomLong()&0x3];
+			newObj->Delta.y = -(5.0f + RandomFloat() * 15.0f);
+		}
+	}
 
 	PlaySong(SONG_BONUS, 0);
 
@@ -1556,13 +1614,31 @@ static void MoveStar(ObjNode *theNode)
 {
 float	fps = gFramesPerSecondFrac;
 
-	theNode->SpecialF[0] += fps * 2.0f;
+	if (theNode->Mode == 1
+		&& gShowScoreMode == SHOW_SCORE_MODE_OFF)
+	{
+		theNode->StatusBits |= STATUS_BIT_HIDDEN;
+		return;
+	}
+	else
+	{
+		theNode->StatusBits &= ~STATUS_BIT_HIDDEN;
+	}
 
-	theNode->ColorFilter.a = .3f + (sin(theNode->SpecialF[0]) + 1.0f) * .5f;
+	float lowY = theNode->SpecialF[0];
+	float highY = theNode->SpecialF[1];
+
+	theNode->Timer += fps * 2.0f;
+
+	theNode->SpecialF[2] += fps * 1.3f;
+	theNode->SpecialF[2] = MinFloat(theNode->SpecialF[2], 1);
+
+	theNode->ColorFilter.a = .3f + (sin(theNode->Timer) + 1.0f) * .5f;
+	theNode->ColorFilter.a *= theNode->SpecialF[2];
 
 	theNode->Coord.y += theNode->Delta.y * fps;
-	if (theNode->Coord.y < STARS_LOW_Y)
-		theNode->Coord.y = STARS_HIGH_Y;
+	if (theNode->Coord.y < lowY)
+		theNode->Coord.y = highY;
 
 	UpdateObjectTransforms(theNode);
 }
