@@ -215,7 +215,6 @@ extern	int						gNumHumansRescuedTotal;
 extern	int						gNumIceCracks;
 extern	int						gNumObjectNodes;
 extern	int						gNumObjectsInBG3DGroupList[MAX_BG3D_GROUPS];
-extern	int						gNumPointers;
 extern	int						gNumShards;
 extern	int						gNumSparkles;
 extern	int						gNumSpritesInGroupList[MAX_SPRITE_GROUPS];
@@ -259,7 +258,3 @@ extern	uint16_t				gTileAttribFlags;
 };
 #endif
 
-#define GAME_ASSERT(condition) do { if (!(condition)) DoAssert(#condition, __func__, __LINE__); } while(0)
-#define GAME_ASSERT_MESSAGE(condition, message) do { if (!(condition)) DoAssert(message, __func__, __LINE__); } while(0)
-#define DECLARE_WORKBUF(buf, bufSize) char (buf)[256]; const int (bufSize) = 256
-#define DECLARE_STATIC_WORKBUF(buf, bufSize) static char (buf)[256]; static const int (bufSize) = 256

@@ -11,6 +11,9 @@
 /***************/
 
 #include "game.h"
+#include <stdio.h>
+#include <stdarg.h>
+
 
 /****************************/
 /*    CONSTANTS             */
@@ -23,12 +26,10 @@
 /*     VARIABLES      */
 /**********************/
 
-int gNumPointers = 0;
-
 short	gPrefsFolderVRefNum;
 long	gPrefsFolderDirID;
 
-uint32_t 	seed0 = 0, seed1 = 0, seed2 = 0;
+static uint32_t seed0 = 0x2a80ce30, seed1 = 0, seed2 = 0;
 
 float	gFramesPerSecond, gFramesPerSecondFrac;
 
@@ -39,44 +40,39 @@ float	gFramesPerSecond, gFramesPerSecondFrac;
 /**********************/
 
 
+
 /*********************** DO ALERT *******************/
 
-void DoAlert(const char* s)
+void DoAlert(const char* format, ...)
 {
 	Enter2D();
 
-	printf("OTTO MATIC Alert: %s\n", s);
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", s, gSDLWindow);
+	char message[1024];
+	va_list args;
+	va_start(args, format);
+	vsnprintf(message, sizeof(message), format, args);
+	va_end(args);
 
-	Exit2D();
-	SDL_ShowCursor(0);
+	printf("OTTO MATIC ALERT: %s\n", message);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", message, gSDLWindow);
 }
 
 
 /*********************** DO FATAL ALERT *******************/
 
-void DoFatalAlert(const char* s)
+void DoFatalAlert(const char* format, ...)
 {
-	Enter2D();
+	if (gSDLWindow)
+		SDL_SetWindowFullscreen(gSDLWindow, 0);
 
-	printf("OTTO MATIC Fatal Alert: %s\n", s);
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", s, gSDLWindow);
+	char message[1024];
+	va_list args;
+	va_start(args, format);
+	vsnprintf(message, sizeof(message), format, args);
+	va_end(args);
 
-	Exit2D();
-	CleanQuit();
-}
-
-
-/*********************** DO ASSERT *******************/
-
-void DoAssert(const char* msg, const char* file, int line)
-{
-	Enter2D();
-	printf("GAME ASSERTION FAILED: %s - %s:%d\n", msg, file, line);
-	static char alertbuf[1024];
-	snprintf(alertbuf, 1024, "%s\n%s:%d", msg, file, line);
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic: Assertion Failed!", alertbuf, /*gSDLWindow*/ nil);
-	Exit2D();
+	printf("OTTO MATIC FATAL ALERT: %s\n", message);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", message, gSDLWindow);
 	ExitToShell();
 }
 
@@ -216,15 +212,6 @@ void SetMyRandomSeed(uint32_t seed)
 	seed2 = 0;
 }
 
-/**************** INIT MY RANDOM SEED *******************/
-
-void InitMyRandomSeed(void)
-{
-	seed0 = 0x2a80ce30;
-	seed1 = 0;
-	seed2 = 0;
-}
-
 
 /**************** POSITIVE MODULO *******************/
 
@@ -239,47 +226,6 @@ int PositiveModulo(int value, unsigned int m)
 }
 
 #pragma mark -
-
-/****************** ALLOC HANDLE ********************/
-
-Handle	AllocHandle(long size)
-{
-	return NewHandle(size);
-}
-
-
-/****************** ALLOC PTR ********************/
-
-void *AllocPtr(long size)
-{
-	gNumPointers++;
-	return NewPtr(size);
-}
-
-
-/****************** ALLOC PTR CLEAR ********************/
-
-void *AllocPtrClear(long size)
-{
-	gNumPointers++;
-	return NewPtrClear(size);
-}
-
-
-/***************** SAFE DISPOSE PTR ***********************/
-
-void SafeDisposePtr(Ptr ptr)
-{
-	if (ptr)
-	{
-		GAME_ASSERT(gNumPointers > 0);
-		gNumPointers--;
-
-		DisposePtr(ptr);
-	}
-}
-
-
 
 /******************* CHECK PREFERENCES FOLDER ******************/
 
@@ -297,19 +243,6 @@ long		createdDirID;
 		DoAlert("Warning: Cannot locate the Preferences folder.");
 
 	iErr = DirCreate(gPrefsFolderVRefNum,gPrefsFolderDirID,"OttoMatic",&createdDirID);		// make folder in there
-}
-
-
-/******************** REGULATE SPEED ***************/
-
-void RegulateSpeed(short fps)
-{
-uint32_t	n;
-static uint32_t oldTick = 0;
-
-	n = 60 / fps;
-	while ((TickCount() - oldTick) < n) {}			// wait for n ticks
-	oldTick = TickCount();							// remember current time
 }
 
 

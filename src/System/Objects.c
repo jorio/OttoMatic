@@ -1222,11 +1222,9 @@ int		i;
 
 	if (theNode->CType == INVALID_NODE_FLAG)		// see if already deleted
 	{
-		char errString[256];
-		snprintf(errString, sizeof(errString),
+		DoFatalAlert(
 			"Attempted to Double Delete an Object.  Object was already deleted!  genre=%d group=%d type=%d",
 			theNode->Genre, theNode->Group, theNode->Type);
-		DoFatalAlert(errString);
 	}
 
 			/* RECURSIVE DELETE OF CHAIN NODE & SHADOW NODE */

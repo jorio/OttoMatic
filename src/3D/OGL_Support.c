@@ -684,7 +684,7 @@ do_anaglyph:
 			"sparkles:\t%d\n"
 			"pgroups:\t%d\n"
 			"\n"
-			"ptrs:\t\t%d\n"
+//			"ptrs:\t\t%d\n"
 			"vram:\t\t%dK\n"
 #if 0
 			"\n"
@@ -716,7 +716,7 @@ do_anaglyph:
 			gNumShards,
 			gNumSparkles,
 			gNumActiveParticleGroups,
-			gNumPointers,
+//			gNumPointers,
 			gVRAMUsedThisFrame/1024
 #if 0
 			gTimeSinceLastThrust,
