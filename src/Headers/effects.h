@@ -21,9 +21,8 @@
 
 typedef struct
 {
-	Boolean			isGroupActive;
 	uint32_t		magicNum;
-	Byte			isUsed[MAX_PARTICLES];
+	Pool			*pool;
 	Byte			type;
 	uint32_t		flags;
 	Byte			particleTextureNum;
@@ -105,11 +104,10 @@ typedef struct
 void InitEffects(void);
 void InitParticleSystem(void);
 
-
 void DeleteAllParticleGroups(void);
-short NewParticleGroup(const NewParticleGroupDefType* def);
+int NewParticleGroup(const NewParticleGroupDefType* def);
 Boolean AddParticleToGroup(const NewParticleDefType* def);
-Boolean VerifyParticleGroupMagicNum(short group, uint32_t magicNum);
+Boolean VerifyParticleGroupMagicNum(int group, uint32_t magicNum);
 Boolean ParticleHitObject(ObjNode *theNode, uint16_t inFlags);
 void DisposeParticleSystem(void);
 

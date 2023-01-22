@@ -15,7 +15,6 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static int FindFreeShard(void);
 static void ExplodeGeometry_Recurse(MetaObjectPtr obj);
 static void ExplodeVertexArray(MOVertexArrayData *data, MOMaterialObject *overrideTexture);
 
@@ -28,7 +27,6 @@ static void ExplodeVertexArray(MOVertexArrayData *data, MOMaterialObject *overri
 
 typedef struct
 {
-	Boolean					isUsed;
 	OGLVector3D				rot,rotDelta;
 	OGLPoint3D				coord,coordDelta;
 	float					decaySpeed,scale;
@@ -47,8 +45,8 @@ typedef struct
 /*    VARIABLES      */
 /*********************/
 
-int			gNumShards = 0;
 ShardType	gShards[MAX_SHARDS];
+Pool*		gShardPool = NULL;
 
 static	float		gBoomForce,gShardDecaySpeed;
 static	Byte		gShardMode;
@@ -60,30 +58,10 @@ static 	ObjNode		*gShardSrcObj;
 
 void InitShardSystem(void)
 {
-	gNumShards = 0;
-
-	for (int i = 0; i < MAX_SHARDS; i++)
-		gShards[i].isUsed = false;
-}
-
-
-
-
-/********************* FIND FREE PARTICLE ***********************/
-//
-// OUTPUT: -1 == none free found
-//
-
-static int FindFreeShard(void)
-{
-	if (gNumShards >= MAX_SHARDS)
-		return(-1);
-
-	for (int i = 0; i < MAX_SHARDS; i++)
-		if (!gShards[i].isUsed)
-			return(i);
-
-	return(-1);
+	if (!gShardPool)
+		gShardPool = Pool_New(MAX_SHARDS);
+	else
+		Pool_Reset(gShardPool);
 }
 
 
@@ -217,10 +195,11 @@ OGLPoint3D			origin = {0,0,0};
 	{
 				/* GET FREE PARTICLE INDEX */
 
-		int i = FindFreeShard();
-		if (i == -1)														// see if all out
+		int i = Pool_AllocateIndex(gShardPool);
+		if (i < 0)															// see if all out
 			break;
 
+		ShardType* shard = &gShards[i];
 
 				/* DO POINTS */
 
@@ -228,27 +207,27 @@ OGLPoint3D			origin = {0,0,0};
 		ind[1] = data->triangles[t].vertexIndices[1];
 		ind[2] = data->triangles[t].vertexIndices[2];
 
-		gShards[i].points[0] = data->points[ind[0]];						// get coords of 3 points
-		gShards[i].points[1] = data->points[ind[1]];
-		gShards[i].points[2] = data->points[ind[2]];
+		shard->points[0] = data->points[ind[0]];						// get coords of 3 points
+		shard->points[1] = data->points[ind[1]];
+		shard->points[2] = data->points[ind[2]];
 
-		OGLPoint3D_Transform(&gShards[i].points[0],&gWorkMatrix,&gShards[i].points[0]);							// transform points
-		OGLPoint3D_Transform(&gShards[i].points[1],&gWorkMatrix,&gShards[i].points[1]);
-		OGLPoint3D_Transform(&gShards[i].points[2],&gWorkMatrix,&gShards[i].points[2]);
+		OGLPoint3D_Transform(&shard->points[0], &gWorkMatrix, &shard->points[0]);							// transform points
+		OGLPoint3D_Transform(&shard->points[1], &gWorkMatrix, &shard->points[1]);
+		OGLPoint3D_Transform(&shard->points[2], &gWorkMatrix, &shard->points[2]);
 
-		centerPt.x = (gShards[i].points[0].x + gShards[i].points[1].x + gShards[i].points[2].x) * 0.3333f;		// calc center of polygon
-		centerPt.y = (gShards[i].points[0].y + gShards[i].points[1].y + gShards[i].points[2].y) * 0.3333f;
-		centerPt.z = (gShards[i].points[0].z + gShards[i].points[1].z + gShards[i].points[2].z) * 0.3333f;
+		centerPt.x = (shard->points[0].x + shard->points[1].x + shard->points[2].x) * 0.3333f;		// calc center of polygon
+		centerPt.y = (shard->points[0].y + shard->points[1].y + shard->points[2].y) * 0.3333f;
+		centerPt.z = (shard->points[0].z + shard->points[1].z + shard->points[2].z) * 0.3333f;
 
-		gShards[i].points[0].x -= centerPt.x;								// offset coords to be around center
-		gShards[i].points[0].y -= centerPt.y;
-		gShards[i].points[0].z -= centerPt.z;
-		gShards[i].points[1].x -= centerPt.x;
-		gShards[i].points[1].y -= centerPt.y;
-		gShards[i].points[1].z -= centerPt.z;
-		gShards[i].points[2].x -= centerPt.x;
-		gShards[i].points[2].y -= centerPt.y;
-		gShards[i].points[2].z -= centerPt.z;
+		shard->points[0].x -= centerPt.x;								// offset coords to be around center
+		shard->points[0].y -= centerPt.y;
+		shard->points[0].z -= centerPt.z;
+		shard->points[1].x -= centerPt.x;
+		shard->points[1].y -= centerPt.y;
+		shard->points[1].z -= centerPt.z;
+		shard->points[2].x -= centerPt.x;
+		shard->points[2].y -= centerPt.y;
+		shard->points[2].z -= centerPt.z;
 
 
 				/* DO VERTEX UV'S */
@@ -256,9 +235,9 @@ OGLPoint3D			origin = {0,0,0};
 		uvPtr = data->uvs[0];
 		if (uvPtr)																// see if also has UV (texture layer 0 only!)
 		{
-			gShards[i].uvs[0] = uvPtr[ind[0]];									// get vertex u/v's
-			gShards[i].uvs[1] = uvPtr[ind[1]];
-			gShards[i].uvs[2] = uvPtr[ind[2]];
+			shard->uvs[0] = uvPtr[ind[0]];									// get vertex u/v's
+			shard->uvs[1] = uvPtr[ind[1]];
+			shard->uvs[2] = uvPtr[ind[2]];
 		}
 
 				/* DO MATERIAL INFO */
@@ -280,9 +259,9 @@ OGLPoint3D			origin = {0,0,0};
 			/* SET PHYSICS STUFF */
 			/*********************/
 
-		gShards[i].coord 	= centerPt;
-		gShards[i].rot.x 	= gShards[i].rot.y = gShards[i].rot.z = 0;
-		gShards[i].scale 	= 1.0;
+		shard->coord	= centerPt;
+		shard->rot		= (OGLVector3D) {0,0,0};
+		shard->scale	= 1;
 
 		if (gShardMode & SHARD_MODE_FROMORIGIN)								// see if random deltas or from origin
 		{
@@ -293,31 +272,26 @@ OGLPoint3D			origin = {0,0,0};
 			v.z = centerPt.z - origin.z;
 			FastNormalizeVector(v.x, v.y, v.z, &v);
 
-			gShards[i].coordDelta.x = v.x * boomForce;
-			gShards[i].coordDelta.y = v.y * boomForce;
-			gShards[i].coordDelta.z = v.z * boomForce;
+			shard->coordDelta.x = v.x * boomForce;
+			shard->coordDelta.y = v.y * boomForce;
+			shard->coordDelta.z = v.z * boomForce;
 		}
 		else
 		{
-			gShards[i].coordDelta.x = RandomFloat2() * boomForce;
-			gShards[i].coordDelta.y = RandomFloat2() * boomForce;
-			gShards[i].coordDelta.z = RandomFloat2() * boomForce;
+			shard->coordDelta.x = RandomFloat2() * boomForce;
+			shard->coordDelta.y = RandomFloat2() * boomForce;
+			shard->coordDelta.z = RandomFloat2() * boomForce;
 		}
 
 		if (gShardMode & SHARD_MODE_UPTHRUST)
-			gShards[i].coordDelta.y += 1.5f * gBoomForce;
+			shard->coordDelta.y += 1.5f * gBoomForce;
 
-		gShards[i].rotDelta.x 	= RandomFloat2() * (boomForce * .008f);			// random rotation deltas
-		gShards[i].rotDelta.y 	= RandomFloat2() * (boomForce * .008f);
-		gShards[i].rotDelta.z	= RandomFloat2() * (boomForce * .008f);
+		shard->rotDelta.x 	= RandomFloat2() * (boomForce * .008f);			// random rotation deltas
+		shard->rotDelta.y 	= RandomFloat2() * (boomForce * .008f);
+		shard->rotDelta.z	= RandomFloat2() * (boomForce * .008f);
 
-		gShards[i].decaySpeed 	= gShardDecaySpeed;
-		gShards[i].mode 		= gShardMode;
-
-				/* SET VALID & INC COUNTER */
-
-		gShards[i].isUsed = true;
-		gNumShards++;
+		shard->decaySpeed 	= gShardDecaySpeed;
+		shard->mode 		= gShardMode;
 	}
 }
 
@@ -329,32 +303,34 @@ void MoveShards(void)
 float	ty,y,fps,x,z;
 OGLMatrix4x4	matrix,matrix2;
 
-	if (gNumShards == 0)												// quick check if any particles at all
+	if (!gShardPool || Pool_Empty(gShardPool))				// quick check if any shards at all
 		return;
 
 	fps = gFramesPerSecondFrac;
 
-	for (int i = 0; i < MAX_SHARDS; i++)
+	int i = Pool_First(gShardPool);
+	while (i >= 0)
 	{
-		if (!gShards[i].isUsed)
-			continue;
+		int nextIndex = Pool_Next(gShardPool, i);
+
+		ShardType* shard = &gShards[i];
 
 				/* ROTATE IT */
 
-		gShards[i].rot.x += gShards[i].rotDelta.x * fps;
-		gShards[i].rot.y += gShards[i].rotDelta.y * fps;
-		gShards[i].rot.z += gShards[i].rotDelta.z * fps;
+		shard->rot.x += shard->rotDelta.x * fps;
+		shard->rot.y += shard->rotDelta.y * fps;
+		shard->rot.z += shard->rotDelta.z * fps;
 
 					/* MOVE IT */
 
-		if (gShards[i].mode & SHARD_MODE_HEAVYGRAVITY)
-			gShards[i].coordDelta.y -= fps * 1000.0f;		// gravity
+		if (shard->mode & SHARD_MODE_HEAVYGRAVITY)
+			shard->coordDelta.y -= fps * 1000.0f;		// gravity
 		else
-			gShards[i].coordDelta.y -= fps * 300.0f;		// gravity
+			shard->coordDelta.y -= fps * 300.0f;		// gravity
 
-		x = (gShards[i].coord.x += gShards[i].coordDelta.x * fps);
-		y = (gShards[i].coord.y += gShards[i].coordDelta.y * fps);
-		z = (gShards[i].coord.z += gShards[i].coordDelta.z * fps);
+		x = (shard->coord.x += shard->coordDelta.x * fps);
+		y = (shard->coord.y += shard->coordDelta.y * fps);
+		z = (shard->coord.z += shard->coordDelta.z * fps);
 
 
 					/* SEE IF BOUNCE */
@@ -362,12 +338,12 @@ OGLMatrix4x4	matrix,matrix2;
 		ty = GetTerrainY(x,z);								// get terrain height here
 		if (y <= ty)
 		{
-			if (gShards[i].mode & SHARD_MODE_BOUNCE)
+			if (shard->mode & SHARD_MODE_BOUNCE)
 			{
-				gShards[i].coord.y  = ty;
-				gShards[i].coordDelta.y *= -0.5f;
-				gShards[i].coordDelta.x *= 0.9f;
-				gShards[i].coordDelta.z *= 0.9f;
+				shard->coord.y  = ty;
+				shard->coordDelta.y *= -0.5f;
+				shard->coordDelta.x *= 0.9f;
+				shard->coordDelta.z *= 0.9f;
 			}
 			else
 				goto del;
@@ -375,14 +351,13 @@ OGLMatrix4x4	matrix,matrix2;
 
 					/* SCALE IT */
 
-		gShards[i].scale -= gShards[i].decaySpeed * fps;
-		if (gShards[i].scale <= 0.0f)
+		shard->scale -= shard->decaySpeed * fps;
+		if (shard->scale <= 0.0f)
 		{
 				/* DEACTIVATE THIS PARTICLE */
 del:
-			gShards[i].isUsed = false;
-			gNumShards--;
-			continue;
+			Pool_ReleaseIndex(gShardPool, i);
+			goto next;
 		}
 
 			/***************************/
@@ -391,17 +366,20 @@ del:
 
 				/* SET SCALE MATRIX */
 
-		OGLMatrix4x4_SetScale(&gShards[i].matrix, gShards[i].scale,	gShards[i].scale, gShards[i].scale);
+		OGLMatrix4x4_SetScale(&shard->matrix, shard->scale,	shard->scale, shard->scale);
 
 					/* NOW ROTATE IT */
 
-		OGLMatrix4x4_SetRotate_XYZ(&matrix, gShards[i].rot.x, gShards[i].rot.y, gShards[i].rot.z);
-		OGLMatrix4x4_Multiply(&gShards[i].matrix,&matrix, &matrix2);
+		OGLMatrix4x4_SetRotate_XYZ(&matrix, shard->rot.x, shard->rot.y, shard->rot.z);
+		OGLMatrix4x4_Multiply(&shard->matrix,&matrix, &matrix2);
 
 					/* NOW TRANSLATE IT */
 
-		OGLMatrix4x4_SetTranslate(&matrix, gShards[i].coord.x, gShards[i].coord.y, gShards[i].coord.z);
-		OGLMatrix4x4_Multiply(&matrix2,&matrix, &gShards[i].matrix);
+		OGLMatrix4x4_SetTranslate(&matrix, shard->coord.x, shard->coord.y, shard->coord.z);
+		OGLMatrix4x4_Multiply(&matrix2,&matrix, &shard->matrix);
+
+next:
+		i = nextIndex;
 	}
 }
 
@@ -410,9 +388,7 @@ del:
 
 void DrawShards(void)
 {
-long	i;
-
-	if (gNumShards == 0)												// quick check if any particles at all
+	if (!gShardPool || Pool_Empty(gShardPool))			// quick check if any shards at all
 		return;
 
 			/* SET STATE */
@@ -420,60 +396,45 @@ long	i;
 	glDisable(GL_CULL_FACE);
 	OGL_DisableLighting();
 
-	for (i=0; i < MAX_SHARDS; i++)
+	for (int i = Pool_First(gShardPool); i >= 0; i = Pool_Next(gShardPool, i))
 	{
-		if (gShards[i].isUsed)
-		{
-					/* SUBMIT MATERIAL */
+		const ShardType* shard = &gShards[i];
 
-			gGlobalColorFilter.r = gShards[i].colorFilter.r;
-			gGlobalColorFilter.g = gShards[i].colorFilter.g;
-			gGlobalColorFilter.b = gShards[i].colorFilter.b;
-			gGlobalTransparency = gShards[i].colorFilter.a;
+				/* SUBMIT MATERIAL */
 
-			if (gShards[i].glow)
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-			else
-			    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		gGlobalColorFilter.r = shard->colorFilter.r;
+		gGlobalColorFilter.g = shard->colorFilter.g;
+		gGlobalColorFilter.b = shard->colorFilter.b;
+		gGlobalTransparency = shard->colorFilter.a;
 
+		glBlendFunc(GL_SRC_ALPHA, shard->glow ? GL_ONE : GL_ONE_MINUS_SRC_ALPHA);
 
-			if (gShards[i].material)
-				MO_DrawMaterial(gShards[i].material);
+		if (shard->material)
+			MO_DrawMaterial(shard->material);
 
-					/* SET MATRIX */
+				/* SET MATRIX */
 
-			glPushMatrix();
-			glMultMatrixf(gShards[i].matrix.value);
+		glPushMatrix();
+		glMultMatrixf(shard->matrix.value);
 
+				/* DRAW TRIANGLE */
 
-					/* DRAW THE TRIANGLE */
+		glBegin(GL_TRIANGLES);
+		glTexCoord2fv(&shard->uvs[0].u);	glVertex3fv(&shard->points[0].x);
+		glTexCoord2fv(&shard->uvs[1].u);	glVertex3fv(&shard->points[1].x);
+		glTexCoord2fv(&shard->uvs[2].u);	glVertex3fv(&shard->points[2].x);
+		glEnd();
 
-			glBegin(GL_TRIANGLES);
-			glTexCoord2f(gShards[i].uvs[0].u, gShards[i].uvs[0].v);	glVertex3f(gShards[i].points[0].x, gShards[i].points[0].y, gShards[i].points[0].z);
-			glTexCoord2f(gShards[i].uvs[1].u, gShards[i].uvs[1].v);	glVertex3f(gShards[i].points[1].x, gShards[i].points[1].y, gShards[i].points[1].z);
-			glTexCoord2f(gShards[i].uvs[2].u, gShards[i].uvs[2].v);	glVertex3f(gShards[i].points[2].x, gShards[i].points[2].y, gShards[i].points[2].z);
-			glEnd();
-
-			glPopMatrix();
-		}
+		glPopMatrix();
 	}
 
 		/* CLEANUP */
 
-	gGlobalColorFilter.r =
-	gGlobalColorFilter.g =
-	gGlobalColorFilter.b =
+	gGlobalColorFilter.r = 1;
+	gGlobalColorFilter.g = 1;
+	gGlobalColorFilter.b = 1;
 	gGlobalTransparency = 1;
 	glEnable(GL_CULL_FACE);
 	OGL_EnableLighting();
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
-
-
-
-
-
-
-
-
-

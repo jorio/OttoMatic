@@ -16,7 +16,7 @@
 /*    PROTOTYPES            */
 /****************************/
 
-static void DeleteParticleGroup(long groupNum);
+static void DeleteParticleGroup(int groupNum);
 static void MoveParticleGroups(ObjNode *theNode);
 
 static void DrawParticleGroup(ObjNode *theNode);
@@ -29,11 +29,6 @@ static void MoveSmoker(ObjNode *theNode);
 /****************************/
 /*    CONSTANTS             */
 /****************************/
-
-
-
-#define	BONEBOMB_BLAST_RADIUS		(TERRAIN_POLYGON_SIZE * 1.9f)
-#define	FIRE_BLAST_RADIUS			(TERRAIN_POLYGON_SIZE * 1.5f)
 
 #define	FIRE_TIMER	.05f
 #define	SMOKE_TIMER	.07f
@@ -50,12 +45,11 @@ enum
 /*********************/
 
 static ParticleGroupType	gParticleGroups[MAX_PARTICLE_GROUPS];
+Pool *gParticleGroupPool = NULL;
 
 static float	gGravitoidDistBuffer[MAX_PARTICLES][MAX_PARTICLES];
 
 NewParticleGroupDefType	gNewParticleGroupDef;
-
-int				gNumActiveParticleGroups = 0;
 
 Boolean	gDoDeathExit = false;
 static float	gDeathExitX = 0;
@@ -83,14 +77,22 @@ void InitEffects(void)
 
 void InitParticleSystem(void)
 {
+	if (!gParticleGroupPool)
+		gParticleGroupPool = Pool_New(MAX_PARTICLE_GROUPS);
+	else
+		Pool_Reset(gParticleGroupPool);
+
+
 			/* INIT GROUP ARRAY */
 
 	memset(gParticleGroups, 0, sizeof(gParticleGroups));
 
-	gNumActiveParticleGroups = 0;
-
 	for (int i = 0; i < MAX_PARTICLE_GROUPS; i++)
 	{
+		gParticleGroups[i].pool = Pool_New(MAX_PARTICLES);
+
+				/* VERTEX ARRAY DATA BASE */
+
 		MOVertexArrayData vertexArrayData =
 		{
 			.numMaterials	= 0,
@@ -174,13 +176,17 @@ void InitParticleSystem(void)
 
 void DisposeParticleSystem(void)
 {
-			/* NUKE GEOMETRY DATA*/
+			/* NUKE MEMORY */
 
 	for (int i = 0; i < MAX_PARTICLE_GROUPS; i++)
 	{
 		GAME_ASSERT(gParticleGroups[i].geometryObj);
 		MO_DisposeObjectReference(gParticleGroups[i].geometryObj);
 		gParticleGroups[i].geometryObj = NULL;
+
+		GAME_ASSERT(gParticleGroups[i].pool);
+		Pool_Free(gParticleGroups[i].pool);
+		gParticleGroups[i].pool = NULL;
 	}
 
 	DeleteAllParticleGroups();
@@ -198,23 +204,22 @@ void DeleteAllParticleGroups(void)
 		DeleteParticleGroup(i);
 	}
 
-	GAME_ASSERT(gNumActiveParticleGroups == 0);
+	GAME_ASSERT(0 == Pool_Size(gParticleGroupPool));
 }
 
 
 /******************* DELETE PARTICLE GROUP ***********************/
 
-static void DeleteParticleGroup(long groupNum)
+static void DeleteParticleGroup(int groupNum)
 {
-	if (!gParticleGroups[groupNum].isGroupActive)
+	if (!Pool_IsUsed(gParticleGroupPool, groupNum))
 		return;
 
-	gParticleGroups[groupNum].isGroupActive = false;
 	gParticleGroups[groupNum].geometryObj->objectData.numMaterials = 0;
 	gParticleGroups[groupNum].geometryObj->objectData.numPoints = 0;
 	gParticleGroups[groupNum].geometryObj->objectData.numTriangles = 0;
 
-	gNumActiveParticleGroups--;
+	Pool_ReleaseIndex(gParticleGroupPool, groupNum);
 }
 
 
@@ -228,62 +233,49 @@ static void DeleteParticleGroup(long groupNum)
 // OUTPUT:	group ID#
 //
 
-short NewParticleGroup(const NewParticleGroupDefType *def)
+int NewParticleGroup(const NewParticleGroupDefType *def)
 {
-ParticleGroupType* particleGroup = NULL;
-
 			/*************************/
 			/* SCAN FOR A FREE GROUP */
 			/*************************/
-	
-	int i;
-	for (i = 0; i < MAX_PARTICLE_GROUPS; i++)
-	{
-		if (!gParticleGroups[i].isGroupActive)
-		{
-			particleGroup = &gParticleGroups[i];
-			break;
-		}
-	}
 
-	if (particleGroup == NULL)		// nothing free
-		return -1;
+	int i = Pool_AllocateIndex(gParticleGroupPool);
+	if (i < 0)		// nothing free
+		return i;
+
+	ParticleGroupType* pg = &gParticleGroups[i];
 
 
 		/* INITIALIZE THE GROUP */
 
-	particleGroup->isGroupActive = true;
+	GAME_ASSERT(pg->pool);
+	Pool_Reset(pg->pool);						// mark all particles unused
 
-	particleGroup->type = def->type;						// set type
-	memset(particleGroup->isUsed, 0, sizeof(particleGroup->isUsed));	// mark all unused
+	pg->type					= def->type;
+	pg->flags					= def->flags;
+	pg->gravity					= def->gravity;
+	pg->magnetism				= def->magnetism;
+	pg->baseScale				= def->baseScale;
+	pg->decayRate				= def->decayRate;
+	pg->fadeRate				= def->fadeRate;
+	pg->magicNum				= def->magicNum;
+	pg->particleTextureNum		= def->particleTextureNum;
 
-	particleGroup->flags 				= def->flags;
-	particleGroup->gravity 				= def->gravity;
-	particleGroup->magnetism 			= def->magnetism;
-	particleGroup->baseScale 			= def->baseScale;
-	particleGroup->decayRate 			= def->decayRate;
-	particleGroup->fadeRate 			= def->fadeRate;
-	particleGroup->magicNum 			= def->magicNum;
-	particleGroup->particleTextureNum 	= def->particleTextureNum;
-
-	particleGroup->srcBlend 			= def->srcBlend;
-	particleGroup->dstBlend 			= def->dstBlend;
+	pg->srcBlend				= def->srcBlend;
+	pg->dstBlend				= def->dstBlend;
 
 		/**************************************/
 		/* INIT THE GROUP'S VERTEX ARRAY DATA */
 		/**************************************/
 		// Note: most everything was initialized in InitParticleSystem
 
-	MOVertexArrayData* vertexArrayData = &particleGroup->geometryObj->objectData;
+	MOVertexArrayData* vertexArrayData = &pg->geometryObj->objectData;
 
 	vertexArrayData->numPoints = 0;		// no quads until we call AddParticleToGroup
 	vertexArrayData->numTriangles = 0;
 
 	vertexArrayData->numMaterials = 1;
 	vertexArrayData->materials[0] = gSpriteGroupList[SPRITE_GROUP_PARTICLES][def->particleTextureNum].materialObject;	// set illegal ref because it is made legit below
-
-
-	gNumActiveParticleGroups++;
 
 	return i;
 }
@@ -301,7 +293,9 @@ Boolean AddParticleToGroup(const NewParticleDefType *def)
 	GAME_ASSERT(group >= 0);
 	GAME_ASSERT(group < MAX_PARTICLE_GROUPS);
 
-	if (!gParticleGroups[group].isGroupActive)
+	ParticleGroupType* pg = &gParticleGroups[group];
+
+	if (!Pool_IsUsed(gParticleGroupPool, group))
 	{
 		return(true);
 	}
@@ -309,38 +303,33 @@ Boolean AddParticleToGroup(const NewParticleDefType *def)
 
 			/* SCAN FOR FREE SLOT */
 
-	int p;
-	for (p = 0; p < MAX_PARTICLES; p++)
-	{
-		if (!gParticleGroups[group].isUsed[p])
-			goto got_it;
-	}
+	int p = Pool_AllocateIndex(pg->pool);
 
 			/* NO FREE SLOTS */
 
-	return(true);
+	if (p < 0)
+		return true;
 
 
 			/* INIT PARAMETERS */
-got_it:
-	gParticleGroups[group].alpha[p] = def->alpha;
-	gParticleGroups[group].scale[p] = def->scale;
-	gParticleGroups[group].coord[p] = *def->where;
-	gParticleGroups[group].delta[p] = *def->delta;
-	gParticleGroups[group].rotZ[p] = def->rotZ;
-	gParticleGroups[group].rotDZ[p] = def->rotDZ;
-	gParticleGroups[group].isUsed[p] = true;
+
+	pg->alpha[p] = def->alpha;
+	pg->scale[p] = def->scale;
+	pg->coord[p] = *def->where;
+	pg->delta[p] = *def->delta;
+	pg->rotZ[p] = def->rotZ;
+	pg->rotDZ[p] = def->rotDZ;
 
 
 			/* SEE IF ATTACH VAPOR TRAIL */
 
-	if (gParticleGroups[group].flags & PARTICLE_FLAGS_VAPORTRAIL)
+	if (pg->flags & PARTICLE_FLAGS_VAPORTRAIL)
 	{
 		static OGLColorRGBA color = {1,.5,.5,1};
 
 		color.a = def->alpha;
 
-		gParticleGroups[group].vaporTrail[p] = CreateNewVaporTrail(nil, group, VAPORTRAIL_TYPE_COLORSTREAK,
+		pg->vaporTrail[p] = CreateNewVaporTrail(nil, group, VAPORTRAIL_TYPE_COLORSTREAK,
 																	def->where, &color, .3, 2.0, 50);
 	}
 
@@ -362,12 +351,12 @@ OGLVector3D	*delta;
 
 #pragma unused(theNode)
 
-	for (int i = 0; i < MAX_PARTICLE_GROUPS; i++)
+	int g = Pool_First(gParticleGroupPool);
+	while (g >= 0)
 	{
-		ParticleGroupType* particleGroup = &gParticleGroups[i];
+		int nextGroupIndex = Pool_Next(gParticleGroupPool, g);
 
-		if (!particleGroup->isGroupActive)
-			continue;
+		ParticleGroupType* particleGroup = &gParticleGroups[g];
 
 		baseScale 	= particleGroup->baseScale;					// get base scale
 		oneOverBaseScaleSquared = 1.0f/(baseScale*baseScale);
@@ -377,13 +366,14 @@ OGLVector3D	*delta;
 		magnetism 	= particleGroup->magnetism;					// get magnetism
 		flags 		= particleGroup->flags;
 
-		int n = 0;														// init counter
-		for (int p = 0; p < MAX_PARTICLES; p++)
+		int n = 0;												// init counter
+		int p = Pool_First(particleGroup->pool);
+		while (p >= 0)
 		{
-			if (!particleGroup->isUsed[p])							// make sure this particle is used
-				continue;
+			int nextParticleIndex = Pool_Next(particleGroup->pool, p);
+			Boolean deleteParticle = false;
 
-			n++;														// inc counter
+			n++;													// inc counter
 			delta = &particleGroup->delta[p];						// get ptr to deltas
 			coord = &particleGroup->coord[p];						// get ptr to coords
 
@@ -416,43 +406,37 @@ OGLVector3D	*delta;
 						//
 
 				case	PARTICLE_TYPE_GRAVITOIDS:
-						for (int j = MAX_PARTICLES-1; j >= 0; j--)
+						for (int q = Pool_Last(particleGroup->pool); q >= 0; q = Pool_Prev(particleGroup->pool, q))
 						{
-							float		dist,temp,x,z;
+							float		dist,x,z;
 							OGLVector3D	v;
 
-							if (p==j)									// dont check against self
-								continue;
-							if (!particleGroup->isUsed[j])			// make sure this particle is used
+							if (p == q)									// don't check against self
 								continue;
 
-							x = particleGroup->coord[j].x;
-							y = particleGroup->coord[j].y;
-							z = particleGroup->coord[j].z;
+							x = particleGroup->coord[q].x;
+							y = particleGroup->coord[q].y;
+							z = particleGroup->coord[q].z;
 
 									/* calc 1/(dist2) */
 
-							if (i < j)									// see if calc or get from buffer
+							if (p < q)									// see if calc or get from buffer
 							{
-								temp = coord->x - x;					// dx squared
-								dist = temp*temp;
-								temp = coord->y - y;					// dy squared
-								dist += temp*temp;
-								temp = coord->z - z;					// dz squared
-								dist += temp*temp;
-
-								dist = sqrt(dist);						// 1/dist2
+								float dx = coord->x - x;
+								float dy = coord->y - y;
+								float dz = coord->z - z;
+								dist = sqrtf(dx*dx + dy*dy + dz*dz);
 								if (dist != 0.0f)
 									dist = 1.0f / (dist*dist);
 
 								if (dist > oneOverBaseScaleSquared)		// adjust if closer than radius
 									dist = oneOverBaseScaleSquared;
 
-								gGravitoidDistBuffer[i][j] = dist;		// remember it
+								gGravitoidDistBuffer[p][q] = dist;		// remember it
 							}
 							else
 							{
-								dist = gGravitoidDistBuffer[j][i];		// use from buffer
+								dist = gGravitoidDistBuffer[p][q];		// use from buffer
 							}
 
 										/* calc vector to particle */
@@ -518,23 +502,24 @@ OGLVector3D	*delta;
 				{
 					if (coord->y < y)									// if hit floor then nuke particle
 					{
-						particleGroup->isUsed[p] = false;
+						deleteParticle = true;
 					}
 				}
 			}
 
 
+
 				/* DO SCALE */
 
-			particleGroup->scale[p] -= decayRate * fps;			// shrink it
-			if (particleGroup->scale[p] <= 0.0f)					// see if gone
-				particleGroup->isUsed[p] = false;
+			particleGroup->scale[p] -= decayRate * fps;				// shrink it
+			if (particleGroup->scale[p] <= 0.0f)					// see if deleteParticle
+				deleteParticle = true;
 
 				/* DO FADE */
 
 			particleGroup->alpha[p] -= fadeRate * fps;				// fade it
-			if (particleGroup->alpha[p] <= 0.0f)					// see if gone
-				particleGroup->isUsed[p] = false;
+			if (particleGroup->alpha[p] <= 0.0f)					// see if deleteParticle
+				deleteParticle = true;
 
 
 					/*****************************/
@@ -544,27 +529,38 @@ OGLVector3D	*delta;
 			if (particleGroup->flags & PARTICLE_FLAGS_VAPORTRAIL)
 			{
 				static OGLColorRGBA color = {.9,1,.8,1};
-				short	v = particleGroup->vaporTrail[p];
+				short vaporTrailIndex = particleGroup->vaporTrail[p];
 
-				if (v != -1)
+				if (vaporTrailIndex != -1)
 				{
-					if (VerifyVaporTrail(v, nil, i))					// if valid then update it
+					if (VerifyVaporTrail(vaporTrailIndex, nil, g))	// if valid then update it
 					{
 						color.a = particleGroup->alpha[p];
-						AddToVaporTrail(&v, coord, &color);
+						AddToVaporTrail(&vaporTrailIndex, coord, &color);
 					}
 					else
 						particleGroup->vaporTrail[p] = -1;			// no longer valid
 				}
 			}
+
+					/* IF GONE THEN RELEASE INDEX */
+
+			if (deleteParticle)
+				Pool_ReleaseIndex(particleGroup->pool, p);
+
+					/* NEXT PARTICLE */
+
+			p = nextParticleIndex;
 		}
 
 			/* SEE IF GROUP WAS EMPTY, THEN DELETE */
 
 		if (n == 0)
 		{
-			DeleteParticleGroup(i);
+			DeleteParticleGroup(g);
 		}
+
+		g = nextGroupIndex;
 	}
 }
 
@@ -576,7 +572,7 @@ static void DrawParticleGroup(ObjNode *theNode)
 float				scale,baseScale;
 OGLColorRGBA_Byte	*vertexColors;
 MOVertexArrayData	*geoData;
-OGLPoint3D		v[4],*camCoords,*coord;
+OGLPoint3D		v[4],*camCoords;
 static const OGLVector3D up = {0,1,0};
 OGLBoundingBox	bbox;
 
@@ -596,40 +592,38 @@ OGLBoundingBox	bbox;
 
 	camCoords = &gGameViewInfoPtr->cameraPlacement.cameraLocation;
 
-	for (int g = 0; g < MAX_PARTICLE_GROUPS; g++)
+	for (int g = Pool_First(gParticleGroupPool); g >= 0; g = Pool_Next(gParticleGroupPool, g))
 	{
+		GAME_ASSERT(Pool_IsUsed(gParticleGroupPool, g));
+
 		float	minX,minY,minZ,maxX,maxY,maxZ;
 
-		ParticleGroupType* particleGroup = &gParticleGroups[g];
+		const ParticleGroupType* pg = &gParticleGroups[g];
 
-		if (!particleGroup->isGroupActive)
-			continue;
+		uint32_t	allAim = pg->flags & PARTICLE_FLAGS_ALLAIM;
 
-		uint32_t	allAim = particleGroup->flags & PARTICLE_FLAGS_ALLAIM;
-
-		geoData = &particleGroup->geometryObj->objectData;			// get pointer to geometry object data
-		vertexColors = geoData->colorsByte;								// get pointer to vertex color array
-		baseScale = particleGroup->baseScale;						// get base scale
+		geoData = &pg->geometryObj->objectData;			// get pointer to geometry object data
+		vertexColors = geoData->colorsByte;				// get pointer to vertex color array
+		baseScale = pg->baseScale;						// get base scale
 
 				/********************************/
 				/* ADD ALL PARTICLES TO TRIMESH */
 				/********************************/
 
-		minX = minY = minZ = 100000000;									// init bbox
+		minX = minY = minZ = 1e9f;									// init bbox
 		maxX = maxY = maxZ = -minX;
 
 		int n = 0;
-		for (int p = 0; p < MAX_PARTICLES; p++)
+		for (int p = Pool_First(pg->pool); p >= 0; p = Pool_Next(pg->pool, p))
 		{
+			GAME_ASSERT(Pool_IsUsed(pg->pool, p));
+
 			float			rot;
 			OGLMatrix4x4	m;
 
-			if (!particleGroup->isUsed[p])							// make sure this particle is used
-				continue;
-
 						/* CREATE VERTEX DATA */
 
-			scale = particleGroup->scale[p] * baseScale;
+			scale = pg->scale[p] * baseScale;
 
 			v[0].x = -scale;
 			v[0].y = scale;
@@ -646,7 +640,7 @@ OGLBoundingBox	bbox;
 
 				/* TRANSFORM THIS PARTICLE'S VERTICES & ADD TO TRIMESH */
 
-			coord = &particleGroup->coord[p];
+			const OGLPoint3D* coord = &pg->coord[p];
 			if ((n == 0) || allAim)										// only set the look-at matrix for the 1st particle unless we want to force it for all (optimization technique)
 				SetLookAtMatrixAndTranslate(&m, &up, coord, camCoords);	// aim at camera & translate
 			else
@@ -656,7 +650,7 @@ OGLBoundingBox	bbox;
 				m.value[M23] = coord->z;
 			}
 
-			rot = particleGroup->rotZ[p];							// get z rotation
+			rot = pg->rotZ[p];											// get z rotation
 			if (rot != 0.0f)											// see if need to apply rotation matrix
 			{
 				OGLMatrix4x4	rm;
@@ -691,7 +685,7 @@ OGLBoundingBox	bbox;
 				vertexColors[i].r =
 				vertexColors[i].g =
 				vertexColors[i].b = 0xff;
-				vertexColors[i].a = particleGroup->alpha[p] * 255.0f;		// set transparency alpha
+				vertexColors[i].a = (GLubyte)(pg->alpha[p] * 255.0f);		// set transparency alpha
 			}
 
 			n++;											// inc particle count
@@ -716,8 +710,8 @@ OGLBoundingBox	bbox;
 		{
 			GLint	src,dst;
 
-			src = particleGroup->srcBlend;
-			dst = particleGroup->dstBlend;
+			src = pg->srcBlend;
+			dst = pg->dstBlend;
 
 				/* DRAW IT */
 
@@ -731,7 +725,7 @@ OGLBoundingBox	bbox;
 					glEnable(GL_FOG);
 			}
 
-			MO_DrawObject(particleGroup->geometryObj);						// draw geometry
+			MO_DrawObject(pg->geometryObj);						// draw geometry
 		}
 	}
 
@@ -739,15 +733,14 @@ OGLBoundingBox	bbox;
 
 	SetColor4f(1,1,1,1);										// reset this
 	OGL_PopState();
-
 }
 
 
 /**************** VERIFY PARTICLE GROUP MAGIC NUM ******************/
 
-Boolean VerifyParticleGroupMagicNum(short group, uint32_t magicNum)
+Boolean VerifyParticleGroupMagicNum(int group, uint32_t magicNum)
 {
-	return gParticleGroups[group].isGroupActive
+	return Pool_IsUsed(gParticleGroupPool, group)
 		&& gParticleGroups[group].magicNum == magicNum;
 }
 
@@ -759,28 +752,21 @@ Boolean VerifyParticleGroupMagicNum(short group, uint32_t magicNum)
 
 Boolean ParticleHitObject(ObjNode *theNode, uint16_t inFlags)
 {
-	for (int i = 0; i < MAX_PARTICLE_GROUPS; i++)
+	for (int g = Pool_First(gParticleGroupPool); g >= 0; g = Pool_Next(gParticleGroupPool, g))
 	{
-		const ParticleGroupType* particleGroup = &gParticleGroups[i];
+		const ParticleGroupType* pg = &gParticleGroups[g];
 
-		if (!particleGroup->isGroupActive)					// see if group active
-			continue;
-
-		if (inFlags)												// see if check flags
+		if (inFlags && !(inFlags & pg->flags))			// see if check flags
 		{
-			if (!(inFlags & particleGroup->flags))
-				continue;
+			continue;
 		}
 
-		for (int p = 0; p < MAX_PARTICLES; p++)
+		for (int p = Pool_First(pg->pool); p >= 0; p = Pool_Next(pg->pool, p))
 		{
-			if (!particleGroup->isUsed[p])							// make sure this particle is used
+			if (pg->alpha[p] < .4f)						// if particle is too decayed, then skip
 				continue;
 
-			if (particleGroup->alpha[p] < .4f)						// if particle is too decayed, then skip
-				continue;
-
-			const OGLPoint3D* coord = &particleGroup->coord[p];
+			const OGLPoint3D* coord = &pg->coord[p];
 			if (DoSimpleBoxCollisionAgainstObject(coord->y+40.0f,coord->y-40.0f,
 												coord->x-40.0f, coord->x+40.0f,
 												coord->z+40.0f, coord->z-40.0f,
@@ -790,6 +776,7 @@ Boolean ParticleHitObject(ObjNode *theNode, uint16_t inFlags)
 			}
 		}
 	}
+
 	return(false);
 }
 

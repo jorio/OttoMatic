@@ -988,6 +988,7 @@ void GameMain(void)
 
 	InitSpriteManager();
 	InitBG3DManager();
+	InitObjectManager();
 	InitWindowStuff();
 	InitTerrainManager();
 	InitSkeletonManager();
@@ -997,7 +998,6 @@ void GameMain(void)
 
 			/* INIT MORE MY STUFF */
 
-	InitObjectManager();
 
 	{
 			/* INIT RANDOM SEED */

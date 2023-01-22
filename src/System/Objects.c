@@ -1,7 +1,8 @@
 /*********************************/
 /*    OBJECT MANAGER 		     */
-/* (c)2001 Pangea Software  */
 /* By Brian Greenstone      	 */
+/* (c)2001 Pangea Software       */
+/* (c)2023 Iliyas Jorio          */
 /*********************************/
 
 
@@ -37,8 +38,8 @@ ObjNode		*gFirstNodePtr = nil;
 
 ObjNode		*gCurrentNode,*gMostRecentlyAddedNode,*gNextNode;
 
-static Boolean	gPooledObjNodesInUse[OBJ_BUDGET];
-static ObjNode	gObjNodePool[OBJ_BUDGET];
+static ObjNode	gObjNodeMemory[OBJ_BUDGET];
+static Pool*	gObjNodePool;
 
 
 NewObjectDefinitionType	gNewObjectDefinition;
@@ -73,8 +74,8 @@ void InitObjectManager(void)
 
 		/* INIT OBJECT POOL */
 
-	memset(gObjNodePool, 0, sizeof(gObjNodePool));
-	memset(gPooledObjNodesInUse, 0, sizeof(gPooledObjNodesInUse));
+	memset(gObjNodeMemory, 0, sizeof(gObjNodeMemory));
+	gObjNodePool = Pool_New(OBJ_BUDGET);
 
 		/* INIT NEW OBJ DEF */
 
@@ -82,7 +83,7 @@ void InitObjectManager(void)
 	gNewObjectDefinition.scale = 1;
 
 #if _DEBUG
-	printf("ObjNode pool: %d KB\n", (int)(sizeof(gObjNodePool)/1024));
+	printf("ObjNode pool: %d KB\n", (int)(sizeof(gObjNodeMemory) / 1024));
 #endif
 }
 
@@ -102,20 +103,14 @@ uint32_t flags = newObjDef->flags;
 
 			/* TRY TO GET AN OBJECT FROM THE POOL */
 
-	for (int i = 0; i < OBJ_BUDGET; i++)
+	int poolIndex = Pool_AllocateIndex(gObjNodePool);
+	if (poolIndex >= 0)
 	{
-		if (!gPooledObjNodesInUse[i])
-		{
-			gPooledObjNodesInUse[i] = true;		// lock that one
-			newNodePtr = &gObjNodePool[i];		// point to pooled node
-			break;
-		}
+		newNodePtr = &gObjNodeMemory[poolIndex];		// point to pooled node
 	}
-
-			/* POOL FULL, ALLOCATE NEW NODE ON HEAP */
-
-	if (newNodePtr == NULL)
+	else
 	{
+		// pool full, allocate new node on heap
 		newNodePtr = (ObjNode*) AllocPtr(sizeof(ObjNode));
 	}
 
@@ -1446,13 +1441,12 @@ static void FlushObjectDeleteQueue(void)
 		ObjNode* node = gObjectDeleteQueue[i];
 		GAME_ASSERT(node != NULL);
 
-		ptrdiff_t poolIndex = node - gObjNodePool;
+		ptrdiff_t poolIndex = node - gObjNodeMemory;
 
 		if (poolIndex >= 0 && poolIndex < OBJ_BUDGET)
 		{
 			// node is pooled, put back into pool
-			GAME_ASSERT_MESSAGE(gPooledObjNodesInUse[poolIndex], "Pooled node freed twice");
-			gPooledObjNodesInUse[poolIndex] = false;
+			Pool_ReleaseIndex(gObjNodePool, poolIndex);
 		}
 		else
 		{

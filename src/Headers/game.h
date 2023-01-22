@@ -29,6 +29,7 @@ extern "C"
 
 #include "Pomme.h"
 
+#include "pool.h"
 #include "globals.h"
 #include "structs.h"
 #include "metaobjects.h"
@@ -149,6 +150,9 @@ extern	ObjNode					*gSaucerTarget;
 extern	ObjNode					*gSoapBubble;
 extern	ObjNode					*gTargetPickup;
 extern	ObjNode					*gTractorBeamObj;
+extern	Pool 					*gParticleGroupPool;
+extern	Pool					*gShardPool;
+extern	Pool					*gSparklePool;
 extern	PrefsType				gGamePrefs;
 extern	SDL_GameController		*gSDLController;
 extern	SDL_GLContext			gAGLContext;
@@ -215,8 +219,6 @@ extern	int						gNumHumansRescuedTotal;
 extern	int						gNumIceCracks;
 extern	int						gNumObjectNodes;
 extern	int						gNumObjectsInBG3DGroupList[MAX_BG3D_GROUPS];
-extern	int						gNumShards;
-extern	int						gNumSparkles;
 extern	int						gNumSpritesInGroupList[MAX_SPRITE_GROUPS];
 extern	int						gPolysThisFrame;
 extern	int						gVRAMUsedThisFrame;
@@ -236,7 +238,6 @@ extern	short					gBeamMode;
 extern	short					gBeamModeSelected;
 extern	short					gBestCheckpointNum;
 extern	short					gDisplayedHelpMessage;
-extern	int						gNumActiveParticleGroups;
 extern	int						gNumCollisions;
 extern	int						gNumFencesDrawn;
 extern	int						gNumHumansInSaucer;

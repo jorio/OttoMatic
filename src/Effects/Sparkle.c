@@ -1,7 +1,8 @@
 /****************************/
 /*   	SPARKLE.C  			*/
-/* (c)2001 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2001 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -29,25 +30,20 @@ static void DrawSparkles(ObjNode*);
 /*********************/
 
 SparkleType	gSparkles[MAX_SPARKLES];
+Pool*		gSparklePool = NULL;
 
 static float	gPlayerSparkleColor = 0;
-
-int	gNumSparkles;
 
 /*************************** INIT SPARKLES **********************************/
 
 void InitSparkles(void)
 {
-int		i;
-
-	for (i = 0; i < MAX_SPARKLES; i++)
-	{
-		gSparkles[i].isActive = false;
-	}
+	if (!gSparklePool)
+		gSparklePool = Pool_New(MAX_SPARKLES);
+	else
+		Pool_Reset(gSparklePool);
 
 	gPlayerSparkleColor = 0;
-
-	gNumSparkles = 0;
 
 	NewObjectDefinitionType sparkleDrawerDef =
 	{
@@ -66,27 +62,18 @@ int		i;
 // OUTPUT:  -1 if none
 //
 
-short GetFreeSparkle(ObjNode *theNode)
+int GetFreeSparkle(ObjNode *theNode)
 {
-int		i;
-
 			/* FIND A FREE SLOT */
 
-	for (i = 0; i < MAX_SPARKLES; i++)
+	int i = Pool_AllocateIndex(gSparklePool);
+
+	if (i >= 0)
 	{
-		if (!gSparkles[i].isActive)
-			goto got_it;
-
+		gSparkles[i].owner = theNode;
 	}
-	return(-1);
 
-got_it:
-
-	gSparkles[i].isActive = true;
-	gSparkles[i].owner = theNode;
-	gNumSparkles++;
-
-	return(i);
+	return i;
 }
 
 
@@ -94,23 +81,16 @@ got_it:
 
 /***************** DELETE SPARKLE *********************/
 
-void DeleteSparkle(short i)
+void DeleteSparkle(int i)
 {
-	if (i == -1)
+	if (i < 0)
 		return;
 
-	if (gSparkles[i].isActive)
-	{
-		gSparkles[i].isActive = false;
-		gSparkles[i].owner = NULL;
-		gNumSparkles--;
-	}
-#if _DEBUG
-	else
-	{
-		DoAlert("DeleteSparkle: double delete sparkle");
-	}
-#endif
+	GAME_ASSERT(Pool_IsUsed(gSparklePool, i));
+
+	gSparkles[i].owner = NULL;
+
+	Pool_ReleaseIndex(gSparklePool, i);
 }
 
 
@@ -118,8 +98,6 @@ void DeleteSparkle(short i)
 
 static void DrawSparkles(ObjNode* theNode)
 {
-uint32_t	flags;
-int		i;
 float	dot,separation;
 OGLMatrix4x4	m;
 OGLVector3D	v;
@@ -135,6 +113,9 @@ static OGLPoint3D		frame[4] =
 };
 
 	(void) theNode;
+
+	if (!gSparklePool || Pool_Empty(gSparklePool))			// quick check if any sparkles at all
+		return;
 
 
 	OGL_PushState();
@@ -154,16 +135,13 @@ static OGLPoint3D		frame[4] =
 
 	cameraLocation = &gGameViewInfoPtr->cameraPlacement.cameraLocation;		// point to camera coord
 
-	for (i = 0; i < MAX_SPARKLES; i++)
+	for (int i = Pool_First(gSparklePool); i >= 0; i = Pool_Next(gSparklePool, i))
 	{
-		ObjNode	*owner;
+		GAME_ASSERT(Pool_IsUsed(gSparklePool, i));			// must be active
 
-		if (!gSparkles[i].isActive)							// must be active
-			continue;
+		uint32_t flags = gSparkles[i].flags;				// get sparkle flags
 
-		flags = gSparkles[i].flags;							// get sparkle flags
-
-		owner = gSparkles[i].owner;
+		ObjNode* owner = gSparkles[i].owner;
 		if (owner != nil)									// if owner is culled then dont draw
 		{
 			if (owner->StatusBits & (STATUS_BIT_ISCULLED|STATUS_BIT_HIDDEN))
@@ -207,7 +185,7 @@ static OGLPoint3D		frame[4] =
 
 			/* CALC TRANSFORM MATRIX */
 
-		frame[0].x = -gSparkles[i].scale;								// set size of quad
+		frame[0].x = -gSparkles[i].scale;								// set allocated of quad
 		frame[0].y = gSparkles[i].scale;
 		frame[1].x = gSparkles[i].scale;
 		frame[1].y = gSparkles[i].scale;

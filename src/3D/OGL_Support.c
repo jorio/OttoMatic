@@ -713,9 +713,9 @@ do_anaglyph:
 			gNumTerrainDeformations,
 			gNumWaterDrawn,
 #endif
-			gNumShards,
-			gNumSparkles,
-			gNumActiveParticleGroups,
+			gShardPool? Pool_Size(gShardPool): 0,
+			gSparklePool? Pool_Size(gSparklePool): 0,
+			gParticleGroupPool? Pool_Size(gParticleGroupPool): 0,
 //			gNumPointers,
 			gVRAMUsedThisFrame/1024
 #if 0
