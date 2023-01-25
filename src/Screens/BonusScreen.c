@@ -151,7 +151,8 @@ static const float gWeaponIconYOff[] =
 };
 
 
-float	gBonusTimer;
+static float	gBonusTimer;
+static float	gBonusFastForward = 1.0f;
 
 #define	HumanNumberInSequence	Special[0]
 #define	InvisibleDelay	SpecialF[0]
@@ -168,7 +169,7 @@ static	uint32_t	gBonusTotal;
 static	uint32_t	gBonus;
 static	uint32_t	gInventoryQuantity;
 
-static	float	gScoreAlpha,gInventoryQuantityAlpha,gInventoryCountTimer;
+static	float	gScoreAlpha,gInventoryQuantityAlpha;
 
 static	short	gPointBeepChannel;
 
@@ -181,6 +182,7 @@ void DoBonusScreen(void)
 {
 			/* SETUP */
 
+	gBonusFastForward = 1;
 	SetupBonusScreen();
 	MakeFadeEvent(true, 1.0);
 
@@ -495,6 +497,20 @@ static void FreeBonusScreen(void)
 	Pomme_FlushPtrTracking(true);
 }
 
+
+
+/**************** CHECK FAST FORWARD KEY ********************/
+
+static void CheckFastForward(void)
+{
+	if (GetNeedState(kNeed_Jump))
+		gBonusFastForward = 3.0f;
+	else
+		gBonusFastForward = 1.0f;
+}
+
+
+
 #pragma mark -
 
 
@@ -633,7 +649,7 @@ static void DoHumansBonusTally(void)
 
 	while(true)
 	{
-		float	fps = gFramesPerSecondFrac;
+		float	fps = gFramesPerSecondFrac * gBonusFastForward;
 
 		CalcFramesPerSecond();
 		UpdateInput();
@@ -642,6 +658,8 @@ static void DoHumansBonusTally(void)
 
 		if (gGameViewInfoPtr->cameraPlacement.cameraLocation.x < 0.0f)				// keep @ 0 for icon alignment
 			OGL_MoveCameraFrom(fps * 5.0f, 0, 0);	// slowly move camera
+
+		CheckFastForward();
 
 		gBonusTimer -= fps;
 		if (gBonusTimer < 0.0f)
@@ -688,12 +706,14 @@ static void DoInventoryBonusTally(void)
 
 	while(true)
 	{
-		float	fps = gFramesPerSecondFrac;
+		float	fps = gFramesPerSecondFrac * gBonusFastForward;
 
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
 		OGL_DrawScene(DrawBonusCallback);
+
+		CheckFastForward();
 
 		gBonusTimer -= fps;
 		if (gBonusTimer < 0.0f)
@@ -744,12 +764,14 @@ float	tick;
 
 	while(true)
 	{
-		float	fps = gFramesPerSecondFrac;
+		float	fps = gFramesPerSecondFrac * gBonusFastForward;
 
 		CalcFramesPerSecond();
 		UpdateInput();
 		MoveObjects();
 		OGL_DrawScene(DrawBonusCallback);
+
+		CheckFastForward();
 
 
 
@@ -1262,7 +1284,8 @@ ObjNode	*newObj;
 
 static void MoveBonusInventoryIcon(ObjNode *theNode)
 {
-float	fps = gFramesPerSecondFrac;
+static float gInventoryCountTimer = 0;
+float	fps = gFramesPerSecondFrac * gBonusFastForward;
 
 			/* SEE IF SHOW NOW */
 
@@ -1300,6 +1323,7 @@ float	fps = gFramesPerSecondFrac;
 			theNode->ColorFilter.a -= fps * 2.0;				// fade out and delete when gone
 			if (theNode->ColorFilter.a <= 0.0f)
 			{
+				gInventoryQuantityAlpha = 0;
 				DeleteObject(theNode);
 				return;
 			}
@@ -1308,7 +1332,7 @@ float	fps = gFramesPerSecondFrac;
 
 				/* SPIN THE ICON */
 
-		theNode->Rot.y +=  fps * PI2;
+		theNode->Rot.y +=  fps * PI2 / gBonusFastForward;
 		UpdateObjectTransforms(theNode);
 
 
@@ -1323,7 +1347,7 @@ float	fps = gFramesPerSecondFrac;
 			gInventoryCountTimer -= fps;							// check timer
 			if (gInventoryCountTimer <= 0.0f)
 			{
-				gInventoryCountTimer = INVENTORY_COUNT_DELAY;		// reset timer
+				gInventoryCountTimer += INVENTORY_COUNT_DELAY;		// reset timer
 				theNode->Quantity--;								// dec quanitity
 				gBonus += POINTS_INVENTORY;
 
@@ -1409,7 +1433,7 @@ const short	humanSkeletons[NUM_HUMAN_TYPES] =
 
 static void MoveBonusHuman(ObjNode *theNode)
 {
-float	fps = gFramesPerSecondFrac;
+float	fps = gFramesPerSecondFrac * gBonusFastForward;
 
 			/* SEE IF FADE IN NOW */
 
@@ -1438,7 +1462,7 @@ float	fps = gFramesPerSecondFrac;
 
 static void MoveBonusHuman_WalkOff(ObjNode *theNode)
 {
-float	fps = gFramesPerSecondFrac;
+float	fps = gFramesPerSecondFrac * MinFloat(1.5f, gBonusFastForward);
 
 			/* SEE IF WALKED OUT OF VIEW */
 
@@ -1547,7 +1571,7 @@ int		i;
 
 static void UpdateBonusTeleport(ObjNode *human)
 {
-float	fps = gFramesPerSecondFrac;
+float	fps = gFramesPerSecondFrac * gBonusFastForward;
 ObjNode *ring1,*ring2;
 int		i;
 
