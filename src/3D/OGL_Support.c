@@ -684,7 +684,7 @@ do_anaglyph:
 			"sparkles:\t%d\n"
 			"pgroups:\t%d\n"
 			"\n"
-//			"ptrs:\t\t%d\n"
+			"heap:\t\t%dK, %dp\n"
 			"vram:\t\t%dK\n"
 #if 0
 			"\n"
@@ -717,6 +717,8 @@ do_anaglyph:
 			gSparklePool? Pool_Size(gSparklePool): 0,
 			gParticleGroupPool? Pool_Size(gParticleGroupPool): 0,
 //			gNumPointers,
+			(int) (Pomme_GetHeapSize()/1024),
+			(int) Pomme_GetNumAllocs(),
 			gVRAMUsedThisFrame/1024
 #if 0
 			gTimeSinceLastThrust,
