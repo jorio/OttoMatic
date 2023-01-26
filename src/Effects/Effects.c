@@ -600,7 +600,8 @@ OGLBoundingBox	bbox;
 
 		const ParticleGroupType* pg = &gParticleGroups[g];
 
-		uint32_t	allAim = pg->flags & PARTICLE_FLAGS_ALLAIM;
+		// If we have enough horsepower (gG4), apply ALLAIM to all particles
+		Boolean allAim = gG4 || (pg->flags & PARTICLE_FLAGS_ALLAIM);
 
 		geoData = &pg->geometryObj->objectData;			// get pointer to geometry object data
 		vertexColors = geoData->colorsByte;				// get pointer to vertex color array
