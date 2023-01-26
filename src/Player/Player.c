@@ -1086,8 +1086,11 @@ float	y;
 			gLevelCompleted = true;
 			gLevelCompletedCoolDownTimer = 0;
 		}
+		else
+		{
+			DeleteObject(rocket);
+		}
 
-		DeleteObject(rocket);
 		return;
 	}
 
