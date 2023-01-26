@@ -305,6 +305,7 @@ Boolean		hitImpenetrable = false;
 short		oldNumCollisions;
 Boolean		previouslyOnGround, hitMPlatform = false;
 Boolean		hasTriggered = false;
+Boolean		didBounceOffFence = false;
 float		fps = gFramesPerSecondFrac;
 
 	if (deltaBounce > 0.0f)									// make sure Brian entered a (-) bounce value!
@@ -571,6 +572,8 @@ again:
 	{
 		if (DoFenceCollision(theNode))
 		{
+			didBounceOffFence = true;
+
 			numPasses++;
 			if (numPasses < 3)
 				goto again;
@@ -606,6 +609,10 @@ again:
 
 		DoWaterCollisionDetect(theNode, gCoord.x, gCoord.y, gCoord.z, &patchNum);
 	}
+
+
+	if (didBounceOffFence)
+		totalSides |= SIDE_BITS_FENCE;
 
 	return(totalSides);
 }

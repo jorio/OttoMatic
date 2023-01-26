@@ -75,6 +75,7 @@ int _i;																	\
 #define	SIDE_BITS_BACK		(1<<5)						// %100000
 #define	ALL_SOLID_SIDES		(SIDE_BITS_TOP|SIDE_BITS_BOTTOM|SIDE_BITS_LEFT|SIDE_BITS_RIGHT|\
 							SIDE_BITS_FRONT|SIDE_BITS_BACK)
+#define	SIDE_BITS_FENCE		(1<<6)						// not a real side, but returned by HandleCollision if a fence was hit
 
 
 							// CBITS (32 BIT VALUES)

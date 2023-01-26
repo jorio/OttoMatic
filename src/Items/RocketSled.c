@@ -235,8 +235,7 @@ uint16_t		effect;
 //	ny = cos(gRecentTerrainNormal.y);
 
 	theNode->Speed2D += 900.0f * fps;
-	if (theNode->Speed2D > MAX_ROCKETSLED_SPEED)
-		theNode->Speed2D = MAX_ROCKETSLED_SPEED;
+	theNode->Speed2D = MinFloat(theNode->Speed2D, MAX_ROCKETSLED_SPEED);
 
 	gDelta.x = -sin(r) * theNode->Speed2D;
 	gDelta.z = -cos(r) * theNode->Speed2D;
@@ -267,7 +266,13 @@ uint16_t		effect;
 
 		/* DO COLLISION DETECT */
 
-	HandleCollisions(theNode, CTYPE_MISC | CTYPE_FENCE, .5);
+	if (SIDE_BITS_FENCE & HandleCollisions(theNode, CTYPE_MISC | CTYPE_FENCE, .5))
+	{
+		// Bouncing off fences may alter our gDelta, so re-compute it
+		// (otherwise Otto might inherit a strong backwards gDelta when initiating belly slide)
+		gDelta.x = -sin(r) * theNode->Speed2D;
+		gDelta.z = -cos(r) * theNode->Speed2D;
+	}
 
 
 

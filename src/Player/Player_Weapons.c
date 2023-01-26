@@ -420,7 +420,7 @@ float	fps = gFramesPerSecondFrac;
 	gCoord.y += gDelta.y * fps;
 	gCoord.z += gDelta.z * fps;
 
-	if (HandleCollisions(vial, CTYPE_MISC | CTYPE_TERRAIN | CTYPE_FENCE, 0))
+	if (ALL_SOLID_SIDES & HandleCollisions(vial, CTYPE_MISC | CTYPE_TERRAIN | CTYPE_FENCE, 0))
 	{
 		ExplodeGeometry(vial, 200, SHARD_MODE_BOUNCE|SHARD_MODE_FROMORIGIN, 1, .9);
 		PlayEffect3D(EFFECT_SHATTER, &vial->Coord);
