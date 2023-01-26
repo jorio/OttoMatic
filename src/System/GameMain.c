@@ -933,6 +933,13 @@ static void CleanupLevel(void)
 
 static void CheckBootCheats(void)
 {
+		/* SKIP FLUFF */
+
+	if (GetKeyState(SDL_SCANCODE_F))
+	{
+		gCommandLine.skipFluff = 1;
+	}
+
 		/* TEST HIGH SCORE SCREEN: HOLD DOWN MINUS KEY AFTER LEGAL SCREEN */
 
 	if (GetKeyState(SDL_SCANCODE_MINUS))
