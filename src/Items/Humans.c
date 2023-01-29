@@ -966,7 +966,10 @@ float	fps = gFramesPerSecondFrac;
 			{
 				gPlayerHasLanded = false;
 				if (gExitRocket->Mode == ROCKET_MODE_WAITING2)
+				{
+					MorphToSkeletonAnim(human->Skeleton, PLAYER_ANIM_STAND, 1);		// stop footsteps
 					gExitRocket->Mode = ROCKET_MODE_CLOSEDOOR;
+				}
 
 			}
 
