@@ -83,12 +83,7 @@ static const char* GenerateVideoSettingsSubtitle(void)
 
 static const char* GenerateDisplayName(char* buf, int bufSize, Byte value)
 {
-	snprintf(buf, bufSize,
-		"%s %d (%s)",
-		Localize(STR_DISPLAY),
-		1 + (int)value,
-		SDL_GetDisplayName(value));
-
+	snprintf(buf, bufSize, "%s %d", Localize(STR_DISPLAY), 1 + (int)value);
 	return buf;
 }
 
@@ -296,7 +291,7 @@ static const MenuItem gVideoMenu[] =
 			.choices = {STR_OFF, STR_ON},
 		},
 	},
-#if !(__APPLE__)	// hot-switching the preferred display if the game started as fullscreen is buggy on macOS for now
+
 	{
 		.type = kMenuItem_Cycler,
 		.text = STR_PREFERRED_DISPLAY,
@@ -308,7 +303,6 @@ static const MenuItem gVideoMenu[] =
 			.generateChoiceString = GenerateDisplayName,
 		},
 	},
-#endif
 
 #if !(__APPLE__)
 	{
