@@ -166,7 +166,9 @@ int		playerCar = itemPtr->parm[3] & 1;
 
 	id = itemPtr->parm[0];											// get car ID #
 
+#if 0	// source port: always do fewer cars
 	if (!gG4)														// on slow machines, add fewer cars
+#endif
 	{
 		if (id > 3)
 			return(true);
