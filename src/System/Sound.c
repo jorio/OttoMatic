@@ -870,7 +870,7 @@ void EnforceMusicPausePref(void)
 
 	SndChannelStatus(gMusicChannel, sizeof(SCStatus), &theStatus);	// get channel info
 
-	if (gGamePrefs.music != theStatus.scChannelBusy)
+	if (gGamePrefs.music == theStatus.scChannelPaused)
 		SndPauseFilePlay(gMusicChannel);
 }
 
