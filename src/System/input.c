@@ -1,5 +1,5 @@
 // INPUT.C
-// (c)2021 Iliyas Jorio
+// (c)2023 Iliyas Jorio
 // This file is part of Otto Matic. https://github.com/jorio/ottomatic
 
 #include "game.h"
@@ -13,13 +13,15 @@
 
 enum
 {
-	KEYSTATE_OFF		= 0b00,
-	KEYSTATE_UP			= 0b01,
+	KEYSTATE_ACTIVE_BIT		= 0b001,
+	KEYSTATE_CHANGE_BIT		= 0b010,
+	KEYSTATE_IGNORE_BIT		= 0b100,
 
-	KEYSTATE_PRESSED	= 0b10,
-	KEYSTATE_HELD		= 0b11,
-
-	KEYSTATE_ACTIVE_BIT	= 0b10,
+	KEYSTATE_OFF			= 0b000,
+	KEYSTATE_PRESSED		= KEYSTATE_ACTIVE_BIT | KEYSTATE_CHANGE_BIT,
+	KEYSTATE_HELD			= KEYSTATE_ACTIVE_BIT,
+	KEYSTATE_UP				= KEYSTATE_OFF | KEYSTATE_CHANGE_BIT,
+	KEYSTATE_IGNOREHELD		= KEYSTATE_OFF | KEYSTATE_IGNORE_BIT,
 };
 
 #define kJoystickDeadZone				(33 * 32767 / 100)
@@ -37,19 +39,21 @@ enum
 /*     PROTOTYPES     */
 /**********************/
 
+typedef uint8_t KeyState;
+
 Boolean				gUserPrefersGamepad = false;
 
 SDL_GameController	*gSDLController = NULL;
 static SDL_JoystickID	gSDLJoystickInstanceID = -1;		// ID of the joystick bound to gSDLController
 
-static Byte			gRawKeyboardState[SDL_NUM_SCANCODES];
-char				gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
+static KeyState		gMouseButtonState[NUM_SUPPORTED_MOUSE_BUTTONS + 2];
+static KeyState		gRawKeyboardState[SDL_NUM_SCANCODES];
+static KeyState		gNeedStates[NUM_CONTROL_NEEDS];
 
-static Byte			gNeedStates[NUM_CONTROL_NEEDS];
+char				gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
 
 static Boolean		gEatMouse = false;
 Boolean				gMouseMotionNow = false;
-static Byte			gMouseButtonState[NUM_SUPPORTED_MOUSE_BUTTONS + 2];
 
 OGLVector2D			gCameraControlDelta;
 
@@ -61,7 +65,7 @@ OGLVector2D			gCameraControlDelta;
 
 static OGLVector2D GetThumbStickVector(bool rightStick);
 
-static inline void UpdateKeyState(Byte* state, bool downNow)
+static inline void UpdateKeyState(KeyState* state, bool downNow)
 {
 	switch (*state)	// look at prev state
 	{
@@ -69,10 +73,15 @@ static inline void UpdateKeyState(Byte* state, bool downNow)
 		case KEYSTATE_PRESSED:
 			*state = downNow ? KEYSTATE_HELD : KEYSTATE_UP;
 			break;
+
 		case KEYSTATE_OFF:
 		case KEYSTATE_UP:
 		default:
 			*state = downNow ? KEYSTATE_PRESSED : KEYSTATE_OFF;
+			break;
+
+		case KEYSTATE_IGNOREHELD:
+			*state = downNow ? KEYSTATE_IGNOREHELD : KEYSTATE_OFF;
 			break;
 	}
 }
@@ -225,6 +234,19 @@ void UpdateInput(void)
 	}
 
 	// --------------------------------------------
+	// Parse Alt+Enter
+
+	if (GetNewKeyState(SDL_SCANCODE_RETURN)
+		&& (GetKeyState(SDL_SCANCODE_LALT) || GetKeyState(SDL_SCANCODE_RALT)))
+	{
+		gGamePrefs.fullscreen = gGamePrefs.fullscreen ? 0 : 1;
+		SetFullscreenModeFromPrefs();
+
+		gRawKeyboardState[SDL_SCANCODE_RETURN] = KEYSTATE_IGNOREHELD;
+	}
+
+	// --------------------------------------------
+	// Update need states
 
 	for (int i = 0; i < NUM_CONTROL_NEEDS; i++)
 	{
@@ -234,7 +256,7 @@ void UpdateInput(void)
 
 		for (int j = 0; j < KEYBINDING_MAX_KEYS; j++)
 			if (kb->key[j] && kb->key[j] < numkeys)
-				downNow |= 0 != keystate[kb->key[j]];
+				downNow |= gRawKeyboardState[kb->key[j]] & KEYSTATE_ACTIVE_BIT;
 
 		downNow |= gMouseButtonState[kb->mouseButton] & KEYSTATE_ACTIVE_BIT;
 
@@ -394,7 +416,7 @@ Boolean GetNewKeyState(unsigned short sdlScanCode)
 
 Boolean GetKeyState(unsigned short sdlScanCode)
 {
-	return gRawKeyboardState[sdlScanCode] == KEYSTATE_PRESSED || gRawKeyboardState[sdlScanCode] == KEYSTATE_HELD;
+	return 0 != (gRawKeyboardState[sdlScanCode] & KEYSTATE_ACTIVE_BIT);
 }
 
 Boolean UserWantsOut(void)
