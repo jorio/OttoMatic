@@ -45,7 +45,7 @@ typedef struct
 /*    VARIABLES      */
 /*********************/
 
-ShardType	gShards[MAX_SHARDS];
+static ShardType	gShards[MAX_SHARDS];
 Pool*		gShardPool = NULL;
 
 static	float		gBoomForce,gShardDecaySpeed;
@@ -58,10 +58,17 @@ static 	ObjNode		*gShardSrcObj;
 
 void InitShardSystem(void)
 {
-	if (!gShardPool)
-		gShardPool = Pool_New(MAX_SHARDS);
-	else
-		Pool_Reset(gShardPool);
+	GAME_ASSERT(!gShardPool);
+	gShardPool = Pool_New(MAX_SHARDS);
+}
+
+
+/********************** DISPOSE SHARD SYSTEM ***************************/
+
+void DisposeShardSystem(void)
+{
+	Pool_Free(gShardPool);
+	gShardPool = NULL;
 }
 
 

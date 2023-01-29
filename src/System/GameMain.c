@@ -766,7 +766,6 @@ DeformationType		defData;
 	InitHumans();
 	InitEffects();
 	InitVaporTrails();
-	InitSparkles();
 	InitItemsManager();
 	InitSky();
 
@@ -910,8 +909,7 @@ static void CleanupLevel(void)
 	DisposeSuperTileMemoryList();
 	DisposeTerrain();
 	DisposeSky();
-	DeleteAllParticleGroups();
-	DisposeParticleSystem();
+	DisposeEffects();
 	DisposeAllSpriteGroups();
 	DisposeFences();
 

@@ -38,10 +38,8 @@ static float	gPlayerSparkleColor = 0;
 
 void InitSparkles(void)
 {
-	if (!gSparklePool)
-		gSparklePool = Pool_New(MAX_SPARKLES);
-	else
-		Pool_Reset(gSparklePool);
+	GAME_ASSERT(!gSparklePool);
+	gSparklePool = Pool_New(MAX_SPARKLES);
 
 	gPlayerSparkleColor = 0;
 
@@ -54,6 +52,14 @@ void InitSparkles(void)
 		.drawCall = DrawSparkles,
 	};
 	MakeNewObject(&sparkleDrawerDef);
+}
+
+/************************* DISPOSE SPARKLES ********************************/
+
+void DisposeSparkles(void)
+{
+	Pool_Free(gSparklePool);
+	gSparklePool = NULL;
 }
 
 

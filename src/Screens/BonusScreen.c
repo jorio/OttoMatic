@@ -326,7 +326,7 @@ static const OGLColorRGBA	starColors[] =
 				/* LOAD ART */
 				/************/
 
-	InitSparkles();
+	InitEffects();
 
 			/* LOAD MODELS */
 
@@ -344,7 +344,7 @@ static const OGLColorRGBA	starColors[] =
 
 			/* LOAD SPRITES */
 
-	LoadSpriteGroup(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_COUNT, "particle");
+//	LoadSpriteGroup(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_COUNT, "particle");
 	LoadSpriteGroup(SPRITE_GROUP_BONUS, BONUS_SObjType_COUNT, "bonus");
 	LoadSpriteGroup(SPRITE_GROUP_SPHEREMAPS, SPHEREMAP_SObjType_COUNT, "spheremap");
 
@@ -490,6 +490,7 @@ static void FreeBonusScreen(void)
 	MyFlushEvents();
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
+	DisposeEffects();
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUNDBANK_BONUS);

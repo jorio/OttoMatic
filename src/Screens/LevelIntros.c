@@ -287,8 +287,7 @@ const Byte	cloud[] =
 								 	-1, MULTI_TEXTURE_COMBINE_ADD, SPHEREMAP_SObjType_Sea);
 
 
-	InitSparkles();
-	InitParticleSystem();
+	InitEffects();
 
 
 			/**************/
@@ -478,8 +477,8 @@ static void FreeIntroScreen(void)
 {
 	MyFlushEvents();
 	DeleteAllObjects();
-	DisposeParticleSystem();
 	DisposeAllSpriteGroups();
+	DisposeEffects();
 	DisposeAllBG3DContainers();
 	OGL_DisposeWindowSetup();
 	Pomme_FlushPtrTracking(true);

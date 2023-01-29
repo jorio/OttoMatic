@@ -477,7 +477,7 @@ Str255				scoreString;
 				/* LOAD ART */
 				/************/
 
-	InitSparkles();
+	InitEffects();
 
 			/* LOAD MODELS */
 
@@ -492,7 +492,7 @@ Str255				scoreString;
 
 			/* LOAD SPRITES */
 
-	LoadSpriteGroup(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_COUNT, "particle");
+//	LoadSpriteGroup(SPRITE_GROUP_PARTICLES, PARTICLE_SObjType_COUNT, "particle");
 	LoadSpriteGroup(SPRITE_GROUP_HIGHSCORES, HIGHSCORES_SObjType_COUNT, "highscores");
 	BlendAllSpritesInGroup(SPRITE_GROUP_PARTICLES);
 
@@ -547,6 +547,7 @@ static void FreeScoreScreen(void)
 	gNewScoreNameMesh = nil;
 	gCursorMesh = nil;
 	FreeAllSkeletonFiles(-1);
+	DisposeEffects();
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	DisposeSoundBank(SOUNDBANK_BONUS);

@@ -26,6 +26,7 @@ typedef struct
 
 
 void InitSparkles(void);
+void DisposeSparkles(void);
 int GetFreeSparkle(ObjNode *theNode);
 void DeleteSparkle(int i);
 

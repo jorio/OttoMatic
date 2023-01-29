@@ -63,6 +63,7 @@ void InitEffects(void)
 {
 	InitParticleSystem();
 	InitShardSystem();
+	InitSparkles();
 
 
 			/* SET SPRITE BLENDING FLAGS */
@@ -71,16 +72,26 @@ void InitEffects(void)
 }
 
 
+
+/********************** DISPOSE EFFECT SYSTEMS *********************/
+
+void DisposeEffects(void)
+{
+	DisposeParticleSystem();
+	DisposeShardSystem();
+	DisposeSparkles();
+}
+
+
+
 #pragma mark -
 
 /************************ INIT PARTICLE SYSTEM **************************/
 
 void InitParticleSystem(void)
 {
-	if (!gParticleGroupPool)
-		gParticleGroupPool = Pool_New(MAX_PARTICLE_GROUPS);
-	else
-		Pool_Reset(gParticleGroupPool);
+	GAME_ASSERT(!gParticleGroupPool);
+	gParticleGroupPool = Pool_New(MAX_PARTICLE_GROUPS);
 
 
 			/* INIT GROUP ARRAY */
@@ -176,6 +187,8 @@ void InitParticleSystem(void)
 
 void DisposeParticleSystem(void)
 {
+	DeleteAllParticleGroups();
+
 			/* NUKE MEMORY */
 
 	for (int i = 0; i < MAX_PARTICLE_GROUPS; i++)
@@ -189,9 +202,11 @@ void DisposeParticleSystem(void)
 		gParticleGroups[i].pool = NULL;
 	}
 
-	DeleteAllParticleGroups();
 
 	DisposeSpriteGroup(SPRITE_GROUP_PARTICLES);
+
+	Pool_Free(gParticleGroupPool);
+	gParticleGroupPool = NULL;
 }
 
 

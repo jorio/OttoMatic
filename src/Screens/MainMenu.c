@@ -276,8 +276,6 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 	OGL_SetupWindow(&viewDef);
 
 
-	InitSparkles();
-
 				/************/
 				/* LOAD ART */
 				/************/
@@ -304,7 +302,11 @@ static OGLVector3D			fillDirection1 = { -1, 0, -1 };
 			/* LOAD SPRITES */
 
 	LoadSpriteGroup(SPRITE_GROUP_SPHEREMAPS, SPHEREMAP_SObjType_COUNT, "spheremap");
-	InitParticleSystem();
+	
+
+			/* INIT EFFECT SYSTEMS */
+	
+	InitEffects();
 
 
 			/* LOAD SKELETONS */
@@ -493,7 +495,7 @@ static void FreeMainMenuScreen(void)
 	DeleteAllObjects();
 	FreeAllSkeletonFiles(-1);
 	DisposeSoundBank(SOUNDBANK_MENU);
-	DisposeParticleSystem();
+	DisposeEffects();
 	DisposeAllSpriteGroups();
 	DisposeAllBG3DContainers();
 	OGL_DisposeWindowSetup();

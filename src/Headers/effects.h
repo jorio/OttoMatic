@@ -102,9 +102,11 @@ typedef struct
 
 
 void InitEffects(void);
-void InitParticleSystem(void);
+void DisposeEffects(void);
 
-void DeleteAllParticleGroups(void);
+void InitParticleSystem(void);		// Use InitEffects in user code
+void DeleteAllParticleGroups(void);	// Use DisposeEffects in user code
+
 int NewParticleGroup(const NewParticleGroupDefType* def);
 Boolean AddParticleToGroup(const NewParticleDefType* def);
 Boolean VerifyParticleGroupMagicNum(int group, uint32_t magicNum);
