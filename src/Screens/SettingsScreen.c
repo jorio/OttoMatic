@@ -97,6 +97,18 @@ static const char* GenerateCurrentLanguageName(char* buf, int bufSize, Byte valu
 	return Localize(STR_LANGUAGE_NAME);
 }
 
+static void cb_ChangeAnaglyphMode(void)
+{
+	gAnaglyphPass = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		glClearColor(0,0,0,1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		SDL_GL_SwapWindow(gSDLWindow);
+	}
+}
+
 /***************************************************************/
 /*                     MENU DEFINITIONS                        */
 /***************************************************************/
@@ -316,10 +328,10 @@ static const MenuItem gVideoMenu[] =
 		.text = STR_ANAGLYPH,
 		.cycler =
 		{
-			.callback = NULL,
-			.valuePtr = &gGamePrefs.anaglyph,
-			.numChoices = 2,
-			.choices = {STR_OFF, STR_ON},
+			.callback = cb_ChangeAnaglyphMode,
+			.valuePtr = &gGamePrefs.anaglyphMode,
+			.numChoices = 3,
+			.choices = {STR_OFF, STR_ON_COLOR, STR_ON_MONOCHROME},
 		},
 	},
 
@@ -509,7 +521,7 @@ void DoSettingsOverlay(void (*updateRoutine)(void),
 	}
 
 	// If user changed anaglyph setting, show warning
-	if (gPreviousPrefs.anaglyph != gGamePrefs.anaglyph)
+	if (gPreviousPrefs.anaglyphMode != gGamePrefs.anaglyphMode)
 	{
 		StartMenu(kAnaglyphWarning, nil, updateRoutine, backgroundDrawRoutine);
 	}

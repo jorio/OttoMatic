@@ -69,8 +69,7 @@ typedef struct
 	Boolean	mouseControlsOtto;
 	Boolean	snappyCameraControl;		// if false, vanilla momentum-y camera swinging
 	Boolean	gamepadRumble;
-	Boolean	anaglyph;
-	Boolean	anaglyphColor;
+	Byte	anaglyphMode;
 	uint8_t	anaglyphCalibrationRed;
 	uint8_t	anaglyphCalibrationGreen;
 	uint8_t	anaglyphCalibrationBlue;
@@ -78,6 +77,12 @@ typedef struct
 	KeyBinding	remappableKeys[NUM_REMAPPABLE_NEEDS];
 }PrefsType;
 
+enum
+{
+	ANAGLYPH_OFF,
+	ANAGLYPH_COLOR,
+	ANAGLYPH_MONO,
+};
 
 
 

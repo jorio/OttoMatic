@@ -1010,7 +1010,7 @@ Boolean			superTileVisible;
 
 				/* ASSUME SUPERTILES WILL BE UNUSED ON NEXT FRAME */
 
-			if ((!gGamePrefs.anaglyph) || (gAnaglyphPass > 0))
+			if ((gGamePrefs.anaglyphMode == ANAGLYPH_OFF) || (gAnaglyphPass > 0))
 				gSuperTileStatusGrid[r][c].statusFlags &= ~SUPERTILE_IS_USED_THIS_FRAME;			// clear the isUsed bit
 
 		}

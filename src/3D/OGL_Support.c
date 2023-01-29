@@ -314,35 +314,32 @@ static void OGL_InitDrawContext(OGLViewDefType* viewDefPtr)
 			// The NTSC luminance standard where grayscale = .299r + .587g + .114b
 			//
 
-	if (gGamePrefs.anaglyph)
+	if (gGamePrefs.anaglyphMode == ANAGLYPH_COLOR)
 	{
-		if (gGamePrefs.anaglyphColor)
-		{
-			uint32_t	r,g,b;
+		uint32_t	r,g,b;
 
-			r = viewDefPtr->clearColor.r * 255.0f;
-			g = viewDefPtr->clearColor.g * 255.0f;
-			b = viewDefPtr->clearColor.b * 255.0f;
+		r = viewDefPtr->clearColor.r * 255.0f;
+		g = viewDefPtr->clearColor.g * 255.0f;
+		b = viewDefPtr->clearColor.b * 255.0f;
 
-			ColorBalanceRGBForAnaglyph(&r, &g, &b);
+		ColorBalanceRGBForAnaglyph(&r, &g, &b);
 
-			viewDefPtr->clearColor.r = (float)r / 255.0f;
-			viewDefPtr->clearColor.g = (float)g / 255.0f;
-			viewDefPtr->clearColor.b = (float)b / 255.0f;
+		viewDefPtr->clearColor.r = (float)r / 255.0f;
+		viewDefPtr->clearColor.g = (float)g / 255.0f;
+		viewDefPtr->clearColor.b = (float)b / 255.0f;
 
-		}
-		else
-		{
-			float	f;
+	}
+	else if (gGamePrefs.anaglyphMode == ANAGLYPH_MONO)
+	{
+		float	f;
 
-			f = viewDefPtr->clearColor.r * .299;
-			f += viewDefPtr->clearColor.g * .587;
-			f += viewDefPtr->clearColor.b * .114;
+		f = viewDefPtr->clearColor.r * .299;
+		f += viewDefPtr->clearColor.g * .587;
+		f += viewDefPtr->clearColor.b * .114;
 
-			viewDefPtr->clearColor.r =
-			viewDefPtr->clearColor.g =
-			viewDefPtr->clearColor.b = f;
-		}
+		viewDefPtr->clearColor.r =
+		viewDefPtr->clearColor.g =
+		viewDefPtr->clearColor.b = f;
 	}
 
 
@@ -519,7 +516,7 @@ void OGL_DrawScene(void (*drawRoutine)(void))
 
 			/* INIT SOME STUFF */
 
-	if (gGamePrefs.anaglyph)
+	if (gGamePrefs.anaglyphMode != ANAGLYPH_OFF)
 	{
 		gAnaglyphPass = 0;
 		PrepAnaglyphCameras();
@@ -551,13 +548,10 @@ void OGL_DrawScene(void (*drawRoutine)(void))
 
 	if (gGameViewInfoPtr->clearBackBuffer || (gDebugMode == 3))
 	{
-		if (gGamePrefs.anaglyph)
-		{
-			if (gGamePrefs.anaglyphColor)
-				glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);		// make sure clearing Red/Green/Blue channels
-			else
-				glColorMask(GL_TRUE, GL_FALSE, GL_TRUE, GL_TRUE);		// make sure clearing Red/Blue channels
-		}
+		if (gGamePrefs.anaglyphMode == ANAGLYPH_COLOR)
+			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);		// make sure clearing Red/Green/Blue channels
+		else if (gGamePrefs.anaglyphMode == ANAGLYPH_MONO)
+			glColorMask(GL_TRUE, GL_FALSE, GL_TRUE, GL_TRUE);		// make sure clearing Red/Blue channels
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	}
 	else
@@ -570,7 +564,7 @@ void OGL_DrawScene(void (*drawRoutine)(void))
 
 do_anaglyph:
 
-	if (gGamePrefs.anaglyph)
+	if (gGamePrefs.anaglyphMode != ANAGLYPH_OFF)
 	{
 				/* SET COLOR MASK */
 
@@ -580,7 +574,7 @@ do_anaglyph:
 		}
 		else
 		{
-			if (gGamePrefs.anaglyphColor)
+			if (gGamePrefs.anaglyphMode == ANAGLYPH_COLOR)
 				glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE);
 			else
 				glColorMask(GL_FALSE, GL_FALSE, GL_TRUE, GL_TRUE);
@@ -628,7 +622,7 @@ do_anaglyph:
 			/* SEE IF DO ANOTHER ANAGLYPH PASS */
 			/***********************************/
 
-	if (gGamePrefs.anaglyph)
+	if (gGamePrefs.anaglyphMode != ANAGLYPH_OFF)
 	{
 		gAnaglyphPass++;
 		if (gAnaglyphPass == 1)
@@ -747,7 +741,7 @@ do_anaglyph:
 	SDL_GL_SwapWindow(gSDLWindow);					// end render loop
 
 
-	if (gGamePrefs.anaglyph)
+	if (gGamePrefs.anaglyphMode != ANAGLYPH_OFF)
 		RestoreCamerasFromAnaglyph();
 
 }
@@ -788,13 +782,10 @@ GLuint OGL_TextureMap_Load(void *imageMemory, int width, int height,
 GLuint	textureName;
 
 
-	if (gGamePrefs.anaglyph)
-	{
-		if (gGamePrefs.anaglyphColor)
-			ConvertTextureToColorAnaglyph(imageMemory, width, height, srcFormat, dataType);
-		else
-			ConvertTextureToGrey(imageMemory, width, height, srcFormat, dataType);
-	}
+	if (gGamePrefs.anaglyphMode == ANAGLYPH_COLOR)
+		ConvertTextureToColorAnaglyph(imageMemory, width, height, srcFormat, dataType);
+	else if (gGamePrefs.anaglyphMode == ANAGLYPH_MONO)
+		ConvertTextureToGrey(imageMemory, width, height, srcFormat, dataType);
 
 			/* GET A UNIQUE TEXTURE NAME & INITIALIZE IT */
 
@@ -1290,7 +1281,7 @@ OGLLightDefType	*lights;
 
 			/* SETUP FOR ANAGLYPH STEREO 3D CAMERA */
 
-	if (gGamePrefs.anaglyph)
+	if (gGamePrefs.anaglyphMode != ANAGLYPH_OFF)
 	{
 		float	left, right;
 		float	halfFOV = gGameViewInfoPtr->fov * .5f;

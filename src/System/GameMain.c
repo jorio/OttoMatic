@@ -149,8 +149,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.mouseControlsOtto			= true;
 	gGamePrefs.snappyCameraControl			= true;
 	gGamePrefs.mouseSensitivityLevel		= DEFAULT_MOUSE_SENSITIVITY_LEVEL;
-	gGamePrefs.anaglyph						= false;
-	gGamePrefs.anaglyphColor				= true;
+	gGamePrefs.anaglyphMode					= ANAGLYPH_OFF;
 	gGamePrefs.anaglyphCalibrationRed		= DEFAULT_ANAGLYPH_R;
 	gGamePrefs.anaglyphCalibrationGreen		= DEFAULT_ANAGLYPH_G;
 	gGamePrefs.anaglyphCalibrationBlue		= DEFAULT_ANAGLYPH_B;
@@ -690,9 +689,9 @@ DeformationType		defData;
 			/* SET ANAGLYPH INFO */
 			/*********************/
 
-	if (gGamePrefs.anaglyph)
+	if (gGamePrefs.anaglyphMode != ANAGLYPH_OFF)
 	{
-		if (!gGamePrefs.anaglyphColor)
+		if (gGamePrefs.anaglyphMode == ANAGLYPH_MONO)
 		{
 			viewDef.lights.ambientColor.r 		+= .1f;					// make a little brighter
 			viewDef.lights.ambientColor.g 		+= .1f;
