@@ -80,7 +80,7 @@ static int					gMenuRow = 0;
 static int					gLastRowOnRootMenu = -1;
 static int					gKeyColumn = 0;
 static int					gPadColumn = 0;
-static float				gMenuColXs[MAX_MENU_COLS] = { 0, 170, 300, 430, 560 };
+static float				gMenuColXs[MAX_MENU_COLS] = { 0, 190, 300, 430, 560 };
 static float				gMenuRowYs[MAX_MENU_ROWS];
 static float				gMenuFadeAlpha = 0;
 static int					gMenuState = kMenuStateOff;

@@ -365,6 +365,17 @@ static const MenuItem gSettingsMenu[] =
 
 	{
 		.type = kMenuItem_Cycler,
+		.text = STR_AUTO_ALIGN_CAMERA,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.autoAlignCamera,
+			.numChoices = 2,
+			.choices = {STR_OFF, STR_ON},
+		},
+	},
+
+	{
+		.type = kMenuItem_Cycler,
 		.text= STR_UI_CENTERING,
 		.cycler =
 		{

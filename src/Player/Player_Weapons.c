@@ -206,7 +206,9 @@ OGLMatrix4x4	m;
 
 	gTimeSinceLastShoot = 0;
 	gCameraUserRotY = 0;											// reset user rot see we can see where we're shooting
-	gForceCameraAlignment = true;
+
+	if (gGamePrefs.autoAlignCamera)
+		gForceCameraAlignment = true;
 
 		/* CALC COORD & VECTOR OF MUZZLE */
 

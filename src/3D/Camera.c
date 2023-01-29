@@ -469,7 +469,8 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 
 				/* MOVE TO BEHIND PLAYER */
 
-		if ((gTimeSinceLastThrust > .5f) || gForceCameraAlignment || (gGamePrefs.playerRelControls)) 	// dont auto-align if player is being moved & we are not forcing it
+		if (gForceCameraAlignment
+			|| (gGamePrefs.autoAlignCamera && (gTimeSinceLastThrust > .5f || gGamePrefs.playerRelControls))) 	// don't auto-align if player is being moved & we are not forcing it
 		{
 			float	r;
 			const float	ratio = .5;
@@ -852,7 +853,8 @@ float			oldCamX,oldCamZ,oldCamY,oldPointOfInterestX,oldPointOfInterestZ,oldPoint
 
 				/* MOVE TO BEHIND PLAYER */
 
-		if ((gTimeSinceLastThrust > 1.1f) || gForceCameraAlignment)			// dont auto-align if player is being moved & we are not forcing it
+		if (gForceCameraAlignment
+			|| (gGamePrefs.autoAlignCamera && gTimeSinceLastThrust > 1.1f))			// don't auto-align if player is being moved & we are not forcing it
 		{
 			float	r,ratio;
 			OGLVector2D	behind;

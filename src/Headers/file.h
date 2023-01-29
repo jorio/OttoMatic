@@ -64,6 +64,7 @@ typedef struct
 	Boolean	music;
 	Byte	language;
 	Boolean	playerRelControls;
+	Boolean	autoAlignCamera;
 	Byte	mouseSensitivityLevel;
 	Boolean	mouseControlsOtto;
 	Boolean	snappyCameraControl;		// if false, vanilla momentum-y camera swinging

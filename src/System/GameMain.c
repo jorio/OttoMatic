@@ -141,6 +141,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.vsync						= true;
 	gGamePrefs.uiCentering					= false;
 	gGamePrefs.uiScaleLevel					= DEFAULT_UI_SCALE_LEVEL;
+	gGamePrefs.autoAlignCamera				= true;
 	gGamePrefs.preferredDisplay				= 0;
 	gGamePrefs.antialiasingLevel			= 0;
 	gGamePrefs.music						= true;
@@ -925,6 +926,9 @@ static void CleanupLevel(void)
 	gPlayerInfo.objNode = nil;
 	gPlayerInfo.leftHandObj = nil;
 	gPlayerInfo.rightHandObj = nil;
+
+	gAlienSaucer = nil;
+	gSaucerTarget = nil;
 }
 
 /************ CHEAT KEYS CHECKED AFTER LEGAL SCREEN ******************/
