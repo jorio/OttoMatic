@@ -436,6 +436,7 @@ DeformationType		defData;
 
 	gPlayerInfo.objNode = nil;
 	gPlayerInfo.didCheat = false;
+	gPlayerInfo.isTeleporting = false;
 
 
 

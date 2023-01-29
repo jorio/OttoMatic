@@ -423,6 +423,8 @@ ObjNode	*leftHand = gPlayerInfo.leftHandObj;
 ObjNode	*rightHand = gPlayerInfo.rightHandObj;
 float	fps = gFramesPerSecondFrac;
 
+	gPlayerInfo.isTeleporting = true;
+
 	switch(gTeleportMode)
 	{
 						/* FADE OUT */
@@ -460,6 +462,8 @@ float	fps = gFramesPerSecondFrac;
 
 					player->Delta.x = -sin(r) * 1300.0f;				// give some forward momentum
 					player->Delta.z = -cos(r) * 1300.0f;
+
+					gPlayerInfo.isTeleporting = false;
 				}
 				break;
 	}

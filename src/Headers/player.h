@@ -217,6 +217,7 @@ typedef struct
 			/* SPECIAL */
 
 	ObjNode*			fellThroughTrapDoor;
+	Boolean				isTeleporting;
 }PlayerInfoType;
 
 

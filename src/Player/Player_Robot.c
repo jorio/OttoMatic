@@ -201,7 +201,8 @@ int		i;
 
 	newObj = MakeNewSkeletonObject(&gNewObjectDefinition);
 
-	gPlayerInfo.objNode 	= newObj;
+	gPlayerInfo.objNode 		= newObj;
+	gPlayerInfo.isTeleporting 	= false;
 
 	newObj->Rot.y = rotY;
 

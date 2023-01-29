@@ -105,6 +105,9 @@ Boolean CallAlienSaucer(ObjNode *who)
 	if (MyRandomLong() & 0xf)							// randomize so that various types of callers have a chance each time
 		return(false);
 
+	if (gPlayerInfo.isTeleporting)						// not while Otto is teleporting (no controls)
+		return(false);
+
 	// Reduce call distance if Otto is doing some level-specific acrobatics with non-standard controls
 	if (gPlayerInfo.objNode && gPlayerInfo.objNode->Skeleton)
 	{
