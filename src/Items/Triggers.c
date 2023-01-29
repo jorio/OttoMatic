@@ -597,6 +597,9 @@ shim:
 	}
 
 
+	PlayEffect3D(EFFECT_METALGATECRASH, &theNode->Coord);		// play crash sound
+
+
 			/* DELETE THE GATE */
 
 	theNode->TerrainItemPtr = nil;								// never come back
@@ -605,13 +608,7 @@ shim:
 
 			/* STOP THE TRACTOR */
 
-	whoNode->Mode = TRACTOR_MODE_WAIT;
-	whoNode->TractorIsDone = true;
-	whoNode->Damage = 0;
-	whoNode->CType = CTYPE_MISC;
-
-	StopAChannelIfEffectNum(&whoNode->EffectChannel, EFFECT_TRACTOR);	// stop tractor loop
-	PlayEffect3D(EFFECT_METALGATECRASH, &theNode->Coord);		// play crash sound
+	StopTractor(whoNode);
 
 
 	return(true);

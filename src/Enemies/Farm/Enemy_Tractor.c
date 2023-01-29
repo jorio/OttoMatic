@@ -1,7 +1,8 @@
 /****************************/
 /*   ENEMY: TRACTOR.C		*/
-/* (c)2001 Pangea Software  */
 /* By Brian Greenstone      */
+/* (c)2001 Pangea Software  */
+/* (c)2023 Iliyas Jorio     */
 /****************************/
 
 
@@ -19,7 +20,7 @@ static void MoveTractor(ObjNode *theNode);
 static void AlignTractorWheels(ObjNode *theNode);
 static void MoveTractor_Chase(ObjNode *theNode);
 static void MoveTractor_Ram(ObjNode *theNode);
-static void MoveTractor_Wait(ObjNode *theNode);
+static void MoveTractor_Idle(ObjNode *theNode);
 static void DoTractorCollisionDetect(ObjNode *theNode);
 
 
@@ -41,13 +42,18 @@ static void DoTractorCollisionDetect(ObjNode *theNode);
 #define	RAM_DURATION		1.3f
 #define	WAIT_DELAY			1.5f
 
+enum
+{
+	TRACTOR_MODE_WAIT,
+	TRACTOR_MODE_CHASE,
+	TRACTOR_MODE_RAM,
+	TRACTOR_MODE_PLAYERDEAD,
+	TRACTOR_MODE_DONE,
+};
 
 /*********************/
 /*    VARIABLES      */
 /*********************/
-
-#define	RamTimer	SpecialF[0]
-#define	WaitDelay	SpecialF[1]
 
 
 /************************* ADD TRACTOR *********************************/
@@ -75,8 +81,7 @@ ObjNode	*newObj,*frontLeftWheel, *backLeftWheel,*frontRightWheel,*backRightWheel
 	newObj->TerrainItemPtr = itemPtr;								// keep ptr to item list
 
 	newObj->Mode = TRACTOR_MODE_WAIT;
-	newObj->WaitDelay = 0;
-	newObj->TractorIsDone = false;
+	newObj->Timer = 0;
 
 	newObj->Damage = .4;
 
@@ -128,8 +133,35 @@ ObjNode	*newObj,*frontLeftWheel, *backLeftWheel,*frontRightWheel,*backRightWheel
 	AttachShadowToObject(newObj, SHADOW_TYPE_CIRCULAR, 9, 14,false);
 
 
-
 	return(true);													// item was added
+}
+
+
+/***************** STOP TRACTOR AFTER BREAKING THRU GATE *****************/
+
+void StopTractor(ObjNode* theNode)
+{
+	theNode->Mode = TRACTOR_MODE_DONE;
+	theNode->Damage = 0;
+	theNode->CType = CTYPE_MISC;
+
+	StopAChannelIfEffectNum(&theNode->EffectChannel, EFFECT_TRACTOR);	// stop tractor loop
+}
+
+
+/************* RESET TRACTOR POSITION WHEN PLAYER RESPAWNS ***************/
+
+static void ResetTractorPosition(ObjNode* theNode)
+{
+	theNode->Mode = TRACTOR_MODE_WAIT;
+	theNode->CType = CTYPE_MISC;
+	theNode->Delta = (OGLVector3D){ 0, 0, 0 };
+	theNode->Speed2D = 0;
+	theNode->Speed3D = 0;
+	theNode->Coord.x = theNode->TerrainItemPtr->x;
+	theNode->Coord.z = theNode->TerrainItemPtr->y;
+	theNode->Coord.y = GetTerrainY(theNode->Coord.x, theNode->Coord.z);
+	theNode->Timer = 0;
 }
 
 
@@ -137,16 +169,11 @@ ObjNode	*newObj,*frontLeftWheel, *backLeftWheel,*frontRightWheel,*backRightWheel
 
 static void MoveTractor(ObjNode *theNode)
 {
-		/* SEE IF MAKE GO AWAY */
+		/* STICK TO PLAYERDEAD MODE WHILE PLAYER IS DEAD */
 
-	if (theNode->TractorIsDone)
+	if (gPlayerIsDead && theNode->Mode != TRACTOR_MODE_DONE)
 	{
-		if (TrackTerrainItem(theNode))
-		{
-			theNode->TerrainItemPtr = nil;					// never come back
-			DeleteObject(theNode);
-			return;
-		}
+		theNode->Mode = TRACTOR_MODE_PLAYERDEAD;
 	}
 
 
@@ -156,26 +183,51 @@ static void MoveTractor(ObjNode *theNode)
 
 	switch(theNode->Mode)
 	{
-				/* WAITING MODE */
-
-		case	TRACTOR_MODE_WAIT:
-				MoveTractor_Wait(theNode);
+		case	TRACTOR_MODE_DONE:
+				if (TrackTerrainItem(theNode))
+				{
+					theNode->TerrainItemPtr = nil;					// never come back
+					DeleteObject(theNode);
+					return;
+				}
+				else
+				{
+					MoveTractor_Idle(theNode);
+				}
 				break;
 
+		case	TRACTOR_MODE_WAIT:
+				MoveTractor_Idle(theNode);
 
-				/* CHASE MODE */
+				theNode->Timer -= gFramesPerSecondFrac;				// see if ready to chase
+				if (theNode->Timer <= 0.0f
+					&& CalcQuickDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < TRACTOR_CHASE_DIST)
+				{
+					theNode->Mode = TRACTOR_MODE_CHASE;
+				}
+				break;
 
 		case	TRACTOR_MODE_CHASE:
 				MoveTractor_Chase(theNode);
 				break;
 
-
-				/* RAM MODE */
-
 		case	TRACTOR_MODE_RAM:
 				MoveTractor_Ram(theNode);
 				break;
 
+		case	TRACTOR_MODE_PLAYERDEAD:
+				if (gPlayerIsDead)
+				{
+					MoveTractor_Idle(theNode);
+				}
+				else												// player just respawned, reset position
+				{
+					ResetTractorPosition(theNode);
+					if (TrackTerrainItem(theNode))					// purge objnode if player respawns far away
+						DeleteObject(theNode);
+					return;
+				}
+				break;
 	}
 
 
@@ -190,7 +242,7 @@ static void MoveTractor(ObjNode *theNode)
 
 		/* UPDATE SOUND */
 
-	if (!theNode->TractorIsDone)
+	if (theNode->Mode != TRACTOR_MODE_DONE)
 	{
 		if (theNode->EffectChannel == -1)			// make sure playing sound
 			theNode->EffectChannel = PlayEffect3D(EFFECT_TRACTOR, &gCoord);
@@ -211,7 +263,7 @@ static void MoveTractor(ObjNode *theNode)
 	/* SEE IF HIT PLAYER */
 	/*********************/
 
-	if (!theNode->TractorIsDone
+	if (theNode->Mode != TRACTOR_MODE_DONE
 		&& OGLPoint3D_Distance(&gCoord, &gPlayerInfo.coord) < (theNode->BBox.max.z * theNode->Scale.x + gPlayerInfo.objNode->BBox.max.x))
 	{
 		OGLVector2D	v1,v2;
@@ -239,7 +291,7 @@ static void MoveTractor(ObjNode *theNode)
 
 /******************** MOVE TRACTOR:  WAIT *****************************/
 
-static void MoveTractor_Wait(ObjNode *theNode)
+static void MoveTractor_Idle(ObjNode *theNode)
 {
 float	speed,r,fps = gFramesPerSecondFrac;
 
@@ -260,21 +312,6 @@ float	speed,r,fps = gFramesPerSecondFrac;
 	gCoord.z += gDelta.z * fps;
 	gCoord.y = GetTerrainY(gCoord.x, gCoord.z) + TRACTOR_YOFF;			// always stick to ground
 	gDelta.y = (gCoord.y - theNode->OldCoord.y) * gFramesPerSecond;
-
-
-			/* SEE IF CHASE */
-
-	if (!theNode->TractorIsDone)
-	{
-		theNode->WaitDelay -= fps;							// see if ready to chase
-		if (theNode->WaitDelay <= 0.0f)
-		{
-			if (CalcQuickDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < TRACTOR_CHASE_DIST)
-			{
-				theNode->Mode = TRACTOR_MODE_CHASE;
-			}
-		}
-	}
 }
 
 
@@ -313,7 +350,7 @@ float	speed,angle,r,fps = gFramesPerSecondFrac;
 		if (CalcQuickDistance(gCoord.x, gCoord.z, gPlayerInfo.coord.x, gPlayerInfo.coord.z) < TRACTOR_RAM_DIST)
 		{
 			theNode->Mode = TRACTOR_MODE_RAM;
-			theNode->RamTimer = RAM_DURATION;
+			theNode->Timer = RAM_DURATION;
 		}
 	}
 }
@@ -347,11 +384,11 @@ float	speed,r,fps = gFramesPerSecondFrac;
 
 			/* SEE IF DONE */
 
-	theNode->RamTimer -= fps;
-	if (theNode->RamTimer <= 0.0f)
+	theNode->Timer -= fps;
+	if (theNode->Timer <= 0.0f)
 	{
 		theNode->Mode = TRACTOR_MODE_WAIT;
-		theNode->WaitDelay = WAIT_DELAY;
+		theNode->Timer = WAIT_DELAY;
 	}
 }
 
@@ -418,15 +455,3 @@ static void DoTractorCollisionDetect(ObjNode *theNode)
 	DoFenceCollision(theNode);
 
 }
-
-
-
-
-
-
-
-
-
-
-
-

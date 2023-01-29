@@ -46,17 +46,6 @@ enum
 
 
 
-		/* TRACTOR MODES */
-		
-#define	TractorIsDone		Flag[0]
-		
-enum
-{
-	TRACTOR_MODE_WAIT,
-	TRACTOR_MODE_CHASE,
-	TRACTOR_MODE_RAM
-};
-
 
 		/* SAUCER INFO */
 		
@@ -133,6 +122,7 @@ Boolean PrimeEnemy_Tomato(long splineNum, SplineItemType *itemPtr);
 		/* TRACTOR */
 		
 Boolean AddTractor(TerrainItemEntryType *itemPtr, long  x, long z);
+void StopTractor(ObjNode* theNode);
 
 
 		/* BLOB */
