@@ -105,7 +105,7 @@ ObjNode	*newObj,*frontLeftWheel, *backLeftWheel,*frontRightWheel,*backRightWheel
 
 				/* BACK RIGHT */
 
-	gNewObjectDefinition.type 		= FARM_ObjType_BackLeftWheel;
+	gNewObjectDefinition.type 		= FARM_ObjType_BackRightWheel;
 	backRightWheel = MakeNewDisplayGroupObject(&gNewObjectDefinition);
 	backLeftWheel->ChainNode = backRightWheel;
 
