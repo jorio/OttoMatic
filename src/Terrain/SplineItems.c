@@ -851,7 +851,6 @@ void PatchSplineLoop(SplineDefType* spline)
 {
 	int numNubs = spline->numNubs;
 	SplinePointType* nubList = *spline->nubList;
-	int oldNumPoints = spline->numPoints;
 
 	int numWrapNubs = 3;		// wrap around for this many nubs
 	GAME_ASSERT(numNubs > numWrapNubs);
@@ -901,6 +900,7 @@ void PatchSplineLoop(SplineDefType* spline)
 #if _DEBUG
 		/* MAKE SURE NEW SPLINE HASN'T STRAYED TOO FAR FROM FILE VALUES */
 
+	int oldNumPoints = spline->numPoints;
 	GAME_ASSERT(abs(newNumPoints - oldNumPoints) <= 10);		// tolerate some wiggle room
 	// (note: level 3 will be especially bad here since I edited the nubs in the .ter.rsrc file)
 
