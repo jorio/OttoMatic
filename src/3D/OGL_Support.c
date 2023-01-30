@@ -11,6 +11,7 @@
 /****************************/
 
 #include "game.h"
+#include "version.h"
 
 /****************************/
 /*    PROTOTYPES            */
@@ -688,6 +689,7 @@ do_anaglyph:
 			"cam user rot:\t\t%.3f\n"
 			"cam ctrl dX:\t\t%.3f\n"
 #endif
+			"\n\n\n\n\n\n\n\nOtto Matic %s, %s\n%s, OpenGL %s, %s"
 			,
 			(int)(gFramesPerSecond+.5f),
 			gPolysThisFrame,
@@ -713,14 +715,19 @@ do_anaglyph:
 //			gNumPointers,
 			(int) (Pomme_GetHeapSize()/1024),
 			(int) Pomme_GetNumAllocs(),
-			gVRAMUsedThisFrame/1024
+			gVRAMUsedThisFrame/1024,
 #if 0
 			gTimeSinceLastThrust,
 			gForceCameraAlignment? 'Y': 'N',
 			gAutoRotateCamera? 'Y': 'N',
 			gCameraUserRotY,
-			gCameraControlDelta.x
+			gCameraControlDelta.x,
 #endif
+			PROJECT_VERSION,
+			SDL_GetRevision(),
+			(const char*) glGetString(GL_RENDERER),
+			(const char*) glGetString(GL_VERSION),
+			SDL_GetCurrentVideoDriver()
 		);
 		TextMesh_Update(debugString, 0, gDebugText);
 		gDebugText->StatusBits &= ~STATUS_BIT_HIDDEN;
