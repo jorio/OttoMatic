@@ -76,11 +76,6 @@ static uint8_t GenerateNumDisplays(void)
 	return ClampInt(numDisplays, 1, 255);
 }
 
-static const char* GenerateVideoSettingsSubtitle(void)
-{
-	return (const char*) glGetString(GL_RENDERER);
-}
-
 static const char* GenerateDisplayName(char* buf, int bufSize, Byte value)
 {
 	snprintf(buf, bufSize, "%s %d", Localize(STR_DISPLAY), 1 + (int)value);
@@ -263,10 +258,113 @@ static const MenuItem gMouseMenu[] =
 	{ .type = kMenuItem_END_SENTINEL }
 };
 
-static const MenuItem gVideoMenu[] =
+static const MenuItem gSettingsMenu[] =
 {
-	{.type = kMenuItem_Title, .text = STR_VIDEO_SETTINGS},
-	{.type = kMenuItem_Subtitle, .generateText = GenerateVideoSettingsSubtitle},
+	{.type = kMenuItem_Title, .text = STR_SETTINGS},
+	{.type = kMenuItem_Spacer},
+
+
+	{
+		.type = kMenuItem_Submenu,
+		.text = STR_CONFIGURE_KEYBOARD,
+		.submenu = {.menu = gKeybindingMenu},
+	},
+
+	{
+		.type = kMenuItem_Submenu,
+		.text = STR_CONFIGURE_MOUSE,
+		.submenu = {.menu = gMouseMenu},
+	},
+
+	{
+		.type = kMenuItem_Submenu,
+		.text = STR_CONFIGURE_GAMEPAD,
+		.submenu = {.menu = gGamepadMenu},
+	},
+
+	{ .type = kMenuItem_Spacer },
+
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_MUSIC,
+		.cycler =
+		{
+			.callback = EnforceMusicPausePref,
+			.valuePtr = &gGamePrefs.music,
+			.numChoices = 2,
+			.choices = {STR_OFF, STR_ON},
+		},
+	},
+
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_AUTO_ALIGN_CAMERA,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.autoAlignCamera,
+			.numChoices = 2,
+			.choices = {STR_OFF, STR_ON},
+		},
+	},
+
+#if _DEBUG
+	{
+		.type = kMenuItem_Cycler,
+		.rawText = "Tank controls",
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.playerRelControls,
+			.numChoices = 2,
+			.choices = {STR_OFF, STR_ON},
+		},
+	},
+#endif
+
+	{ .type = kMenuItem_Spacer },
+
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_LANGUAGE,
+		.cycler =
+		{
+			.callback = cb_SetLanguage,
+			.valuePtr = &gGamePrefs.language,
+			.numChoices = MAX_LANGUAGES,
+			.generateChoiceString = GenerateCurrentLanguageName,
+		},
+	},
+
+	{
+		.type = kMenuItem_Cycler,
+		.text= STR_UI_CENTERING,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.uiCentering,
+			.numChoices = 2,
+			.choices = {STR_OFF, STR_ON},
+		},
+	},
+	{
+		.type = kMenuItem_Cycler,
+		.text = STR_UI_SCALE,
+		.cycler =
+		{
+			.valuePtr = &gGamePrefs.uiScaleLevel,
+			.numChoices = NUM_UI_SCALE_LEVELS,
+			.choices =
+			{
+				STR_MOUSE_SENSITIVITY_1,
+				STR_MOUSE_SENSITIVITY_2,
+				STR_MOUSE_SENSITIVITY_3,
+				STR_MOUSE_SENSITIVITY_4,
+				STR_MOUSE_SENSITIVITY_5,
+				STR_MOUSE_SENSITIVITY_6,
+				STR_MOUSE_SENSITIVITY_7,
+				STR_MOUSE_SENSITIVITY_8,
+			},
+		},
+	},
+
 	{ .type = kMenuItem_Spacer },
 
 	{
@@ -280,6 +378,7 @@ static const MenuItem gVideoMenu[] =
 			.choices = {STR_OFF, STR_ON},
 		},
 	},
+
 	{
 		.type = kMenuItem_Cycler,
 		.text = STR_VSYNC,
@@ -328,131 +427,6 @@ static const MenuItem gVideoMenu[] =
 			.choices = {STR_OFF, STR_ON_COLOR, STR_ON_MONOCHROME},
 		},
 	},
-
-	{ .type = kMenuItem_Spacer },
-
-	{
-		.type = kMenuItem_Action,
-		.text = STR_BACK,
-		.action = { .callback = MenuCallback_Back },
-	},
-
-	{ .type = kMenuItem_END_SENTINEL }
-};
-
-static const MenuItem gSettingsMenu[] =
-{
-	{.type = kMenuItem_Title, .text = STR_SETTINGS},
-	{.type = kMenuItem_Spacer},
-
-	{
-		.type = kMenuItem_Cycler,
-		.text = STR_LANGUAGE,
-		.cycler =
-		{
-			.callback = cb_SetLanguage,
-			.valuePtr = &gGamePrefs.language,
-			.numChoices = MAX_LANGUAGES,
-			.generateChoiceString = GenerateCurrentLanguageName,
-		},
-	},
-
-	{
-		.type = kMenuItem_Cycler,
-		.text = STR_MUSIC,
-		.cycler =
-		{
-			.callback = EnforceMusicPausePref,
-			.valuePtr = &gGamePrefs.music,
-			.numChoices = 2,
-			.choices = {STR_OFF, STR_ON},
-		},
-	},
-
-	{
-		.type = kMenuItem_Cycler,
-		.text = STR_AUTO_ALIGN_CAMERA,
-		.cycler =
-		{
-			.valuePtr = &gGamePrefs.autoAlignCamera,
-			.numChoices = 2,
-			.choices = {STR_OFF, STR_ON},
-		},
-	},
-
-	{
-		.type = kMenuItem_Cycler,
-		.text= STR_UI_CENTERING,
-		.cycler =
-		{
-			.valuePtr = &gGamePrefs.uiCentering,
-			.numChoices = 2,
-			.choices = {STR_OFF, STR_ON},
-		},
-	},
-	{
-		.type = kMenuItem_Cycler,
-		.text = STR_UI_SCALE,
-		.cycler =
-		{
-			.valuePtr = &gGamePrefs.uiScaleLevel,
-			.numChoices = NUM_UI_SCALE_LEVELS,
-			.choices =
-			{
-				STR_MOUSE_SENSITIVITY_1,
-				STR_MOUSE_SENSITIVITY_2,
-				STR_MOUSE_SENSITIVITY_3,
-				STR_MOUSE_SENSITIVITY_4,
-				STR_MOUSE_SENSITIVITY_5,
-				STR_MOUSE_SENSITIVITY_6,
-				STR_MOUSE_SENSITIVITY_7,
-				STR_MOUSE_SENSITIVITY_8,
-			},
-		},
-	},
-
-	{ .type = kMenuItem_Spacer },
-
-	{
-		.type = kMenuItem_Submenu,
-		.text = STR_VIDEO_SETTINGS,
-		.submenu = {.menu = gVideoMenu},
-	},
-
-	{ .type = kMenuItem_Spacer },
-
-	{
-		.type = kMenuItem_Submenu,
-		.text = STR_CONFIGURE_KEYBOARD,
-		.submenu = {.menu = gKeybindingMenu},
-	},
-
-	{
-		.type = kMenuItem_Submenu,
-		.text = STR_CONFIGURE_MOUSE,
-		.submenu = {.menu = gMouseMenu},
-	},
-
-	{
-		.type = kMenuItem_Submenu,
-		.text = STR_CONFIGURE_GAMEPAD,
-		.submenu = {.menu = gGamepadMenu},
-	},
-
-
-#if _DEBUG
-	{.type = kMenuItem_Spacer},
-	{
-		.type = kMenuItem_Cycler,
-		.rawText = "Tank controls",
-		.cycler =
-		{
-			.valuePtr = &gGamePrefs.playerRelControls,
-			.numChoices = 2,
-			.choices = {STR_OFF, STR_ON},
-		},
-	},
-#endif
 
 	{ .type = kMenuItem_Spacer },
 
