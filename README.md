@@ -39,6 +39,10 @@ Otto Matic is being re-released here (https://github.com/jorio/ottomatic) under 
 
 If you like games by Pangea Software, you might enjoy my other ports:
 
-- [Nanosaur](https://github.com/jorio/nanosaur)
-- [Bugdom](https://github.com/jorio/bugdom)
-- [Mighty Mike](https://github.com/jorio/mightymike)
+- [Billy Frontier](https://github.com/jorio/BillyFrontier)
+- [Bugdom](https://github.com/jorio/Bugdom)
+- [Cro-Mag Rally](https://github.com/jorio/CroMagRally)
+- [Mighty Mike (Power Pete)](https://github.com/jorio/MightyMike)
+- [Nanosaur](https://github.com/jorio/Nanosaur)
+- [Nanosaur II](https://github.com/jorio/Nanosaur2)
+- [Otto Matic](https://github.com/jorio/OttoMatic)

@@ -2,7 +2,15 @@
 
 ## During copyright screen
 
-- Hold down a number key (0...9) and press space to start on the corresponding level.
+During the copyright screen, hold down one of these keys (assuming a US keyboard layout) and press space to warp to specific scenes:
+
+| Key                             | Scene                                                          |
+|---------------------------------|----------------------------------------------------------------|
+| 1, 2, 3, 4, 5, 6, 7, 8, 9, or 0 | Jump to corresponding level                                    |
+| F                               | Fast-forward through fluff (can be combined with a number key) |
+| Minus (-)                       | High score entry                                               |
+| W                               | Win                                                            |
+| L                               | Lose                                                           |
 
 ## In the main menu
 
@@ -10,7 +18,7 @@
 
 ## In game
 
-- Press B, R, I simultaneously to fill up your inventory.
+- Press B, R, I simultaneously to fill up your inventory. (If that doesn't work on your keyboard, try pressing C, M, R simultaneously.)
 
 - Press F8 to bring up debug mode.
 

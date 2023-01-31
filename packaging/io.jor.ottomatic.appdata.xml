@@ -3,12 +3,12 @@
   <id>io.jor.ottomatic</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>CC-BY-NC-SA-4.0</project_license>
-  <name>OttoMatic</name>
+  <name>Otto Matic</name>
   <developer_name>Pangea Software, Inc., Iliyas Jorio</developer_name>
 
   <summary>Save the Earth from the clutches of the Giant Brain from Planet X</summary>
   <summary xml:lang="fr">Sauvez la Terre de l’emprise du Cerveau Géant de la Planète X !</summary>
-  
+
   <description>
     <p>The year is 1957 and a fleet of flying saucers from Planet X have come to Earth. These saucers are under the control of the evil Brain Aliens who are abducting helpless human beings and taking them away to strange alien worlds to become slaves of The Giant Brain. Luckily for the human race there exist the Otto Matics, robots who police the galaxy in name of all that is good and decent.</p>
     <p xml:lang="fr">Nous sommes en 1957 et une flotte de soucoupes volantes de la Planète X est arrivée sur Terre. Ces soucoupes sont sous le contrôle des Aliens Cérébroïdes maléfiques. Ils kidnappent des humains sans défense et les emmènent dans d’étranges mondes extraterrestres pour en faire les esclaves du Cerveau Géant. Heureusement pour l’humanité, il existe les Otto Matics, d’honorables robots qui font respecter la loi à travers la galaxie au nom de tout ce qui est juste et bon.</p>
@@ -38,109 +38,68 @@
 
     <p><em>Otto Matic was released in 2001 by Pangea Software. It was a pack-in game on Macs that came out around that time. This port aims to provide the best way to experience Otto Matic today. It introduces some modern comforts and fixes some gameplay bugs. The overall experience is intended to be faithful to the spirit of the original game, so modifications to the game’s design are out of the scope of this project. This port was made and re-released under permission from Pangea Software, Inc.</em></p>
   </description>
-  
+
   <categories>
     <category>Game</category>
   </categories>
-  
+
   <content_rating type="oars-1.1">
     <content_attribute id="violence-cartoon">mild</content_attribute>
     <content_attribute id="violence-fantasy">mild</content_attribute>
   </content_rating>
-  
+
   <launchable type="desktop-id">io.jor.ottomatic.desktop</launchable>
   <provides>
     <id>io.jor.ottomatic.desktop</id>
   </provides>
 
   <screenshots>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/bigotto.jpg</image>
+    <screenshot type="default">
+      <image>https://img.itch.zone/aW1hZ2UvMTU2ODMzOS85MTc5OTY1LmpwZw==/794x1000/83cOXC.jpg</image>
     </screenshot>
     <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/boulders.jpg</image>
+      <image>https://img.itch.zone/aW1hZ2UvMTU2ODMzOS85MTc5OTY2LmpwZw==/794x1000/BFvggo.jpg</image>
     </screenshot>
     <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/bubble.jpg</image>
+      <image>https://img.itch.zone/aW1hZ2UvMTU2ODMzOS85MTc5OTY3LmpwZw==/794x1000/h0PHVg.jpg</image>
     </screenshot>
     <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/cannon.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/clouds.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/clown.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/corn.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/cracked.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/cropcircles.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/foliage.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/iceman.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/jumpjet.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/kaboom.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/landing.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/lava.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/lizard.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/platforms1.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/platforms.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/robots.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/skiing.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/slimeabduct.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/slime.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/supernova.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/tomatos.jpg</image>
-    </screenshot>
-    <screenshot>
-      <image>https://pangeasoft.net/otto/files/screenshots/turtles.jpg</image>
+      <image>https://img.itch.zone/aW1hZ2UvMTU2ODMzOS85MTc5OTc1LmpwZw==/794x1000/L61HNj.jpg</image>
     </screenshot>
   </screenshots>
-  
+
   <url type="homepage">https://jorio.itch.io/ottomatic</url>
   <url type="donation">https://ko-fi.com/jorio</url>
   <url type="vcs-browser">https://github.com/jorio/OttoMatic</url>
   <url type="bugtracker">https://github.com/jorio/OttoMatic/issues</url>
 
   <releases>
+    <release version="4.0.1" date="2023-01-31">
+      <url>https://github.com/jorio/OttoMatic/releases/tag/4.0.1</url>
+      <description>
+        <p>Here are the major changes since version 4.0.0 in a nutshell:</p>
+        <ul>
+          <li>New quality-of-life settings: infobar centering/scaling, camera auto-alignment on/off, etc.</li>
+          <li>For completionists: all humans should now be possible to rescue, and the bonus screen will let you know if you've rescued them all</li>
+          <li>Physics are more stable, enabling the game to be played at higher framerates</li>
+          <li>A lot of polishing: seamless terrain texturing, smooth spline motions, etc.</li>
+          <li>Fixed a whole host of minor gameplay bugs and softlocks</li>
+          <li>And more!</li>
+        </ul>
+      </description>
+    </release>
+
     <release version="4.0.0" date="2021-08-21">
       <url>https://github.com/jorio/OttoMatic/releases/tag/4.0.0</url>
       <description>
-        <p>Initial playable release</p>
+        <p>Initial playable release of the modern version of Otto Matic for modern operating systems.</p>
+        <ul>
+          <li>Cross-platform support</li>
+          <li>Many, many gameplay and cosmetic bugfixes and improvements</li>
+          <li>Reworked UI and scenes for widescreen support</li>
+          <li>Modern controller support</li>
+          <li>All-new menu system</li>
+        </ul>
       </description>
     </release>
   </releases>
