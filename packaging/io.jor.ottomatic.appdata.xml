@@ -20,28 +20,63 @@
     <p xml:lang="fr">Votre fusée vous emmènera sur chacune des planètes, en commençant par la Terre. Sur chaque planète, vous devez secourir autant d’humains que possible, mais prenez garde : les Cérébroïdes essaieront d’enlever les humains avant que vous ne puissiez les secourir ! Quand vous sauvez des humains, ils sont téléportés en sécurité dans votre fusée que vous devez alimenter avec suffisamment de carburant pour pouvoir décoller de la planète. Une fois le Cerveau Géant vaincu et la paix rétablie dans la galaxie, vous retournerez sur Terre avec votre cargaison d’humains, où ils seront enfin libérés.</p>
 
     <p>In Otto Matic...</p>
+    <p xml:lang="fr">Dans Otto Matic...</p>
+
     <ul>
       <li>10 levels on strange alien planets!</li>
+      <li xml:lang="fr">10 niveaux sur d’étranges planètes extraterrestres !</li>
+
       <li>Battle 25 different alien creatures!</li>
+      <li xml:lang="fr">Combattez 25 créatures extraterrestres différentes !</li>
+
       <li>Attack with 7 different types of space-age weapons</li>
+      <li xml:lang="fr">Attaquez avec 7 armes différentes de l’ère spatiale !</li>
+
       <li>Fight off giant radioactive killer vegetables!</li>
+      <li xml:lang="fr">Luttez contre des légumes tueurs radioactifs géants !</li>
+
       <li>Ski behind giant metal beasts on a sea of toxic ooze!</li>
+      <li xml:lang="fr">Faites du ski nautique sur un océan d’écume toxique !</li>
+
       <li>Ride soap bubbles across noxious lakes of slimy goo!</li>
+      <li xml:lang="fr">Survolez des lacs gluants dans une bulle de savon géante !</li>
+
       <li>Get shot out of a cannon!</li>
+      <li xml:lang="fr">Faites-vous propulser par un canon !</li>
+
       <li>Smash alien clowns in hovercraft bumper-cars!</li>
+      <li xml:lang="fr">Fracassez des clowns extraterrestres dans des aéroglisseurs auto-tamponneurs !</li>
+
       <li>Drink radioactive potions to grow to 50ft tall!</li>
+      <li xml:lang="fr">Buvez une potion radioactive pour grandir jusqu’à 15 mètres !</li>
+
       <li>Ride a zip-line to escape mutant radioactive robots!</li>
+      <li xml:lang="fr">Prenez une tyrolienne pour échapper aux robots mutants radioactifs !</li>
+
       <li>Pilot a flying saucer and lay waste to an alien fortress!</li>
+      <li xml:lang="fr">Pilotez une soucoupe volante pour bousiller une forteresse extraterrestre !</li>
+
       <li>Battle the Giant Brain from Planet X</li>
+      <li xml:lang="fr">Affrontez le Cerveau Géant de la Planète X !</li>
+
       <li>And much, much more!</li>
+      <li xml:lang="fr">Et bien plus encore !</li>
     </ul>
 
-    <p><em>Otto Matic was released in 2001 by Pangea Software. It was a pack-in game on Macs that came out around that time. This port aims to provide the best way to experience Otto Matic today. It introduces some modern comforts and fixes some gameplay bugs. The overall experience is intended to be faithful to the spirit of the original game, so modifications to the game’s design are out of the scope of this project. This port was made and re-released under permission from Pangea Software, Inc.</em></p>
+    <p>About this port: Otto Matic was released in 2001 by Pangea Software. It was a pack-in game on Macs that came out around that time. This port aims to provide the best way to experience the game today. This port was made and re-released under permission from Pangea Software, Inc.</p>
+    <p xml:lang="fr">À propos de ce portage : Otto Matic fut initialement lancé en 2001 par Pangea Software. Ce jeu était fourni sur les Macs qui sortaient à cette époque. Ce portage a pour objectif d’offrir la meilleure façon de jouer à ce jeu aujourd’hui. Ce portage a été réalisé et rediffusé avec la permission de Pangea Software, Inc.</p>
   </description>
 
   <categories>
     <category>Game</category>
+    <category>ActionGame</category>
   </categories>
+
+  <supports>
+    <control>keyboard</control>
+    <control>gamepad</control>
+    <control>mouse</control>
+  </supports>
 
   <content_rating type="oars-1.1">
     <content_attribute id="violence-cartoon">mild</content_attribute>
