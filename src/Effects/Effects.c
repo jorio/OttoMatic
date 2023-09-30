@@ -451,7 +451,7 @@ OGLVector3D	*delta;
 							}
 							else
 							{
-								dist = gGravitoidDistBuffer[p][q];		// use from buffer
+								dist = gGravitoidDistBuffer[q][p];		// use from buffer
 							}
 
 										/* calc vector to particle */
