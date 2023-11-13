@@ -109,3 +109,5 @@ float SnapAngle(float angle, float snap);
 
 SDL_GameController* TryOpenController(bool showMessageOnFailure);
 void OnJoystickRemoved(SDL_JoystickID which);
+
+void SetMacLinearMouse(int linear);

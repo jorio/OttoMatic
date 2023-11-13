@@ -4,7 +4,6 @@
 
 #include "game.h"
 #include "mousesmoothing.h"
-#include "killmacmouseacceleration.h"
 
 
 /***************/
@@ -134,7 +133,7 @@ void UpdateInput(void)
 					case SDL_WINDOWEVENT_FOCUS_LOST:
 #if __APPLE__
 						// On Mac, always restore system mouse accel if cmd-tabbing away from the game
-						RestoreMacMouseAcceleration();
+						SetMacLinearMouse(0);
 #endif
 						gEatMouse = true;
 						break;
@@ -143,7 +142,7 @@ void UpdateInput(void)
 #if __APPLE__
 						// On Mac, kill mouse accel when focus is regained only if the game has captured the mouse
 						if (SDL_GetRelativeMouseMode())
-							KillMacMouseAcceleration();
+							SetMacLinearMouse(1);
 #endif
 						gEatMouse = true;
 						break;
@@ -395,13 +394,7 @@ void CaptureMouse(Boolean doCapture)
 	SDL_ShowCursor(doCapture ? 0 : 1);
 //	ClearMouseState();
 	EatMouseEvents();
-
-#if __APPLE__
-	if (doCapture)
-        KillMacMouseAcceleration();
-    else
-        RestoreMacMouseAcceleration();
-#endif
+	SetMacLinearMouse(doCapture);
 }
 
 void EatMouseEvents(void)

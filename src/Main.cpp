@@ -10,10 +10,6 @@
 #include <iostream>
 #include <cstring>
 
-#if __APPLE__
-#include "killmacmouseacceleration.h"
-#endif
-
 extern "C"
 {
 	#include "game.h"
@@ -214,10 +210,8 @@ retryVideo:
 
 static void Shutdown()
 {
-#if __APPLE__
 	// Whether we failed or succeeded, always restore the user's mouse acceleration before exiting.
-	RestoreMacMouseAcceleration();
-#endif
+	SetMacLinearMouse(0);
 
 	Pomme::Shutdown();
 
