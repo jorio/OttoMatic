@@ -1300,7 +1300,8 @@ next:
 Boolean SeeIfLineSegmentHitsAnything(const OGLPoint3D* endPoint1, const OGLPoint3D* endPoint2, const ObjNode* except, uint32_t ctype)
 {
 const ObjNode	*thisNode;
-OGLPoint2D	p1,p2,crossBeamP1,crossBeamP2;
+OGLPoint2D	p1,p2;
+OGLPoint2D	crossBeamPts[4];
 short			targetNumBoxes;
 float	ix,iz,iy;
 
@@ -1349,21 +1350,32 @@ float	ix,iz,iy;
 		const CollisionBoxType* targetBox = &thisNode->CollisionBoxes[0];
 
 
-				/* CREATE SEGMENT FROM CROSSBEAM */
+				/* CREATE CROSSBEAM SEGMENTS */
 
-		crossBeamP1.x = targetBox->left;
-		crossBeamP1.y = targetBox->back;
+		crossBeamPts[0] = (OGLPoint2D) { targetBox->left,	targetBox->back };
+		crossBeamPts[1] = (OGLPoint2D) { targetBox->right,	targetBox->front };
 
-		crossBeamP2.x = targetBox->right;
-		crossBeamP2.y = targetBox->front;
+		crossBeamPts[2] = (OGLPoint2D) { targetBox->left,	targetBox->front };
+		crossBeamPts[3] = (OGLPoint2D) { targetBox->right,	targetBox->back };
 
 
-			/* SEE IF INPUT SEGMENT INTERSECTS THE CROSSBEAM SEGMENT */
+				/* SEE IF INPUT SEGMENT INTERSECTS EITHER CROSSBEAM SEGMENTS */
 
-		if (IntersectLineSegments(p1.x, p1.y, p2.x, p2.y,
-			                     crossBeamP1.x, crossBeamP1.y, crossBeamP2.x, crossBeamP2.y,
-	                             &ix, &iz))
-	  	{
+		for (int i = 0; i < 4; i += 2)
+		{
+			OGLPoint2D crossBeamP1 = crossBeamPts[i];
+			OGLPoint2D crossBeamP2 = crossBeamPts[i+1];
+
+			Boolean hitCrossBeam = IntersectLineSegments(
+					p1.x, p1.y, p2.x, p2.y,
+					crossBeamP1.x, crossBeamP1.y, crossBeamP2.x, crossBeamP2.y,
+					&ix, &iz);
+
+			if (!hitCrossBeam)
+			{
+				continue;
+			}
+
 			float	dy = endPoint2->y - endPoint1->y;			// get dy of line segment
 
 			float	d1 = CalcDistance(p1.x, p1.y, p2.x, p2.y);
@@ -1378,8 +1390,7 @@ float	ix,iz,iy;
 			{
 				return(true);
 			}
-	  	}
-
+		}
 
 next:
 		thisNode = thisNode->NextNode;							// next target node
