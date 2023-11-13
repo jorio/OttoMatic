@@ -580,11 +580,10 @@ float	x,y,z,r;
 Boolean AddDebrisGate(TerrainItemEntryType *itemPtr, long  x, long z)
 {
 ObjNode	*newObj;
-int		i;
-short	type = itemPtr->parm[0];
+short	type = itemPtr->parm[0];		// 0=open, 1=blocked with debris
 
 	gNewObjectDefinition.group 		= MODEL_GROUP_LEVELSPECIFIC;
-	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_DebrisGate_Intact + type;
+	gNewObjectDefinition.type 		= APOCALYPSE_ObjType_DebrisGate_Open + type;
 	gNewObjectDefinition.coord.x 	= x;
 	gNewObjectDefinition.coord.z 	= z;
 	gNewObjectDefinition.coord.y 	= GetTerrainY(x,z);
@@ -603,9 +602,9 @@ short	type = itemPtr->parm[0];
 	newObj->TerrainItemPtr = itemPtr;								// keep ptr to item list
 
 
-			/* SET COLLISION STUFF */
+			/* SET COLLISION STUFF IF "BLOCKED" TYPE */
 
-	if (type == 1)
+	if (type == 1)	// type 1: gate is blocked with debris
 	{
 		newObj->CType 			= CTYPE_TRIGGER|CTYPE_MISC|CTYPE_IMPENETRABLE|CTYPE_BLOCKCAMERA|CTYPE_BLOCKRAYS;
 		newObj->CBits			= CBITS_ALLSOLID;
@@ -613,14 +612,19 @@ short	type = itemPtr->parm[0];
 		newObj->Kind		 	= TRIGTYPE_DEBRISGATE;
 		CreateCollisionBoxFromBoundingBox_Rotated(newObj, 1.1, 1);
 
-		for (i = 0; i < NUM_WEAPON_TYPES; i++)								// all weapons call this
+
+			/* SINK COLLISION BOX INTO GROUND (GITHUB ISSUE #28) */
+
+		newObj->BottomOff -= 500;
+		CalcObjectBoxFromNode(newObj);
+		KeepOldCollisionBoxes(newObj);
+
+
+			/* COLLISION CALLBACKS */
+
+		for (int i = 0; i < NUM_WEAPON_TYPES; i++)				// all weapons call this
 			newObj->HitByWeaponHandler[i] = DebrisGate_HitByWeaponHandler;
 	}
-	else
-	{
-
-	}
-
 
 
 	return(true);													// item was added
