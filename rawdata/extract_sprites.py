@@ -66,9 +66,12 @@ with open(inPath, 'rb') as f:
             bpp = tgaBPP = 32
             if noAlpha:
                 tgaBPP = 24
+            else:
+                tgaFlags |= 8
         elif srcFormat == GL_RGB5_A1_EXT:
             assert False, "RGB5_A1 unsupported"
             bpp = tgaBPP = 16
+            tgaFlags |= 1
         elif srcFormat == GL_UNSIGNED_SHORT_1_5_5_5_REV:
             bpp = tgaBPP = 16
             if not noAlpha:
@@ -76,6 +79,7 @@ with open(inPath, 'rb') as f:
         else:
             assert False, "Unsupported source format"
 
+        os.makedirs(outPath, exist_ok=True)
         with open(os.path.join(outPath, F"{basename}{spriteNo:03}.tga"), "wb") as tga:
             tga.write(struct.pack("<xxb xx xx x xx xx hhbb", TGA_IMAGETYPE_RAW_BGR, width, height, tgaBPP, tgaFlags))
 
@@ -94,3 +98,5 @@ with open(inPath, 'rb') as f:
                     tga.write(struct.pack("<H", sixteen))
                 else:
                     assert False
+
+            tga.write(b"\0\0\0\0\0\0\0\0TRUEVISION-XFILE.\0")
