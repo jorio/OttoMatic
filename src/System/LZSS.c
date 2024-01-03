@@ -35,21 +35,12 @@ Ptr			initialDestPtr = destPtr;
 	// ring buffer of size N, with extra F-1 bytes to facilitate string comparison
 	uint8_t	*text_buf	= (uint8_t*)AllocPtr(RING_BUFF_SIZE + F - 1);
 
-	// left & right children & parents -- These constitute binary search trees.
-	short	*lson		= (short *)AllocPtr(sizeof(short) * (RING_BUFF_SIZE + 1));
-	short	*rson		= (short *)AllocPtr(sizeof(short) * (RING_BUFF_SIZE + 257));
-	short	*dad		= (short *)AllocPtr(sizeof(short) * (RING_BUFF_SIZE + 1));
-
 	// ZS pack buffer
 	srcOriginalPtr = (Ptr)AllocPtr(sourceSize+1);
 
 	sourcePtr = (unsigned char *)srcOriginalPtr;
 
 	GAME_ASSERT(text_buf);
-	GAME_ASSERT(lson);
-	GAME_ASSERT(rson);
-	GAME_ASSERT(dad);
-	GAME_ASSERT(srcOriginalPtr);
 
 				/* READ LZSS DATA */
 
@@ -111,9 +102,6 @@ Ptr			initialDestPtr = destPtr;
 
 	SafeDisposePtr(srcOriginalPtr);				// release the memory for packed buffer
 	SafeDisposePtr((Ptr)text_buf);
-	SafeDisposePtr((Ptr)lson);
-	SafeDisposePtr((Ptr)rson);
-	SafeDisposePtr((Ptr)dad);
 
 	return (long) decompSize;
 }
