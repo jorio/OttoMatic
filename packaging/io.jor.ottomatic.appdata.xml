@@ -75,7 +75,7 @@
   <supports>
     <control>keyboard</control>
     <control>gamepad</control>
-    <control>mouse</control>
+    <control>pointing</control>
   </supports>
 
   <content_rating type="oars-1.1">
