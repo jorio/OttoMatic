@@ -115,3 +115,5 @@ bool SaveGame(int saveSlot);
 bool LoadSaveGameStruct(int saveSlot, SaveGameType* saveData);
 bool LoadSavedGame(int saveSlot);
 
+Ptr LoadDataFile(const char* path, long* outLength);
+char* CSVIterator(char** csvCursor, bool* eolOut);

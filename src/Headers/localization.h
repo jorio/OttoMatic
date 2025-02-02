@@ -9,12 +9,13 @@ typedef enum GameLanguageID
 	LANGUAGE_SPANISH,
 	LANGUAGE_ITALIAN,
 	LANGUAGE_SWEDISH,
-	MAX_LANGUAGES
+	NUM_LANGUAGES
 } GameLanguageID;
 
 typedef enum LocStrID
 {
-	STR_LANGUAGE_NAME			= 0,
+	STR_NULL,
+	STR_LANGUAGE_NAME,
 	STR_NEW_GAME,
 	STR_LOAD_GAME,
 	STR_HELP,
@@ -154,10 +155,14 @@ typedef enum LocStrID
 	STR_ALL_HUMANS_RESCUED,
 	STR_N_HUMANS_MISSING,
 	STR_1_HUMAN_MISSING,
+	NUM_LOCALIZED_STRINGS,
 } LocStrID;
 
 void LoadLocalizedStrings(GameLanguageID languageID);
+void DisposeLocalizedStrings(void);
 
 const char* Localize(LocStrID stringID);
+int LocalizeWithPlaceholder(LocStrID stringID, char* buf, size_t bufSize, const char* format, ...);
 
+bool IsNativeEnglishSystem(void);
 GameLanguageID GetBestLanguageIDFromSystemLocale(void);

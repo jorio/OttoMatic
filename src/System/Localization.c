@@ -1,16 +1,18 @@
 // LOCALIZATION.C
-// (C) 2021 Iliyas Jorio
+// (C) 2025 Iliyas Jorio
 // This file is part of Otto Matic. https://github.com/jorio/ottomatic
 
 #include "game.h"
 
-#define MAX_STRINGS 256
+#define CSV_PATH ":System:strings.csv"
+
+#define MAX_STRINGS (NUM_LOCALIZED_STRINGS + 1)
 
 static GameLanguageID	gCurrentStringsLanguage = LANGUAGE_ILLEGAL;
 static Ptr				gStringsBuffer = nil;
 static const char*		gStringsTable[MAX_STRINGS];
 
-static const char kLanguageCodesISO639_1[MAX_LANGUAGES][3] =
+static const char kLanguageCodesISO639_1[NUM_LANGUAGES][3] =
 {
 	[LANGUAGE_ENGLISH	] = "en",
 	[LANGUAGE_FRENCH	] = "fr",
@@ -29,92 +31,57 @@ void LoadLocalizedStrings(GameLanguageID languageID)
 	}
 
 	// Free previous strings buffer
-	if (gStringsBuffer != nil)
-	{
-		SafeDisposePtr(gStringsBuffer);
-		gStringsBuffer = nil;
-	}
+	DisposeLocalizedStrings();
 
 	GAME_ASSERT(languageID >= 0);
-	GAME_ASSERT(languageID < MAX_LANGUAGES);
+	GAME_ASSERT(languageID < NUM_LANGUAGES);
 
-	FSSpec spec;
-	FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":system:strings.tsv", &spec);
-
-	short refNum;
-	if (FSpOpenDF(&spec, fsRdPerm, &refNum) != noErr)
-		DoFatalAlert("LoadTextFile: FSpOpenDF failed");
-
-	long eof = 0;
-	GetEOF(refNum, &eof);
-	long count = eof;
-	gStringsBuffer = AllocPtrClear(count + 1);		// +1 for final '\0'
-	FSRead(refNum, &count, gStringsBuffer);
-	FSClose(refNum);
-
-	GAME_ASSERT(count == eof);
+	long count = 0;
+	gStringsBuffer = LoadDataFile(CSV_PATH, &count);
 
 	for (int i = 0; i < MAX_STRINGS; i++)
 		gStringsTable[i] = nil;
+	gStringsTable[STR_NULL] = "???";
+	_Static_assert(STR_NULL == 0, "STR_NULL must be 0!");
 
-	int row = 0;
-	int col = 0;
+	int row = 1;	// start row at 1, so that 0 is an illegal index (STR_NULL)
 
-	char prevChar = '\0';
-	char* currentString = gStringsBuffer;
-	char* fallbackString = gStringsBuffer;
-
-	for (int i = 0; i < count; i++)
+	char* csvReader = gStringsBuffer;
+	while (csvReader != NULL)
 	{
-		char currChar = gStringsBuffer[i];
+		char* myPhrase = NULL;
+		bool eol = false;
 
-		if (currChar == '\t')
+		for (int x = 0; !eol; x++)
 		{
-			gStringsBuffer[i] = '\0';
+			char* phrase = CSVIterator(&csvReader, &eol);
 
-			if (col == languageID)
+			if (phrase &&
+				phrase[0] &&
+				(x == languageID || !myPhrase))
 			{
-				gStringsTable[row] = currentString[0]? currentString: fallbackString;
+				myPhrase = phrase;
 			}
-
-			currentString = &gStringsBuffer[i + 1];
-			col++;
 		}
 
-		if (currChar == '\n' || currChar == '\r')
+		if (myPhrase != NULL)
 		{
-			gStringsBuffer[i] = '\0';
-
-			if (!(prevChar == '\r' && currChar == '\n'))	// Windows CR+LF
-			{
-				if (col == languageID)
-				{
-					gStringsTable[row] = currentString[0]? currentString: fallbackString;
-				}
-
-				row++;
-				col = 0;
-				GAME_ASSERT(row < MAX_STRINGS);
-			}
-
-			currentString = &gStringsBuffer[i + 1];
-			fallbackString = currentString;
+			GAME_ASSERT(row < NUM_LOCALIZED_STRINGS);
+			gStringsTable[row] = myPhrase;
+			row++;
 		}
-
-		prevChar = currChar;
 	}
 
-//	for (int i = 0; i < MAX_STRINGS; i++)
-//		printf("String #%d: %s\n", i, gStringsTable[i]);
+	GAME_ASSERT(row == NUM_LOCALIZED_STRINGS);
 }
 
 const char* Localize(LocStrID stringID)
 {
 	if (!gStringsBuffer)
-		return "STRINGS NOT LOADED!!";
+		return "STRINGS NOT LOADED";
 
 	if (stringID < 0 || stringID >= MAX_STRINGS)
-		return "ILLEGAL STRING ID!!";
+		return "ILLEGAL STRING ID";
 
 	if (!gStringsTable[stringID])
 		return "";
@@ -122,24 +89,88 @@ const char* Localize(LocStrID stringID)
 	return gStringsTable[stringID];
 }
 
+int LocalizeWithPlaceholder(LocStrID stringID, char* buf0, size_t bufSize, const char* format, ...)
+{
+	char* buf = buf0;
+	const char* localizedString = Localize(stringID);
+
+	const char* placeholder = SDL_strchr(localizedString, '#');
+
+	if (!placeholder)
+	{
+		goto fail;
+	}
+
+	size_t bytesBeforePlaceholder = placeholder - localizedString;
+
+	if (bytesBeforePlaceholder + 1 >= bufSize)		// +1 for nul terminator
+	{
+		goto fail;
+	}
+
+	SDL_memcpy(buf, localizedString, bytesBeforePlaceholder);
+	buf += bytesBeforePlaceholder;
+	bufSize -= bytesBeforePlaceholder;
+
+	va_list args;
+	va_start(args, format);
+	int rc = SDL_vsnprintf(buf, bufSize, format, args);
+	va_end(args);
+
+	if (rc >= 0)
+	{
+		buf += rc;
+		bufSize -= rc;
+
+		rc = SDL_snprintf(buf, bufSize, "%s", placeholder + 1);
+		if (rc >= 0)
+		{
+			buf += rc;
+			bufSize -= rc;
+		}
+	}
+
+	return (int) (buf - buf0);
+
+fail:
+	return SDL_snprintf(buf, bufSize, "%s", localizedString);
+}
+
+bool IsNativeEnglishSystem(void)
+{
+	bool prefersEnglish = true;
+
+	int numLocales = 0;
+	SDL_Locale** localeList = SDL_GetPreferredLocales(&numLocales);
+
+	if (NULL != localeList
+		&& 0 != localeList[0]->language
+		&& (0 != strncmp(localeList[0]->language, kLanguageCodesISO639_1[LANGUAGE_ENGLISH], 2)))
+	{
+		prefersEnglish = false;
+	}
+
+	SDL_free(localeList);
+
+	return prefersEnglish;
+}
+
 GameLanguageID GetBestLanguageIDFromSystemLocale(void)
 {
 	GameLanguageID languageID = LANGUAGE_ENGLISH;
 
-#if !(SDL_VERSION_ATLEAST(2,0,14))
-	#warning Please upgrade to SDL 2.0.14 or later for SDL_GetPreferredLocales. Will default to English for now.
-#else
-	SDL_Locale* localeList = SDL_GetPreferredLocales();
-	if (!localeList)
-		return languageID;
+	int numLocales = 0;
+	SDL_Locale** localeList = SDL_GetPreferredLocales(&numLocales);
 
-	for (SDL_Locale* locale = localeList; locale->language; locale++)
+	for (int locale = 0; locale < numLocales; locale++)
 	{
-		for (int i = 0; i < MAX_LANGUAGES; i++)
+		const char* localeLanguage = localeList[locale]->language;
+
+		for (int language = 0; language < NUM_LANGUAGES; language++)
 		{
-			if (0 == strncmp(locale->language, kLanguageCodesISO639_1[i], 2))
+			if (0 == SDL_strncmp(localeLanguage, kLanguageCodesISO639_1[language], 2))
 			{
-				languageID = i;
+				languageID = language;
 				goto foundLocale;
 			}
 		}
@@ -147,7 +178,15 @@ GameLanguageID GetBestLanguageIDFromSystemLocale(void)
 
 foundLocale:
 	SDL_free(localeList);
-#endif
 
 	return languageID;
+}
+
+void DisposeLocalizedStrings(void)
+{
+	if (gStringsBuffer != nil)
+	{
+		SafeDisposePtr(gStringsBuffer);
+		gStringsBuffer = nil;
+	}
 }
