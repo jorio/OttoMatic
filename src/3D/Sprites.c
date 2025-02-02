@@ -116,7 +116,7 @@ char			path[256];
 
 	for (int i = 0; i < numSprites; i++)
 	{
-		snprintf(path, sizeof(path), ":sprites:%s:%s%03d.tga", groupName, groupName, i);
+		SDL_snprintf(path, sizeof(path), ":Sprites:%s:%s%03d.tga", groupName, groupName, i);
 
 		FSSpec spec;
 		OSErr iErr = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, path, &spec);

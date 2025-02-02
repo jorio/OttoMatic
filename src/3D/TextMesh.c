@@ -194,7 +194,7 @@ void TextMesh_LoadMetrics(void)
 
 	GAME_ASSERT_MESSAGE(!gFontMetricsLoaded, "Metrics already loaded");
 
-	err = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":system:font.sfl", &spec);
+	err = FSMakeFSSpec(gDataSpec.vRefNum, gDataSpec.parID, ":System:font.sfl", &spec);
 	GAME_ASSERT(!err);
 	err = FSpOpenDF(&spec, fsRdPerm, &refNum);
 	GAME_ASSERT(!err);
@@ -234,7 +234,7 @@ void TextMesh_InitMaterial(bool redFont)
 	matData.numMipmaps		= 1;
 	matData.width			= (uint32_t) ATLAS_WIDTH;
 	matData.height			= (uint32_t) ATLAS_HEIGHT;
-	matData.textureName[0]	= OGL_TextureMap_LoadTGA(redFont? ":system:font2.tga": ":system:font1.tga", 0, nil, nil);
+	matData.textureName[0]	= OGL_TextureMap_LoadTGA(redFont? ":System:font2.tga": ":System:font1.tga", 0, nil, nil);
 	gFontMaterial = MO_CreateNewObjectOfType(MO_TYPE_MATERIAL, 0, &matData);
 }
 
