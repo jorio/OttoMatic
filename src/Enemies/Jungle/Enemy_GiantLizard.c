@@ -894,6 +894,16 @@ static void KillGiantLizard(ObjNode *enemy)
 {
 int	i;
 
+
+			/* LET GO OF PLAYER IN GRASP (GITHUB ISSUE #34) */
+
+	if (enemy->GrippingPlayer)
+	{
+		MorphToSkeletonAnim(gPlayerInfo.objNode->Skeleton, PLAYER_ANIM_GOTHIT, 7.0);
+		enemy->GrippingPlayer = false;
+	}
+
+
 	enemy->CType = CTYPE_MISC;
 
 	if (enemy->Skeleton->AnimNum != GIANTLIZARD_ANIM_DEATH)
