@@ -1,5 +1,10 @@
 # Otto Matic changelog
 
+## **4.0.2** (NOT RELEASED YET)
+
+- Ported to SDL 3
+- **NOTE:** The Mac version now requires macOS 10.13.
+
 ## **4.0.1** (Jan 2023)
 
 Quality of life improvements:

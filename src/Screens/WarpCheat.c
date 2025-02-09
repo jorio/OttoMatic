@@ -53,37 +53,37 @@ void DoWarpCheat(void)
 		switch (item->type)
 		{
 			case MAP_ITEM_MYSTARTCOORD:
-				snprintf(name, sizeof(name), "Start");
+				SDL_snprintf(name, sizeof(name), "Start");
 				break;
 
 			case MAP_ITEM_EXITROCKET:
-				snprintf(name, sizeof(name), "Exit");
+				SDL_snprintf(name, sizeof(name), "Exit");
 				break;
 
 			case MAP_ITEM_TELEPORTER:
-				snprintf(name, sizeof(name), "Teleporter %d > %d", item->parm[0], item->parm[1]);
+				SDL_snprintf(name, sizeof(name), "Teleporter %d > %d", item->parm[0], item->parm[1]);
 				break;
 
 			case MAP_ITEM_CHECKPOINT:
-				snprintf(name, sizeof(name), "Checkpoint %d", item->parm[0]);
+				SDL_snprintf(name, sizeof(name), "Checkpoint %d", item->parm[0]);
 				break;
 
 			case MAP_ITEM_BUBBLEPUMP:
-				snprintf(name, sizeof(name), "BubblePump");
+				SDL_snprintf(name, sizeof(name), "BubblePump");
 				break;
 
 			case MAP_ITEM_BUMPERCARGATE:
-				snprintf(name, sizeof(name), "BumperCarGate");
+				SDL_snprintf(name, sizeof(name), "BumperCarGate");
 				break;
 
 			case MAP_ITEM_ZIPLINE:
 				if (item->parm[1] != 0)		// only show posts at start of zipline
 					continue;
-				snprintf(name, sizeof(name), "ZipLine %d", item->parm[0]);
+				SDL_snprintf(name, sizeof(name), "ZipLine %d", item->parm[0]);
 				break;
 
 			case MAP_ITEM_ROCKETSLED:
-				snprintf(name, sizeof(name), "RocketSled");
+				SDL_snprintf(name, sizeof(name), "RocketSled");
 				break;
 
 			default:
@@ -92,7 +92,7 @@ void DoWarpCheat(void)
 
 		GAME_ASSERT(mi < kMaxItems);
 
-		snprintf(textPtr, kCharsPerLine, "#%03d   %05d,%05d   %X,%X,%X,%X   %s",
+		SDL_snprintf(textPtr, kCharsPerLine, "#%03d   %05d,%05d   %X,%X,%X,%X   %s",
 				 gTerrainItemFileIDs[i], item->x, item->y,
 				 item->parm[0],
 				 item->parm[1],

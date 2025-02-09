@@ -11,8 +11,6 @@
 /***************/
 
 #include "game.h"
-#include <stdio.h>
-#include <stdarg.h>
 
 
 /****************************/
@@ -50,11 +48,11 @@ void DoAlert(const char* format, ...)
 	char message[1024];
 	va_list args;
 	va_start(args, format);
-	vsnprintf(message, sizeof(message), format, args);
+	SDL_vsnprintf(message, sizeof(message), format, args);
 	va_end(args);
 
-	printf("OTTO MATIC ALERT: %s\n", message);
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", message, gSDLWindow);
+	SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Game Alert: %s", message);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GAME_FULL_NAME, message, gSDLWindow);
 }
 
 
@@ -68,11 +66,11 @@ void DoFatalAlert(const char* format, ...)
 	char message[1024];
 	va_list args;
 	va_start(args, format);
-	vsnprintf(message, sizeof(message), format, args);
+	SDL_vsnprintf(message, sizeof(message), format, args);
 	va_end(args);
 
-	printf("OTTO MATIC FATAL ALERT: %s\n", message);
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Otto Matic", message, gSDLWindow);
+	SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Game Fatal Alert: %s", message);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GAME_FULL_NAME, message, gSDLWindow);
 	ExitToShell();
 }
 
@@ -101,7 +99,7 @@ static Boolean	beenHere = false;
 		TextMesh_DisposeMetrics();
 	}
 
-	SDL_ShowCursor(1);
+	SDL_ShowCursor();
 	MyFlushEvents();
 
 //	SavePrefs();							// save prefs before bailing
@@ -296,9 +294,9 @@ slow_down:
 		gFramesPerSecond = MIN_FPS;
 	}
 #if _DEBUG
-	else if (gSDLController)
+	else if (gSDLGamepad)
 	{
-		float analogSpeedUp = SDL_GameControllerGetAxis(gSDLController, SDL_CONTROLLER_AXIS_TRIGGERLEFT) / 32767.0f;
+		float analogSpeedUp = SDL_GetGamepadAxis(gSDLGamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) / 32767.0f;
 		if (analogSpeedUp > .25f)
 		{
 			gFramesPerSecond = MIN_FPS;
@@ -338,8 +336,8 @@ int		i;
 
 void MyFlushEvents(void)
 {
-	SDL_FlushEvents(SDL_KEYDOWN, SDL_JOYBUTTONUP);
-	SDL_FlushEvents(SDL_CONTROLLERAXISMOTION, SDL_CONTROLLERBUTTONUP);
+	// Flush input events
+	SDL_FlushEvents(SDL_EVENT_KEY_DOWN, SDL_EVENT_FINGER_CANCELED);
 }
 
 

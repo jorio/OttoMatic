@@ -59,7 +59,7 @@ typedef struct
 	Boolean	vsync;
 	Boolean	uiCentering;
 	Byte	uiScaleLevel;
-	Byte	preferredDisplay;
+	Byte	displayNumMinus1;
 	Byte	antialiasingLevel;
 	Boolean	music;
 	Byte	language;

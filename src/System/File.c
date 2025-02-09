@@ -509,7 +509,8 @@ PrefsType	prefBuffer;
 	return noErr;
 
 fileIsCorrupt:
-	printf("Prefs appear corrupt.\n");
+	InitDefaultPrefs();
+	SDL_Log("Prefs appear corrupt.");
 	FSClose(refNum);
 	return badFileFormat;
 }
@@ -1135,7 +1136,7 @@ OSErr					iErr;
 			item->flags = SwizzleUShort(&item->flags);
 
 #if 0
-			printf("Item#%d: %08x %08x %04x %02x%02x%02x%02x %04x\n",
+			SDL_Log("Item#%d: %08x %08x %04x %02x%02x%02x%02x %04x",
 				i,
 				item->x,
 				item->y,
@@ -1371,7 +1372,7 @@ OSErr					iErr;
 	Ptr allImages = AllocPtrClear(gNumUniqueSuperTiles * size);							// all supertile images from .ter data fork
 	Ptr canvas = AllocPtrClear(seamlessCanvasSize);										// we'll assemble the final supertile texture in there
 
-	memset(gSuperTileTextureObjects, 0, sizeof(gSuperTileTextureObjects));				// clear all supertile texture pointers
+	SDL_memset(gSuperTileTextureObjects, 0, sizeof(gSuperTileTextureObjects));				// clear all supertile texture pointers
 
 
 				/* READ ALL SUPERTILE IMAGES FROM DATA FORK */
@@ -1423,7 +1424,7 @@ OSErr					iErr;
 		{
 			cw = SUPERTILE_TEXMAP_SIZE;
 			ch = SUPERTILE_TEXMAP_SIZE;
-			memcpy(canvas, TILEIMAGE(col, row), size);
+			SDL_memcpy(canvas, TILEIMAGE(col, row), size);
 		}
 		else		// Do seamless texturing
 		{
@@ -1433,7 +1434,7 @@ OSErr					iErr;
 			ch = th + 2;
 
 			// Clear canvas to black
-			memset(canvas, 0, seamlessCanvasSize);
+			SDL_memset(canvas, 0, seamlessCanvasSize);
 
 			// Blit supertile image to middle of canvas
 			Blit16(TILEIMAGE(col, row), tw, th, 0, 0, tw, th, canvas, cw, ch, 1, 1);
@@ -1556,7 +1557,7 @@ static inline void Blit16(
 
 	for (int row = 0; row < srcRectHeight; row++)
 	{
-		memcpy(dst, src, bytesPerPixel * srcRectWidth);
+		SDL_memcpy(dst, src, bytesPerPixel * srcRectWidth);
 		src += bytesPerPixel * srcWidth;
 		dst += bytesPerPixel * dstWidth;
 	}
@@ -1608,7 +1609,7 @@ Str255			saveFilePath;
 		/* DO NAV SERVICES */
 		/*******************/
 
-	snprintf(saveFilePath, sizeof(saveFilePath), SAVE_PATH_FORMAT, saveSlot);
+	SDL_snprintf(saveFilePath, sizeof(saveFilePath), SAVE_PATH_FORMAT, saveSlot);
 
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, saveFilePath, &spec);
 
@@ -1652,7 +1653,7 @@ Str255			saveFilePath;
 
 				/* GET FILE WITH NAVIGATION SERVICES */
 
-	snprintf(saveFilePath, sizeof(saveFilePath), SAVE_PATH_FORMAT, saveSlot);
+	SDL_snprintf(saveFilePath, sizeof(saveFilePath), SAVE_PATH_FORMAT, saveSlot);
 
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, saveFilePath, &spec);
 	err = FSpOpenDF(&spec, fsRdPerm, &refNum);

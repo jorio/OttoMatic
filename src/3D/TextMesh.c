@@ -7,7 +7,6 @@
 /****************************/
 
 #include "game.h"
-#include <stdio.h>
 
 /****************************/
 /*    PROTOTYPES            */
@@ -128,13 +127,13 @@ static void ParseSFL(const char* data)
 
 	ParseSFL_SkipLine(&data);	// Skip font name
 
-	nArgs = sscanf(data, "%d %f", &junk, &gFontLineHeight);
+	nArgs = SDL_sscanf(data, "%d %f", &junk, &gFontLineHeight);
 	GAME_ASSERT(nArgs == 2);
 	ParseSFL_SkipLine(&data);
 
 	ParseSFL_SkipLine(&data);	// Skip image filename
 
-	nArgs = sscanf(data, "%d", &nGlyphs);
+	nArgs = SDL_sscanf(data, "%d", &nGlyphs);
 	GAME_ASSERT(nArgs == 1);
 	ParseSFL_SkipLine(&data);
 
@@ -142,7 +141,7 @@ static void ParseSFL(const char* data)
 	{
 		AtlasGlyph newGlyph;
 		uint32_t codePoint = 0;
-		nArgs = sscanf(
+		nArgs = SDL_sscanf(
 				data,
 				"%d %f %f %f %f %f %f %f",
 				&codePoint,
@@ -158,7 +157,7 @@ static void ParseSFL(const char* data)
 		uint32_t codePointPage = codePoint >> 8;
 		if (codePointPage >= MAX_CODEPOINT_PAGES)
 		{
-			printf("WARNING: codepoint 0x%x exceeds supported maximum (0x%x)\n", codePoint, MAX_CODEPOINT_PAGES * 256 - 1);
+			SDL_Log("WARNING: codepoint 0x%x exceeds supported maximum (0x%x)", codePoint, MAX_CODEPOINT_PAGES * 256 - 1);
 			continue;
 		}
 
@@ -212,7 +211,7 @@ void TextMesh_LoadMetrics(void)
 	FSClose(refNum);
 
 	// Parse metrics (gAtlasGlyphs) from SFL file
-	memset(gAtlasGlyphsPages, 0, sizeof(gAtlasGlyphsPages));
+	SDL_memset(gAtlasGlyphsPages, 0, sizeof(gAtlasGlyphsPages));
 	ParseSFL(data);
 
 	// Nuke data buffer
@@ -227,7 +226,7 @@ void TextMesh_InitMaterial(bool redFont)
 
 	GAME_ASSERT_MESSAGE(!gFontMaterial, "gFontMaterial already created");
 	MOMaterialData matData;
-	memset(&matData, 0, sizeof(matData));
+	SDL_memset(&matData, 0, sizeof(matData));
 	matData.setupInfo		= gGameViewInfoPtr;
 	matData.flags			= BG3D_MATERIALFLAG_ALWAYSBLEND | BG3D_MATERIALFLAG_TEXTURED | BG3D_MATERIALFLAG_CLAMP_U | BG3D_MATERIALFLAG_CLAMP_V;
 	matData.diffuseColor	= (OGLColorRGBA) {1, 1, 1, 1};
@@ -298,7 +297,7 @@ static void TextMesh_ReallocateMesh(MOVertexArrayData* mesh, int numQuads)
 
 static void TextMesh_InitMesh(MOVertexArrayData* mesh, int numQuads)
 {
-	memset(mesh, 0, sizeof(*mesh));
+	SDL_memset(mesh, 0, sizeof(*mesh));
 	
 	GAME_ASSERT(gFontMaterial);
 	mesh->numMaterials = 1;

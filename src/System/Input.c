@@ -41,15 +41,13 @@ enum
 typedef uint8_t KeyState;
 
 Boolean				gUserPrefersGamepad = false;
-
-SDL_GameController	*gSDLController = NULL;
-static SDL_JoystickID	gSDLJoystickInstanceID = -1;		// ID of the joystick bound to gSDLController
+SDL_Gamepad			*gSDLGamepad = NULL;
 
 static KeyState		gMouseButtonState[NUM_SUPPORTED_MOUSE_BUTTONS + 2];
-static KeyState		gRawKeyboardState[SDL_NUM_SCANCODES];
+static KeyState		gRawKeyboardState[SDL_SCANCODE_COUNT];
 static KeyState		gNeedStates[NUM_CONTROL_NEEDS];
 
-char				gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
+char				gTextInput[64];
 
 static Boolean		gEatMouse = false;
 Boolean				gMouseMotionNow = false;
@@ -113,48 +111,33 @@ void UpdateInput(void)
 	{
 		switch (event.type)
 		{
-			case SDL_QUIT:
+			case SDL_EVENT_QUIT:
+			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
 				ExitToShell();			// throws Pomme::QuitRequest
 				return;
 
-			case SDL_WINDOWEVENT:
-				switch (event.window.event)
-				{
-					case SDL_WINDOWEVENT_CLOSE:
-						ExitToShell();	// throws Pomme::QuitRequest
-						return;
-
-					/*
-					case SDL_WINDOWEVENT_RESIZED:
-						QD3D_OnWindowResized(event.window.data1, event.window.data2);
-						break;
-					*/
-
-					case SDL_WINDOWEVENT_FOCUS_LOST:
-#if __APPLE__
-						// On Mac, always restore system mouse accel if cmd-tabbing away from the game
-						SetMacLinearMouse(0);
-#endif
-						gEatMouse = true;
-						break;
-
-					case SDL_WINDOWEVENT_FOCUS_GAINED:
-#if __APPLE__
-						// On Mac, kill mouse accel when focus is regained only if the game has captured the mouse
-						if (SDL_GetRelativeMouseMode())
-							SetMacLinearMouse(1);
-#endif
-						gEatMouse = true;
-						break;
-				}
+			case SDL_EVENT_WINDOW_RESIZED:
+				// QD3D_OnWindowResized(event.window.data1, event.window.data2);
 				break;
 
-			case SDL_TEXTINPUT:
-				memcpy(gTextInput, event.text.text, sizeof(gTextInput));
-				_Static_assert(sizeof(gTextInput) == sizeof(event.text.text), "size mismatch: gTextInput/event.text.text");
+			case SDL_EVENT_WINDOW_FOCUS_LOST:
+				// On Mac, always restore system mouse accel if cmd-tabbing away from the game
+				SetMacLinearMouse(0);
+				gEatMouse = true;
 				break;
 
-			case SDL_MOUSEMOTION:
+			case SDL_EVENT_WINDOW_FOCUS_GAINED:
+				// On Mac, kill mouse accel when focus is regained only if the game has captured the mouse
+				if (SDL_GetWindowRelativeMouseMode(gSDLWindow))
+					SetMacLinearMouse(1);
+				gEatMouse = true;
+				break;
+
+			case SDL_EVENT_TEXT_INPUT:
+				SDL_snprintf(gTextInput, sizeof(gTextInput), "%s", event.text.text);
+				break;
+
+			case SDL_EVENT_MOUSE_MOTION:
 				if (!gEatMouse)
 				{
 					gMouseMotionNow = true;
@@ -162,7 +145,7 @@ void UpdateInput(void)
 				}
 				break;
 
-			case SDL_MOUSEWHEEL:
+			case SDL_EVENT_MOUSE_WHEEL:
 				if (!gEatMouse)
 				{
 					mouseWheelDelta += event.wheel.y;
@@ -170,21 +153,20 @@ void UpdateInput(void)
 				}
 				break;
 
-			case SDL_JOYDEVICEADDED:	 // event.jdevice.which is the joy's INDEX (not an instance id!)
-				TryOpenController(false);
+			case SDL_EVENT_GAMEPAD_ADDED:
+				TryOpenGamepad(false);
 				break;
 
-			case SDL_JOYDEVICEREMOVED:	// event.jdevice.which is the joy's UNIQUE INSTANCE ID (not an index!)
-				OnJoystickRemoved(event.jdevice.which);
+			case SDL_EVENT_GAMEPAD_REMOVED:
+				OnJoystickRemoved(event.gdevice.which);
 				break;
 
-			case SDL_KEYDOWN:
+			case SDL_EVENT_KEY_DOWN:
 				gUserPrefersGamepad = false;
 				break;
 
-			case SDL_CONTROLLERBUTTONDOWN:
-			case SDL_CONTROLLERBUTTONUP:
-			case SDL_JOYBUTTONDOWN:
+			case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+			case SDL_EVENT_GAMEPAD_BUTTON_UP:
 				gUserPrefersGamepad = true;
 				break;
 		}
@@ -197,7 +179,7 @@ void UpdateInput(void)
 	if (gEatMouse)
 	{
 		MouseSmoothing_ResetState();
-		memset(gMouseButtonState, KEYSTATE_OFF, sizeof(gMouseButtonState));
+		SDL_memset(gMouseButtonState, KEYSTATE_OFF, sizeof(gMouseButtonState));
 	}
 	else
 	{
@@ -206,7 +188,7 @@ void UpdateInput(void)
 		// Actual mouse buttons
 		for (int i = 1; i < NUM_SUPPORTED_MOUSE_BUTTONS_PURESDL; i++)
 		{
-			bool downNow = mouseButtons & SDL_BUTTON(i);
+			bool downNow = mouseButtons & SDL_BUTTON_MASK(i);
 			UpdateKeyState(&gMouseButtonState[i], downNow);
 		}
 
@@ -219,16 +201,16 @@ void UpdateInput(void)
 	// Refresh the state of each individual keyboard key
 
 	int numkeys = 0;
-	const UInt8* keystate = SDL_GetKeyboardState(&numkeys);
+	const bool* keystate = SDL_GetKeyboardState(&numkeys);
 
 	{
-		int minNumKeys = numkeys < SDL_NUM_SCANCODES ? numkeys : SDL_NUM_SCANCODES;
+		int minNumKeys = numkeys < SDL_SCANCODE_COUNT ? numkeys : SDL_SCANCODE_COUNT;
 
 		for (int i = 0; i < minNumKeys; i++)
 			UpdateKeyState(&gRawKeyboardState[i], keystate[i]);
 
 		// fill out the rest
-		for (int i = minNumKeys; i < SDL_NUM_SCANCODES; i++)
+		for (int i = minNumKeys; i < SDL_SCANCODE_COUNT; i++)
 			UpdateKeyState(&gRawKeyboardState[i], false);
 	}
 
@@ -239,7 +221,7 @@ void UpdateInput(void)
 		&& (GetKeyState(SDL_SCANCODE_LALT) || GetKeyState(SDL_SCANCODE_RALT)))
 	{
 		gGamePrefs.fullscreen = gGamePrefs.fullscreen ? 0 : 1;
-		SetFullscreenModeFromPrefs();
+		SetFullscreenMode(false);
 
 		gRawKeyboardState[SDL_SCANCODE_RETURN] = KEYSTATE_IGNOREHELD;
 	}
@@ -259,7 +241,7 @@ void UpdateInput(void)
 
 		downNow |= gMouseButtonState[kb->mouseButton] & KEYSTATE_ACTIVE_BIT;
 
-		if (gSDLController)
+		if (gSDLGamepad)
 		{
 			int16_t deadZone = i >= NUM_REMAPPABLE_NEEDS
 							   ? kJoystickDeadZone_UI
@@ -270,15 +252,15 @@ void UpdateInput(void)
 				switch (kb->gamepad[j].type)
 				{
 					case kInputTypeButton:
-						downNow |= 0 != SDL_GameControllerGetButton(gSDLController, kb->gamepad[j].id);
+						downNow |= 0 != SDL_GetGamepadButton(gSDLGamepad, kb->gamepad[j].id);
 						break;
 
 					case kInputTypeAxisPlus:
-						downNow |= SDL_GameControllerGetAxis(gSDLController, kb->gamepad[j].id) > deadZone;
+						downNow |= SDL_GetGamepadAxis(gSDLGamepad, kb->gamepad[j].id) > deadZone;
 						break;
 
 					case kInputTypeAxisMinus:
-						downNow |= SDL_GameControllerGetAxis(gSDLController, kb->gamepad[j].id) < -deadZone;
+						downNow |= SDL_GetGamepadAxis(gSDLGamepad, kb->gamepad[j].id) < -deadZone;
 						break;
 
 					default:
@@ -303,7 +285,7 @@ void UpdateInput(void)
 
 			/* FIRST CHECK ANALOG AXES */
 
-	if (gSDLController)
+	if (gSDLGamepad)
 	{
 		OGLVector2D thumbVec = GetThumbStickVector(false);
 		if (thumbVec.x != 0 || thumbVec.y != 0)
@@ -357,7 +339,7 @@ void UpdateInput(void)
 	gCameraControlDelta.x = 0;
 	gCameraControlDelta.y = 0;
 
-	if (gSDLController)
+	if (gSDLGamepad)
 	{
 		OGLVector2D rsVec = GetThumbStickVector(true);
 		gCameraControlDelta.x -= rsVec.x * 1.0f;
@@ -390,8 +372,12 @@ void UpdateInput(void)
 void CaptureMouse(Boolean doCapture)
 {
 	SDL_PumpEvents();	// Prevent SDL from thinking mouse buttons are stuck as we switch into relative mode
-	SDL_SetRelativeMouseMode(doCapture ? SDL_TRUE : SDL_FALSE);
-	SDL_ShowCursor(doCapture ? 0 : 1);
+	SDL_SetWindowMouseGrab(gSDLWindow, doCapture);
+	SDL_SetWindowRelativeMouseMode(gSDLWindow, doCapture);
+	if (doCapture)
+		SDL_HideCursor();
+	else
+		SDL_ShowCursor();
 //	ClearMouseState();
 	EatMouseEvents();
 	SetMacLinearMouse(doCapture);
@@ -445,7 +431,7 @@ Boolean IsCmdQPressed(void)
 {
 #if __APPLE__
 	return (GetKeyState(SDL_SCANCODE_LGUI) || GetKeyState(SDL_SCANCODE_RGUI))
-		&& GetNewKeyState(SDL_GetScancodeFromKey(SDLK_q));
+		&& GetNewKeyState(SDL_GetScancodeFromKey(SDLK_Q, NULL));
 #else
 	// on non-mac systems, alt-f4 is handled by the system
 	return false;
@@ -462,81 +448,101 @@ Boolean GetCheatKeyCombo(void)
 
 /****************************** SDL JOYSTICK FUNCTIONS ********************************/
 
-SDL_GameController* TryOpenController(bool showMessage)
+SDL_Gamepad* TryOpenGamepad(bool showMessage)
 {
-	if (gSDLController)
-	{
-		printf("Already have a valid controller.\n");
-		return gSDLController;
-	}
+	int numJoysticks = 0;
+	int numJoysticksAlreadyInUse = 0;
 
-	if (SDL_NumJoysticks() == 0)
-	{
-		return NULL;
-	}
+	SDL_JoystickID* joysticks = SDL_GetJoysticks(&numJoysticks);
+	SDL_Gamepad* newGamepad = NULL;
 
-	for (int i = 0; gSDLController == NULL && i < SDL_NumJoysticks(); ++i)
+	for (int i = 0; i < numJoysticks; ++i)
 	{
-		if (SDL_IsGameController(i))
+		SDL_JoystickID joystickID = joysticks[i];
+
+		// Usable as an SDL_Gamepad?
+		if (!SDL_IsGamepad(joystickID))
 		{
-			gSDLController = SDL_GameControllerOpen(i);
-			gSDLJoystickInstanceID = SDL_JoystickGetDeviceInstanceID(i);
+			continue;
+		}
+
+		// Already in use?
+		if (gSDLGamepad && SDL_GetGamepadID(gSDLGamepad) == joystickID)
+		{
+			numJoysticksAlreadyInUse++;
+			continue;
+		}
+
+		// Use this one
+		newGamepad = SDL_OpenGamepad(joystickID);
+		if (newGamepad)
+		{
+			break;
 		}
 	}
 
-	if (!gSDLController)
+	if (newGamepad)
 	{
-		printf("Joystick(s) found, but none is suitable as an SDL_GameController.\n");
+		// OK
+	}
+	else if (numJoysticksAlreadyInUse == numJoysticks)
+	{
+		// No-op; All joysticks already in use (or there might be zero joysticks)
+	}
+	else
+	{
+		SDL_Log("%d joysticks found, but none is suitable as an SDL_Gamepad.", numJoysticks);
 		if (showMessage)
 		{
 			char messageBuf[1024];
-			snprintf(messageBuf, sizeof(messageBuf),
-					 "The game does not support your controller yet (\"%s\").\n\n"
-					 "You can play with the keyboard and mouse instead. Sorry!",
-					 SDL_JoystickNameForIndex(0));
+			SDL_snprintf(messageBuf, sizeof(messageBuf),
+						 "The game does not support your controller yet (\"%s\").\n\n"
+						 "You can play with the keyboard and mouse instead. Sorry!",
+						 SDL_GetJoystickNameForID(joysticks[0]));
 			SDL_ShowSimpleMessageBox(
-					SDL_MESSAGEBOX_WARNING,
-					"Controller not supported",
-					messageBuf,
-					gSDLWindow);
+				SDL_MESSAGEBOX_WARNING,
+				"Controller not supported",
+				messageBuf,
+				gSDLWindow);
 		}
-		return NULL;
 	}
 
-	printf("Opened joystick %d as controller: %s\n", gSDLJoystickInstanceID, SDL_GameControllerName(gSDLController));
+	SDL_free(joysticks);
 
-	return gSDLController;
+	return newGamepad;
 }
 
 void Rumble(float strength, uint32_t ms)
 {
-	if (NULL == gSDLController || !gGamePrefs.gamepadRumble)
+	if (NULL == gSDLGamepad || !gGamePrefs.gamepadRumble)
 		return;
 
-#if !(SDL_VERSION_ATLEAST(2,0,9))
-	#warning Rumble support requires SDL 2.0.9 or later
-#else
-	SDL_GameControllerRumble(gSDLController, (Uint16)(strength * 65535), (Uint16)(strength * 65535), ms);
-#endif
+	// TODO: Read global rumble intensity off prefs
+	float rumbleIntensityFrac = 1;
+
+	SDL_RumbleGamepad(
+		gSDLGamepad,
+		(Uint16)(strength * 65535),
+		(Uint16)(strength * 65535),
+		(Uint32)((float)ms * rumbleIntensityFrac));
 }
 
 void OnJoystickRemoved(SDL_JoystickID which)
 {
-	if (NULL == gSDLController)		// don't care, I didn't open any controller
+	if (NULL == gSDLGamepad)		// don't care, I didn't open any controller
 		return;
 
-	if (which != gSDLJoystickInstanceID)	// don't care, this isn't the joystick I'm using
+	if (which != SDL_GetGamepadID(gSDLGamepad))	// don't care, this isn't the joystick I'm using
 		return;
 
-	printf("Current joystick was removed: %d\n", which);
+	SDL_Log("Current joystick was removed: %d", which);
 
-	// Nuke reference to this controller+joystick
-	SDL_GameControllerClose(gSDLController);
-	gSDLController = NULL;
-	gSDLJoystickInstanceID = -1;
+	// Nuke reference to this SDL_Gamepad
+	SDL_CloseGamepad(gSDLGamepad);
+	gSDLGamepad = NULL;
 
 	// Try to open another joystick if any is connected.
-	TryOpenController(false);
+	TryOpenGamepad(false);
 }
 
 float SnapAngle(float angle, float snap)
@@ -555,8 +561,8 @@ float SnapAngle(float angle, float snap)
 
 static OGLVector2D GetThumbStickVector(bool rightStick)
 {
-	Sint16 dxRaw = SDL_GameControllerGetAxis(gSDLController, rightStick ? SDL_CONTROLLER_AXIS_RIGHTX : SDL_CONTROLLER_AXIS_LEFTX);
-	Sint16 dyRaw = SDL_GameControllerGetAxis(gSDLController, rightStick ? SDL_CONTROLLER_AXIS_RIGHTY : SDL_CONTROLLER_AXIS_LEFTY);
+	Sint16 dxRaw = SDL_GetGamepadAxis(gSDLGamepad, rightStick ? SDL_GAMEPAD_AXIS_RIGHTX : SDL_GAMEPAD_AXIS_LEFTX);
+	Sint16 dyRaw = SDL_GetGamepadAxis(gSDLGamepad, rightStick ? SDL_GAMEPAD_AXIS_RIGHTY : SDL_GAMEPAD_AXIS_LEFTY);
 
 	float dx = dxRaw / 32767.0f;
 	float dy = dyRaw / 32767.0f;

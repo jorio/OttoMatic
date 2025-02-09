@@ -107,7 +107,7 @@ Boolean GetCheatKeyCombo(void);
 void Rumble(float strength, uint32_t ms);
 float SnapAngle(float angle, float snap);
 
-SDL_GameController* TryOpenController(bool showMessageOnFailure);
+SDL_Gamepad* TryOpenGamepad(bool showMessageOnFailure);
 void OnJoystickRemoved(SDL_JoystickID which);
 
 void SetMacLinearMouse(int linear);

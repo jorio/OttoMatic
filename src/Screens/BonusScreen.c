@@ -584,16 +584,16 @@ static void MoveTallyText(ObjNode* theNode)
 			case 0:
 			case 1:
 			case 2:
-				snprintf(text, sizeof(text), "%d", targetTally);
+				SDL_snprintf(text, sizeof(text), "%d", targetTally);
 				break;
 
 			case 3:
 				if (targetTally <= 0)
-					snprintf(text, sizeof(text), "%s", Localize(STR_ALL_HUMANS_RESCUED));
+					SDL_snprintf(text, sizeof(text), "%s", Localize(STR_ALL_HUMANS_RESCUED));
 				else if (targetTally == 1)
-					snprintf(text, sizeof(text), "%s", Localize(STR_1_HUMAN_MISSING));
+					SDL_snprintf(text, sizeof(text), "%s", Localize(STR_1_HUMAN_MISSING));
 				else
-					snprintf(text, sizeof(text), Localize(STR_N_HUMANS_MISSING), targetTally);
+					SDL_snprintf(text, sizeof(text), Localize(STR_N_HUMANS_MISSING), targetTally);
 				break;
 		}
 

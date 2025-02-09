@@ -97,7 +97,7 @@ int		i;
 
 
 	MOMaterialData matData;
-	memset(&matData, 0, sizeof(matData));
+	SDL_memset(&matData, 0, sizeof(matData));
 	matData.setupInfo		= gGameViewInfoPtr;
 	matData.flags			= BG3D_MATERIALFLAG_ALWAYSBLEND;
 	matData.diffuseColor	= (OGLColorRGBA) {1, 1, 1, 1};

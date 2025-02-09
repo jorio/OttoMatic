@@ -3,10 +3,9 @@
 // This file is part of Bugdom. https://github.com/jorio/bugdom
 
 #include "game.h"
-#include <stdbool.h>
-#include <assert.h>
+#include "mousesmoothing.h"
 
-static const int kAccumulatorWindowTicks = 10;
+static const int kAccumulatorWindowNanoseconds = 10 * 1e6;	// 10 ms
 
 #define DELTA_MOUSE_MAX_SNAPSHOTS 64
 
@@ -14,9 +13,9 @@ static bool gNeedInit = true;
 
 typedef struct
 {
-	Uint32 timestamp;
-	int dx;
-	int dy;
+	uint64_t timestamp;
+	float dx;
+	float dy;
 } DeltaMouseSnapshot;
 
 static struct
@@ -24,8 +23,8 @@ static struct
 	DeltaMouseSnapshot snapshots[DELTA_MOUSE_MAX_SNAPSHOTS];
 	int ringStart;
 	int ringLength;
-	int dxAccu;
-	int dyAccu;
+	float dxAccu;
+	float dyAccu;
 } gState;
 
 //-----------------------------------------------------------------------------
@@ -38,7 +37,12 @@ static void PopOldestSnapshot(void)
 	gState.ringStart = (gState.ringStart + 1) % DELTA_MOUSE_MAX_SNAPSHOTS;
 	gState.ringLength--;
 
-	assert(gState.ringLength != 0 || (gState.dxAccu == 0 && gState.dyAccu == 0));
+	if (gState.ringLength <= 0)
+	{
+		GAME_ASSERT(fabsf(gState.dxAccu) < EPS);
+		GAME_ASSERT(fabsf(gState.dyAccu) < EPS);
+		MouseSmoothing_ResetState();
+	}
 }
 
 void MouseSmoothing_ResetState(void)
@@ -57,8 +61,8 @@ void MouseSmoothing_StartFrame(void)
 		gNeedInit = false;
 	}
 
-	Uint32 now = SDL_GetTicks();
-	Uint32 cutoffTimestamp = now - kAccumulatorWindowTicks;
+	uint64_t now = SDL_GetTicksNS();
+	uint64_t cutoffTimestamp = now - kAccumulatorWindowNanoseconds;
 
 	// Purge old snapshots
 	while (gState.ringLength > 0 &&
@@ -78,7 +82,7 @@ void MouseSmoothing_OnMouseMotion(const SDL_MouseMotionEvent* motion)
 
 	if (gState.ringLength == DELTA_MOUSE_MAX_SNAPSHOTS)
 	{
-//		printf("%s: buffer full!!\n", __func__);
+//		SDL_Log("%s: buffer full!!", __func__);
 		PopOldestSnapshot();				// make room at start of ring buffer
 	}
 
@@ -95,8 +99,6 @@ void MouseSmoothing_OnMouseMotion(const SDL_MouseMotionEvent* motion)
 
 void MouseSmoothing_GetDelta(int* dxOut, int* dyOut)
 {
-	assert(gState.ringLength != 0 || (gState.dxAccu == 0 && gState.dyAccu == 0));
-
 	*dxOut = gState.dxAccu;
 	*dyOut = gState.dyAccu;
 }

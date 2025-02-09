@@ -997,7 +997,7 @@ ObjNode	*door = rocket->ChainNode;
 
 	gCoord.y += gDelta.y * gFramesPerSecondFrac;
 
-	if (gCommandLine.skipFluff)
+	if (gSkipFluff)
 		gCoord.y -= gFramesPerSecondFrac * 50000;
 
 			/* MAKE SURE SOUND IS GOING */
@@ -1071,7 +1071,7 @@ float	y;
 	if (gDelta.y < -2000.0f)
 		gDelta.y = -2000.0f;
 
-	if (gCommandLine.skipFluff)
+	if (gSkipFluff)
 		gDelta.y = 7500;
 
 
@@ -1135,7 +1135,7 @@ ObjNode *door = rocket->ChainNode;
 
 	door->Rot.x += gFramesPerSecondFrac * 1.9f;
 
-	if (gCommandLine.skipFluff)
+	if (gSkipFluff)
 		door->Rot.x += gFramesPerSecondFrac * 100;
 
 		/* SEE IF DONE OPENING */
@@ -1153,7 +1153,7 @@ ObjNode *door = rocket->ChainNode;
 			rocket->Mode = ROCKET_MODE_DEPLANE;
 			gDeplaneTimer = 2.5;
 
-			if (gCommandLine.skipFluff)
+			if (gSkipFluff)
 				gDeplaneTimer *= 0.1f;
 
 			MorphToSkeletonAnim(gPlayerInfo.objNode->Skeleton, PLAYER_ANIM_WALK, 8);	// start robot walking

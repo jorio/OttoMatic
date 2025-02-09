@@ -56,7 +56,7 @@ void DoLegalScreen(void)
 		.scale = 0.5f,
 		.slot = SPRITE_SLOT + 1
 	};
-	ObjNode* versionText = TextMesh_New("version " PROJECT_VERSION, kTextMeshAlignCenter, &versionDef);
+	ObjNode* versionText = TextMesh_New("version " GAME_VERSION, kTextMeshAlignCenter, &versionDef);
 	versionText->ColorFilter = (OGLColorRGBA) {0.3f, 0.5f, 0.2f, 1.0f};
 
 		/***********/

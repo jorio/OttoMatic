@@ -458,7 +458,7 @@ void InitSoundTools(void)
 
 			/* INIT BANK INFO */
 
-	memset(gLoadedEffects, 0, sizeof(gLoadedEffects));
+	SDL_memset(gLoadedEffects, 0, sizeof(gLoadedEffects));
 
 			/******************/
 			/* ALLOC CHANNELS */
@@ -567,7 +567,7 @@ void DisposeSoundEffect(int effectNum)
 	if (loadedSound->sndHandle)
 	{
 		DisposeHandle((Handle) loadedSound->sndHandle);
-		memset(loadedSound, 0, sizeof(LoadedEffect));
+		SDL_memset(loadedSound, 0, sizeof(LoadedEffect));
 	}
 }
 

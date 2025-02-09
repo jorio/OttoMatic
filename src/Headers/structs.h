@@ -354,14 +354,3 @@ typedef struct
 	float		rot,scale;
 	ObjNode		*autoChain;
 }NewObjectDefinitionType;
-
-
-		/* COMMAND LINE OPTIONS */
-
-typedef struct
-{
-	int		fullscreenWidth;
-	int		fullscreenHeight;
-	int		fullscreenRefreshRate;
-	bool	skipFluff;
-} CommandLineOptions;

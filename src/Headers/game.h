@@ -22,13 +22,13 @@ extern "C"
 
 		/* HEADERS */
 
-#include <SDL.h>
-#include <SDL_opengl.h>
-#include <SDL_opengl_glext.h>
-#include <stdio.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_opengl.h>
+#include <SDL3/SDL_opengl_glext.h>
 
 #include "Pomme.h"
 
+#include "version.h"
 #include "pool.h"
 #include "globals.h"
 #include "structs.h"
@@ -105,6 +105,7 @@ extern	Boolean					gPlayerFellIntoBottomlessPit;
 extern	Boolean					gPlayerHasLanded;
 extern	Boolean					gPlayerIsDead;
 extern	Boolean					gPlayingFromSavedGame;
+extern	Boolean					gSkipFluff;
 extern	Boolean					gUserPrefersGamepad;
 extern	Byte					**gMapSplitMode;
 extern	Byte					gDebugMode;
@@ -112,7 +113,6 @@ extern	Byte					gHumansInSaucerList[];
 extern	ChannelInfoType			gChannelInfo[];
 extern	CollisionBoxType 		*gSaucerIceBounds;
 extern	CollisionRec			gCollisionList[];
-extern	CommandLineOptions		gCommandLine;
 extern	FSSpec					gDataSpec;
 extern	FenceDefType			*gFenceList;
 extern	HighScoreType			gHighScores[];
@@ -154,7 +154,7 @@ extern	Pool 					*gParticleGroupPool;
 extern	Pool					*gShardPool;
 extern	Pool					*gSparklePool;
 extern	PrefsType				gGamePrefs;
-extern	SDL_GameController		*gSDLController;
+extern	SDL_Gamepad				*gSDLGamepad;
 extern	SDL_GLContext			gAGLContext;
 extern	SDL_Window				*gSDLWindow;
 extern	SparkleType				gSparkles[MAX_SPARKLES];
@@ -168,7 +168,7 @@ extern	TerrainItemEntryType	**gMasterItemList;
 extern	TileAttribType			**gTileAttribList;
 extern	WaterDefType			**gWaterListHandle;
 extern	WaterDefType			*gWaterList;
-extern	char					gTextInput[SDL_TEXTINPUTEVENT_TEXT_SIZE];
+extern	char					gTextInput[64];
 extern	const KeyBinding		kDefaultKeyBindings[NUM_CONTROL_NEEDS];
 extern	const MenuStyle			kDefaultMenuStyle;
 extern	const OGLPoint3D		gPlayerMuzzleTipOff;
@@ -193,6 +193,7 @@ extern	float					gDeathTimer;
 extern	float					gDischargeTimer;
 extern	float					gFramesPerSecond;
 extern	float					gFramesPerSecondFrac;
+extern	float					gGammaFadeFrac;
 extern	float					gGlobalTransparency;
 extern	float					gGravity;
 extern	float					gHumanScaleRatio;

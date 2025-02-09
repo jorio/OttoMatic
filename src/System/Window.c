@@ -67,7 +67,7 @@ void InitWindowStuff(void)
 
 void OGL_FadeOutScene(void (*drawCall)(void), void (*moveCall)(void))
 {
-	if (gCommandLine.skipFluff)
+	if (gSkipFluff)
 		return;
 
 	ObjNode* fader = MakeFadeEvent(false, 3.0f);
@@ -116,7 +116,7 @@ void OGL_FadeOutScene(void (*drawCall)(void), void (*moveCall)(void))
 
 void GammaOn(void)
 {
-	if (gCommandLine.skipFluff)
+	if (gSkipFluff)
 		return;
 
 	if (gGammaFadeFrac != 1.0f)
@@ -254,52 +254,104 @@ void Exit2D(void)
 #if !__APPLE__
 	SDL_PumpEvents();
 	SDL_ShowWindow(gSDLWindow);
-	SetFullscreenModeFromPrefs();
+	SetFullscreenMode(false);
 #endif
 }
 
 
-/******************* SET FULLSCREEN MODE FROM PREFS **************/
+/******************** GET DEFAULT WINDOW SIZE *******************/
 
-void SetFullscreenModeFromPrefs(void)
+void GetDefaultWindowSize(SDL_DisplayID display, int* width, int* height)
+{
+	const float aspectRatio = 16.0 / 9.0f;
+	const float screenCoverage = .8f;
+
+	SDL_Rect displayBounds = { .x = 0, .y = 0, .w = 640, .h = 480 };
+	SDL_GetDisplayUsableBounds(display, &displayBounds);
+
+	if (displayBounds.w > displayBounds.h)
+	{
+		*width = displayBounds.h * screenCoverage * aspectRatio;
+		*height = displayBounds.h * screenCoverage;
+	}
+	else
+	{
+		*width = displayBounds.w * screenCoverage;
+		*height = displayBounds.w * screenCoverage / aspectRatio;
+	}
+}
+
+/******************** GET NUM DISPLAYS *******************/
+
+int GetNumDisplays(void)
+{
+	int numDisplays = 0;
+	SDL_DisplayID* displays = SDL_GetDisplays(&numDisplays);
+	SDL_free(displays);
+	return numDisplays;
+}
+
+/******************** MOVE WINDOW TO PREFERRED DISPLAY *******************/
+//
+// This works best in windowed mode.
+// Turn off fullscreen before calling this!
+//
+
+void MoveToPreferredDisplay(void)
+{
+	if (gGamePrefs.displayNumMinus1 >= GetNumDisplays())
+	{
+		gGamePrefs.displayNumMinus1 = 0;
+	}
+
+	SDL_DisplayID display = gGamePrefs.displayNumMinus1 + 1;
+
+	int w = 640;
+	int h = 480;
+	GetDefaultWindowSize(display, &w, &h);
+	SDL_SetWindowSize(gSDLWindow, w, h);
+	SDL_SyncWindow(gSDLWindow);
+
+	int centered = SDL_WINDOWPOS_CENTERED_DISPLAY(display);
+	SDL_SetWindowPosition(gSDLWindow, centered, centered);
+	SDL_SyncWindow(gSDLWindow);
+}
+
+/*********************** SET FULLSCREEN MODE **********************/
+
+void SetFullscreenMode(bool enforceDisplayPref)
 {
 	if (!gGamePrefs.fullscreen)
 	{
 		SDL_SetWindowFullscreen(gSDLWindow, 0);
-		SDL_SetWindowPosition(gSDLWindow,
-							  SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.preferredDisplay),
-							  SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.preferredDisplay));
+		SDL_SyncWindow(gSDLWindow);
+
+		if (enforceDisplayPref)
+		{
+			MoveToPreferredDisplay();
+		}
 	}
 	else
 	{
-		// We must switch back to windowed mode for the preferred monitor to take effect
-		SDL_SetWindowFullscreen(gSDLWindow, 0);
-		SDL_SetWindowPosition(gSDLWindow,
-							  SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.preferredDisplay),
-							  SDL_WINDOWPOS_CENTERED_DISPLAY(gGamePrefs.preferredDisplay));
+		if (enforceDisplayPref)
+		{
+			SDL_DisplayID currentDisplay = SDL_GetDisplayForWindow(gSDLWindow);
+			SDL_DisplayID desiredDisplay = gGamePrefs.displayNumMinus1 + 1;
 
-		if (gCommandLine.fullscreenWidth <= 0 || gCommandLine.fullscreenHeight <= 0)
-		{
-			// No custom fullscreen resolution specified.
-			// Enter windowed fullscreen mode.
-			SDL_SetWindowFullscreen(gSDLWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-		}
-		else
-		{
-			SDL_DisplayMode mode =
+			if (currentDisplay != desiredDisplay)
 			{
-					.w = gCommandLine.fullscreenWidth,
-					.h = gCommandLine.fullscreenHeight,
-					.refresh_rate = gCommandLine.fullscreenRefreshRate,
-					.format = SDL_PIXELFORMAT_UNKNOWN,
-					.driverdata = NULL,
-			};
-			SDL_SetWindowDisplayMode(gSDLWindow, &mode);
-			SDL_SetWindowFullscreen(gSDLWindow, SDL_WINDOW_FULLSCREEN);
+				// We must switch back to windowed mode for the preferred monitor to take effect
+				SDL_SetWindowFullscreen(gSDLWindow, false);
+				SDL_SyncWindow(gSDLWindow);
+				MoveToPreferredDisplay();
+			}
 		}
+
+		// Enter fullscreen mode
+		SDL_SetWindowFullscreen(gSDLWindow, true);
+		SDL_SyncWindow(gSDLWindow);
 	}
 
 	SDL_GL_SetSwapInterval(gGamePrefs.vsync);
-
 	EatMouseEvents();
 }

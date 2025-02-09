@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <math.h>
+
 #define OGLMath_RadiansToDegrees(x)	((float)((x) * 180.0f / PI))
 #define OGLMath_DegreesToRadians(x)	((float)((x) * PI / 180.0f))
 

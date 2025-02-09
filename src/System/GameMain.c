@@ -54,6 +54,7 @@ static const short kLevelSongs[NUM_LEVELS] =
 
 Boolean				gG4 = true;
 Boolean				gIsInGame = false;
+Boolean				gSkipFluff = false;
 
 float				gGravity = NORMAL_GRAVITY;
 
@@ -64,9 +65,6 @@ uint32_t			gAutoFadeStatusBits;
 OGLSetupOutputType		*gGameViewInfoPtr = nil;
 
 PrefsType			gGamePrefs;
-
-FSSpec				gDataSpec;
-
 
 OGLVector3D			gWorldSunDirection = { .5, -.35, .8};		// also serves as lense flare vector
 OGLColorRGBA		gFillColor1 = { .9, .9, 0.85, 1};
@@ -99,32 +97,19 @@ uint32_t			gLoadedScore;
 
 
 /****************** TOOLBOX INIT  *****************/
+//
+// Note: the preferences are loaded in Main.cpp
+//
 
 void ToolBoxInit(void)
 {
-	MyFlushEvents();
-
-			/* BOOT OGL */
+	SetFullscreenMode(true);
 
 	OGL_Boot();
 
-
  	InitInput();
 
-
-			/*********************/
-			/* APPLY PREFERENCES */
-			/*********************/
-			//
-			// Note: the preferences are loaded in Main.cpp
-			//
-
 	LoadLocalizedStrings(gGamePrefs.language);
-
-	if (gSDLWindow)
-	{
-		SetFullscreenModeFromPrefs();
-	}
 
 	MyFlushEvents();
 }
@@ -134,7 +119,7 @@ void ToolBoxInit(void)
 
 void InitDefaultPrefs(void)
 {
-	memset(&gGamePrefs, 0, sizeof(gGamePrefs));
+	SDL_memset(&gGamePrefs, 0, sizeof(gGamePrefs));
 
 	gGamePrefs.language						= GetBestLanguageIDFromSystemLocale();
 	gGamePrefs.fullscreen					= true;
@@ -142,7 +127,7 @@ void InitDefaultPrefs(void)
 	gGamePrefs.uiCentering					= false;
 	gGamePrefs.uiScaleLevel					= DEFAULT_UI_SCALE_LEVEL;
 	gGamePrefs.autoAlignCamera				= true;
-	gGamePrefs.preferredDisplay				= 0;
+	gGamePrefs.displayNumMinus1				= 0;
 	gGamePrefs.antialiasingLevel			= 0;
 	gGamePrefs.music						= true;
 	gGamePrefs.playerRelControls			= false;
@@ -891,7 +876,7 @@ DeformationType		defData;
 
 	InitCamera();
 
-	SDL_ShowCursor(0);							// do this again to be sure!
+	SDL_HideCursor();							// do this again to be sure!
  }
 
 
@@ -899,7 +884,7 @@ DeformationType		defData;
 
 static void CleanupLevel(void)
 {
-	memset(gRocketShipHotZone, 0, sizeof(gRocketShipHotZone));
+	SDL_memset(gRocketShipHotZone, 0, sizeof(gRocketShipHotZone));
 
 	StopAllEffectChannels();
  	EmptySplineObjectList();
@@ -939,7 +924,7 @@ static void CheckBootCheats(void)
 
 	if (GetKeyState(SDL_SCANCODE_F))
 	{
-		gCommandLine.skipFluff = 1;
+		gSkipFluff = true;
 	}
 
 		/* TEST HIGH SCORE SCREEN: HOLD DOWN MINUS KEY AFTER LEGAL SCREEN */
@@ -1016,7 +1001,7 @@ void GameMain(void)
 		SetMyRandomSeed((uint32_t) someLong);
 	}
 
-	SDL_ShowCursor(0);
+	SDL_HideCursor();
 
 	Pomme_FlushPtrTracking(false);
 

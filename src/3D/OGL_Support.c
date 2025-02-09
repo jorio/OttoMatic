@@ -11,7 +11,6 @@
 /****************************/
 
 #include "game.h"
-#include "version.h"
 
 /****************************/
 /*    PROTOTYPES            */
@@ -183,7 +182,7 @@ void OGL_SetupWindow(OGLSetupInputType *setupDefPtr)
 {
 	GAME_ASSERT_MESSAGE(gGameViewInfoPtr == NULL, "gGameViewInfoPtr is already active");
 
-	SDL_ShowCursor(0);	// do this just as a safety precaution to make sure no cursor lingering around
+	SDL_HideCursor();	// safety precaution to make sure no cursor lingering around
 
 			/* ALLOC MEMORY FOR OUTPUT DATA */
 
@@ -265,8 +264,8 @@ static void OGL_CreateDrawContext(void)
 
 			/* ACTIVATE CONTEXT */
 
-	int mkc = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);
-	GAME_ASSERT_MESSAGE(mkc == 0, SDL_GetError());
+	bool didMakeCurrent = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);
+	GAME_ASSERT_MESSAGE(didMakeCurrent, SDL_GetError());
 
 
 			/* GET OPENGL EXTENSIONS */
@@ -301,7 +300,7 @@ static void OGL_DisposeDrawContext(void)
 	}
 
 	SDL_GL_MakeCurrent(gSDLWindow, NULL);		// make context not current
-	SDL_GL_DeleteContext(gAGLContext);			// nuke context
+	SDL_GL_DestroyContext(gAGLContext);			// nuke context
 	gAGLContext = nil;
 }
 
@@ -502,8 +501,8 @@ void OGL_DrawScene(void (*drawRoutine)(void))
 	GAME_ASSERT(gGameViewInfoPtr);						// make sure it's legit
 	GAME_ASSERT(gGameViewInfoPtr->isActive);
 
-	int makeCurrentRC = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);		// make context active
-	GAME_ASSERT_MESSAGE(makeCurrentRC == 0, SDL_GetError());
+	bool didMakeCurrent = SDL_GL_MakeCurrent(gSDLWindow, gAGLContext);		// make context active
+	GAME_ASSERT_MESSAGE(didMakeCurrent, SDL_GetError());
 
 
 	if (gGammaFadeFrac <= 0)							// if we just finished fading out and haven't started fading in yet, just show black
@@ -655,7 +654,7 @@ do_anaglyph:
 	else if (gDebugMode == 1 || gDebugMode == 2)
 	{
 		char debugString[1024];
-		snprintf(
+		SDL_snprintf(
 			debugString,
 			sizeof(debugString),
 			"fps:\t\t%d\n"
@@ -689,7 +688,7 @@ do_anaglyph:
 			"cam user rot:\t\t%.3f\n"
 			"cam ctrl dX:\t\t%.3f\n"
 #endif
-			"\n\n\n\n\n\n\n\nOtto Matic %s, %s\n%s, OpenGL %s, %s"
+			"\n\n\n\n\n\n\n\nOtto Matic %s, SDL %s\n%s, OpenGL %s, %s"
 			,
 			(int)(gFramesPerSecond+.5f),
 			gPolysThisFrame,
@@ -723,7 +722,7 @@ do_anaglyph:
 			gCameraUserRotY,
 			gCameraControlDelta.x,
 #endif
-			PROJECT_VERSION,
+			GAME_VERSION,
 			SDL_GetRevision(),
 			(const char*) glGetString(GL_RENDERER),
 			(const char*) glGetString(GL_VERSION),
@@ -764,7 +763,7 @@ void OGL_GetCurrentViewport(int *x, int *y, int *w, int *h)
 {
 int	t,b,l,r;
 
-	SDL_GL_GetDrawableSize(gSDLWindow, &gGameWindowWidth, &gGameWindowHeight);
+	SDL_GetWindowSizeInPixels(gSDLWindow, &gGameWindowWidth, &gGameWindowHeight);
 
 	t = gGameViewInfoPtr->clip.top;
 	b = gGameViewInfoPtr->clip.bottom;
@@ -1376,7 +1375,7 @@ GLenum _OGL_CheckError(const char* file, const int line)
 	if (error != 0)
 	{
 		static char buf[256];
-		snprintf(buf, 256, "OpenGL Error 0x%x in %s:%d", error, file, line);
+		SDL_snprintf(buf, 256, "OpenGL Error 0x%x in %s:%d", error, file, line);
 		DoFatalAlert(buf);
 	}
 	return error;
@@ -1515,7 +1514,7 @@ void OGL_DisableLighting(void)
 static void OGL_InitFont(void)
 {
 	NewObjectDefinitionType newObjDef;
-	memset(&newObjDef, 0, sizeof(newObjDef));
+	SDL_memset(&newObjDef, 0, sizeof(newObjDef));
 	newObjDef.flags = STATUS_BIT_HIDDEN;
 	newObjDef.slot = DEBUGOVERLAY_SLOT;
 	newObjDef.scale = 0.45f;

@@ -1804,8 +1804,8 @@ static const Byte gridMask[(SUPERTILE_ACTIVE_RANGE+SUPERTILE_ITEMRING_MARGIN)*2]
 
 				/* SEE IF ROW/COLUMN HAVE CHANGED */
 
-	long deltaRow = labs(gCurrentSuperTileRow - gPreviousSuperTileRow);
-	long deltaCol = labs(gCurrentSuperTileCol - gPreviousSuperTileCol);
+	int deltaRow = SDL_abs(gCurrentSuperTileRow - gPreviousSuperTileRow);
+	int deltaCol = SDL_abs(gCurrentSuperTileCol - gPreviousSuperTileCol);
 
 	if (deltaRow || deltaCol)
 	{

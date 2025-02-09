@@ -12,6 +12,11 @@
 /*                       CALLBACKS                             */
 /***************************************************************/
 
+static void cb_Fullscreen(void)
+{
+	SetFullscreenMode(true);
+}
+
 static void cb_SetLanguage(void)
 {
 	LoadLocalizedStrings(gGamePrefs.language);
@@ -30,7 +35,7 @@ static void cb_ResetKeyBindings(void)
 {
 	for (int i = 0; i < NUM_REMAPPABLE_NEEDS; i++)
 	{
-		memcpy(gGamePrefs.remappableKeys[i].key, kDefaultKeyBindings[i].key, sizeof(gGamePrefs.remappableKeys[i].key));
+		SDL_memcpy(gGamePrefs.remappableKeys[i].key, kDefaultKeyBindings[i].key, sizeof(gGamePrefs.remappableKeys[i].key));
 	}
 
 	MyFlushEvents();
@@ -42,7 +47,7 @@ static void cb_ResetPadBindings(void)
 {
 	for (int i = 0; i < NUM_REMAPPABLE_NEEDS; i++)
 	{
-		memcpy(gGamePrefs.remappableKeys[i].gamepad, kDefaultKeyBindings[i].gamepad, sizeof(gGamePrefs.remappableKeys[i].gamepad));
+		SDL_memcpy(gGamePrefs.remappableKeys[i].gamepad, kDefaultKeyBindings[i].gamepad, sizeof(gGamePrefs.remappableKeys[i].gamepad));
 	}
 
 	MyFlushEvents();
@@ -64,21 +69,21 @@ static void cb_ResetMouseBindings(void)
 
 static const char* GenerateGamepadLabel(void)
 {
-	if (gSDLController)
-		return SDL_GameControllerName(gSDLController);
+	if (gSDLGamepad)
+		return SDL_GetGamepadName(gSDLGamepad);
 	else
 		return Localize(STR_NO_GAMEPAD_DETECTED);
 }
 
 static uint8_t GenerateNumDisplays(void)
 {
-	int numDisplays = SDL_GetNumVideoDisplays();
+	int numDisplays = GetNumDisplays();
 	return ClampInt(numDisplays, 1, 255);
 }
 
 static const char* GenerateDisplayName(char* buf, int bufSize, Byte value)
 {
-	snprintf(buf, bufSize, "%s %d", Localize(STR_DISPLAY), 1 + (int)value);
+	SDL_snprintf(buf, bufSize, "%s %d", Localize(STR_DISPLAY), 1 + (int)value);
 	return buf;
 }
 
@@ -329,7 +334,7 @@ static const MenuItem gSettingsMenu[] =
 		{
 			.callback = cb_SetLanguage,
 			.valuePtr = &gGamePrefs.language,
-			.numChoices = MAX_LANGUAGES,
+			.numChoices = NUM_LANGUAGES,
 			.generateChoiceString = GenerateCurrentLanguageName,
 		},
 	},
@@ -372,7 +377,7 @@ static const MenuItem gSettingsMenu[] =
 		.text = STR_FULLSCREEN,
 		.cycler =
 		{
-			.callback = SetFullscreenModeFromPrefs,
+			.callback = cb_Fullscreen,
 			.valuePtr = &gGamePrefs.fullscreen,
 			.numChoices = 2,
 			.choices = {STR_OFF, STR_ON},
@@ -384,7 +389,7 @@ static const MenuItem gSettingsMenu[] =
 		.text = STR_VSYNC,
 		.cycler =
 		{
-			.callback = SetFullscreenModeFromPrefs,
+			.callback = cb_Fullscreen,
 			.valuePtr = &gGamePrefs.vsync,
 			.numChoices = 2,
 			.choices = {STR_OFF, STR_ON},
@@ -396,14 +401,13 @@ static const MenuItem gSettingsMenu[] =
 		.text = STR_PREFERRED_DISPLAY,
 		.cycler =
 		{
-			.callback = SetFullscreenModeFromPrefs,
-			.valuePtr = &gGamePrefs.preferredDisplay,
+			.callback = cb_Fullscreen,
+			.valuePtr = &gGamePrefs.displayNumMinus1,
 			.generateNumChoices = GenerateNumDisplays,
 			.generateChoiceString = GenerateDisplayName,
 		},
 	},
 
-#if !(__APPLE__)
 	{
 		.type = kMenuItem_Cycler,
 		.text = STR_ANTIALIASING,
@@ -414,7 +418,6 @@ static const MenuItem gSettingsMenu[] =
 			.choices = {STR_OFF, STR_MSAA_2X, STR_MSAA_4X, STR_MSAA_8X},
 		}
 	},
-#endif
 
 	{
 		.type = kMenuItem_Cycler,
@@ -477,7 +480,7 @@ void DoSettingsOverlay(void (*updateRoutine)(void),
 	StartMenu(gSettingsMenu, nil, updateRoutine, backgroundDrawRoutine);
 
 	// Save prefs if any changes
-	if (0 != memcmp(&gGamePrefs, &gPreviousPrefs, sizeof(gGamePrefs)))
+	if (0 != SDL_memcmp(&gGamePrefs, &gPreviousPrefs, sizeof(gGamePrefs)))
 		SavePrefs();
 
 	gAllowAudioKeys = true;

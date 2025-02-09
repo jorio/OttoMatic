@@ -96,7 +96,7 @@ void InitParticleSystem(void)
 
 			/* INIT GROUP ARRAY */
 
-	memset(gParticleGroups, 0, sizeof(gParticleGroups));
+	SDL_memset(gParticleGroups, 0, sizeof(gParticleGroups));
 
 	for (int i = 0; i < MAX_PARTICLE_GROUPS; i++)
 	{

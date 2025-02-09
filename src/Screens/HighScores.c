@@ -68,7 +68,7 @@ static void UpdateNewNameMesh(void)
 	GAME_ASSERT(gNewScoreNameMesh);
 	DeleteObject(gNewScoreNameMesh);
 
-	memset(&gNewObjectDefinition, 0, sizeof(gNewObjectDefinition));
+	SDL_memset(&gNewObjectDefinition, 0, sizeof(gNewObjectDefinition));
 	gNewObjectDefinition.slot		= SLOT_OF_DUMB+100;
 	gNewObjectDefinition.moveCall	= nil;
 	gNewObjectDefinition.flags		= 0;
@@ -292,6 +292,7 @@ void NewScore(void)
 		return;
 
 	gAllowAudioKeys = false;					// dont interfere with name editing
+	SDL_StartTextInput(gSDLWindow);
 
 			/* INIT */
 
@@ -345,6 +346,7 @@ void NewScore(void)
 
 
 	gAllowAudioKeys = true;
+	SDL_StopTextInput(gSDLWindow);
 }
 
 
@@ -710,7 +712,7 @@ static void StartEnterName(void)
 	gNewScoreNameMesh = SetupHighScoreTableObjNodes(nil, gNewScoreSlot);
 
 
-	memset(&gNewObjectDefinition, 0, sizeof(gNewObjectDefinition));
+	SDL_memset(&gNewObjectDefinition, 0, sizeof(gNewObjectDefinition));
 	gNewObjectDefinition.slot		= SLOT_OF_DUMB+100;
 	gNewObjectDefinition.moveCall	= nil;
 	gNewObjectDefinition.flags		= 0;
@@ -833,7 +835,7 @@ err:
 
 void ClearHighScores(void)
 {
-	memset(gHighScores, 0, sizeof(gHighScores));
+	SDL_memset(gHighScores, 0, sizeof(gHighScores));
 
 	SaveHighScores();
 }
@@ -864,7 +866,7 @@ got_slot:
 	for (i = NUM_SCORES-1; i > slot; i--)						// make hole
 		gHighScores[i] = gHighScores[i-1];
 	gHighScores[slot].score = newScore;							// set score in structure
-	memset(gHighScores[slot].name, 0, sizeof(gHighScores[slot].name));
+	SDL_memset(gHighScores[slot].name, 0, sizeof(gHighScores[slot].name));
 	return(slot);
 }
 

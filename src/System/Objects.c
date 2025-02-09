@@ -74,16 +74,16 @@ void InitObjectManager(void)
 
 		/* INIT OBJECT POOL */
 
-	memset(gObjNodeMemory, 0, sizeof(gObjNodeMemory));
+	SDL_memset(gObjNodeMemory, 0, sizeof(gObjNodeMemory));
 	gObjNodePool = Pool_New(OBJ_BUDGET);
 
 		/* INIT NEW OBJ DEF */
 
-	memset(&gNewObjectDefinition, 0, sizeof(gNewObjectDefinition));
+	SDL_memset(&gNewObjectDefinition, 0, sizeof(gNewObjectDefinition));
 	gNewObjectDefinition.scale = 1;
 
 #if _DEBUG
-	printf("ObjNode pool: %d KB\n", (int)(sizeof(gObjNodeMemory) / 1024));
+	SDL_Log("ObjNode pool: %d KB", (int)(sizeof(gObjNodeMemory) / 1024));
 #endif
 }
 
@@ -120,7 +120,7 @@ uint32_t flags = newObjDef->flags;
 
 			/* INITIALIZE ALL OF THE FIELDS */
 
-	memset(newNodePtr, 0, sizeof(ObjNode));
+	SDL_memset(newNodePtr, 0, sizeof(ObjNode));
 
 	slot = newObjDef->slot;
 

@@ -971,11 +971,11 @@ static const char* GetShortNameForInputNeed(int need)
 		switch (type)
 		{
 			case kInputTypeButton:
-				return SDL_GameControllerGetStringForButton(id);
+				return SDL_GetGamepadStringForButton(id);
 
 			case kInputTypeAxisMinus:
 			case kInputTypeAxisPlus:
-				return SDL_GameControllerGetStringForAxis(id);
+				return SDL_GetGamepadStringForAxis(id);
 		}
 	}
 	else
@@ -1045,7 +1045,7 @@ static const char* FormatHelpMessage(const char* localized, int need)
 				i++;
 				k++;
 			}
-			//i += snprintf(buf+i, N-i, "%s", keyDesc);
+			//i += SDL_snprintf(buf+i, N-i, "%s", keyDesc);
 		}
 		else
 		{
