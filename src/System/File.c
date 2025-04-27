@@ -468,7 +468,10 @@ PrefsType	prefBuffer;
 	FSMakeFSSpec(gPrefsFolderVRefNum, gPrefsFolderDirID, PREFS_FILE_NAME, &file);
 	iErr = FSpOpenDF(&file, fsRdPerm, &refNum);
 	if (iErr)
+	{
+		InitDefaultPrefs();
 		return(iErr);
+	}
 
 				/* CHECK FILE LENGTH */
 
