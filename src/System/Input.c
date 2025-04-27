@@ -89,6 +89,8 @@ static inline void UpdateKeyState(KeyState* state, bool downNow)
 
 void InitInput(void)
 {
+	// Open a connected gamepad on startup.
+	TryOpenGamepad(true);
 }
 
 void UpdateInput(void)
@@ -477,6 +479,7 @@ SDL_Gamepad* TryOpenGamepad(bool showMessage)
 		newGamepad = SDL_OpenGamepad(joystickID);
 		if (newGamepad)
 		{
+			gSDLGamepad = newGamepad;
 			break;
 		}
 	}
@@ -576,7 +579,7 @@ static OGLVector2D GetThumbStickVector(bool rightStick)
 	else
 	{
 		float magnitude;
-		
+
 		if (magnitudeSquared > 1.0f)
 		{
 			// Cap magnitude -- what's returned by the controller actually lies within a square
