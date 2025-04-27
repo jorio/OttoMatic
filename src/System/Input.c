@@ -90,7 +90,7 @@ static inline void UpdateKeyState(KeyState* state, bool downNow)
 void InitInput(void)
 {
 	// Open a connected gamepad on startup.
-	TryOpenGamepad(false);
+	TryOpenGamepad(true);
 }
 
 void UpdateInput(void)
